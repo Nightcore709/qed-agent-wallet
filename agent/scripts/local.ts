@@ -14,14 +14,15 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { createPublicClient, http, parseEther, type Hex } from "viem";
 import { ensureDevKeys, loadEnvFile } from "../src/config.js";
 
-loadEnvFile(".keys.env");
+loadEnvFile(process.env.KEYS_FILE ?? ".keys.env");
+const SCRIPT = process.env.SCRIPT ?? "agent/scripts/live.ts";
 const shadowOf = process.env.SHADOW_OF ? Number(process.env.SHADOW_OF) : undefined;
 const chainId = shadowOf ?? 31337;
 const port = Number(process.env.ANVIL_PORT ?? 8545);
 const rpc = `http://127.0.0.1:${port}`;
 
 async function main() {
-  if (!shadowOf && ensureDevKeys()) console.log("no .keys.env found → using deterministic DEV keys (local chain only)");
+  if (!shadowOf && !process.env.KEYS_FILE && ensureDevKeys()) console.log("no .keys.env found → using deterministic DEV keys (local chain only)");
   if (shadowOf && !process.env.DEPLOYER_PK) throw new Error("replica mode needs the real role keys in .keys.env");
   const anvil = spawn("anvil", ["--port", String(port), "--chain-id", String(chainId), "--hardfork", "osaka", "--base-fee", "21", "--gas-limit", "60000000", "--silent"], { stdio: "ignore" });
   const pub = createPublicClient({ transport: http(rpc) });
@@ -35,7 +36,7 @@ async function main() {
   }
   // Same starting ETH as the real deployer (0.05 Sepolia ETH from the faucet); every other role starts at 0.
   const startBal = process.env.DEPLOYER_START_WEI ? BigInt(process.env.DEPLOYER_START_WEI) : parseEther(process.env.DEPLOYER_START_ETH ?? "0.05");
-  await (pub as any).request({ method: "anvil_setBalance", params: [process.env.DEPLOYER_ADDR, `0x${startBal.toString(16)}`] });
+  if (process.env.DEPLOYER_ADDR) await (pub as any).request({ method: "anvil_setBalance", params: [process.env.DEPLOYER_ADDR, `0x${startBal.toString(16)}`] });
   if (process.env.DEPLOYER_START_NONCE) {
     // mirror the public chain exactly: nonces already used there must be used here too
     await (pub as any).request({ method: "anvil_setNonce", params: [process.env.DEPLOYER_ADDR, `0x${Number(process.env.DEPLOYER_START_NONCE).toString(16)}`] });
@@ -58,7 +59,7 @@ async function main() {
     EVIDENCE_DIR: process.env.EVIDENCE_DIR ?? (shadowOf ? `evidence/shadow-${chainId}` : "evidence/local"),
   };
   const code = await new Promise<number>((resolve) => {
-    const p = spawn(process.execPath, ["--import", "tsx", "agent/scripts/live.ts"], { env, stdio: "inherit" });
+    const p = spawn(process.execPath, ["--import", "tsx", SCRIPT], { env, stdio: "inherit" });
     p.on("exit", (c) => resolve(c ?? 1));
   });
 
@@ -87,8 +88,9 @@ async function main() {
       }
     }
     mkdirSync("relay", { recursive: true });
-    writeFileSync(`relay/outbox-${chainId}.json`, JSON.stringify(outbox, null, 1));
-    console.log(`\nexported ${outbox.length} signed transactions → relay/outbox-${chainId}.json`);
+    const outName = process.env.OUTBOX_NAME ?? `outbox-${chainId}`;
+    writeFileSync(`relay/${outName}.json`, JSON.stringify(outbox, null, 1));
+    console.log(`\nexported ${outbox.length} signed transactions → relay/${outName}.json`);
   }
   anvil.kill();
   process.exit(code);

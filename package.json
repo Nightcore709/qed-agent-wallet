@@ -21,7 +21,10 @@
     "build:app": "tsx agent/scripts/build-app.ts",
     "typecheck": "tsc --noEmit -p .",
     "resume": "tsx agent/scripts/resume.ts",
-    "evidence:md": "tsx agent/scripts/evidence-md.ts"
+    "evidence:md": "tsx agent/scripts/evidence-md.ts",
+    "fixtures:clearing": "tsx agent/scripts/fixtures-clearing.ts",
+    "clearing": "tsx agent/scripts/clearing.ts",
+    "local:clearing": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/clearing.ts EVIDENCE_DIR=evidence/local-clearing tsx agent/scripts/local.ts"
   },
   "dependencies": {
     "viem": "^2.21.55"

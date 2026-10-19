@@ -16,3 +16,4 @@ deployments/31337.json
 *.log
 .DS_Store
 .scratch/
+evidence/local-clearing/
