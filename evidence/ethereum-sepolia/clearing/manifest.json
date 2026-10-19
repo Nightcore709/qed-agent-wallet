@@ -19,7 +19,7 @@
   "contracts": {
     "token": "0x6753a8ea4560f07534bcfbca2dea790afb9552d4",
     "clearing": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
-    "deployBlock": "2"
+    "deployBlock": "11949578"
   },
   "final": {
     "gross": "200000000",

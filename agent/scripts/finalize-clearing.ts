@@ -33,6 +33,8 @@ for (const s of manifest.steps) {
   labels.set(s.tx.hash.toLowerCase(), `${s.id} · ${s.title}`);
 }
 const blocks = receipts.transactions.map((r: any) => r.block);
+const k1 = manifest.steps.find((s: any) => s.id === "K1");
+manifest.contracts.deployBlock = k1.tx.blockNumber; // the Sepolia block, not the replica's
 manifest.sepolia = {
   firstBlock: Math.min(...blocks),
   lastBlock: Math.max(...blocks),
