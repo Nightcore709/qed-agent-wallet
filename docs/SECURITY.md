@@ -1,6 +1,6 @@
 # QED — Security Design & Self-Assessment
 
-> Scope: `contracts/src/*` (QEDVault, QEDLens, ProofEscrow, MinVarianceVerifier, TestUSD) and the off-chain
+> Scope: `contracts/src/*` (QEDVault, QEDLens, ProofEscrow, MinVarianceVerifier, QEDClearing, TestUSD) and the off-chain
 > agent system in `agent/`. Status: **testnet prototype, not externally audited.** Every claim below links to a
 > test, an invariant, or a public Sepolia transaction.
 

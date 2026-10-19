@@ -9,7 +9,7 @@ Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-a
 
 ---
 
-## The idea in four sentences
+## The idea in five sentences
 
 1. **The AI holds one key that can call one function.** `QEDVault.executePayment` succeeds only with an owner-signed EIP-712 *mandate* **and** a certificate from an *independent co-signer* (a separate process, a separate key, 12 policy checks) **and** inside an on-chain *solvency invariant* that ring-fences money owed to creditors.
 2. **The worst case is computed, not hoped for.** `QEDLens.blastRadius(vault, horizon)` returns, at any block, the most the vault can lose if *both* hot keys are stolen — and the loss to any address the owner never approved is provably **zero**.
@@ -51,6 +51,7 @@ Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-a
             │  QEDVault  — mandates · certificates · ring-fenced liabilities · caps · pause          │
             │  ProofEscrow — signed quotes · pays iff verifier accepts · refunds after deadline      │
             │  MinVarianceVerifier — exact KKT + PSD certificate check     QEDLens — blast radius    │
+            │  QEDClearing — anyone may net agents' debts; executes only on an LP-duality proof      │
             └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 

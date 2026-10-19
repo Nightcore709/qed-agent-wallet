@@ -61,4 +61,5 @@ Honest certificate passes and returns the variance; asymmetric covariance, negat
 | When (UTC) | Machine | Steps | Result |
 |---|---|---|---|
 | 2026-10-19 16:50 | Fresh Linux container with nothing installed (no Foundry, no keys, no prior state) | `git clone --recursive`, install Foundry 1.7.1 + solc 0.8.26 from their GitHub releases, `npm ci`, `forge build`, `forge test`, `npm run test:ts` | **67 / 67** Solidity tests and **42 / 42** TypeScript tests passed |
-| every push + daily | GitHub Actions `ubuntu-latest` | `.github/workflows/ci.yml`: Solidity suite, TypeScript suite, full local economy, `npm run verify` against public Sepolia | green |
+| 2026-10-19 21:46 | Fresh `git clone --recursive` of commit `dee4c07` into an empty directory (Foundry 1.7.1 toolchain present; no keys, no `node_modules`, no build output) | `npm ci`, `forge build`, `forge test`, `npm run test:ts`, `QED_OFFLINE=1 npm run local`, `npm run local:clearing` | **82 / 82** Solidity and **45 / 45** TypeScript tests passed; both economies ran end to end on a local chain (4 min 6 s) |
+| every push + daily | GitHub Actions `ubuntu-latest` | `.github/workflows/ci.yml`: Solidity suite, TypeScript suite, both economies on a local chain, `npm run verify` (both runs) against public Sepolia | green |

@@ -27,6 +27,7 @@ flowchart LR
     VERIFIER["MinVarianceVerifier<br/>KKT + PSD certificate check"]
     LENS["QEDLens<br/>blast radius · snapshots · EIP-712 digests"]
     TOKEN["TestUSD (tUSD)"]
+    CLEAR["QEDClearing<br/>proof-gated multilateral netting"]
     ESCROW --> VERIFIER
     LENS -.reads.-> VAULT
   end
@@ -38,6 +39,7 @@ flowchart LR
   ESCROW -- "pays on valid proof" --> VAULT
   GUARDIAN["Guardian"] -- "pause()" --> VAULT
   VAULT -- "settle() → creditor only" --> CREDITOR["CloudCo (creditor)"]
+  AGENT -- "net(ids, x, π, y)" --> CLEAR
 ```
 
 The design rule is a trust gradient: **everything that can be fooled is off-chain and holds at most one key;
@@ -123,7 +125,26 @@ sequenceDiagram
   A->>Q: executePayment(...)
 ```
 
-### 3.3 Defence in depth against a manipulated agent
+### 3.3 Certified clearing of an agent economy (QEDClearing)
+
+```mermaid
+sequenceDiagram
+  participant M as 5 member agents (one key each)
+  participant P as QED prover (any key)
+  participant X as Mallory / rival bot
+  participant C as QEDClearing
+  M->>C: join()  — on-chain consent to TERMS
+  M->>C: issue(creditor, amount, dueAt, memo)  — 11 debts, 200 tUSD
+  M-xC: pay(id) gross — reverts: 28 tUSD of cash cannot settle 200 (G1)
+  P->>P: min-mean cycle cancelling → x (169) · Bellman–Ford → π, y · Σx = Σd·y
+  X-xC: net(lazy / shifting / oversized / partial / forged / replayed) — 6 reverts (N1–N5, N7)
+  P->>C: net(ids, amounts, x, π, y)
+  C->>C: conservation per member · 0 ≤ x ≤ d · dual feasibility · Σx = Σd·y (exact integers)
+  C-->>M: Reduced × 11 · Netted(169 cancelled, 200 → 31)
+  M->>C: pay(id) in DAG order — each payer needs only its net debit (S1–S4)
+```
+
+### 3.4 Defence in depth against a manipulated agent
 
 | Layer | Who | Stops |
 |---|---|---|
@@ -174,6 +195,9 @@ can also run the economy directly against Sepolia: `RPC_URL=… CHAIN_ID=1115511
 | Deploy QEDLens | 8 026 770 |
 | Deploy MinVarianceVerifier | 3 847 926 |
 | Deploy TestUSD | 3 716 239 |
+| Deploy QEDClearing | 8 579 134 |
+| `QEDClearing.net` — 11 obligations, 5 members, certificate checked (N6) | 550 826 |
+| `QEDClearing.issue` (first / later) | 795 367 / ≈ 501 600 |
 
 Sepolia's current schedule prices state creation far above the classic EVM (a plain ETH transfer to a fresh
 account costs ≈ 205 k gas); local replicas don't model this, so all broadcasts use an explicit 16.7 M gas limit
