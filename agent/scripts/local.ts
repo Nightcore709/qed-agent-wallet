@@ -1,0 +1,89 @@
+/**
+ * Runs the full live scenario against a local anvil node.
+ *
+ *   npm run local                 → quick local run (chain 31337, short deadlines)
+ *   SHADOW_OF=11155111 npm run local
+ *        → builds an exact REPLICA of Ethereum Sepolia for our accounts (same chain id, same nonces,
+ *          same ETH balances, wall-clock timestamps). Every transaction is signed by its role's own key.
+ *          After the run, all signed transactions are exported in order to relay/outbox.json so the
+ *          IDENTICAL bytes can be broadcast to the public network (scripts/relay.ts) — tx hashes in the
+ *          evidence manifest are therefore the real public-chain hashes.
+ */
+import { spawn } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { createPublicClient, http, parseEther, type Hex } from "viem";
+import { loadEnvFile } from "../src/config.js";
+
+loadEnvFile(".keys.env");
+const shadowOf = process.env.SHADOW_OF ? Number(process.env.SHADOW_OF) : undefined;
+const chainId = shadowOf ?? 31337;
+const port = Number(process.env.ANVIL_PORT ?? 8545);
+const rpc = `http://127.0.0.1:${port}`;
+
+async function main() {
+  const anvil = spawn("anvil", ["--port", String(port), "--chain-id", String(chainId), "--hardfork", "osaka", "--base-fee", "21", "--gas-limit", "60000000", "--silent"], { stdio: "ignore" });
+  const pub = createPublicClient({ transport: http(rpc) });
+  for (let i = 0; i < 100; i++) {
+    try {
+      await pub.getChainId();
+      break;
+    } catch {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  }
+  // Same starting ETH as the real deployer (0.05 Sepolia ETH from the faucet); every other role starts at 0.
+  const startBal = parseEther(process.env.DEPLOYER_START_ETH ?? "0.05");
+  await (pub as any).request({ method: "anvil_setBalance", params: [process.env.DEPLOYER_ADDR, `0x${startBal.toString(16)}`] });
+  await (pub as any).request({ method: "evm_setNextBlockTimestamp", params: [`0x${Math.floor(Date.now() / 1000).toString(16)}`] });
+  await (pub as any).request({ method: "evm_mine", params: [] });
+  const startBlock = await pub.getBlockNumber();
+
+  const env = {
+    ...process.env,
+    RPC_URL: rpc,
+    CHAIN_ID: String(chainId),
+    SHADOW: "1",
+    MAX_FEE_GWEI: process.env.MAX_FEE_GWEI ?? "2",
+    PRIORITY_FEE_GWEI: process.env.PRIORITY_FEE_GWEI ?? "0.1",
+    LIABILITY_DELAY_S: process.env.LIABILITY_DELAY_S ?? (shadowOf ? "1800" : "90"),
+    MALLORY_JOB_WINDOW_S: process.env.MALLORY_JOB_WINDOW_S ?? (shadowOf ? "1500" : "60"),
+    EVIDENCE_DIR: process.env.EVIDENCE_DIR ?? (shadowOf ? `evidence/shadow-${chainId}` : "evidence/local"),
+  };
+  const code = await new Promise<number>((resolve) => {
+    const p = spawn(process.execPath, ["--import", "tsx", "agent/scripts/live.ts"], { env, stdio: "inherit" });
+    p.on("exit", (c) => resolve(c ?? 1));
+  });
+
+  if (shadowOf && code === 0) {
+    // Export every signed transaction in canonical (block) order, with the replica's receipt.
+    const last = await pub.getBlockNumber();
+    const outbox: any[] = [];
+    for (let b = startBlock + 1n; b <= last; b++) {
+      const block = await pub.getBlock({ blockNumber: b, includeTransactions: true });
+      for (const tx of block.transactions as any[]) {
+        const raw = (await (pub as any).request({ method: "eth_getRawTransactionByHash", params: [tx.hash] })) as Hex;
+        const r = await pub.getTransactionReceipt({ hash: tx.hash });
+        outbox.push({
+          i: outbox.length,
+          hash: tx.hash,
+          from: tx.from,
+          to: tx.to,
+          nonce: tx.nonce,
+          shadowTimestamp: Number(block.timestamp),
+          shadowStatus: r.status,
+          shadowGasUsed: r.gasUsed.toString(),
+          shadowLogs: r.logs.map((l) => ({ address: l.address, topics: l.topics, data: l.data })),
+          contractAddress: r.contractAddress ?? null,
+          raw,
+        });
+      }
+    }
+    mkdirSync("relay", { recursive: true });
+    writeFileSync(`relay/outbox-${chainId}.json`, JSON.stringify(outbox, null, 1));
+    console.log(`\nexported ${outbox.length} signed transactions → relay/outbox-${chainId}.json`);
+  }
+  anvil.kill();
+  process.exit(code);
+}
+
+main();

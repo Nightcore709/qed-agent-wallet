@@ -1,0 +1,38 @@
+[profile.default]
+src = "contracts/src"
+test = "contracts/test"
+script = "contracts/script"
+out = "out"
+cache_path = "cache"
+libs = ["lib"]
+solc_version = "0.8.26"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+bytecode_hash = "none"
+cbor_metadata = false
+fs_permissions = [{ access = "read", path = "./contracts/test/fixtures" }]
+remappings = [
+  "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+  "forge-std/=lib/forge-std/src/",
+]
+
+[fuzz]
+runs = 2000
+seed = "0x51ed"
+
+[invariant]
+runs = 512
+depth = 96
+fail_on_revert = false
+call_override = false
+
+[profile.ci.fuzz]
+runs = 5000
+
+[profile.ci.invariant]
+runs = 1024
+depth = 128
+
+[lint]
+lint_on_build = false

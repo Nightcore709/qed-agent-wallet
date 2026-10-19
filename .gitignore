@@ -1,0 +1,17 @@
+# secrets — never commit
+.keys.env*
+.env
+.env.*
+!.env.example
+*.pem
+# build
+node_modules/
+out/
+cache/
+broadcast/
+# local runs
+evidence/local/
+evidence/shadow-*/
+deployments/31337.json
+*.log
+.DS_Store

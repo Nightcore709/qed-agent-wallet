@@ -1,0 +1,18 @@
+{
+  "chainId": 11155111,
+  "network": "Ethereum Sepolia",
+  "explorer": "https://sepolia.etherscan.io",
+  "token": "0xade14befe0e539929059b82afe92a3537680f28e",
+  "verifier": "0x2ff2e8763413b803ab2686b8c18aa11d38fd49c7",
+  "escrow": "0x8fd01a15d131134a285e53cf4db3e93036695cff",
+  "vault": "0x76852204c14667fac3184aabb3349844ca68484d",
+  "honeypotVault": "0x4b0c495c20a06c7972c35251ac66e960d1d5be31",
+  "deployBlock": "2",
+  "txs": {
+    "token": "0xc102ba31d71599df4aad97a0415d8a3ca0ee62c4d49fed8230348882ac519521",
+    "verifier": "0xc2e631b1b4497e2f159e707a8d89ba0179509a4c566f0aaa9c47c7e53ff91762",
+    "escrow": "0xa0d2cd52f83fbabf8662cca1f79ae83a6876d713df2eab85f312cacda84d3c81",
+    "vault": "0x0e66f9d15c489f3202cbb4a0b222014a875dd7db59b24493f307e6ed18008f67",
+    "honeypotVault": "0x1c90ef353bfaf84bba921299dea33f789d6f385f0d3854a07481196cfd392d6b"
+  }
+}
