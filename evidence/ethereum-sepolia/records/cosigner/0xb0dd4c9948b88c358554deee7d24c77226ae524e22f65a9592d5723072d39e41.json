@@ -1,0 +1,137 @@
+{
+  "core": {
+    "block": {
+      "number": "22",
+      "timestamp": 1792418722
+    },
+    "chainId": 11155111,
+    "checks": [
+      {
+        "detail": "recovered 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7",
+        "id": "C1",
+        "name": "Mandate signed by the vault owner",
+        "pass": true
+      },
+      {
+        "detail": "epoch 0, valid until 2026-10-26T14:05:20.000Z",
+        "id": "C2",
+        "name": "Mandate active and current epoch",
+        "pass": true
+      },
+      {
+        "detail": "invoice signer 0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+        "id": "C3",
+        "name": "Invoice signed by the payee's registered key",
+        "pass": true
+      },
+      {
+        "detail": "buyer 0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6, expires 2026-10-19T15:05:10.000Z",
+        "id": "C4",
+        "name": "Invoice addressed to this vault, not expired",
+        "pass": true
+      },
+      {
+        "detail": "invoice 6.00 vs list 6.00",
+        "id": "C5",
+        "name": "Price equals the vendor's published list price",
+        "pass": true
+      },
+      {
+        "detail": "HELIX-1792418710-1",
+        "id": "C6",
+        "name": "Invoice not seen before",
+        "pass": true
+      },
+      {
+        "detail": "job #1: status 1, price 15.00, cost 6.00",
+        "id": "C7",
+        "name": "Funded escrow job exists for this vault and covers the cost with margin",
+        "pass": true
+      },
+      {
+        "detail": "job spec 0xbb5b6471… vs data 0xbb5b6471…",
+        "id": "C8",
+        "name": "Purchased data is exactly what the job's committed spec requires",
+        "pass": true
+      },
+      {
+        "detail": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+        "id": "C9",
+        "name": "Payee is listed in the owner's mandate",
+        "pass": true
+      },
+      {
+        "detail": "free 30.00 − 6.00 = 24.00 ≥ 5.00 (ring-fenced 70.00)",
+        "id": "C10",
+        "name": "Reserve buffer above ring-fenced liabilities preserved",
+        "pass": true
+      },
+      {
+        "detail": "payee not on deny-list",
+        "id": "C11",
+        "name": "Sanctions / deny-list screening",
+        "pass": true
+      },
+      {
+        "detail": "spent 0.00 + 6.00 ≤ allowance 10.00 (verified revenue 0.00)",
+        "id": "C12",
+        "name": "Earned autonomy: discretionary spend ≤ 10 + 50% of VERIFIED revenue",
+        "pass": true
+      }
+    ],
+    "cosigner": "0xf1F8941003702C5141977Ee0E9E03A45a9f62402",
+    "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427",
+    "payment": {
+      "amount": "6000000",
+      "dueAt": "0",
+      "intentId": "0xd022f7486ca7dc58d073e1ad33136006a1e2da05aa01ef4f03144e4107c4a303",
+      "payee": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+      "ref": "0x6acceded2dd3066a7a7468c3886f685fad9da4e90cff26d2d9d173f0e30a4bda"
+    },
+    "request": {
+      "brainEngine": "anthropic:claude-sonnet-5-5",
+      "invoice": {
+        "amount": "6000000",
+        "buyer": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+        "dataCommitment": "0xbb5b6471783eba7c2bb91e2dd093fc2964255ebf27caf7ed84a437f2ca76c47a",
+        "expiresAt": 1792422310,
+        "invoiceId": "HELIX-1792418710-1",
+        "issuedAt": 1792418710,
+        "jobId": "1",
+        "payTo": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+        "productId": "helix-risk-model-2026-10",
+        "title": "Helix Risk Model — Oct 2026 (6-asset covariance, illustrative)",
+        "vendor": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8"
+      },
+      "jobId": "1",
+      "kind": "purchase",
+      "rationale": "Job #1 requires the Helix model committed in its spec; buying it for 6.00 tUSD to earn the escrowed fee."
+    },
+    "schema": "qed.decision-record/v1",
+    "treasury": {
+      "balance": "100000000",
+      "blastRadius24h": "30000000",
+      "dailyCap": "25000000",
+      "free": "30000000",
+      "protected": "70000000",
+      "spentInWindow": "0"
+    },
+    "vault": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6",
+    "verdict": "APPROVED"
+  },
+  "canonical": "{\"block\":{\"number\":\"22\",\"timestamp\":1792418722},\"chainId\":11155111,\"checks\":[{\"detail\":\"recovered 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7\",\"id\":\"C1\",\"name\":\"Mandate signed by the vault owner\",\"pass\":true},{\"detail\":\"epoch 0, valid until 2026-10-26T14:05:20.000Z\",\"id\":\"C2\",\"name\":\"Mandate active and current epoch\",\"pass\":true},{\"detail\":\"invoice signer 0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\",\"id\":\"C3\",\"name\":\"Invoice signed by the payee's registered key\",\"pass\":true},{\"detail\":\"buyer 0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6, expires 2026-10-19T15:05:10.000Z\",\"id\":\"C4\",\"name\":\"Invoice addressed to this vault, not expired\",\"pass\":true},{\"detail\":\"invoice 6.00 vs list 6.00\",\"id\":\"C5\",\"name\":\"Price equals the vendor's published list price\",\"pass\":true},{\"detail\":\"HELIX-1792418710-1\",\"id\":\"C6\",\"name\":\"Invoice not seen before\",\"pass\":true},{\"detail\":\"job #1: status 1, price 15.00, cost 6.00\",\"id\":\"C7\",\"name\":\"Funded escrow job exists for this vault and covers the cost with margin\",\"pass\":true},{\"detail\":\"job spec 0xbb5b6471… vs data 0xbb5b6471…\",\"id\":\"C8\",\"name\":\"Purchased data is exactly what the job's committed spec requires\",\"pass\":true},{\"detail\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\",\"id\":\"C9\",\"name\":\"Payee is listed in the owner's mandate\",\"pass\":true},{\"detail\":\"free 30.00 − 6.00 = 24.00 ≥ 5.00 (ring-fenced 70.00)\",\"id\":\"C10\",\"name\":\"Reserve buffer above ring-fenced liabilities preserved\",\"pass\":true},{\"detail\":\"payee not on deny-list\",\"id\":\"C11\",\"name\":\"Sanctions / deny-list screening\",\"pass\":true},{\"detail\":\"spent 0.00 + 6.00 ≤ allowance 10.00 (verified revenue 0.00)\",\"id\":\"C12\",\"name\":\"Earned autonomy: discretionary spend ≤ 10 + 50% of VERIFIED revenue\",\"pass\":true}],\"cosigner\":\"0xf1F8941003702C5141977Ee0E9E03A45a9f62402\",\"mandateHash\":\"0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427\",\"payment\":{\"amount\":\"6000000\",\"dueAt\":\"0\",\"intentId\":\"0xd022f7486ca7dc58d073e1ad33136006a1e2da05aa01ef4f03144e4107c4a303\",\"payee\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\",\"ref\":\"0x6acceded2dd3066a7a7468c3886f685fad9da4e90cff26d2d9d173f0e30a4bda\"},\"request\":{\"brainEngine\":\"anthropic:claude-sonnet-5-5\",\"invoice\":{\"amount\":\"6000000\",\"buyer\":\"0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6\",\"dataCommitment\":\"0xbb5b6471783eba7c2bb91e2dd093fc2964255ebf27caf7ed84a437f2ca76c47a\",\"expiresAt\":1792422310,\"invoiceId\":\"HELIX-1792418710-1\",\"issuedAt\":1792418710,\"jobId\":\"1\",\"payTo\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\",\"productId\":\"helix-risk-model-2026-10\",\"title\":\"Helix Risk Model — Oct 2026 (6-asset covariance, illustrative)\",\"vendor\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\"},\"jobId\":\"1\",\"kind\":\"purchase\",\"rationale\":\"Job #1 requires the Helix model committed in its spec; buying it for 6.00 tUSD to earn the escrowed fee.\"},\"schema\":\"qed.decision-record/v1\",\"treasury\":{\"balance\":\"100000000\",\"blastRadius24h\":\"30000000\",\"dailyCap\":\"25000000\",\"free\":\"30000000\",\"protected\":\"70000000\",\"spentInWindow\":\"0\"},\"vault\":\"0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6\",\"verdict\":\"APPROVED\"}",
+  "evidenceHash": "0xb0dd4c9948b88c358554deee7d24c77226ae524e22f65a9592d5723072d39e41",
+  "certificate": {
+    "amount": "6000000",
+    "dueAt": "0",
+    "epoch": "0",
+    "evidenceHash": "0xb0dd4c9948b88c358554deee7d24c77226ae524e22f65a9592d5723072d39e41",
+    "expiresAt": "1792425922",
+    "intentId": "0xd022f7486ca7dc58d073e1ad33136006a1e2da05aa01ef4f03144e4107c4a303",
+    "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427",
+    "notBefore": "1792418662",
+    "recipient": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+    "ref": "0x6acceded2dd3066a7a7468c3886f685fad9da4e90cff26d2d9d173f0e30a4bda"
+  },
+  "signature": "0xed5b2ad0077112169d3a28d7c11d0a17fafc051216d8e0914b0b1df49e8ca3883bdd453d6fce5bd733d82300bf2d58056e643790b761a41343ebc3decb5e770f1b"
+}

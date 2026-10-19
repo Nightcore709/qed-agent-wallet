@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *" # re-verify the public-chain evidence daily
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    name: Solidity — build, 67 tests, fuzz + invariants
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: forge build --sizes
+      - run: forge test -vv
+        env: { FOUNDRY_PROFILE: ci }
+
+  agent:
+    name: Agent — type-check, 42 tests, full economy on a local chain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: npm ci
+      - run: forge build
+      - run: npx tsc -p tsconfig.json
+      - run: npm run test:ts
+      - name: Run the whole autonomous economy locally (deterministic offline brain, dev keys)
+        run: npm run local
+        env: { QED_OFFLINE: "1" }
+
+  verify-sepolia:
+    name: Independently re-verify every on-chain claim (Ethereum Sepolia, no keys)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: npm ci
+      - run: forge build
+      - run: npm run verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verification-report
+          path: evidence/ethereum-sepolia/verification.json

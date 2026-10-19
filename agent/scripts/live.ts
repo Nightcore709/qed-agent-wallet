@@ -13,7 +13,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { keccak256, parseEther, toHex, type Address, type Hex, type LocalAccount } from "viem";
 import { MinVarianceVerifierAbi, MinVarianceVerifierBytecode, ProofEscrowAbi, ProofEscrowBytecode, QEDLensAbi, QEDLensBytecode, QEDVaultAbi, QEDVaultBytecode, TestUSDAbi, TestUSDBytecode } from "../src/abi/contracts.js";
 import { fn, fmtUsd, sleep, type TxResult } from "../src/chain.js";
-import { account, chain, deploymentPath, EXPLORERS, loadEnvFile, NETWORK_NAMES, rpcConfig, type Deployment } from "../src/config.js";
+import { account, chain, deploymentPath, ensureDevKeys, EXPLORERS, loadEnvFile, NETWORK_NAMES, rpcConfig, type Deployment } from "../src/config.js";
 import { Evidence } from "../src/evidence.js";
 import { call, waitFor } from "../src/net.js";
 import { mandateHash, signMandate, signQuote, toJson, type Mandate, type Quote } from "../src/protocol/eip712.js";
@@ -26,6 +26,7 @@ import type { Rfq, RfqResponse } from "../src/roles/agent.js";
 
 loadEnvFile(".keys.env");
 const { chainId, rpcUrl } = rpcConfig();
+if (chainId === 31337) ensureDevKeys();
 const network = (NETWORK_NAMES[chainId] ?? `chain-${chainId}`).toLowerCase().replace(/\s+/g, "-");
 const OUT = process.env.EVIDENCE_DIR ?? `evidence/${network}`;
 const RECORDS = `${OUT}/records`;
@@ -65,7 +66,7 @@ function spawnRole(role: "cosigner" | "vendor" | "agent", port: number, keyRole:
     ...extra,
   };
   // Only what each process needs. (NODE_EXTRA_CA_CERTS: sandboxes with TLS-inspecting egress.)
-  for (const k of ["MAX_FEE_GWEI", "PRIORITY_FEE_GWEI", "SHADOW", "NODE_EXTRA_CA_CERTS", "SSL_CERT_FILE"]) if (process.env[k]) env[k] = process.env[k]!;
+  for (const k of ["MAX_FEE_GWEI", "PRIORITY_FEE_GWEI", "GAS_LIMIT", "SHADOW", "REQUIRE_FIXED_GAS", "NODE_EXTRA_CA_CERTS", "SSL_CERT_FILE"]) if (process.env[k]) env[k] = process.env[k]!;
   if (role === "agent") for (const k of ["ANTHROPIC_API_KEY", "LLM_MODEL", "QED_OFFLINE"]) if (process.env[k]) env[k] = process.env[k]!;
   const p = spawn(process.execPath, ["--import", "tsx", "agent/src/bin/services.ts", role], { env, stdio: ["ignore", "pipe", "pipe"] });
   p.stdout!.on("data", (d) => process.stdout.write(`      ${String(d).trimEnd().split("\n").join("\n      ")}\n`));

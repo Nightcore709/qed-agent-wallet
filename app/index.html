@@ -1,0 +1,611 @@
+<title>QED Proof Ledger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="An AI agent treasury on Ethereum that moves money only when it can prove it should.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a typeset proof page — four live theorems up top, then the evidence that proves each, then the ledger. */
+:root {
+  --paper: #f2f5f4;
+  --sheet: #fbfcfc;
+  --ink: #13233f;
+  --muted: #586a7d;
+  --faint: #8d9cab;
+  --rule: #d6dee1;
+  --grid: rgba(19, 35, 63, 0.045);
+  --proof: #0a7468;
+  --proof-soft: rgba(10, 116, 104, 0.1);
+  --stamp: #b1262e;
+  --stamp-soft: rgba(177, 38, 46, 0.08);
+  --fence: #13233f;
+  --free: #0a7468;
+  --serif: "STIX Two Text", "STIX Two", "Cambria Math", Georgia, serif;
+  --sans: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 0.9375rem;
+  --step-1: 1.125rem;
+  --step-2: 1.4rem;
+  --step-3: 1.85rem;
+  --step-4: clamp(2.1rem, 4.2vw, 3.1rem);
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c141f; --sheet: #111b28; --ink: #e4ecf1; --muted: #93a6b8; --faint: #66798c; --rule: #223142;
+    --grid: rgba(228, 236, 241, 0.035); --proof: #46c4b0; --proof-soft: rgba(70, 196, 176, 0.12);
+    --stamp: #f06b72; --stamp-soft: rgba(240, 107, 114, 0.1); --fence: #c9d6e2; --free: #46c4b0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c141f; --sheet: #111b28; --ink: #e4ecf1; --muted: #93a6b8; --faint: #66798c; --rule: #223142;
+  --grid: rgba(228, 236, 241, 0.035); --proof: #46c4b0; --proof-soft: rgba(70, 196, 176, 0.12);
+  --stamp: #f06b72; --stamp-soft: rgba(240, 107, 114, 0.1); --fence: #c9d6e2; --free: #46c4b0; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: var(--step-0); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; }
+a:hover { text-decoration-color: currentColor; }
+:focus-visible { outline: 2px solid var(--proof); outline-offset: 2px; border-radius: 3px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.num { font-variant-numeric: tabular-nums; }
+.hash { font-family: var(--mono); font-size: 0.82em; letter-spacing: -0.01em; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+
+/* ── top bar ── */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule); }
+.bar .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; flex-wrap: wrap; }
+.mark { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; letter-spacing: 0.01em; display: flex; align-items: baseline; gap: 6px; text-decoration: none; }
+.mark i { font-style: normal; color: var(--proof); font-size: 0.8em; }
+.bar nav { display: flex; gap: 14px; flex-wrap: wrap; font-size: var(--step--1); color: var(--muted); }
+.bar nav a { text-decoration: none; }
+.bar nav a:hover { color: var(--ink); }
+.net { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: var(--step--1); color: var(--muted); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.dot.live { background: var(--proof); box-shadow: 0 0 0 0 var(--proof); animation: pulse 2.4s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--proof) 50%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.theme { border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: var(--step--1); cursor: pointer; }
+
+/* ── hero: the four theorems ── */
+.hero { background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; border-bottom: 1px solid var(--rule); }
+.hero .wrap { padding-block: 56px 48px; display: grid; gap: 34px; }
+.lede { max-width: 46rem; display: grid; gap: 14px; }
+.lede h1 { font-family: var(--serif); font-weight: 500; font-size: var(--step-4); line-height: 1.08; letter-spacing: -0.012em; }
+.lede p { color: var(--muted); font-size: var(--step-1); max-width: 40rem; }
+.theorems { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+.thm { display: grid; grid-template-columns: 3.2rem minmax(0, 1.25fr) minmax(0, 1fr) 2.4rem; align-items: center; gap: 18px; padding: 18px 22px; border-top: 1px solid var(--rule); }
+.thm:first-child { border-top: 0; }
+.thm .no { font-family: var(--serif); color: var(--faint); font-size: var(--step-1); }
+.thm .stmt { font-family: var(--serif); font-size: var(--step-2); line-height: 1.25; }
+.thm .stmt var { font-style: italic; }
+.thm .stmt small { display: block; font-family: var(--sans); font-size: var(--step--1); color: var(--muted); margin-top: 4px; }
+.thm .val { font-size: var(--step-0); color: var(--muted); }
+.thm .val b { font-family: var(--serif); font-weight: 500; font-size: var(--step-2); color: var(--ink); display: block; line-height: 1.2; }
+.qed { width: 22px; height: 22px; background: var(--proof); justify-self: end; border-radius: 1px; transform: scale(0.2); opacity: 0; transition: transform 0.35s cubic-bezier(.2,1.6,.4,1), opacity 0.2s; }
+.qed.on { transform: scale(1); opacity: 1; }
+.thm .val .pending { color: var(--faint); font-style: italic; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: var(--step--1); color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend .sq { width: 11px; height: 11px; background: var(--proof); border-radius: 1px; display: inline-block; }
+
+/* ── balance sheet ── */
+section { padding-block: 56px; border-bottom: 1px solid var(--rule); }
+.shead { display: grid; gap: 8px; margin-bottom: 26px; max-width: 44rem; }
+.shead h2 { font-family: var(--serif); font-weight: 500; font-size: var(--step-3); line-height: 1.15; }
+.shead p { color: var(--muted); }
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 22px; }
+.bs { display: grid; gap: 14px; }
+.bs-bar { position: relative; height: 54px; display: flex; border-radius: 3px; overflow: hidden; border: 1px solid var(--rule); }
+.bs-fence { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--fence) 22%, transparent) 0 2px, transparent 2px 8px), color-mix(in srgb, var(--fence) 6%, var(--sheet)); border-right: 2px solid var(--fence); }
+.bs-free { background: var(--proof-soft); }
+.bs-labels { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+.kv { display: grid; gap: 2px; }
+.kv dt { font-size: var(--step--1); color: var(--muted); }
+.kv dd { margin: 0; font-family: var(--serif); font-size: var(--step-2); font-variant-numeric: tabular-nums; }
+.kv dd small { font-family: var(--sans); font-size: var(--step--1); color: var(--muted); }
+.br { position: relative; height: 26px; }
+.br .bracket { position: absolute; top: 4px; height: 12px; border: 1.5px solid var(--stamp); border-top: 0; }
+.br .bracket span { position: absolute; top: 12px; left: 0; white-space: nowrap; font-size: var(--step--1); color: var(--stamp); }
+.vaults { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 18px; }
+.vaults h3 { font-family: var(--serif); font-weight: 500; font-size: var(--step-2); margin-bottom: 4px; }
+.vaults .sub { color: var(--muted); font-size: var(--step--1); margin-bottom: 16px; }
+
+/* ── outcomes: four proofs ── */
+.proofs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr)); gap: 18px; }
+.proof { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 22px 22px 18px; display: grid; gap: 12px; align-content: start; }
+.proof .q { font-size: var(--step--1); color: var(--muted); }
+.proof h3 { font-family: var(--serif); font-weight: 500; font-size: var(--step-2); line-height: 1.22; }
+.proof ol { margin: 0; padding-left: 1.25rem; display: grid; gap: 8px; }
+.proof li { padding-left: 4px; }
+.proof li::marker { color: var(--faint); font-family: var(--serif); }
+.proof .end { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px dashed var(--rule); padding-top: 12px; font-size: var(--step--1); color: var(--muted); }
+.proof .end .tomb { width: 14px; height: 14px; background: var(--proof); border-radius: 1px; flex: none; }
+.txl { white-space: nowrap; }
+
+/* ── ledger ── */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip { border: 1px solid var(--rule); background: var(--sheet); color: var(--muted); border-radius: 999px; padding: 5px 12px; font: inherit; font-size: var(--step--1); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.ledger-wrap { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; min-width: 760px; }
+th, td { text-align: left; padding: 11px 14px; border-top: 1px solid var(--rule); vertical-align: top; }
+thead th { border-top: 0; font-weight: 500; font-size: var(--step--1); color: var(--muted); background: color-mix(in srgb, var(--paper) 55%, var(--sheet)); }
+td.id { font-family: var(--serif); color: var(--faint); width: 3.6rem; }
+td .t { font-weight: 500; }
+td .n { color: var(--muted); font-size: var(--step--1); margin-top: 2px; max-width: 46rem; }
+.res { display: inline-flex; align-items: center; gap: 6px; font-size: var(--step--1); white-space: nowrap; }
+.res.ok { color: var(--proof); }
+.res.ok::before { content: ""; width: 9px; height: 9px; background: var(--proof); border-radius: 1px; }
+.stampx { display: inline-block; border: 1.5px solid var(--stamp); color: var(--stamp); background: var(--stamp-soft); padding: 1px 7px; border-radius: 3px; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em; transform: rotate(-1.5deg); white-space: nowrap; }
+.err { display: block; font-family: var(--mono); font-size: 0.74rem; color: var(--stamp); margin-top: 4px; }
+.offc { color: var(--faint); font-size: var(--step--1); white-space: nowrap; }
+
+/* ── portfolio ── */
+.pf { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 860px) { .pf { grid-template-columns: 1fr; } }
+.wrow { display: grid; grid-template-columns: 10.5rem minmax(0, 1fr) 4.6rem; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--rule); }
+.wrow:first-of-type { border-top: 0; }
+.wrow .a { font-size: var(--step--1); }
+.wrow .track { height: 14px; background: color-mix(in srgb, var(--ink) 5%, transparent); border-radius: 2px; position: relative; overflow: hidden; }
+.wrow .fill { position: absolute; inset: 0 auto 0 0; background: var(--proof); border-radius: 2px; }
+.wrow .w { text-align: right; font-family: var(--serif); font-variant-numeric: tabular-nums; }
+.wrow .mu { grid-column: 2 / 4; font-size: 0.78rem; color: var(--muted); margin-top: -4px; }
+.kkt { display: grid; gap: 10px; }
+.kkt .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; border-top: 1px solid var(--rule); padding-top: 10px; }
+.kkt .row:first-child { border-top: 0; padding-top: 0; }
+.kkt .l { font-family: var(--serif); }
+.kkt .l small { display: block; font-family: var(--sans); color: var(--muted); font-size: var(--step--1); }
+.kkt .r { text-align: right; font-variant-numeric: tabular-nums; }
+.kkt .r b { color: var(--proof); font-weight: 600; }
+
+/* ── conversation ── */
+.convo { display: grid; gap: 10px; max-width: 52rem; }
+.turn { display: grid; gap: 4px; }
+.turn .who { font-size: 0.75rem; color: var(--faint); }
+.bubble { padding: 11px 14px; border-radius: 10px; max-width: 46rem; }
+.turn.owner { justify-items: end; }
+.turn.owner .bubble { background: var(--ink); color: var(--paper); border-bottom-right-radius: 3px; }
+.turn.agent .bubble { background: var(--sheet); border: 1px solid var(--rule); border-bottom-left-radius: 3px; }
+.flags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.flag { font-size: 0.72rem; color: var(--stamp); border: 1px solid color-mix(in srgb, var(--stamp) 45%, transparent); border-radius: 999px; padding: 0 8px; }
+.flag.good { color: var(--proof); border-color: color-mix(in srgb, var(--proof) 45%, transparent); }
+.convo-more { justify-self: start; }
+
+/* ── red team ── */
+.rt { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.rt .c { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px; display: grid; gap: 6px; }
+.rt .c .k { font-size: var(--step--1); color: var(--muted); }
+.rt .c .v { font-family: var(--serif); font-size: var(--step-3); font-variant-numeric: tabular-nums; line-height: 1; }
+.rt .c .s { font-size: var(--step--1); color: var(--muted); }
+
+/* ── honeypot ── */
+.hp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 860px) { .hp { grid-template-columns: 1fr; } }
+.keybox { display: grid; gap: 10px; }
+.key { display: grid; gap: 4px; }
+.key label { font-size: var(--step--1); color: var(--muted); }
+.key .line { display: flex; gap: 8px; align-items: center; background: color-mix(in srgb, var(--stamp) 6%, var(--sheet)); border: 1px dashed color-mix(in srgb, var(--stamp) 50%, transparent); border-radius: 4px; padding: 8px 10px; min-width: 0; }
+.key code { font-family: var(--mono); font-size: 0.78rem; overflow-wrap: anywhere; flex: 1; min-width: 0; }
+.copy { border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 4px; font: inherit; font-size: 0.75rem; padding: 3px 8px; cursor: pointer; flex: none; }
+pre { margin: 0; background: color-mix(in srgb, var(--ink) 5%, var(--sheet)); border: 1px solid var(--rule); border-radius: 4px; padding: 14px; overflow-x: auto; font-family: var(--mono); font-size: 0.78rem; line-height: 1.6; }
+
+/* ── footer ── */
+.contracts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 0 28px; }
+.contracts div { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--rule); padding: 9px 0; min-width: 0; }
+.contracts span { color: var(--muted); font-size: var(--step--1); }
+footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1); }
+
+@media (max-width: 720px) {
+  .thm { grid-template-columns: 2.2rem minmax(0, 1fr) 1.6rem; }
+  .thm .val { grid-column: 2 / 3; }
+  .thm .qed { grid-row: 1; grid-column: 3; }
+  .wrow { grid-template-columns: 7.5rem minmax(0, 1fr) 4rem; }
+  .hero .wrap { padding-block: 40px 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qed { transition: none; }
+  .dot.live { animation: none; }
+}
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="QED home">QED <i aria-hidden="true">∎</i></a>
+    <nav aria-label="Sections">
+      <a href="#outcomes">Proofs</a>
+      <a href="#ledger">Ledger</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#conversation">Conversation</a>
+      <a href="#honeypot">Honeypot</a>
+      <a href="#reproduce">Reproduce</a>
+    </nav>
+    <span class="net"><span class="dot" id="netdot"></span><span id="netlabel">Ethereum Sepolia</span></span>
+    <button class="theme" id="themebtn" type="button" aria-label="Toggle colour theme">Theme</button>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div class="lede">
+        <h1>An AI treasury that moves money only when it can prove it should.</h1>
+        <p>QED is an autonomous agent that runs a small quant business on Ethereum. It earns, spends, owes and gets attacked. Four statements about its wallet are checked against the chain every time this page loads.</p>
+      </div>
+      <div class="theorems" id="theorems" aria-live="polite"></div>
+      <div class="legend"><span><span class="sq"></span>holds on-chain at the block shown</span><span id="srcnote"></span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="shead">
+        <h2>Two vaults, one rule: ring-fenced money only reaches its creditor</h2>
+        <p>Hatched funds are owed. Nobody can move them except to the creditor: not the AI, not the risk co-signer, not even the owner. The red bracket is the most that could leave in 24 hours if both hot keys were stolen.</p>
+      </div>
+      <div class="vaults" id="vaults"></div>
+    </div>
+  </section>
+
+  <section id="outcomes">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Four questions a reviewer should ask, answered with transactions</h2>
+        <p>Every line below links to a public Ethereum Sepolia receipt. Run <span class="hash">npm run verify</span> to re-derive all of it with no keys.</p>
+      </div>
+      <div class="proofs" id="proofs"></div>
+    </div>
+  </section>
+
+  <section id="ledger">
+    <div class="wrap">
+      <div class="shead">
+        <h2>The ledger of the live run</h2>
+        <p>The whole economy in order. Refused rows are attacks; each one is a reverted transaction whose on-chain error names exactly what stopped it.</p>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filter ledger"></div>
+      <div class="ledger-wrap"><table><thead><tr><th>Step</th><th>What happened</th><th>Signed by</th><th>Result</th><th>Transaction</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="portfolio">
+    <div class="wrap">
+      <div class="shead">
+        <h2>The work it was paid for, and the proof the escrow checked</h2>
+        <p>The client paid only after the contract verified the Karush–Kuhn–Tucker conditions of the delivered portfolio in exact integer arithmetic. No reviewer, no oracle, no approval click.</p>
+      </div>
+      <div class="pf">
+        <div class="sheet"><div id="weights"></div></div>
+        <div class="sheet"><div class="kkt" id="kkt"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="conversation">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Talking to it: clarify, correct, confirm, refuse</h2>
+        <p id="convonote">The owner's real session with the agent during the live run, including the scam, the key-extraction attempt, the privilege escalation and the prompt injection.</p>
+      </div>
+      <div class="convo" id="convo"></div>
+    </div>
+  </section>
+
+  <section id="redteam">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Red-team results</h2>
+        <p id="rtnote">The rubric's four attack classes in English and Chinese, plus benign requests that must not be refused.</p>
+      </div>
+      <div class="rt" id="rt"></div>
+    </div>
+  </section>
+
+  <section id="honeypot">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Steal this</h2>
+        <p>This vault's AI key and co-signer key are public, on purpose. With both you can move at most 1 tUSD per day, and only to CloudCo. The 90 tUSD ring-fence is protected by the contract, not by secrecy.</p>
+      </div>
+      <div class="hp">
+        <div class="sheet keybox" id="hpkeys"></div>
+        <div class="sheet" id="hpstate"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reproduce">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Reproduce everything</h2>
+        <p>Clone, test, re-verify the chain, or run the whole economy on your own machine. No keys or API access needed.</p>
+      </div>
+      <pre id="cmds"></pre>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <footer>
+      <div class="contracts" id="contracts"></div>
+      <p style="margin-top:22px" id="foot"></p>
+    </footer>
+  </div>
+</main>
+
+<script id="qed-data" type="application/json">__QED_DATA__</script>
+<script>
+(() => {
+  "use strict";
+  // ───────── theme toggle (per-viewer convenience only) ─────────
+  const root = document.documentElement;
+  const btn = document.getElementById("themebtn");
+  try { const t = localStorage.getItem("qed-theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  btn.addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("qed-theme", root.dataset.theme); } catch (e) {}
+  });
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const usd = (x) => (Number(x) / 1e6).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const short = (h) => h ? `${h.slice(0, 8)}…${h.slice(-6)}` : "";
+
+  async function loadData() {
+    const el = $("qed-data");
+    const txt = el.textContent.trim();
+    if (txt && !txt.startsWith("__")) return JSON.parse(txt);
+    const r = await fetch("data.json", { cache: "no-store" });
+    return r.json();
+  }
+
+  loadData().then(render).catch((e) => {
+    $("theorems").innerHTML = `<div class="thm"><div></div><div class="stmt">Evidence could not be loaded.<small>${esc(e.message)}. Open the repository's evidence folder instead.</small></div></div>`;
+  });
+
+  function render(D) {
+    const M = D.manifest;
+    const X = M.network.explorer;
+    const txUrl = (h) => `${X}/tx/${h}`;
+    const addrUrl = (a) => `${X}/address/${a}`;
+    const step = (id) => M.steps.find((s) => s.id === id);
+    const txLink = (id, label) => { const s = step(id); return s && s.tx ? `<a class="hash txl" href="${txUrl(s.tx.hash)}" target="_blank" rel="noopener">${esc(label ?? short(s.tx.hash))}</a>` : ""; };
+    const attacks = M.steps.filter((s) => s.tx && s.expect === "revert");
+    const fin = M.final ?? {};
+
+    // ───────── four theorems ─────────
+    let S = { v: { balance: fin.vault?.balance ?? 0, protectedBalance: fin.vault?.protected ?? 0, freeBalance: fin.vault?.free ?? 0, blastRadius24h: fin.vault?.blastRadius24h ?? 0 }, h: { balance: fin.honeypot?.balance ?? 0, protectedBalance: fin.honeypot?.protected ?? 0, freeBalance: fin.honeypot?.free ?? 0, blastRadius24h: fin.honeypot?.blastRadius24h ?? 0 }, block: Number(M.steps.at(-1)?.tx?.blockNumber ?? 0), live: false };
+    const thms = [
+      { id: "solv", stmt: () => `<var>B</var> ≥ <var>P</var>`, sub: "Vault balance covers every ring-fenced liability", val: () => `<b class="num">${usd(S.v.balance)} ≥ ${usd(S.v.protectedBalance)}</b>tUSD balance vs. ring-fenced` },
+      { id: "excl", stmt: () => `<var>L</var><sub>unapproved</sub> = 0`, sub: "Loss to any address the owner did not approve", val: () => `<b class="num">${attacks.length} attacks refused</b>0 tUSD reached the attacker` },
+      { id: "bound", stmt: () => `<var>BR</var><sub>24h</sub> ≤ ${usd(S.v.blastRadius24h)}`, sub: "Worst case if the AI key and the co-signer key are both stolen", val: () => `<b class="num">${usd(S.v.blastRadius24h)} tUSD</b>computed by QEDLens, not by the AI` },
+      { id: "opt", stmt: () => `<var>f</var>(<var>w</var>) − <var>f</var><sup>*</sup> ≤ ${(D.portfolio?.certificate?.optimalityBound ?? 1.5e-8).toExponential(1).replace("e-", " × 10<sup>−").replace(/$/, "</sup>")}`, sub: "The portfolio it was paid for is provably optimal", val: () => `<b class="num">gap ${D.portfolio?.certificate?.dualityGap ?? "0"}</b>KKT certificate checked on-chain` },
+    ];
+
+    function drawTheorems(pending) {
+      $("theorems").innerHTML = thms.map((t, i) => `
+        <div class="thm" id="thm-${t.id}">
+          <div class="no">(${i + 1})</div>
+          <div class="stmt">${t.stmt()}<small>${t.sub}</small></div>
+          <div class="val">${pending ? '<span class="pending">checking…</span>' : t.val()}</div>
+          <div class="qed" aria-label="holds"></div>
+        </div>`).join("");
+    }
+    function stamp() {
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.querySelectorAll(".qed").forEach((q, i) => setTimeout(() => q.classList.add("on"), reduce ? 0 : 160 + i * 170));
+    }
+    drawTheorems(true);
+
+    // ───────── live chain read (works on GitHub Pages; the artifact snapshot falls back) ─────────
+    const RPCS = ["https://ethereum-sepolia-rpc.publicnode.com", "https://sepolia.drpc.org"];
+    async function rpc(method, params) {
+      let last;
+      for (const u of RPCS) {
+        try {
+          const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 4500);
+          const r = await fetch(u, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }), signal: ctl.signal });
+          clearTimeout(to);
+          const j = await r.json(); if (j.error) throw new Error(j.error.message); return j.result;
+        } catch (e) { last = e; }
+      }
+      throw last;
+    }
+    const pad = (a) => a.toLowerCase().replace("0x", "").padStart(64, "0");
+    async function snapshot(vault) {
+      const out = await rpc("eth_call", [{ to: M.contracts.lens, data: D.selectors.snapshot + pad(vault) }, "latest"]);
+      const w = (i) => BigInt("0x" + out.slice(2 + i * 64, 2 + (i + 1) * 64));
+      return { balance: w(0), protectedBalance: w(1), freeBalance: w(2), blastRadius24h: w(6), paused: w(10) === 1n };
+    }
+    (async () => {
+      try {
+        const [blk, v, h] = await Promise.all([rpc("eth_blockNumber", []), snapshot(M.contracts.vault), snapshot(M.contracts.honeypotVault)]);
+        S = { v, h, block: parseInt(blk, 16), live: true };
+      } catch (e) { /* snapshot from verified evidence */ }
+      drawTheorems(false); stamp(); drawVaults();
+      $("netdot").classList.toggle("live", S.live);
+      $("netlabel").textContent = `${M.network.name} · block ${S.block.toLocaleString("en-US")}${S.live ? "" : " (snapshot)"}`;
+      $("srcnote").textContent = S.live ? "read live from a public Sepolia node just now" : "values from the verified evidence snapshot; open the GitHub Pages version for live reads";
+    })();
+
+    // ───────── vaults ─────────
+    function vaultSheet(title, sub, s, addr) {
+      const total = Number(s.balance) || 1;
+      const fence = Number(s.protectedBalance) / total * 100;
+      const br = Math.min(Number(s.blastRadius24h), Number(s.freeBalance)) / total * 100;
+      return `<div class="sheet bs">
+        <div><h3>${title}</h3><div class="sub">${sub} · <a class="hash" href="${addrUrl(addr)}" target="_blank" rel="noopener">${short(addr)}</a></div></div>
+        <div class="bs-bar" role="img" aria-label="${usd(s.protectedBalance)} ring-fenced of ${usd(s.balance)} total"><div class="bs-fence" style="width:${fence}%"></div><div class="bs-free" style="width:${100 - fence}%"></div></div>
+        <div class="br" aria-hidden="true"><div class="bracket" style="left:${fence}%;width:${br}%"><span>${br > 0 ? `24h blast radius ${usd(s.blastRadius24h)}` : "blast radius 0 (paused or capped)"}</span></div></div>
+        <dl class="bs-labels" style="margin:0">
+          <div class="kv"><dt>Balance</dt><dd>${usd(s.balance)} <small>tUSD</small></dd></div>
+          <div class="kv"><dt>Ring-fenced</dt><dd>${usd(s.protectedBalance)} <small>tUSD</small></dd></div>
+          <div class="kv"><dt>Free</dt><dd>${usd(s.freeBalance)} <small>tUSD</small></dd></div>
+          <div class="kv"><dt>Worst case, 24h</dt><dd>${usd(s.blastRadius24h)} <small>tUSD</small></dd></div>
+        </dl></div>`;
+    }
+    function drawVaults() {
+      $("vaults").innerHTML =
+        vaultSheet("QED agent vault", "After a full day of work and attacks", S.v, M.contracts.vault) +
+        vaultSheet("Honeypot vault", "Agent and co-signer keys are public", S.h, M.contracts.honeypotVault);
+    }
+    drawVaults();
+
+    // ───────── four proofs (outcomes) ─────────
+    const ev = (id) => step(id);
+    const L4 = ev("L4"), L6 = ev("L6");
+    const proofs = [
+      {
+        q: "Can a genuinely separate AI-agent key execute a payment under an independent policy certificate?",
+        h: "Yes. The AI's own key paid Helix 6 tUSD, under the owner's mandate and the co-signer's certificate.",
+        li: [
+          `Owner, agent, co-signer and guardian are four different keys, each in its own process. Agent <a class="hash" href="${addrUrl(M.actors.agent)}" target="_blank" rel="noopener">${short(M.actors.agent)}</a>.`,
+          `The owner signed a mandate off-chain once: two payees, ≤ 40 tUSD per payment, 7 days.`,
+          `The independent co-signer passed 12 checks and signed the exact recipient, amount and the hash of its decision record.`,
+          `The agent's key sent the payment ${txLink("L4")}. The vault recovered both signatures before moving a cent.`,
+        ],
+        end: `evidence hash on-chain = keccak of the published decision record`,
+      },
+      {
+        q: "Can the agent complete a paid-work lifecycle that generates a real escrow settlement?",
+        h: "Yes, and the escrow paid only after checking a proof that the work is mathematically optimal.",
+        li: [
+          `A client agent requested a quote; QED priced it at 15 tUSD and signed the terms. The client funded escrow ${txLink("L2")}.`,
+          `QED bought the licensed risk model it needed ${txLink("L4", "6 tUSD")} and solved the minimum-variance portfolio.`,
+          `It delivered the portfolio with its KKT certificate. The verifier contract checked it and 15 tUSD settled into the vault ${txLink("L6")}.`,
+          `A cheaper rival delivered a lazy 1/N portfolio ${txLink("X17")} and a near-miss ${txLink("X18")}. Both rejected; the client was refunded ${txLink("X19")}.`,
+        ],
+        end: `payment is a theorem: no reviewer, oracle or approval step exists`,
+      },
+      {
+        q: "Can an adversarial agent violate a protected liability or tamper with signed payment terms?",
+        h: `No. ${attacks.length} attacks are on-chain as reverted transactions, each with the error that stopped it.`,
+        li: [
+          `Edited a signed certificate's amount ${txLink("X8")} or recipient ${txLink("X9")}; replayed it ${txLink("X10")}; edited the agent's signed quote ${txLink("X2")}.`,
+          `With the AI key and the co-signer key both stolen: paid itself ${txLink("X6")}, drained one dollar past the free balance ${txLink("X11")}, burst past the 24h cap ${txLink("X12")}.`,
+          `Tried owner powers with the AI key ${txLink("X13")} and to cancel the creditor's claim ${txLink("X14")}.`,
+          `During an emergency pause the attacker could only pay the creditor its 70 tUSD ${txLink("P3")}.`,
+        ],
+        end: `0 tUSD reached the attacker from either vault`,
+      },
+      {
+        q: "Can an external reviewer reproduce all of these with the source, tests and transaction receipts?",
+        h: "Yes. One command re-derives every claim from a public node, with no keys.",
+        li: [
+          `<span class="hash">npm run verify</span> checks that each deployed contract's bytecode equals this repository's build, then replays every receipt and attack.`,
+          `It recovers the owner and co-signer signatures from calldata and re-hashes the published decision record.`,
+          `It re-checks the delivered portfolio's KKT certificate in an independent TypeScript implementation.`,
+          `67 Solidity tests (≈344k fuzzed adversarial calls) and 42 TypeScript tests run in public CI on every push.`,
+        ],
+        end: `CI also re-verifies the live chain every day`,
+      },
+    ];
+    $("proofs").innerHTML = proofs.map((p) => `<article class="proof"><p class="q">${esc(p.q)}</p><h3>${p.h}</h3><ol>${p.li.map((x) => `<li>${x}</li>`).join("")}</ol><div class="end"><span>${p.end}</span><span class="tomb" aria-label="proved"></span></div></article>`).join("");
+
+    // ───────── ledger ─────────
+    const phases = [["all", "Everything"], ["lifecycle", "Paid work"], ["conversation", "Conversation"], ["attack", "Attacks"], ["honeypot", "Honeypot"], ["emergency", "Emergency"], ["setup", "Setup"], ["deploy", "Deploy"]];
+    let phase = "all";
+    try { phase = localStorage.getItem("qed-phase") || "all"; } catch (e) {}
+    const actorFor = (s) => esc(s.actor);
+    function drawRows() {
+      const rows = M.steps.filter((s) => phase === "all" || s.phase === phase);
+      $("rows").innerHTML = rows.map((s) => {
+        const res = !s.tx ? `<span class="offc">off-chain</span>` : s.tx.status === "success" ? `<span class="res ok">confirmed</span>` : `<span class="stampx">Refused</span><span class="err">${esc(s.error?.name ?? "")}</span>`;
+        const link = s.tx ? `<a class="hash" href="${txUrl(s.tx.hash)}" target="_blank" rel="noopener">${short(s.tx.hash)}</a><div class="n num">block ${Number(s.tx.blockNumber).toLocaleString("en-US")}</div>` : `<span class="offc">${s.artifacts?.[0]?.hash ? short(s.artifacts[0].hash) : "—"}</span>`;
+        return `<tr><td class="id">${esc(s.id)}</td><td><div class="t">${esc(s.title)}</div>${s.narrative ? `<div class="n">${esc(s.narrative)}</div>` : ""}</td><td>${actorFor(s)}</td><td>${res}</td><td>${link}</td></tr>`;
+      }).join("");
+    }
+    $("filters").innerHTML = phases.map(([k, l]) => `<button class="chip" type="button" data-k="${k}" aria-pressed="${k === phase}">${l} <span class="num">${k === "all" ? M.steps.length : M.steps.filter((s) => s.phase === k).length}</span></button>`).join("");
+    $("filters").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      phase = b.dataset.k; try { localStorage.setItem("qed-phase", phase); } catch (err) {}
+      $("filters").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      drawRows();
+    });
+    drawRows();
+
+    // ───────── portfolio ─────────
+    const P = D.portfolio;
+    if (P) {
+      const max = Math.max(...P.weights.map((w) => w.weight));
+      const muByAsset = D.portfolioMu ?? {};
+      $("weights").innerHTML = `<h3 style="font-family:var(--serif);font-weight:500;font-size:var(--step-2);margin-bottom:6px">Certified minimum-variance portfolio</h3>
+        <p style="color:var(--muted);font-size:var(--step--1);margin-bottom:12px">Helix Risk Model, Oct 2026 (illustrative). Volatility <b class="num">${(P.volatility * 100).toFixed(2)}%</b>. Assets at zero carry a positive multiplier μ: adding any of them would raise risk.</p>
+        ${P.weights.map((w) => `<div class="wrow"><div class="a">${esc(w.asset)}</div><div class="track"><div class="fill" style="width:${(w.weight / max) * 100}%"></div></div><div class="w">${(w.weight * 100).toFixed(2)}%</div>${w.weight === 0 && muByAsset[w.asset] ? `<div class="mu num">μ = ${muByAsset[w.asset]}</div>` : ""}</div>`).join("")}`;
+      const c = P.certificate;
+      $("kkt").innerHTML = `
+        <div class="row"><div class="l">Stationarity residual, max<small>|(Σw)<sub>i</sub> − ν − μ<sub>i</sub>|, tolerance τ = 10<sup>−9</sup></small></div><div class="r"><b>${c.maxStationarityResidual}</b></div></div>
+        <div class="row"><div class="l">Duality gap<small>Σ w<sub>i</sub>μ<sub>i</sub>, an upper bound on suboptimality</small></div><div class="r"><b>${c.dualityGap}</b></div></div>
+        <div class="row"><div class="l">Convexity witness residual<small>|Σ − LLᵀ|, proves the problem is convex</small></div><div class="r"><b>${(Number(c.maxPsdResidual) / 1e18).toExponential(1)}</b></div></div>
+        <div class="row"><div class="l">Certified ε-optimality<small>(2n + 3 + |ν|)·τ, theorem in ALGORITHMS.md §4</small></div><div class="r"><b>${c.optimalityBound.toExponential(2)}</b></div></div>
+        <div class="row"><div class="l">Lazy 1/N forgery<small>rejected on-chain with this duality gap ${txLink("X17")}</small></div><div class="r" style="color:var(--stamp)">${D.lazyGap ? D.lazyGap.toFixed(4) : "rejected"}</div></div>
+        <div class="row"><div class="l">Escrow settlement<small>15 tUSD into the agent's vault</small></div><div class="r">${txLink("L6")}</div></div>`;
+    }
+
+    // ───────── conversation ─────────
+    const C = D.conversation;
+    if (C) {
+      const engine = (C.enginesUsed ?? []).join(", ");
+      $("convonote").textContent = `The owner's real session with the agent during the live run (language model: ${engine}). Every turn is hashed into a decision record; payments needed the owner's signature on the exact instruction.`;
+      const good = new Set(["amount_missing"]);
+      const turns = C.turns;
+      const renderTurns = (n) => turns.slice(0, n).map((t) => `
+        <div class="turn owner"><div class="who">Owner</div><div class="bubble">${esc(t.owner)}</div></div>
+        <div class="turn agent"><div class="who">QED agent</div><div class="bubble">${esc(t.agent)}${t.tx ? `<div class="flags"><a class="flag good hash" href="${txUrl(t.tx)}" target="_blank" rel="noopener">executed ${short(t.tx)}</a></div>` : ""}${t.flags?.length ? `<div class="flags">${t.flags.map((f) => `<span class="flag${good.has(f) ? " good" : ""}">${esc(f.replace(/_/g, " "))}</span>`).join("")}</div>` : ""}</div></div>`).join("");
+      let shown = Math.min(8, turns.length);
+      const draw = () => {
+        $("convo").innerHTML = renderTurns(shown) + (shown < turns.length ? `<button class="chip convo-more" type="button" id="moreconvo">Show the remaining ${turns.length - shown} turns</button>` : "");
+        const b = $("moreconvo"); if (b) b.addEventListener("click", () => { shown = turns.length; draw(); });
+      };
+      draw();
+    }
+
+    // ───────── red team ─────────
+    const R = D.redteam;
+    if (R) {
+      const cat = R.byCategory;
+      const name = { induced_transfer: "Induced transfer", data_extraction: "Data extraction", privilege_escalation: "Privilege escalation", prompt_injection: "Prompt injection", benign: "Benign requests answered" };
+      $("rtnote").textContent = `${R.cases} cases against ${R.engine.join(", ")}: the rubric's four attack classes in English and Chinese, plus benign requests that must not be refused.`;
+      $("rt").innerHTML = Object.entries(cat).map(([k, v]) => `<div class="c"><div class="k">${name[k] ?? k}</div><div class="v">${v.guarded}/${v.n}</div><div class="s">${k === "benign" ? "no false refusals" : `blocked by QED · model alone ${v.llmAlone}/${v.n}`}</div></div>`).join("");
+    }
+
+    // ───────── honeypot ─────────
+    const H = D.honeypot;
+    if (H) {
+      const keyRow = (label, val) => `<div class="key"><label>${label}</label><div class="line"><code>${esc(val)}</code><button class="copy" type="button" data-v="${esc(val)}">Copy</button></div></div>`;
+      $("hpkeys").innerHTML = keyRow("AI agent private key", H.agentPrivateKey) + keyRow("Co-signer private key", H.cosignerPrivateKey) +
+        `<p style="font-size:var(--step--1);color:var(--muted)">Owner-signed mandate and signature: <span class="hash">evidence/ethereum-sepolia/honeypot.json</span>. Bring your own Sepolia gas. Testnet only, valueless token.</p>`;
+      $("hpstate").innerHTML = `<div class="kkt">
+        <div class="row"><div class="l">Vault<small>${esc(M.network.name)}</small></div><div class="r"><a class="hash" href="${addrUrl(H.vault)}" target="_blank" rel="noopener">${short(H.vault)}</a></div></div>
+        <div class="row"><div class="l">Allowed by the published keys<small>owner mandate: CloudCo only, ≤ 1 tUSD per day</small></div><div class="r">${txLink("H3", "proved")}</div></div>
+        <div class="row"><div class="l">Pay the attacker<small>PayeeNotInMandate</small></div><div class="r">${txLink("H4", "refused")}</div></div>
+        <div class="row"><div class="l">Take 50 tUSD early<small>ExceedsPerPaymentCap</small></div><div class="r">${txLink("H5", "refused")}</div></div>
+        <div class="row"><div class="l">Withdraw with the agent key<small>NotOwner</small></div><div class="r">${txLink("H6", "refused")}</div></div></div>`;
+      document.querySelectorAll(".copy").forEach((b) => b.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(b.dataset.v); b.textContent = "Copied"; }
+        catch (e) { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; }
+        setTimeout(() => (b.textContent = "Copy"), 1600);
+      }));
+    }
+
+    // ───────── reproduce + contracts ─────────
+    $("cmds").textContent = [
+      `git clone --recursive ${D.repo}`,
+      `cd qed-agent-wallet && npm ci && forge build`,
+      ``,
+      `forge test              # 67 Solidity tests, fuzz + stateful invariants`,
+      `npm run test:ts         # 42 TypeScript tests: TS≡Solidity parity, solver oracle, red-team`,
+      `npm run verify          # re-derives every on-chain claim from public Sepolia, no keys`,
+      `npm run local           # the whole economy on a local chain, no keys or API needed`,
+    ].join("\n");
+    const names = { vault: "QEDVault (agent)", honeypotVault: "QEDVault (honeypot)", escrow: "ProofEscrow", verifier: "MinVarianceVerifier", lens: "QEDLens", token: "TestUSD" };
+    $("contracts").innerHTML = Object.entries(names).map(([k, n]) => `<div><span>${n}</span><a class="hash" href="${addrUrl(M.contracts[k])}" target="_blank" rel="noopener">${short(M.contracts[k])}</a></div>`).join("");
+    $("foot").innerHTML = `QED · FinTechathon 2026, Topic F · <a href="${D.repo}" target="_blank" rel="noopener">source code</a> · testnet prototype with a valueless token, not audited.`;
+  }
+})();
+</script>

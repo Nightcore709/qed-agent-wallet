@@ -79,6 +79,11 @@ export interface FeeOverride {
  *  differs from the local EVM used for simulation (e.g. Sepolia's state-creation repricing): only gas
  *  actually used is charged, and our contracts contain no gas-dependent logic. */
 const FIXED_GAS = process.env.GAS_LIMIT ? BigInt(process.env.GAS_LIMIT) : undefined;
+if (process.env.REQUIRE_FIXED_GAS === "1" && !FIXED_GAS) {
+  // Fail fast: a process that will broadcast to a network with a different gas schedule must never
+  // fall back to local estimates (this exact mistake once cost a test run an out-of-gas revert).
+  throw new Error("REQUIRE_FIXED_GAS=1 but GAS_LIMIT is not set in this process");
+}
 
 export class Chain$ {
   readonly pub: PublicClient;

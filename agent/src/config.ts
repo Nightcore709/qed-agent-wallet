@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { privateKeyToAccount } from "viem/accounts";
-import type { Address, Hex, LocalAccount } from "viem";
+import { keccak256, toHex, type Address, type Hex, type LocalAccount } from "viem";
 import { Chain$ } from "./chain.js";
 
 export type Role =
@@ -24,6 +24,22 @@ export function loadEnvFile(path: string) {
     const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
     if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
   }
+}
+
+export const ROLES: Role[] = ["DEPLOYER", "OWNER", "AGENT", "COSIGNER", "GUARDIAN", "CLIENT", "VENDOR", "CREDITOR", "ADVERSARY", "HONEYPOT_AGENT", "HONEYPOT_OWNER", "HONEYPOT_COSIGNER"];
+
+/**
+ * Reviewers can run the full economy locally without any secrets: if no keys are configured we
+ * derive DEV-ONLY keys deterministically (keccak256("qed-dev-<ROLE>")). Never used for public networks.
+ */
+export function ensureDevKeys() {
+  if (process.env.DEPLOYER_PK) return false;
+  for (const r of ROLES) {
+    const pk = keccak256(toHex(`qed-dev-${r}`));
+    process.env[`${r}_PK`] = pk;
+    process.env[`${r}_ADDR`] = privateKeyToAccount(pk).address;
+  }
+  return true;
 }
 
 /** A process can only obtain the keys present in ITS environment. Child processes are spawned with

@@ -2,7 +2,7 @@
   "name": "qed-agent-wallet",
   "version": "1.0.0",
   "private": true,
-  "description": "QED — proof-carrying autonomy for AI agent wallets. FinTechathon 2026 Topic F.",
+  "description": "QED \u2014 proof-carrying autonomy for AI agent wallets. FinTechathon 2026 Topic F.",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -15,13 +15,13 @@
     "test": "forge test && npm run test:ts",
     "fixtures": "tsx agent/scripts/fixtures.ts",
     "local": "tsx agent/scripts/local.ts",
-    "deploy": "tsx agent/scripts/deploy.ts",
-    "lifecycle": "tsx agent/scripts/lifecycle.ts",
-    "attacks": "tsx agent/scripts/attacks.ts",
-    "honeypot": "tsx agent/scripts/honeypot.ts",
     "live": "tsx agent/scripts/live.ts",
     "verify": "tsx agent/scripts/verify.ts",
-    "report": "tsx agent/scripts/report.ts"
+    "redteam": "tsx agent/scripts/redteam.ts",
+    "build:app": "tsx agent/scripts/build-app.ts",
+    "typecheck": "tsc --noEmit -p .",
+    "resume": "tsx agent/scripts/resume.ts",
+    "evidence:md": "tsx agent/scripts/evidence-md.ts"
   },
   "dependencies": {
     "viem": "^2.21.55"

@@ -12,7 +12,7 @@
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createPublicClient, http, parseEther, type Hex } from "viem";
-import { loadEnvFile } from "../src/config.js";
+import { ensureDevKeys, loadEnvFile } from "../src/config.js";
 
 loadEnvFile(".keys.env");
 const shadowOf = process.env.SHADOW_OF ? Number(process.env.SHADOW_OF) : undefined;
@@ -21,6 +21,8 @@ const port = Number(process.env.ANVIL_PORT ?? 8545);
 const rpc = `http://127.0.0.1:${port}`;
 
 async function main() {
+  if (!shadowOf && ensureDevKeys()) console.log("no .keys.env found → using deterministic DEV keys (local chain only)");
+  if (shadowOf && !process.env.DEPLOYER_PK) throw new Error("replica mode needs the real role keys in .keys.env");
   const anvil = spawn("anvil", ["--port", String(port), "--chain-id", String(chainId), "--hardfork", "osaka", "--base-fee", "21", "--gas-limit", "60000000", "--silent"], { stdio: "ignore" });
   const pub = createPublicClient({ transport: http(rpc) });
   for (let i = 0; i < 100; i++) {
@@ -49,7 +51,8 @@ async function main() {
     SHADOW: "1",
     MAX_FEE_GWEI: process.env.MAX_FEE_GWEI ?? "0.02",
     PRIORITY_FEE_GWEI: process.env.PRIORITY_FEE_GWEI ?? "0.01",
-    GAS_LIMIT: process.env.GAS_LIMIT ?? (shadowOf ? "16000000" : ""),
+    GAS_LIMIT: process.env.GAS_LIMIT ?? (shadowOf ? "16700000" : ""),
+    REQUIRE_FIXED_GAS: shadowOf ? "1" : "",
     LIABILITY_DELAY_S: process.env.LIABILITY_DELAY_S ?? (shadowOf ? "1800" : "90"),
     MALLORY_JOB_WINDOW_S: process.env.MALLORY_JOB_WINDOW_S ?? (shadowOf ? "1500" : "60"),
     EVIDENCE_DIR: process.env.EVIDENCE_DIR ?? (shadowOf ? `evidence/shadow-${chainId}` : "evidence/local"),

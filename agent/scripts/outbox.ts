@@ -18,9 +18,12 @@ async function main() {
     for (const tx of block.transactions as any[]) {
       const raw = (await (pub as any).request({ method: "eth_getRawTransactionByHash", params: [tx.hash] })) as Hex;
       const r = await pub.getTransactionReceipt({ hash: tx.hash });
+      const minGas = process.env.MIN_GAS ? BigInt(process.env.MIN_GAS) : 0n;
+      if (BigInt(tx.gas) < minGas) throw new Error(`tx ${tx.hash} from ${tx.from} has gas ${tx.gas} < ${minGas} — refusing to export`);
       outbox.push({
         i: outbox.length,
         hash: tx.hash,
+        gas: tx.gas.toString(),
         from: tx.from,
         to: tx.to,
         nonce: tx.nonce,

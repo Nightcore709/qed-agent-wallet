@@ -1,0 +1,42 @@
+{
+  "vault": "0xe5b3e7773115dba454e7e40fa97a5d3e332c7f04",
+  "token": "0x7adb609421e30b3df3063ff2de9d425564893f35",
+  "chainId": 11155111,
+  "agentPrivateKey": "0x524a92e496e20cf74b24e66aeb9e33bda140dd98d39f311ab2fcee5f5810d63f",
+  "cosignerPrivateKey": "0x402815651c54509e9d6ddfd0058c059e230dbbe2d7d12d6deb3317f41737bfb1",
+  "agent": "0x22f224dd5Db8344E6474c9d165DC273E96c173F5",
+  "cosigner": "0x35b370861B06aA2a372f02BdF027f5E324153ab7",
+  "mandate": {
+    "vault": "0xe5b3e7773115dba454e7e40fa97a5d3e332c7f04",
+    "agent": "0x22f224dd5Db8344E6474c9d165DC273E96c173F5",
+    "payees": [
+      "0x2d3e8af597fcA9F4ecDc41C69F2956EDd6f1CB78"
+    ],
+    "maxPerPayment": {
+      "$big": "1000000"
+    },
+    "maxPerPeriod": {
+      "$big": "1000000"
+    },
+    "period": {
+      "$big": "86400"
+    },
+    "maxTotal": {
+      "$big": "10000000"
+    },
+    "validFrom": {
+      "$big": "1792418727"
+    },
+    "validUntil": {
+      "$big": "1823868387"
+    },
+    "epoch": {
+      "$big": "0"
+    },
+    "requireCosign": true,
+    "purpose": "0xb461c17482353f30493e9ee5427751448d645a4168fc5bc4e8dcb30237612e54",
+    "salt": "0x5aa12dac1fad02da199134ef2505a9fd3d9b97ae7fa46c8298e621eda349a115"
+  },
+  "ownerSig": "0x77508335f3fc2551708407c899564365fe7c40db2fccea9b1d09f24527d1715f5b6d6e3be28fa894409675ace1b0d907ed0205ab4dd5e37825eaf09049732a551b",
+  "note": "These keys are PUBLISHED ON PURPOSE. Ring-fenced funds are protected by the contract, not by key secrecy."
+}

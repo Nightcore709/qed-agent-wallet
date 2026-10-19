@@ -1,0 +1,235 @@
+{
+  "kind": "fulfilment",
+  "hash": "0x4f4ab96f0c474bac6de7b1ce39a0997f686bab4bde4d69744ac38cc13359e7fd",
+  "body": {
+    "jobId": "1",
+    "invoice": {
+      "invoiceId": "HELIX-1792418710-1",
+      "productId": "helix-risk-model-2026-10",
+      "title": "Helix Risk Model — Oct 2026 (6-asset covariance, illustrative)",
+      "vendor": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+      "payTo": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+      "buyer": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+      "amount": "6000000",
+      "dataCommitment": "0xbb5b6471783eba7c2bb91e2dd093fc2964255ebf27caf7ed84a437f2ca76c47a",
+      "jobId": "1",
+      "issuedAt": 1792418710,
+      "expiresAt": 1792422310
+    },
+    "cert": {
+      "approved": true,
+      "certificate": {
+        "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427",
+        "recipient": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+        "amount": "6000000",
+        "dueAt": "0",
+        "intentId": "0xd022f7486ca7dc58d073e1ad33136006a1e2da05aa01ef4f03144e4107c4a303",
+        "evidenceHash": "0xb0dd4c9948b88c358554deee7d24c77226ae524e22f65a9592d5723072d39e41",
+        "ref": "0x6acceded2dd3066a7a7468c3886f685fad9da4e90cff26d2d9d173f0e30a4bda",
+        "notBefore": "1792418662",
+        "expiresAt": "1792425922",
+        "epoch": "0"
+      },
+      "signature": "0xed5b2ad0077112169d3a28d7c11d0a17fafc051216d8e0914b0b1df49e8ca3883bdd453d6fce5bd733d82300bf2d58056e643790b761a41343ebc3decb5e770f1b",
+      "evidenceHash": "0xb0dd4c9948b88c358554deee7d24c77226ae524e22f65a9592d5723072d39e41",
+      "recordPath": "evidence/ethereum-sepolia/records/cosigner/0xb0dd4c9948b88c358554deee7d24c77226ae524e22f65a9592d5723072d39e41.json",
+      "checks": [
+        {
+          "id": "C1",
+          "name": "Mandate signed by the vault owner",
+          "pass": true,
+          "detail": "recovered 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7"
+        },
+        {
+          "id": "C2",
+          "name": "Mandate active and current epoch",
+          "pass": true,
+          "detail": "epoch 0, valid until 2026-10-26T14:05:20.000Z"
+        },
+        {
+          "id": "C3",
+          "name": "Invoice signed by the payee's registered key",
+          "pass": true,
+          "detail": "invoice signer 0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8"
+        },
+        {
+          "id": "C4",
+          "name": "Invoice addressed to this vault, not expired",
+          "pass": true,
+          "detail": "buyer 0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6, expires 2026-10-19T15:05:10.000Z"
+        },
+        {
+          "id": "C5",
+          "name": "Price equals the vendor's published list price",
+          "pass": true,
+          "detail": "invoice 6.00 vs list 6.00"
+        },
+        {
+          "id": "C6",
+          "name": "Invoice not seen before",
+          "pass": true,
+          "detail": "HELIX-1792418710-1"
+        },
+        {
+          "id": "C7",
+          "name": "Funded escrow job exists for this vault and covers the cost with margin",
+          "pass": true,
+          "detail": "job #1: status 1, price 15.00, cost 6.00"
+        },
+        {
+          "id": "C8",
+          "name": "Purchased data is exactly what the job's committed spec requires",
+          "pass": true,
+          "detail": "job spec 0xbb5b6471… vs data 0xbb5b6471…"
+        },
+        {
+          "id": "C9",
+          "name": "Payee is listed in the owner's mandate",
+          "pass": true,
+          "detail": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8"
+        },
+        {
+          "id": "C10",
+          "name": "Reserve buffer above ring-fenced liabilities preserved",
+          "pass": true,
+          "detail": "free 30.00 − 6.00 = 24.00 ≥ 5.00 (ring-fenced 70.00)"
+        },
+        {
+          "id": "C11",
+          "name": "Sanctions / deny-list screening",
+          "pass": true,
+          "detail": "payee not on deny-list"
+        },
+        {
+          "id": "C12",
+          "name": "Earned autonomy: discretionary spend ≤ 10 + 50% of VERIFIED revenue",
+          "pass": true,
+          "detail": "spent 0.00 + 6.00 ≤ allowance 10.00 (verified revenue 0.00)"
+        }
+      ],
+      "reasons": []
+    },
+    "paymentTx": {
+      "hash": "0x56a2334eaf8ef1a22323b456f608851a571295a9adac3fb1a8c379c5e58b83b6",
+      "status": "success",
+      "blockNumber": "23",
+      "gasUsed": "216459",
+      "from": "0x2A101d90D3E502bDBd4a06c6712cA7D240A9d0Bb",
+      "to": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6",
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+            "to": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+            "value": "6000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "PaymentExecuted",
+          "args": {
+            "intentId": "0xd022f7486ca7dc58d073e1ad33136006a1e2da05aa01ef4f03144e4107c4a303",
+            "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427",
+            "recipient": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+            "amount": "6000000",
+            "liabilityId": "0",
+            "evidenceHash": "0xb0dd4c9948b88c358554deee7d24c77226ae524e22f65a9592d5723072d39e41",
+            "ref": "0x6acceded2dd3066a7a7468c3886f685fad9da4e90cff26d2d9d173f0e30a4bda"
+          },
+          "address": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6"
+        }
+      ]
+    },
+    "weights": [
+      {
+        "asset": "Global Equities",
+        "weight": 0.16318330373047862
+      },
+      {
+        "asset": "US Treasuries 7-10y",
+        "weight": 0.8080865744026343
+      },
+      {
+        "asset": "Gold",
+        "weight": 0.02873012186688706
+      },
+      {
+        "asset": "Bitcoin",
+        "weight": 0
+      },
+      {
+        "asset": "IG Corporate Credit",
+        "weight": 0
+      },
+      {
+        "asset": "Global REITs",
+        "weight": 0
+      }
+    ],
+    "variance": 0.00266044249888746,
+    "volatility": 0.051579477497231976,
+    "certificateReport": {
+      "ok": true,
+      "maxStationarityResidual": "0",
+      "dualityGap": "0",
+      "maxPsdResidual": "63",
+      "optimalityBound": 1.500266044249889e-8
+    },
+    "deliverTx": {
+      "hash": "0x4166253f06143b2a07b3c77fb4d4603a33e84f3b6706363f0d727f485f9335f9",
+      "status": "success",
+      "blockNumber": "24",
+      "gasUsed": "238658",
+      "from": "0x2A101d90D3E502bDBd4a06c6712cA7D240A9d0Bb",
+      "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x2e3362D6dc88c40Cf95f885c44fE8fFF9979bA9F",
+            "to": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+            "value": "15000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "JobSettled",
+          "args": {
+            "jobId": "1",
+            "payee": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+            "price": "15000000",
+            "solutionHash": "0xc8a8e0988db79ec75c549c8a6747910aa78cbc60e6182e15e28b321f6a79e454",
+            "resultDigest": "0x000000000000000000000000000000000000000000000000000973a88a176f24"
+          },
+          "address": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f"
+        }
+      ]
+    },
+    "solveMs": 2.204083999999966,
+    "solution": {
+      "w": [
+        "163183303730478624",
+        "808086574402634316",
+        "28730121866887060",
+        "0",
+        "0",
+        "0"
+      ],
+      "nu": "2660442498887460",
+      "mu": [
+        "0",
+        "0",
+        "0",
+        "1755817317734855",
+        "258712775329254",
+        "2311851045527849"
+      ],
+      "support": [
+        0,
+        1,
+        2
+      ]
+    }
+  }
+}
