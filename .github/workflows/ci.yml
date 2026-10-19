@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   contracts:
-    name: Solidity — build, 67 tests, fuzz + invariants
+    name: Solidity — build, 82 tests, fuzz + invariants
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
         env: { FOUNDRY_PROFILE: ci }
 
   agent:
-    name: Agent — type-check, 42 tests, full economy on a local chain
+    name: Agent — type-check, 45 tests, both economies on a local chain
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +38,8 @@ jobs:
       - name: Run the whole autonomous economy locally (deterministic offline brain, dev keys)
         run: npm run local
         env: { QED_OFFLINE: "1" }
+      - name: Run the certified-clearing economy locally (5 AI businesses, proof-gated netting, dev keys)
+        run: npm run local:clearing
 
   verify-sepolia:
     name: Independently re-verify every on-chain claim (Ethereum Sepolia, no keys)
