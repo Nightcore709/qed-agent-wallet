@@ -112,6 +112,7 @@ section { padding-block: 56px; border-bottom: 1px solid var(--rule); }
 .br { position: relative; height: 26px; }
 .br .bracket { position: absolute; top: 4px; height: 12px; border: 1.5px solid var(--stamp); border-top: 0; }
 .br .bracket span { position: absolute; top: 12px; left: 0; white-space: nowrap; font-size: var(--step--1); color: var(--stamp); }
+.br .bracket.end span { left: auto; right: 0; }
 .vaults { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 18px; }
 .vaults h3 { font-family: var(--serif); font-weight: 500; font-size: var(--step-2); margin-bottom: 4px; }
 .vaults .sub { color: var(--muted); font-size: var(--step--1); margin-bottom: 16px; }
@@ -184,6 +185,16 @@ td .n { color: var(--muted); font-size: var(--step--1); margin-top: 2px; max-wid
 .rt .c .v { font-family: var(--serif); font-size: var(--step-3); font-variant-numeric: tabular-nums; line-height: 1; }
 .rt .c .s { font-size: var(--step--1); color: var(--muted); }
 
+/* ── clearing ── */
+.clr { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 900px) { .clr { grid-template-columns: 1fr; } }
+.graphs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.graphs figure { margin: 0; display: grid; gap: 6px; }
+.graphs figcaption { font-size: var(--step--1); color: var(--muted); }
+.graphs figcaption b { color: var(--ink); font-weight: 600; }
+.graphs svg { width: 100%; height: auto; display: block; }
+.clr-rows { margin-top: 18px; }
+
 /* ── honeypot ── */
 .hp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
 @media (max-width: 860px) { .hp { grid-template-columns: 1fr; } }
@@ -221,6 +232,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       <a href="#outcomes">Proofs</a>
       <a href="#ledger">Ledger</a>
       <a href="#portfolio">Portfolio</a>
+      <a href="#clearing">Clearing</a>
       <a href="#conversation">Conversation</a>
       <a href="#honeypot">Honeypot</a>
       <a href="#reproduce">Reproduce</a>
@@ -283,6 +295,20 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
         <div class="sheet"><div id="weights"></div></div>
         <div class="sheet"><div class="kkt" id="kkt"></div></div>
       </div>
+    </div>
+  </section>
+
+  <section id="clearing">
+    <div class="wrap">
+      <div class="shead">
+        <h2>A whole agent economy, cleared by proof</h2>
+        <p id="clrnote">Five AI businesses owe each other money in cycles and hold too little cash to pay gross. Anyone may submit a netting; the contract executes it only if every agent’s net position is unchanged and a duality certificate proves no larger netting exists.</p>
+      </div>
+      <div class="clr">
+        <div class="sheet"><div class="graphs" id="clrgraphs"></div></div>
+        <div class="sheet"><div class="kkt" id="clrfacts"></div></div>
+      </div>
+      <div class="ledger-wrap clr-rows"><table><thead><tr><th>Step</th><th>What happened</th><th>Signed by</th><th>Result</th><th>Transaction</th></tr></thead><tbody id="clrrows"></tbody></table></div>
     </div>
   </section>
 
@@ -385,6 +411,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       { id: "excl", stmt: () => `<var>L</var><sub>unapproved</sub> = 0`, sub: "Loss to any address the owner did not approve", val: () => `<b class="num">${attacks.length} attacks refused</b>0 tUSD reached the attacker` },
       { id: "bound", stmt: () => `<var>BR</var><sub>24h</sub> ≤ ${usd(S.v.blastRadius24h)}`, sub: "Worst case if the AI key and the co-signer key are both stolen", val: () => `<b class="num">${usd(S.v.blastRadius24h)} tUSD</b>computed by QEDLens, not by the AI` },
       { id: "opt", stmt: () => `<var>f</var>(<var>w</var>) − <var>f</var><sup>*</sup> ≤ ${(D.portfolio?.certificate?.optimalityBound ?? 1.5e-8).toExponential(1).replace("e-", " × 10<sup>−").replace(/$/, "</sup>")}`, sub: "The portfolio it was paid for is provably optimal", val: () => `<b class="num">gap ${D.portfolio?.certificate?.dualityGap ?? "0"}</b>KKT certificate checked on-chain` },
+      { id: "clr", stmt: () => `Σ<var>x</var> = Σ<var>d</var>·<var>y</var>`, sub: "The clearing house cancelled the largest possible debt, moving no value", val: () => `<b class="num">${usd(S.c?.cleared ?? D.clearing?.final?.cleared ?? 0)} tUSD cleared</b>maximality certificate checked on-chain` },
     ];
 
     function drawTheorems(pending) {
@@ -425,7 +452,13 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
     (async () => {
       try {
         const [blk, v, h] = await Promise.all([rpc("eth_blockNumber", []), snapshot(M.contracts.vault), snapshot(M.contracts.honeypotVault)]);
-        S = { v, h, block: parseInt(blk, 16), live: true };
+        let cl;
+        if (D.clearing) {
+          const cleared = await rpc("eth_call", [{ to: D.clearing.contracts.clearing, data: D.selectors.totalCleared }, "latest"]);
+          const gross = await rpc("eth_call", [{ to: D.clearing.contracts.clearing, data: D.selectors.grossOpen }, "latest"]);
+          cl = { cleared: BigInt(cleared), grossOpen: BigInt(gross) };
+        }
+        S = { v, h, c: cl, block: parseInt(blk, 16), live: true };
       } catch (e) { /* snapshot from verified evidence */ }
       drawTheorems(false); stamp(); drawVaults();
       $("netdot").classList.toggle("live", S.live);
@@ -441,7 +474,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       return `<div class="sheet bs">
         <div><h3>${title}</h3><div class="sub">${sub} · <a class="hash" href="${addrUrl(addr)}" target="_blank" rel="noopener">${short(addr)}</a></div></div>
         <div class="bs-bar" role="img" aria-label="${usd(s.protectedBalance)} ring-fenced of ${usd(s.balance)} total"><div class="bs-fence" style="width:${fence}%"></div><div class="bs-free" style="width:${100 - fence}%"></div></div>
-        <div class="br" aria-hidden="true"><div class="bracket" style="left:${fence}%;width:${br}%"><span>${br > 0 ? `24h blast radius ${usd(s.blastRadius24h)}` : "blast radius 0 (paused or capped)"}</span></div></div>
+        <div class="br" aria-hidden="true"><div class="bracket${fence > 55 ? " end" : ""}" style="left:${fence}%;width:${br}%"><span>${br > 0 ? `24h blast radius ${usd(s.blastRadius24h)}` : "blast radius 0 (paused or capped)"}</span></div></div>
         <dl class="bs-labels" style="margin:0">
           <div class="kv"><dt>Balance</dt><dd>${usd(s.balance)} <small>tUSD</small></dd></div>
           <div class="kv"><dt>Ring-fenced</dt><dd>${usd(s.protectedBalance)} <small>tUSD</small></dd></div>
@@ -490,6 +523,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
           `With the AI key and the co-signer key both stolen: paid itself ${txLink("X6")}, drained one dollar past the free balance ${txLink("X11")}, burst past the 24h cap ${txLink("X12")}.`,
           `Tried owner powers with the AI key ${txLink("X13")} and to cancel the creditor's claim ${txLink("X14")}.`,
           `During an emergency pause the attacker could only pay the creditor its 70 tUSD ${txLink("P3")}.`,
+          `On the clearing house, a lazy netting, a value-shifting netting, an over-cancellation, a hidden debt, a forged certificate and a replay were all refused (N1–N7, below).`,
         ],
         end: `0 tUSD reached the attacker from either vault`,
       },
@@ -500,7 +534,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
           `<span class="hash">npm run verify</span> checks that each deployed contract's bytecode equals this repository's build, then replays every receipt and attack.`,
           `It recovers the owner and co-signer signatures from calldata and re-hashes the published decision record.`,
           `It re-checks the delivered portfolio's KKT certificate in an independent TypeScript implementation.`,
-          `67 Solidity tests (≈344k fuzzed adversarial calls) and 42 TypeScript tests run in public CI on every push.`,
+          `82 Solidity tests (≈350k fuzzed adversarial calls, 60 random clearing economies) and 45 TypeScript tests run in public CI on every push.`,
         ],
         end: `CI also re-verifies the live chain every day`,
       },
@@ -545,6 +579,56 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
         <div class="row"><div class="l">Certified ε-optimality<small>(2n + 3 + |ν|)·τ, theorem in ALGORITHMS.md §4</small></div><div class="r"><b>${c.optimalityBound.toExponential(2)}</b></div></div>
         <div class="row"><div class="l">Lazy 1/N forgery<small>rejected on-chain with this duality gap ${txLink("X17")}</small></div><div class="r" style="color:var(--stamp)">${D.lazyGap ? D.lazyGap.toFixed(4) : "rejected"}</div></div>
         <div class="row"><div class="l">Escrow settlement<small>15 tUSD into the agent's vault</small></div><div class="r">${txLink("L6")}</div></div>`;
+    }
+
+    // ───────── certified clearing ─────────
+    const CL = D.clearing;
+    if (CL) {
+      const P = CL.proof;
+      const names = P.members;
+      const cx = 180, cy = 168, R = 112, NR = 27;
+      const pos = names.map((_, k) => {
+        const a = -Math.PI / 2 + (2 * Math.PI * k) / names.length;
+        return [cx + R * Math.cos(a), cy + R * Math.sin(a)];
+      });
+      const idx = (n) => names.indexOf(n);
+      const graph = (key, title, amountOf, tone) => {
+        const edges = P.obligations.map((o) => ({ ...o, a: Number(amountOf(o)) / 1e6 })).filter((o) => o.a > 0);
+        const total = edges.reduce((t, e) => t + e.a, 0);
+        const parts = edges.map((e) => {
+          const [x1, y1] = pos[idx(e.debtor)], [x2, y2] = pos[idx(e.creditor)];
+          const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+          const sx = x1 + ux * NR, sy = y1 + uy * NR, ex = x2 - ux * (NR + 4), ey = y2 - uy * (NR + 4);
+          const mx = (sx + ex) / 2 - uy * 26, my = (sy + ey) / 2 + ux * 26;
+          const lx = 0.25 * sx + 0.5 * mx + 0.25 * ex, ly = 0.25 * sy + 0.5 * my + 0.25 * ey;
+          const w = 1.2 + (e.a / 40) * 6;
+          return `<path d="M${sx.toFixed(1)},${sy.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}" style="fill:none;stroke:var(--${tone});stroke-width:${w.toFixed(1)};stroke-linecap:round;opacity:.85" marker-end="url(#ah-${key})"/>` +
+            `<g><rect x="${(lx - 13).toFixed(1)}" y="${(ly - 9).toFixed(1)}" width="26" height="17" rx="3" style="fill:var(--sheet);stroke:var(--rule)"/><text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" style="font:600 11px var(--sans);fill:var(--ink)">${e.a}</text></g>`;
+        }).join("");
+        const nodes = names.map((n, k) => {
+          const [x, y] = pos[k];
+          const below = y > cy + 10;
+          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${NR}" style="fill:var(--sheet);stroke:var(--ink);stroke-width:1.5"/><text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle" style="font:600 11px var(--sans);fill:var(--ink)">${esc(n.slice(0, 9))}</text>`;
+        }).join("");
+        return `<figure><figcaption><b>${title}</b> · ${total} tUSD in ${edges.length} debts</figcaption><svg viewBox="0 0 360 330" role="img" aria-label="${esc(title)}: ${total} tUSD of debt between ${names.length} agents"><defs><marker id="ah-${key}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--${tone})"/></marker></defs>${parts}${nodes}</svg></figure>`;
+      };
+      $("clrgraphs").innerHTML = graph("b", "Before", (o) => o.amount, "muted") + graph("a", "After the proven netting", (o) => o.remaining, "proof");
+      const cs = (id) => CL.steps.find((x) => x.id === id);
+      const cl = (id, label) => { const st = cs(id); return st && st.tx ? `<a class="hash txl" href="${txUrl(st.tx.hash)}" target="_blank" rel="noopener">${esc(label ?? short(st.tx.hash))}</a>` : ""; };
+      const F = CL.final;
+      $("clrfacts").innerHTML = `
+        <div class="row"><div class="l">Gross debt<small>11 debts between 5 AI businesses</small></div><div class="r"><b>${usd(F.gross)}</b></div></div>
+        <div class="row"><div class="l">Cash they hold<small>gross settlement fails ${cl("G1", "(G1)")}</small></div><div class="r">${usd(F.cash)}</div></div>
+        <div class="row"><div class="l">Naive netting, shortest cycles first<small>refused: NotProvablyMaximal ${cl("N1", "(N1)")}</small></div><div class="r" style="color:var(--stamp)">${usd(F.greedyCleared)}</div></div>
+        <div class="row"><div class="l">Proven netting by the QED agent<small>Σx = Σd·y, executed ${cl("N6", "(N6)")}</small></div><div class="r"><b>${usd(F.cleared)}</b></div></div>
+        <div class="row"><div class="l">Paid with tokens afterwards<small>4 payments in topological order ${cl("S1", "(S1–S4)")}</small></div><div class="r">${usd(F.settledWithTokens)}</div></div>
+        <div class="row"><div class="l">Net positions changed<small>every agent ends holding exactly its net position</small></div><div class="r"><b>0</b></div></div>`;
+      $("clrnote").textContent = `Five AI businesses owe each other ${usd(F.gross)} tUSD in cycles and hold only ${usd(F.cash)} tUSD, so nobody can pay gross. Anyone may submit a netting; the contract executes it only if every agent’s net position is unchanged, nothing is created, and a duality certificate proves no larger netting exists. Exact integers, no tolerance.`;
+      $("clrrows").innerHTML = CL.steps.filter((x) => !["setup", "deploy"].includes(x.phase)).map((x) => {
+        const res = !x.tx ? `<span class="offc">off-chain</span>` : x.tx.status === "success" ? `<span class="res ok">confirmed</span>` : `<span class="stampx">Refused</span><span class="err">${esc(x.error?.name ?? "")}</span>`;
+        const link = x.tx ? `<a class="hash" href="${txUrl(x.tx.hash)}" target="_blank" rel="noopener">${short(x.tx.hash)}</a><div class="n num">block ${Number(x.tx.blockNumber).toLocaleString("en-US")}</div>` : `<span class="offc">—</span>`;
+        return `<tr><td class="id">${esc(x.id)}</td><td><div class="t">${esc(x.title)}</div>${x.narrative ? `<div class="n">${esc(x.narrative)}</div>` : ""}</td><td>${esc(x.actor)}</td><td>${res}</td><td>${link}</td></tr>`;
+      }).join("");
     }
 
     // ───────── conversation ─────────
@@ -598,13 +682,15 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       `git clone --recursive ${D.repo}`,
       `cd qed-agent-wallet && npm ci && forge build`,
       ``,
-      `forge test              # 67 Solidity tests, fuzz + stateful invariants`,
-      `npm run test:ts         # 42 TypeScript tests: TS≡Solidity parity, solver oracle, red-team`,
+      `forge test              # 82 Solidity tests, fuzz + stateful invariants`,
+      `npm run test:ts         # 45 TypeScript tests: TS≡Solidity parity, solver oracles, red-team`,
       `npm run verify          # re-derives every on-chain claim from public Sepolia, no keys`,
       `npm run local           # the whole economy on a local chain, no keys or API needed`,
+      `npm run local:clearing  # the clearing economy on a local chain`,
     ].join("\n");
     const names = { vault: "QEDVault (agent)", honeypotVault: "QEDVault (honeypot)", escrow: "ProofEscrow", verifier: "MinVarianceVerifier", lens: "QEDLens", token: "TestUSD" };
     $("contracts").innerHTML = Object.entries(names).map(([k, n]) => `<div><span>${n}</span><a class="hash" href="${addrUrl(M.contracts[k])}" target="_blank" rel="noopener">${short(M.contracts[k])}</a></div>`).join("");
+    if (D.clearing) $("contracts").innerHTML += `<div><span>QEDClearing</span><a class="hash" href="${addrUrl(D.clearing.contracts.clearing)}" target="_blank" rel="noopener">${short(D.clearing.contracts.clearing)}</a></div>`;
     $("foot").innerHTML = `QED · FinTechathon 2026, Topic F · <a href="${D.repo}" target="_blank" rel="noopener">source code</a> · testnet prototype with a valueless token, not audited.`;
   }
 })();

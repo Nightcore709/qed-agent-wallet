@@ -30,6 +30,7 @@ L.push(`|---|---|`);
 L.push(`| Network | ${m.network.name} (chain id ${m.network.chainId}) |`);
 L.push(`| Blocks | ${m.sepolia.firstBlock.toLocaleString("en-US")} → ${m.sepolia.lastBlock.toLocaleString("en-US")} |`);
 L.push(`| Transactions | ${R.transactions.length} (${R.transactions.filter((r: any) => r.status === "success").length} succeeded · ${R.transactions.filter((r: any) => r.status === "reverted").length} reverted **by design** — every one an attack or a paused-vault test) |`);
+L.push(`| Plus Run 2 (certified clearing) | ${JSON.parse(readFileSync(`${EV}/clearing/receipts.json`, "utf8")).transactions.length} more transactions on a separate contract — [see below](#run-2--certified-clearing-of-an-agent-economy-qedclearing) |`);
 L.push(`| Off-chain signed artefacts | ${offSteps.length} (mandate, quote, certificate, vendor release, conversation, red-team) — hashes anchored on-chain |`);
 L.push(`| Total gas | ${R.transactions.reduce((a: number, r: any) => a + r.gasUsed, 0).toLocaleString("en-US")} |`);
 L.push(`| Language model in the loop | ${(m.llmEnginesUsed ?? []).join(", ")} |`);
@@ -83,12 +84,57 @@ L.push(`| Honeypot vault | ${usd(f.honeypot.balance)} | ${usd(f.honeypot.protect
 L.push("");
 L.push(`Token balances: CloudCo (creditor) ${usd(f.balances.creditor)} · Helix (vendor) ${usd(f.balances.vendor)} · Northwind (client) ${usd(f.balances.client)} · Mallory ${usd(f.balances.mallory)} (all of it minted to her for the test; **0 from any vault or the escrow**).`);
 L.push("");
+// ---- Run 2: certified clearing ------------------------------------------------------------
+const CEV = `${EV}/clearing`;
+const C = JSON.parse(readFileSync(`${CEV}/manifest.json`, "utf8"));
+const CR = JSON.parse(readFileSync(`${CEV}/receipts.json`, "utf8"));
+const crc: Record<string, any> = Object.fromEntries(CR.transactions.map((r: any) => [r.hash, r]));
+const cf = C.final;
+L.push(`## Run 2 — certified clearing of an agent economy (QEDClearing)`);
+L.push("");
+L.push(`> \`${CEV}/manifest.json\`, \`receipts.json\`, \`proof.json\`. Separate keys, separate token, separate contract; \`npm run verify\` re-checks it too, including an independent re-check of the netting certificate taken from the executed calldata.`);
+L.push("");
+L.push(`| | |`);
+L.push(`|---|---|`);
+L.push(`| Blocks | ${C.sepolia.firstBlock.toLocaleString("en-US")} → ${C.sepolia.lastBlock.toLocaleString("en-US")} |`);
+L.push(`| Transactions | ${CR.transactions.length} (${CR.transactions.filter((r: any) => r.status === "success").length} succeeded · ${CR.transactions.filter((r: any) => r.status === "reverted").length} reverted **by design**) |`);
+L.push(`| Gross debt between 5 AI businesses | ${usd(cf.gross)} tUSD in 11 obligations; cash held in total ${usd(cf.cash)} tUSD |`);
+L.push(`| Naive netting (shortest cycles first) | ${usd(cf.greedyCleared)} — **refused on-chain** as \`NotProvablyMaximal\` |`);
+L.push(`| Proven-maximal netting | ${usd(cf.cleared)} cancelled with the LP-duality certificate Σx = Σd·y checked in exact integers |`);
+L.push(`| Settled with tokens afterwards | ${usd(cf.settledWithTokens)} tUSD; open obligations at the end: ${cf.openObligations} |`);
+L.push("");
+L.push(`| Contract | Address |`);
+L.push(`|---|---|`);
+L.push(`| QEDClearing | ${addr(C.contracts.clearing)} |`);
+L.push(`| TestUSD (clearing run) | ${addr(C.contracts.token)} |`);
+L.push("");
+L.push(`| Role | Address |`);
+L.push(`|---|---|`);
+for (const [k, v] of Object.entries<string>(C.actors)) L.push(`| ${k} | ${addr(v)} |`);
+L.push("");
+L.push(`| Step | What happened | Actor | Result | Transaction | Block | Gas |`);
+L.push(`|---|---|---|---|---|---|---|`);
+for (const s of C.steps) {
+  if (!s.tx) {
+    L.push(`| ${s.id} | ${esc(s.title)} | ${esc(s.actor ?? "")} | off-chain | — | | |`);
+    continue;
+  }
+  const r = crc[s.tx.hash];
+  const res = s.expect === "revert" ? `**reverted** · \`${s.error?.name}\`` : "success";
+  L.push(`| ${s.id} | ${esc(s.title)} | ${esc(s.actor ?? "")} | ${res} | ${tx(s.tx.hash)} | ${r.block} | ${r.gasUsed.toLocaleString("en-US")} |`);
+}
+L.push("");
+L.push(`Final token balances equal each agent's net position: ${Object.entries<string>(cf.balances).map(([k, v]) => `${k} ${usd(v)}`).join(" · ")}. Mallory received 0.`);
+L.push("");
+const setupC = CR.transactions.filter((r: any) => /^setup/.test(r.label ?? ""));
+if (setupC.length) L.push(`Set-up transactions of this run (funding, mints): ${setupC.map((r: any) => tx(r.hash)).join(", ")}.`);
+L.push("");
 L.push(`## How these transactions were produced — full disclosure`);
 L.push("");
 L.push(m.executionNote);
 L.push("");
-L.push(`* The relay fetched \`relay/outbox-11155111.json\` and \`relay/outbox-11155111-b2.json\` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.`);
-L.push(`* Each public receipt was compared with the replica's receipt: ${m.sepolia.relayComparison}.`);
+L.push(`* The relay fetched \`relay/outbox-11155111.json\`, \`relay/outbox-11155111-b2.json\` and \`relay/outbox-11155111-clearing.json\` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.`);
+L.push(`* Each public receipt was compared with the replica's receipt: ${m.sepolia.relayComparison}; clearing run: ${C.sepolia.relayComparison}.`);
 L.push(`* Block timestamps differ by seconds between replica and Sepolia; no assertion depends on them (windows are 24 h, certificates live 2 h, deadlines are days).`);
 L.push(`* Two earlier attempts under different keys failed and were abandoned: the first ran out of gas on deployment under Sepolia's state-creation repricing; in the second, one agent payment was under-provisioned with gas. The vault was slimmed (via-IR; views moved to QEDLens), every transaction now carries an explicit 16.7 M gas limit (only gas used is charged), and the canonical run above was executed under **fresh keys**, so it shares no state with those attempts.`);
 L.push(`* Gas used on Sepolia differs from the replica because Sepolia prices state creation and calldata differently; the relay compared status and logs, not gas.`);

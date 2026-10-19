@@ -8,6 +8,7 @@
 | Network | Ethereum Sepolia (chain id 11155111) |
 | Blocks | 11,948,657 → 11,949,339 |
 | Transactions | 55 (36 succeeded · 19 reverted **by design** — every one an attack or a paused-vault test) |
+| Plus Run 2 (certified clearing) | 44 more transactions on a separate contract — [see below](#run-2--certified-clearing-of-an-agent-economy-qedclearing) |
 | Off-chain signed artefacts | 7 (mandate, quote, certificate, vendor release, conversation, red-team) — hashes anchored on-chain |
 | Total gas | 66,358,024 |
 | Language model in the loop | anthropic:claude-sonnet-5-5 |
@@ -145,12 +146,78 @@
 
 Token balances: CloudCo (creditor) 71.00 · Helix (vendor) 9.00 · Northwind (client) 85.00 · Mallory 50.00 (all of it minted to her for the test; **0 from any vault or the escrow**).
 
+## Run 2 — certified clearing of an agent economy (QEDClearing)
+
+> `evidence/ethereum-sepolia/clearing/manifest.json`, `receipts.json`, `proof.json`. Separate keys, separate token, separate contract; `npm run verify` re-checks it too, including an independent re-check of the netting certificate taken from the executed calldata.
+
+| | |
+|---|---|
+| Blocks | 11,949,578 → 11,949,690 |
+| Transactions | 44 (37 succeeded · 7 reverted **by design**) |
+| Gross debt between 5 AI businesses | 200.00 tUSD in 11 obligations; cash held in total 28.00 tUSD |
+| Naive netting (shortest cycles first) | 162.00 — **refused on-chain** as `NotProvablyMaximal` |
+| Proven-maximal netting | 169.00 cancelled with the LP-duality certificate Σx = Σd·y checked in exact integers |
+| Settled with tokens afterwards | 31.00 tUSD; open obligations at the end: 0 |
+
+| Contract | Address |
+|---|---|
+| QEDClearing | [`0x7b7de15772198d82d07019fc816cffc52e7d6ad2`](https://sepolia.etherscan.io/address/0x7b7de15772198d82d07019fc816cffc52e7d6ad2) |
+| TestUSD (clearing run) | [`0x6753a8ea4560f07534bcfbca2dea790afb9552d4`](https://sepolia.etherscan.io/address/0x6753a8ea4560f07534bcfbca2dea790afb9552d4) |
+
+| Role | Address |
+|---|---|
+| deployer | [`0x94C938E642BbC657D5F45546E35268a70c936448`](https://sepolia.etherscan.io/address/0x94C938E642BbC657D5F45546E35268a70c936448) |
+| northwind | [`0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816`](https://sepolia.etherscan.io/address/0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816) |
+| qed | [`0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d`](https://sepolia.etherscan.io/address/0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d) |
+| cloudco | [`0x0418CfE812572f01535Fb260b6a77dAb5704D737`](https://sepolia.etherscan.io/address/0x0418CfE812572f01535Fb260b6a77dAb5704D737) |
+| helix | [`0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7`](https://sepolia.etherscan.io/address/0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7) |
+| atlas | [`0x13958b9C4154996E6Db79f9a86c5765e0D6048AF`](https://sepolia.etherscan.io/address/0x13958b9C4154996E6Db79f9a86c5765e0D6048AF) |
+| mallory | [`0x56D161255Ced6863698eA3c6a886982088fa30a8`](https://sepolia.etherscan.io/address/0x56D161255Ced6863698eA3c6a886982088fa30a8) |
+
+| Step | What happened | Actor | Result | Transaction | Block | Gas |
+|---|---|---|---|---|---|---|
+| K1 | Deploy the clearing run's TestUSD (valueless; minter = this run's deployer) | Deployer | success | [`0x627457ae…5865`](https://sepolia.etherscan.io/tx/0x627457ae40dae71779b7af6466b541ce7ee5dcee8e759f140b288134096d5865) | 11949578 | 3,716,239 |
+| K2 | Deploy QEDClearing (proof-gated multilateral netting) | Deployer | success | [`0x58efadf2…d140`](https://sepolia.etherscan.io/tx/0x58efadf2d07971cc0c00998dea4dba71e0ce4298c82589901c80bf0918f1d140) | 11949578 | 8,579,134 |
+| J1 | Northwind joins the clearing house | Northwind | success | [`0x73dc94e3…03ab`](https://sepolia.etherscan.io/tx/0x73dc94e32ef12ceeb4783031cd16c02bb37298c27da3034dee39090a6ce603ab) | 11949579 | 348,185 |
+| J2 | QED joins the clearing house | QED | success | [`0xba620589…537d`](https://sepolia.etherscan.io/tx/0xba6205899c72ecc244e8b103f1549e7398a5ecc5837d96c2802455d20495537d) | 11949580 | 250,265 |
+| J3 | CloudCo joins the clearing house | CloudCo | success | [`0x4e6748d9…aa6b`](https://sepolia.etherscan.io/tx/0x4e6748d972d6ad000f08e396aac81d325e7797765c019900cbe40c9c9fa6aa6b) | 11949581 | 250,265 |
+| J4 | Helix joins the clearing house | Helix | success | [`0x2b3c68ee…6229`](https://sepolia.etherscan.io/tx/0x2b3c68eeea83db6530dd03a7084404dedea5268fdee33dcf8eb337aaf9f86229) | 11949582 | 250,265 |
+| J5 | Atlas joins the clearing house | Atlas | success | [`0x03e19549…30ca`](https://sepolia.etherscan.io/tx/0x03e19549ce47485cd58c9a2a3ce2f07c4ec3ebd18c3ba0500557b2e5d68c30ca) | 11949583 | 250,265 |
+| I1 | Northwind owes QED 40 tUSD (portfolio subscription) | Northwind | success | [`0x7b808c9a…3cee`](https://sepolia.etherscan.io/tx/0x7b808c9a6286edc43bde1d7523deb6e90bae4005f23e54f16747de6667093cee) | 11949584 | 795,367 |
+| I2 | QED owes CloudCo 30 tUSD (GPU compute) | QED | success | [`0xbd67bb55…a165`](https://sepolia.etherscan.io/tx/0xbd67bb551b90bc4b70d574770c078d26207ec0abc86d76a61a96a42b733aa165) | 11949585 | 501,607 |
+| I3 | CloudCo owes Helix 25 tUSD (data licence) | CloudCo | success | [`0xadfa6dc4…8c32`](https://sepolia.etherscan.io/tx/0xadfa6dc4fca51fa59d56eb2e73ad9f69a402bd2310f97b35477fa9392b8f8c32) | 11949586 | 501,619 |
+| I4 | Helix owes Northwind 20 tUSD (advisory fees) | Helix | success | [`0x8b216187…75e5`](https://sepolia.etherscan.io/tx/0x8b216187fec7e6523d9688951e0960ff63f9148aeb8056ee65d091f5ac7675e5) | 11949587 | 501,607 |
+| I5 | QED owes Helix 15 tUSD (risk model) | QED | success | [`0x7a0649e1…680f`](https://sepolia.etherscan.io/tx/0x7a0649e140e840ec971dc5b4eeb59d3ee59f81fc2f13ba79de573e3bedbb680f) | 11949588 | 501,607 |
+| I6 | Helix owes QED 15 tUSD (model validation) | Helix | success | [`0x280d6f94…4d71`](https://sepolia.etherscan.io/tx/0x280d6f9475466177c7c82bf4b819cd9ab5e9841fd081740ffd871a793f364d71) | 11949589 | 501,607 |
+| I7 | CloudCo owes Northwind 12 tUSD (volume rebate) | CloudCo | success | [`0x59af539e…e0c0`](https://sepolia.etherscan.io/tx/0x59af539e8cd4c01816fd77e11f600c43b2e431d21ecbf3003e5f0fe97619e0c0) | 11949590 | 501,595 |
+| I8 | Northwind owes CloudCo 10 tUSD (hosting) | Northwind | success | [`0x57bc03f7…1398`](https://sepolia.etherscan.io/tx/0x57bc03f70e9bb321b9a5c64dc31b4786fa70e4a8d3f4b9eb7c7ab5a855d61398) | 11949591 | 501,607 |
+| I9 | Atlas owes QED 18 tUSD (backtests) | Atlas | success | [`0xf5c02f7a…e673`](https://sepolia.etherscan.io/tx/0xf5c02f7afb450a8625877d696bb939892eb821f965b2a1b12cbb2a5d3402e673) | 11949592 | 501,619 |
+| I10 | Helix owes Atlas 9 tUSD (data cleaning) | Helix | success | [`0x8bfe4d58…b7a2`](https://sepolia.etherscan.io/tx/0x8bfe4d582ba28fc0c742169b496e327074af23e9cefa081e2a21b2dc5e93b7a2) | 11949593 | 501,607 |
+| I11 | CloudCo owes Atlas 6 tUSD (labelling) | CloudCo | success | [`0x0ed4ee56…ee96`](https://sepolia.etherscan.io/tx/0x0ed4ee5633f2e1f4ba1c79db2383978e5e2954de9b1b174f5e768462b00cee96) | 11949594 | 501,607 |
+| G1 | Gridlock: Northwind tries to pay its 40 tUSD debt gross, but holds 18 | Northwind | **reverted** · `ERC20InsufficientBalance` | [`0x7d86cdc9…3b2c`](https://sepolia.etherscan.io/tx/0x7d86cdc9dca5a548c5eba0b2a3725466a467d09484f8a8bb04230421bef33b2c) | 11949599 | 87,944 |
+| P0 | QED agent proves the maximal netting: 169.00 of 200.00 tUSD can be cancelled | QED agent | off-chain | — | | |
+| N1 | Lazy netting (shortest cycles first): cancels 162.00, not 169.00 | Mallory / rival clearing bot | **reverted** · `NotProvablyMaximal` | [`0x1b62ae8c…4976`](https://sepolia.etherscan.io/tx/0x1b62ae8cbdd1fcaacda3f3305b880e75b504c712575389e7ad780c69c4724976) | 11949600 | 162,976 |
+| N2 | Netting that quietly cancels 1 tUSD more of Northwind's debt to QED | Mallory / rival clearing bot | **reverted** · `NetPositionChanged` | [`0x29c4ef66…3eaf`](https://sepolia.etherscan.io/tx/0x29c4ef66a5eb98558fce184b0058cf295bc39e095e8eccf58ec6ba99172b3eaf) | 11949600 | 164,780 |
+| N3 | Netting that cancels more than an obligation is worth | Mallory / rival clearing bot | **reverted** · `ExceedsObligation` | [`0x96a304a4…bdfb`](https://sepolia.etherscan.io/tx/0x96a304a4c3fbb50c325a43e983a61f5c02aa93f7da499b4eb1aec6aed77fbdfb) | 11949600 | 138,136 |
+| N4 | Netting over a snapshot that hides one obligation | Mallory / rival clearing bot | **reverted** · `IncompleteSnapshot` | [`0xd6c3f25c…4c9c`](https://sepolia.etherscan.io/tx/0xd6c3f25ca5f8f38664907cb3065a61c41b184e14e584c90747616ce6ece04c9c) | 11949600 | 129,944 |
+| N5 | Forged certificate: drop a dual multiplier to fake a smaller bound | Mallory / rival clearing bot | **reverted** · `DualInfeasible` | [`0xa7d7e7bc…ef8a`](https://sepolia.etherscan.io/tx/0xa7d7e7bcb0303b4c3e7267e1c6d3de472f7ff1bb2a1bddf628de4ccfdeedef8a) | 11949600 | 138,136 |
+| N6 | Proven-maximal netting executes: 169.00 tUSD of debt cancelled, 200.00 → 31.00 | QED agent | success | [`0x46288ece…05a2`](https://sepolia.etherscan.io/tx/0x46288ece141a762a1889eb8e4692b6a19719643b341e0dd31a1e4166c51a05a2) | 11949601 | 550,826 |
+| N7 | Replay the executed netting | Mallory / rival clearing bot | **reverted** · `IncompleteSnapshot` | [`0x4588659b…4df5`](https://sepolia.etherscan.io/tx/0x4588659bad4770f283e3600885b6dabbb95e8b734fb5c27c14ac491acc2e4df5) | 11949602 | 138,136 |
+| S1 | Northwind pays QED the remaining 18.00 tUSD | Northwind | success | [`0x8e6ffd33…358c`](https://sepolia.etherscan.io/tx/0x8e6ffd33285277503602a5b46743e6acda21ce9f42270a76939feb916781358c) | 11949687 | 190,980 |
+| S2 | CloudCo pays Atlas the remaining 3.00 tUSD | CloudCo | success | [`0x8be4b11f…8ebf`](https://sepolia.etherscan.io/tx/0x8be4b11f1c7f0e70ef674bd23583e97dd771ea6ab389a5c22716983460d38ebf) | 11949688 | 93,060 |
+| S3 | Helix pays QED the remaining 4.00 tUSD | Helix | success | [`0xe8af7d69…0648`](https://sepolia.etherscan.io/tx/0xe8af7d6900333b6d7f461aa432bf03feeea17546eb3947b486a6d9b998360648) | 11949689 | 93,060 |
+| S4 | Atlas pays QED the remaining 6.00 tUSD | Atlas | success | [`0xb69b59c9…a654`](https://sepolia.etherscan.io/tx/0xb69b59c99d14062acb126d36036f72850ed6671c45e11ba23bd0da04022aa654) | 11949690 | 91,741 |
+
+Final token balances equal each agent's net position: Northwind 0.00 · QED 28.00 · CloudCo 0.00 · Helix 0.00 · Atlas 0.00. Mallory received 0.
+
+Set-up transactions of this run (funding, mints): [`0xda9bfc81…7390`](https://sepolia.etherscan.io/tx/0xda9bfc81ef90280d38398b52a2cc058acc61e294bddc52e4b2cde24665b87390), [`0x8e8c0c3f…f2b6`](https://sepolia.etherscan.io/tx/0x8e8c0c3fbbd424ab56f0c44dd8cbe1b8174339837331c174c692d843f161f2b6), [`0xbb7e24a6…a102`](https://sepolia.etherscan.io/tx/0xbb7e24a61ecd7c7c3aea3817f9b3bfed60f80c43df4e06e76fa7893e5c3ba102), [`0xd23466d2…5222`](https://sepolia.etherscan.io/tx/0xd23466d2916a25057e210c2dcacf62ed7717854b9f917a70cb0f657c14e55222), [`0xe0a46cd9…001a`](https://sepolia.etherscan.io/tx/0xe0a46cd9ee00d4bd75c4e667380565e7421856ce3b454fc877bfafaed7c5001a), [`0xd0ba9980…c4c9`](https://sepolia.etherscan.io/tx/0xd0ba998040e113ffbe795154e6e7c506e852759ba458c9dd849d05df7401c4c9), [`0x0ce9e106…3182`](https://sepolia.etherscan.io/tx/0x0ce9e10678cf321d62d730963f9936888d31d8accf7a0a9fc3f58c737e793182), [`0x3e69b56d…19f5`](https://sepolia.etherscan.io/tx/0x3e69b56dec22c6df6818baa963bd232e59d4a7dbf2aa99cb635c266d09f819f5), [`0x0dc85d8e…de39`](https://sepolia.etherscan.io/tx/0x0dc85d8eef72ead406909c624b562c7bc466775ba0f80fd80f2aee0baf51de39), [`0x5e9ad960…91dc`](https://sepolia.etherscan.io/tx/0x5e9ad9606da471456ca5a6645adc0883ec153c5f1d8cb0b5f2c725a1019a91dc), [`0xab31a916…1411`](https://sepolia.etherscan.io/tx/0xab31a91691b02300ffd157543af157448af76d2ea2eba777415faff47e451411), [`0x63e9af20…40d2`](https://sepolia.etherscan.io/tx/0x63e9af20b7996f1ef0eb55bfb6a684d516f93e9821ddf4336cd553d4f72140d2), [`0xe2af5f53…991b`](https://sepolia.etherscan.io/tx/0xe2af5f534249066f76827e14e15ee5026a1f509486a93be49845911ee006991b), [`0x97a1b6f6…7320`](https://sepolia.etherscan.io/tx/0x97a1b6f6cca08e93ff7670cb1461e172bfb30bfafda0541e6645237fe0fa7320).
+
 ## How these transactions were produced — full disclosure
 
 Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs). The final phase was executed after rebuilding the replica by replaying the exact signed transactions already on Sepolia.
 
-* The relay fetched `relay/outbox-11155111.json` and `relay/outbox-11155111-b2.json` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
-* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded).
+* The relay fetched `relay/outbox-11155111.json`, `relay/outbox-11155111-b2.json` and `relay/outbox-11155111-clearing.json` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
+* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded).
 * Block timestamps differ by seconds between replica and Sepolia; no assertion depends on them (windows are 24 h, certificates live 2 h, deadlines are days).
 * Two earlier attempts under different keys failed and were abandoned: the first ran out of gas on deployment under Sepolia's state-creation repricing; in the second, one agent payment was under-provisioned with gas. The vault was slimmed (via-IR; views moved to QEDLens), every transaction now carries an explicit 16.7 M gas limit (only gas used is charged), and the canonical run above was executed under **fresh keys**, so it shares no state with those attempts.
 * Gas used on Sepolia differs from the replica because Sepolia prices state creation and calldata differently; the relay compared status and logs, not gas.

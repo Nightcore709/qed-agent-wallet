@@ -53,6 +53,7 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `QEDLens` | 5.1 KB | Stateless views: `blastRadius(vault, horizon)`, `snapshot(vault)`, EIP-712 hashes/digests. Separate so the enforcement contract stays small (Sepolia's state-creation pricing + EIP-7825's 2²⁴ gas cap bound deployable code size). |
 | `ProofEscrow` | 5.6 KB | Agent-to-agent work. Provider-signed EIP-712 quote binds price, payee, client, verifier, problem hash, deadline. `deliver` pays iff `IProofVerifier.verify(spec, solution)` succeeds. Refund after deadline. |
 | `MinVarianceVerifier` | 2.4 KB | `IProofVerifier` for long-only minimum-variance portfolios: exact-integer KKT + PSD certificate check (docs/ALGORITHMS.md §4). |
+| `QEDClearing` | 5.3 KB | Proof-gated multilateral netting for agent economies. Members `join` (on-chain consent to the terms) and record debts as debtors; `net` is permissionless and executes only if net positions are unchanged, nothing is created, the snapshot is complete and current, and an exact LP-duality certificate proves the netting maximal (ALGORITHMS §9). |
 | `TestUSD` | 2.1 KB | Valueless 6-decimal test token with a public 1 000 tUSD/day faucet for reviewers. |
 
 ### Off-chain (`agent/`, TypeScript, viem)
@@ -65,6 +66,8 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `brain/*` | inside agent | `AnthropicBrain` (live LLM) / `OfflineBrain`; `slots.ts` deterministic payment slot filling; `guard.ts` deterministic security layer; `evaluate.ts` red-team scoring |
 | `engine/minvar.ts` | inside agent | certifying solver + bit-exact TS checker |
 | `engine/economics.ts` | inside agent | pricing and acceptance rules |
+| `engine/netting.ts` | inside agent | certifying netting solver (min-mean cycle cancelling + Bellman–Ford dual), bit-exact checker, naive greedy rival |
+| `scripts/clearing.ts` | orchestrator (5 member agents, QED prover, Mallory) | runs the clearing economy: gridlock, attacks, proven netting, settlement |
 | `scripts/live.ts` | orchestrator (owner, client, guardian, Mallory) | deploys and runs the whole economy, records evidence |
 | `scripts/verify.ts` | anyone · no keys | independent re-derivation of every on-chain claim |
 
