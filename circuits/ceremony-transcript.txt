@@ -1,0 +1,118 @@
+[INFO]  snarkJS: First Contribution Hash:
+		bc0bde79 80381fa6 42b20975 91dd83f1
+		ed15b003 e15c3552 0af32c95 eb519149
+		2a6f3175 215635cf c10e6098 e2c612d0
+		ca84f1a9 f90b5333 560c8af5 9b9209f4
+[INFO]  snarkJS: Contribution Response Hash imported: 
+		f7fd684b 2a02fffb 8a73e241 63d5c3d6
+		bb72b179 0e49b04d aaff2735 ab50713b
+		d8c17663 c05e37f8 41ada791 fb15d726
+		034532f5 d19ff4ef dbf0c707 3d8aad1f
+[INFO]  snarkJS: Next Challenge Hash: 
+		1244fbed c3ce04e6 0a65a9da 67b1efa9
+		740d1e1d 3fd4f04d ad30e752 1b1e230b
+		3b66861d d7cd5581 54d8bc34 b3acd779
+		d8d28f7b 527bdc80 9da307a2 5f2ff761
+[INFO]  snarkJS: Contribution Response Hash imported: 
+		d5a8b533 09265674 84080ec9 2d9603ac
+		5fdd7398 9c8e9db0 464c1c7e 9216a852
+		d05ac4a7 dd755db9 a0aab24c 1bac8712
+		e8737375 cee05fb9 c2dc7745 90320f5b
+[INFO]  snarkJS: Next Challenge Hash: 
+		02f7209b 22043cc6 099e763e 8c9a79e0
+		c091374b fa96208f ae98a42e 93b3e3b3
+		3d9744ec da85c697 786b0ba4 bc3443db
+		a459556d 98873fd5 5bb37083 8397cdfe
+[INFO]  snarkJS: Contribution Response Hash imported: 
+		a344fdae b821e92e 5a8cbf4d 2b3affd7
+		b311021a fde1cda5 0e2baf2e ff3307aa
+		b05f171a 812054ad 3d148420 9db2b98a
+		f98f23ff 38b233c1 ca5b3114 5503844a
+[INFO]  snarkJS: Next Challenge Hash: 
+		7db14f46 3fa81226 c1df6b28 99abebe7
+		6b724fff 55b346f9 213cdf1a dedf59f1
+		e1968a56 e6168b1e 0d0a09d0 21789917
+		57b87e89 b466cdad 3eaaa716 85f24163
+[INFO]  snarkJS: Reading r1cs
+[INFO]  snarkJS: Reading tauG1
+[INFO]  snarkJS: Reading tauG2
+[INFO]  snarkJS: Reading alphatauG1
+[INFO]  snarkJS: Reading betatauG1
+[INFO]  snarkJS: Circuit hash: 
+		4ff527dc d34ff877 6f23129b 4109f8d0
+		a710247f 962e8988 47887188 13201eaf
+		a78d04bf 165160b8 fc9bb15a 1043e005
+		cabd534d 610f8068 f1a72ce1 c3b14abe
+[INFO]  snarkJS: Circuit Hash: 
+		4ff527dc d34ff877 6f23129b 4109f8d0
+		a710247f 962e8988 47887188 13201eaf
+		a78d04bf 165160b8 fc9bb15a 1043e005
+		cabd534d 610f8068 f1a72ce1 c3b14abe
+[INFO]  snarkJS: Contribution Hash: 
+		60a27bb5 590597f7 603f9553 fe66e7b8
+		3021e1df 6b57ea85 e60556b4 86fd2387
+		a8d117f6 28b062a1 e04298d3 ab38dfd8
+		8be256db e6162100 a1ac5762 430df0bf
+[INFO]  snarkJS: Circuit Hash: 
+		4ff527dc d34ff877 6f23129b 4109f8d0
+		a710247f 962e8988 47887188 13201eaf
+		a78d04bf 165160b8 fc9bb15a 1043e005
+		cabd534d 610f8068 f1a72ce1 c3b14abe
+[INFO]  snarkJS: Contribution Hash: 
+		71fad33c 8c8afac5 4155cf23 b9eb6771
+		31bcaf93 9d42d55b 9382a7ed 6071d252
+		dbd36493 7f46bde9 b7719ea1 a93cb309
+		1d92bb15 d16b6a4e 86d4afac 719b9b07
+[INFO]  snarkJS: Contribution Hash: 
+		1e2d745d 4961e5ab af1e0421 39406816
+		724e9aec 0675b13c cc32ff64 7380b91c
+		d090a03a 4dce264e 427860aa e19b2266
+		5c595fcb be2641d2 a5d018ea 2447792f
+[INFO]  snarkJS: Reading r1cs
+[INFO]  snarkJS: Reading tauG1
+[INFO]  snarkJS: Reading tauG2
+[INFO]  snarkJS: Reading alphatauG1
+[INFO]  snarkJS: Reading betatauG1
+[INFO]  snarkJS: Circuit hash: 
+		4ff527dc d34ff877 6f23129b 4109f8d0
+		a710247f 962e8988 47887188 13201eaf
+		a78d04bf 165160b8 fc9bb15a 1043e005
+		cabd534d 610f8068 f1a72ce1 c3b14abe
+[INFO]  snarkJS: Circuit Hash: 
+		4ff527dc d34ff877 6f23129b 4109f8d0
+		a710247f 962e8988 47887188 13201eaf
+		a78d04bf 165160b8 fc9bb15a 1043e005
+		cabd534d 610f8068 f1a72ce1 c3b14abe
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #3 Beacon: Sepolia tx N6:
+		1e2d745d 4961e5ab af1e0421 39406816
+		724e9aec 0675b13c cc32ff64 7380b91c
+		d090a03a 4dce264e 427860aa e19b2266
+		5c595fcb be2641d2 a5d018ea 2447792f
+[INFO]  snarkJS: Beacon generator: 46288ece141a762a1889eb8e4692b6a19719643b341e0dd31a1e4166c51a05a2
+[INFO]  snarkJS: Beacon iterations Exp: 10
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #2 QED phase-2 contribution B:
+		71fad33c 8c8afac5 4155cf23 b9eb6771
+		31bcaf93 9d42d55b 9382a7ed 6071d252
+		dbd36493 7f46bde9 b7719ea1 a93cb309
+		1d92bb15 d16b6a4e 86d4afac 719b9b07
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: contribution #1 QED phase-2 contribution A:
+		60a27bb5 590597f7 603f9553 fe66e7b8
+		3021e1df 6b57ea85 e60556b4 86fd2387
+		a8d117f6 28b062a1 e04298d3 ab38dfd8
+		8be256db e6162100 a1ac5762 430df0bf
+[INFO]  snarkJS: -------------------------
+[INFO]  snarkJS: ZKey Ok!
+[INFO]  snarkJS: EXPORT VERIFICATION KEY STARTED
+[INFO]  snarkJS: > Detected protocol: groth16
+[INFO]  snarkJS: EXPORT VERIFICATION KEY FINISHED
+[INFO]  snarkJS: EXPORT VERIFICATION KEY STARTED
+[INFO]  snarkJS: > Detected protocol: groth16
+[INFO]  snarkJS: EXPORT VERIFICATION KEY FINISHED
+setup complete
+
+real	8m2.025s
+user	13m11.207s
+sys	0m1.838s

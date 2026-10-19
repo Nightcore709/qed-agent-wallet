@@ -17,3 +17,14 @@ deployments/31337.json
 .DS_Store
 .scratch/
 evidence/local-clearing/
+evidence/local-private/
+evidence/shadow-private/
+*.private.json
+# zk ceremony intermediates (the final .zkey, the phase-1 .ptau, .r1cs and .wasm are committed)
+circuits/build/pot14_0.ptau
+circuits/build/pot14_1.ptau
+circuits/build/pot14_2.ptau
+circuits/build/pot14_beacon.ptau
+circuits/build/private_minvar_0.zkey
+circuits/build/private_minvar_1.zkey
+circuits/build/private_minvar_2.zkey

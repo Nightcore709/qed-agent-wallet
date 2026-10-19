@@ -2,7 +2,7 @@
   "name": "qed-agent-wallet",
   "version": "1.0.0",
   "private": true,
-  "description": "QED \u2014 proof-carrying autonomy for AI agent wallets. FinTechathon 2026 Topic F.",
+  "description": "QED — proof-carrying autonomy for AI agent wallets. FinTechathon 2026 Topic F.",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -24,13 +24,19 @@
     "evidence:md": "tsx agent/scripts/evidence-md.ts",
     "fixtures:clearing": "tsx agent/scripts/fixtures-clearing.ts",
     "clearing": "tsx agent/scripts/clearing.ts",
-    "local:clearing": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/clearing.ts EVIDENCE_DIR=evidence/local-clearing tsx agent/scripts/local.ts"
+    "local:clearing": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/clearing.ts EVIDENCE_DIR=evidence/local-clearing tsx agent/scripts/local.ts",
+    "fixtures:private": "tsx agent/scripts/fixtures-private.ts",
+    "local:private": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/private.ts EVIDENCE_DIR=evidence/local-private tsx agent/scripts/local.ts",
+    "zk:setup": "bash circuits/setup.sh"
   },
   "dependencies": {
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.5",
     "viem": "^2.21.55"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "circomlib": "^2.0.5",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }
