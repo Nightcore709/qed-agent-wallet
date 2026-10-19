@@ -340,3 +340,108 @@ any amount of debt around every simple cycle of the demo economy and every such 
 
 Remaining debts after a maximal netting always form a DAG (a cycle would admit more cancellation), so paying in
 topological order needs only each agent's net debit in cash: Σ max(0, payables − receivables).
+
+---
+
+## 10. Private optimality: the same certificate, proven in zero knowledge (`PrivateMinVarianceVerifier`)
+
+### 10.1 The tension it removes
+
+§4 makes the chain check that a paid portfolio is optimal. The check needs Σ and w in calldata, so the licensed
+risk model and the client's allocation become public the moment the escrow pays. Accountability and
+confidentiality pull in opposite directions: an auditor who can verify the decision can also read the book.
+QED proves the **same** KKT certificate inside a zk-SNARK, so the chain verifies optimality while learning only
+two commitments, the certified variance and the provider's address.
+
+### 10.2 The statement (`circuits/private_minvar.circom`, n = 6, Groth16 over BN254)
+
+Fixed point `ONE = 10¹²`; all values are integers; signed values use the field's negative encoding.
+
+| Public signal | Meaning |
+|---|---|
+| `dataCommitment` | `Poseidon(Poseidon(Σ₀…Σ₁₀), Poseidon(Σ₁₁…Σ₂₀, saltΣ))`: the vendor's 21 covariance entries |
+| `weightsCommitment` | `Poseidon(w₁…w₆, saltW)`: the delivered portfolio |
+| `variance` | `wᵀΣw` at scale ONE³ (exact) |
+| `provider` | the address the proof is bound to |
+
+The prover knows (Σ, saltΣ, w, ν, μ, L, saltW) such that, with τ = 10⁻¹⁰:
+
+| Constraint | Encoding in the circuit |
+|---|---|
+| Range: \|Σᵢⱼ\|, \|Lᵢⱼ\| < 2⁴⁰; Σᵢᵢ ≥ 1; \|ν\| < 2⁸⁰; 0 ≤ wᵢ < 2⁴⁰; 0 ≤ μᵢ < 2⁸⁰ | `Num2Bits` on value (+ offset) |
+| Budget Σwᵢ = ONE **exactly** | one linear constraint |
+| Stationarity \|(Σw)ᵢ − ν − μᵢ\| ≤ τ | two 90-bit range checks of τ ± r |
+| Complementary slackness Σwᵢμᵢ ≤ τ | one 130-bit range check of τ·ONE − gap |
+| Convexity \|Σᵢⱼ·ONE − (LLᵀ)ᵢⱼ\| ≤ τ, j ≤ i | two 90-bit range checks per entry |
+| Commitments and variance as above | Poseidon (circomlib), 6 products |
+| `provider` | a quadratic constraint so the public input is bound into the proof |
+
+12,569 constraints (9,421 non-linear). **No wrap-around:** with the input ranges every intermediate quantity
+is below 2¹³¹ in magnitude, far under the field modulus p ≈ 2²⁵⁴, so each range check is an exact integer
+comparison. `checkWitness` in `agent/src/engine/privateMinvar.ts` mirrors every arithmetic constraint and is
+used as a pre-flight and in tests.
+
+### 10.3 Theorem (private ε-optimality)
+
+*If `PrivateMinVarianceVerifier` accepts, then (under the knowledge soundness of Groth16 and the collision
+resistance of Poseidon) the provider knows Σ committed to by the attested `dataCommitment` and w committed to
+by `weightsCommitment` such that ½wᵀΣw ≤ min_{x ≥ 0, 1ᵀx = 1} ½xᵀΣx + τ(|ν| + 3 + τ) + ½nτ(2 + τ)².*
+
+**Proof.** The circuit's constraints are exactly the hypotheses of Theorem 4.4 (P1 holds with zero budget
+error), so the bound of §4.4 applies verbatim. For the live job, |ν| ≈ 0.0016 and the bound is ≈ 1.5·10⁻⁹. ∎
+
+### 10.4 What the verifier checks before the pairing
+
+| Check | Error | What it rules out |
+|---|---|---|
+| The data commitment is signed by the registered vendor (EIP-191 over tag, chain id, commitment, universe) | `UntrustedDataAttestation(signer)` | proofs about made-up data; replaying an attestation on another chain |
+| Every public signal is a canonical field element | `NotAFieldElement` | malleable encodings |
+| `verifyProof(a, b, c, [weightsCommitment, variance, dataCommitment, provider])` | `ProofRejected` | everything else: a different portfolio, a lower claimed variance, a copied proof |
+
+Verification costs ≈ 270 k gas, and the escrow needs no change: the verifier is just another `IProofVerifier`
+named in the provider-signed quote. A client accepts a quote only if its spec names the quoting provider; the
+escrow already requires the delivery to come from that provider.
+
+### 10.5 Trusted setup
+
+Groth16 needs a structured reference string. This deployment used a local two-phase ceremony
+(`circuits/setup.sh`): phase 1 powers of tau (2¹⁴) with two contributions and a beacon, phase 2 with two
+contributions and a beacon. The beacons are the hashes of public Sepolia transactions from earlier runs (S4 and
+N6), fixed before the setup ran. Groth16 is sound if any one contributor destroyed their secret; since every
+contribution ran on one machine, **this setup must be treated as trusted** (risk K18). A production deployment
+takes phase 1 from a public ceremony (`PTAU=… bash circuits/setup.sh`) and runs phase 2 with independent
+parties; nothing else changes. `circuits/ceremony-transcript.txt` records every contribution hash, and
+`snarkjs zkey verify` reproduces the check from the committed `.r1cs`, `.ptau` and `.zkey`.
+
+### 10.6 The live run (Ethereum Sepolia)
+
+Helix attested a six-sleeve private-markets model by commitment only. The QED agent proved the optimal
+allocation in 1.5 s; the original `ProofEscrow` paid 12 tUSD into QED's vault on that proof (Z3). Mallory then
+replayed QED's proof from the public calldata into her own job (`ProofRejected`: it is bound to QED), claimed a
+lower variance (`ProofRejected`), and delivered a genuine proof about a data set she attested herself
+(`UntrustedDataAttestation`). The chain never saw the model or the portfolio. (So that reviewers can reproduce
+the run, the demo's synthetic model is in `agent/src/engine/privateScenario.ts`; in production it stays with the
+vendor and the agent, and only its commitment is ever published.)
+
+---
+
+## 11. Theorems with money on them (`OptimalityBounty`, `MaximalityBounty`)
+
+A proof in a document is only as convincing as the reader's patience. These two contracts turn the two theorems
+QED's money depends on into **standing, self-adjudicating offers**: each holds 1,000 tUSD and pays all of it,
+with no human involved, to the first caller who refutes its theorem on-chain.
+
+| Contract | Theorem guarded | A claim must contain | The contract checks, in exact integers |
+|---|---|---|---|
+| `OptimalityBounty` | §4.4: an accepted certificate is within the bound of the optimum | a certificate the **deployed** `MinVarianceVerifier` accepts, and a feasible portfolio x | re-runs the verifier; x ≥ 0, Σx = 1; pays iff F(w) − F(x) > 2tW(\|ν\| + 3W + t) + n·t·(2W + t)² (the theorem's inequality × 2W³) |
+| `MaximalityBounty` | §9.2: a netting with Σx = Σd·y is maximal | an economy, a netting `QEDClearing` would accept, and another netting | re-states `QEDClearing.net`'s acceptance rule line for line; checks the alternative conserves every net position within the debts; pays iff it cancels more |
+
+If the theorems are true the bounties can never pay, and every attempt reverts with the numbers that show why:
+`TheoremHolds(advantage, bound)` or `TheoremHolds(169, 162)`. Positive controls in `contracts/test/Bounties.t.sol`
+show that against an unsound verifier, or an acceptance rule that under-reports by 7 tUSD, the same contracts
+pay out at once; a differential test shows `MaximalityBounty.accepts` agrees with the deployed `QEDClearing` on
+all 60 generated economies; fuzzers try 2,000 random feasible portfolios and 2,000 random circulations.
+
+On Sepolia, Mallory tried the equal-weight portfolio (BA1), QED's optimum shifted by 0.1% (BA2), the forged
+certificate the chain refused in job #2 (BA3), the naive 162 tUSD netting (BM1) and a 170 tUSD netting that
+breaks one net position (BM2). All five reverted; `npm run verify` checks daily that both pools are still full.

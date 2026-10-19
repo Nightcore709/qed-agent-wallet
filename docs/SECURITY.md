@@ -49,6 +49,11 @@ QEDClearing tiers (no owner, no admin, no upgrade path):
 | `pay` an obligation | ✓ as **debtor** only | ✗ | tokens move debtor → creditor, nowhere else |
 | `net` (submit a netting) | ✓ | ✓ | permissionless, because the contract enforces: unchanged net positions, no new claims, full snapshot, maximality proof |
 
+PrivateMinVarianceVerifier, OptimalityBounty and MaximalityBounty have no owner, no admin and no upgrade path.
+The private verifier's only configuration is fixed at deployment (the Groth16 verifier and the data vendor's
+attestation key). A bounty's only outflow is `claim`, which pays the caller only when its theorem is refuted;
+nobody, including the deployer, can withdraw a bounty pool.
+
 Off-chain tiers: each role runs as a separate OS process that receives exactly one private key in its environment
 (`agent/scripts/live.ts → spawnRole`). The language model never receives any key, address book mutation rights or
 tool that can sign.
@@ -73,10 +78,15 @@ tool that can sign.
 | I14 | A netting never erases more than is owed and never creates a claim | 0 ≤ x ≤ d; amounts only decrease | `test_Revert_CancellingMoreThanOwed`; Sepolia N3 |
 | I15 | Only a provably maximal netting executes | LP-duality certificate, Σx = Σd·y, exact integers | 60 random economies; TS solver = exhaustive oracle on 150 economies; Sepolia N1, N5 |
 | I16 | A proof covers the whole, current state | every open id, current amounts | `test_Revert_HidingAnObligation`, `StaleAmounts_AndReplay`; Sepolia N4, N7 |
+| I17 | The escrow pays for private work only if it is ε-optimal for the vendor's attested data | Groth16 proof of the KKT certificate + EIP-191 vendor attestation (§10 ALGORITHMS) | real-proof tests incl. 2,000-run corrupted-proof fuzz; no witness exists for 1/N, a 1 bp nudge or other data (`private.test.ts`); Sepolia Z3, ZA2, ZA3 |
+| I18 | A valid proof is useless to anyone but its author | `provider` is a public input bound into the proof | `test_StolenProofIsUselessToAnotherProvider`; Sepolia ZA1 |
+| I19 | The chain learns nothing about the model or the portfolio beyond two commitments and the variance | zero knowledge of Groth16; Poseidon commitments with 248-bit salts | by construction; `npm run verify` re-verifies the proof from public signals only |
+| I20 | Theorems 4.4 and 9.2 are falsifiable on-chain by anyone, for money | `OptimalityBounty`, `MaximalityBounty` | positive controls pay against unsound rules; differential test vs `QEDClearing` on 60 economies; 2×2,000-run fuzz; Sepolia BA1–BA3, BM1–BM2; pools checked daily by `npm run verify` |
 
-Test totals: **82 Solidity tests** (unit, fuzz, stateful invariants — ≈350 000 adversarial calls per CI run,
-plus 60 random clearing economies), **45 TypeScript tests** (TS ≡ Solidity parity on a live node, portfolio solver vs.
-a 20 000-sample oracle, netting solver vs. an exhaustive oracle, 32-case red-team).
+Test totals: **104 Solidity tests** (unit, fuzz, stateful invariants — ≈350 000 adversarial calls per CI run,
+60 random clearing economies, a real Groth16 proof attacked 2,000 ways, both bounties), **50 TypeScript tests** (TS ≡
+Solidity parity on a live node, portfolio solver vs. a 20 000-sample oracle, netting solver vs. an exhaustive oracle,
+zero-knowledge prover soundness checks, 32-case red-team).
 
 ## 4. Threat model
 
@@ -94,6 +104,8 @@ owner's authority; confidentiality of keys.
 | Public-key attacker (honeypot) | both hot keys are public | ≤ 1 tUSD/day to CloudCo; ring-fence intact (H3–H6, live) |
 | Malicious client | edits signed quotes | rejected (X2, X3) |
 | Lazy / dishonest AI provider | submits unoptimised or near-miss work | rejected by mathematics; client refunded (X17–X19) |
+| Proof thief / data forger | copies a valid zk proof from calldata; proves on self-attested data; overstates quality | proof bound to its author; vendor attestation required (ZA1–ZA3) |
+| Theorem challenger | any input at all, with a 1,000 tUSD incentive per theorem | every refutation attempt reverts with the gap it could not close (BA1–BA3, BM1–BM2) |
 | Stranger | calls permissionless functions | can only settle due liabilities to their creditors (P3) |
 | Owner-key thief | full owner powers | **out of scope** — see K1 |
 
@@ -111,7 +123,7 @@ payees ≤ 32; Elevation of privilege → single-function agent key, owner-only 
 | K3 | Fixed 24h windows allow up to 2× cap around a window boundary. | Low | The published bound accounts for it (inclusive counting). Roadmap: rolling window. |
 | K4 | **Verifier trust**: both sides must agree on the verifier contract in the quote; a malicious verifier could accept anything. | Medium | Verifier address is signed in the quote; clients pin canonical verifiers by bytecode (`npm run verify` checks bytecode). Roadmap: verifier registry. |
 | K5 | **ε-optimal, not exact**: accepted solutions are within `(2n+3+|ν|)τ` of the optimum; τ is client-chosen (≤ 1 %). | Low | Theorem §4.4; `MAX_TOL` cap; clients choose τ = 1e-9 in practice. |
-| K6 | **Data confidentiality**: delivering the certificate reveals the licensed covariance in calldata. | Medium (commercial) | Roadmap: verify the KKT check inside a zk-SNARK so Σ stays private. |
+| K6 | **Data confidentiality** in the public verifier: delivering a §4 certificate reveals the covariance in calldata. | Low (resolved for private jobs) | `PrivateMinVarianceVerifier` (§10) proves the same certificate in zero knowledge; clients choose per job. |
 | K7 | **Guard is heuristic**: regex detectors can have false negatives/positives, the LLM is non-deterministic. | Medium | Guard is defence-in-depth only; the co-signer and contract are the binding controls. Red-team: 25/25 blocked, 0 false refusals. |
 | K8 | **Co-signer liveness**: if the co-signer is down, the agent cannot pay (fails safe). | Low | Fail-closed by design; owner can rotate co-signer. |
 | K9 | Token assumptions: standard ERC-20 (no fee-on-transfer / rebasing). | Low | Single, known asset per vault. |
@@ -123,6 +135,10 @@ payees ≤ 32; Elevation of privilege → single-function agent key, owner-only 
 | K15 | **Clearing griefing**: a member can issue many tiny obligations (≤ 128 open) or front-run a netting with a new obligation, making a submitted proof stale. | Low | Fails safe (`IncompleteSnapshot` / `StaleAmount`); the prover recomputes in milliseconds. Roadmap: per-member caps, a proposal window. |
 | K16 | **Netting changes counterparties' credit mix** only by shrinking it: claims are reduced, never re-assigned, but a member loses a specific receivable it might have preferred to keep. | Low | Disclosed in the on-chain terms every member signs by joining. |
 | K17 | Clearing obligations are acknowledgements, not escrowed funds: a debtor can still default on what remains after netting. | Medium | Netting minimises what must be paid; pairing it with QEDVault ring-fencing is the roadmap. |
+| K18 | **Trusted setup**: the Groth16 parameters came from a local two-phase ceremony whose contributions all ran on one machine; whoever held all contributions' randomness could forge proofs. | Medium (testnet) | Public-transaction beacons; transcript and `.ptau`/`.zkey` committed for `snarkjs zkey verify`. Production: phase 1 from a public ceremony, phase 2 with independent parties (`PTAU=… bash circuits/setup.sh`). |
+| K19 | **Circuit completeness**: an under-constrained circuit would accept bad witnesses. | Medium | Every arithmetic constraint is mirrored in `checkWitness`; explicit range checks keep all values ≪ p; tests show no witness exists for 1/N, a 1 bp nudge or other data. Roadmap: formal circuit audit (e.g. Picus / Circomspect). |
+| K20 | **Provider binding is per spec**: a client that accepts a quote whose spec names a different provider could pay for a proof it cannot use. | Low | Clients check `spec.provider == quote.provider` (enforced by QED's client agent); the escrow already pins delivery to the quoted provider. |
+| K21 | Bounty pools are finite and in a test token; they demonstrate falsifiability, not insurance. | Info | Pools and claims are public; `npm run verify` checks daily that no `Refuted` event exists. |
 
 ## 6. Incident response
 

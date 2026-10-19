@@ -40,6 +40,19 @@ Honest certificate passes and returns the variance; asymmetric covariance, negat
 * `testFuzz_AnyCirculationAroundTheOptimumIsRejected` (2,000 runs): push any amount of debt around any of the 11 simple cycles of the demo economy; conservation still holds, and every such proposal is rejected.
 * `test_SixtyRandomEconomies`: 60 random economies (3–7 agents, 3–16 debts) from the TypeScript solver: every optimal certificate executes with the exact cleared amount; wherever the greedy agent falls short (11 economies) it is rejected with `NotProvablyMaximal`.
 
+### `PrivateMinVarianceVerifier.t.sol` (11 tests): a real Groth16 proof, attacked
+
+The fixture (`npm run fixtures:private`) is a genuine proof from `circuits/private_minvar.circom`.
+* Accepted: the proof verifies through the generated Groth16 verifier and returns `keccak(weightsCommitment, variance)`; ≈ 270 k gas.
+* Rejected: an understated variance, a swapped portfolio commitment, the same proof under another provider's spec (`StolenProofIsUselessToAnotherProvider`), data attested by anyone but the vendor, an attestation replayed on another chain, a non-canonical field element.
+* `testFuzz_AnyCorruptedProofCoordinateIsRejected` (2,000 runs): perturb any of the 8 proof coordinates by any amount; always `ProofRejected`.
+* `test_EscrowPaysOnlyForThePrivateProof`: through `ProofEscrow`, Mallory's copy of QED's proof is refused and QED's delivery pays the vault.
+
+### `Bounties.t.sol` (11 tests): theorems with money on them
+
+* `OptimalityBounty`: the equal-weight portfolio, the certified portfolio itself and 2,000 random feasible portfolios (`testFuzz_Optimality_NoFeasiblePortfolioRefutesTheTheorem`) all fail to refute Theorem 4.4; a forged certificate cannot even enter (the deployed verifier reverts); infeasible challengers are refused; **positive control:** against a verifier that accepts anything, the bounty pays the first real refutation.
+* `MaximalityBounty`: the demo economy is accepted at exactly 169; the greedy 162 cannot refute it; 2,000 random circulations built from the economy's cycles never beat it; `test_Maximality_AgreesWithQEDClearingOnSixtyEconomies` executes each of the 60 economies on a fresh `QEDClearing` and checks the bounty's rule agrees; **positive control:** an acceptance rule that under-reports by 7 tUSD gets refuted and pays out.
+
 ## TypeScript (`node --test`, `agent/test`)
 
 | File | What it proves |
@@ -47,13 +60,16 @@ Honest certificate passes and returns the variance; asymmetric covariance, negat
 | `parity.test.ts` | Starts anvil, deploys the contracts, and checks **TypeScript ≡ Solidity** for every EIP-712 hash/digest (mandate, certificate, quote) and for the KKT checker's verdict and returned variance. |
 | `engine.test.ts` | Certifying solver: honest certificate has zero stationarity residual; matches a 20 000-sample brute-force oracle on the simplex; lazy 1/N fails only on complementary slackness; a 0.01 % nudge is rejected; fixed-point round trip; economics (price = cost × 2.5 rounded up; unsettled revenue never counts as capital). |
 | `netting.test.ts` | Netting solver equals an **exhaustive brute-force oracle** on 150 random economies; certificates are exact; netting never changes a net position; remaining debts always form a DAG that settles with net debits only. |
+| `private.test.ts` | The zero-knowledge prover: the fixed-point certificate satisfies every circuit constraint with zero duality gap and matches the exact solver to 10⁻¹² per weight; the Groth16 proof verifies and its public signals equal the commitments, the provider and the variance; a tampered signal fails; **no proof exists** for the lazy 1/N portfolio, a 1-basis-point nudge, or a different data commitment (the witness generator's constraints fail). |
 | `guard.test.ts` | The 32-case red-team corpus (`redteam.corpus.ts`: 25 attacks across induced transfer, data extraction, privilege escalation and prompt injection, in English and Chinese, plus 7 benign requests) through the deterministic guard; plus overrides of a fully compromised LLM (proposes paying the attacker; leaks secrets; exceeds the free balance). |
 
 ## End-to-end
 
 * `QED_OFFLINE=1 npm run local` — the whole economy (deploy, fund, lifecycle, conversation, 18 attacks, honeypot, emergency) on a local chain, in CI.
 * `npm run local:clearing` — the clearing economy (gridlock, 6 attacks, proven netting, settlement) on a local chain.
-* `npm run verify` — independent re-verification of the public Sepolia evidence for both runs (bytecode, receipts, replayed revert errors, signatures, KKT re-check, netting certificate re-check, live invariants), in CI on every push and daily.
+* `npm run local:private` — the private economy (zero-knowledge proof, escrow settlement, 3 attacks, both bounties funded and 5 refutation attempts) on a local chain.
+* `npm run zk:setup` — re-runs the trusted setup from the circuit (new keys; the committed keys are the ones deployed).
+* `npm run verify` — independent re-verification of the public Sepolia evidence for all three runs (bytecode, receipts, replayed revert errors, signatures, KKT re-check, netting certificate re-check, Groth16 proof re-verified off-chain with snarkjs, vendor attestation recovered, bounty pools intact, live invariants), in CI on every push and daily.
 * `npm run redteam` — the corpus against the live language model alone and the guarded pipeline; report in `evidence/redteam/report.md`.
 
 ## Clean-clone reproduction log

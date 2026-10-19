@@ -50,8 +50,14 @@ const clearing = clrManifest
     }
   : undefined;
 
+const privManifest = read(`${EV}/private/manifest.json`);
+const priv = privManifest
+  ? { contracts: privManifest.contracts, final: privManifest.final, sepolia: privManifest.sepolia, actors: privManifest.actors, steps: privManifest.steps.map((s: any) => ({ ...s, events: undefined })) }
+  : undefined;
+
 const D = {
   clearing,
+  priv,
   manifest: slimManifest,
   portfolio,
   portfolioMu,
@@ -59,7 +65,7 @@ const D = {
   conversation,
   honeypot,
   redteam,
-  selectors: { snapshot: toFunctionSelector("snapshot(address)"), totalCleared: toFunctionSelector("totalCleared()"), grossOpen: toFunctionSelector("grossOpen()") },
+  selectors: { snapshot: toFunctionSelector("snapshot(address)"), totalCleared: toFunctionSelector("totalCleared()"), grossOpen: toFunctionSelector("grossOpen()"), balanceOf: toFunctionSelector("balanceOf(address)") },
   repo: "https://github.com/Nightcore709/qed-agent-wallet",
   builtAt: new Date().toISOString(),
 };

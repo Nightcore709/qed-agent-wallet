@@ -27,7 +27,8 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import { MinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { CIRCUIT, attestationDigest, verifyOffchain, shutdownProver } from "../src/engine/privateMinvar.js";
 import { checkNetting, type Obligation } from "../src/engine/netting.js";
 import { decodeRevert } from "../src/chain.js";
 import { checkCertificate } from "../src/engine/minvar.js";
@@ -223,10 +224,67 @@ async function main() {
   console.log("\n— Outcome 3: adversaries cannot breach liabilities or signed terms —");
   await verifyOutcome3();
   await verifyClearing();
+  await verifyPrivate();
+  await shutdownProver();
   const failed = rows.filter((r) => !r.ok);
   writeFileSync(`${EVIDENCE}/verification.json`, JSON.stringify({ at: new Date().toISOString(), rpc: RPC, chainId, passed: rows.length - failed.length, failed: failed.length, rows }, null, 2));
   console.log(`\n${failed.length === 0 ? "ALL" : rows.length - failed.length + "/" + rows.length} CHECKS PASSED${failed.length ? ` — ${failed.length} FAILED` : ""}  (${rows.length} checks, report: ${EVIDENCE}/verification.json)\n`);
   if (failed.length) process.exit(1);
+}
+
+/** The QED Private run (zero-knowledge optimality + theorem bounties), if its evidence is present. */
+async function verifyPrivate() {
+  const path = `${EVIDENCE}/private/manifest.json`;
+  if (!existsSync(path)) return;
+  const pm = JSON.parse(readFileSync(path, "utf8"));
+  const k = pm.contracts as Record<string, Address>;
+  console.log("\n— QED Private: bytecode —");
+  await verifyBytecode(
+    { groth16: k.groth16, privateVerifier: k.privateVerifier, optimalityBounty: k.optimalityBounty, maximalityBounty: k.maximalityBounty },
+    { groth16: "Groth16Verifier.sol/Groth16Verifier", privateVerifier: "PrivateMinVarianceVerifier.sol/PrivateMinVarianceVerifier", optimalityBounty: "OptimalityBounty.sol/OptimalityBounty", maximalityBounty: "MaximalityBounty.sol/MaximalityBounty" },
+  );
+  const vk = JSON.parse(readFileSync(CIRCUIT.vkey, "utf8"));
+  const sol = readFileSync("contracts/src/verifiers/zk/Groth16Verifier.sol", "utf8");
+  ok("O4", "the deployed Groth16 verifier embeds the committed verification key (circuits/private_minvar.vkey.json)", sol.includes(vk.vk_delta_2[0][0]) && sol.includes(vk.IC[4][1]), `nPublic ${vk.nPublic} · IC points ${vk.IC.length}`);
+  const wired = (await pub.readContract({ address: k.privateVerifier, abi: PrivateMinVarianceVerifierAbi, functionName: "groth16" })) as Address;
+  const vendor = (await pub.readContract({ address: k.privateVerifier, abi: PrivateMinVarianceVerifierAbi, functionName: "dataVendor" })) as Address;
+  ok("O4", "PrivateMinVarianceVerifier is wired to that Groth16 verifier and to Helix as data vendor", getAddress(wired) === getAddress(k.groth16) && getAddress(vendor) === getAddress(pm.actors.helix), `vendor ${vendor}`);
+  console.log("\n— QED Private: every recorded transaction —");
+  await verifySteps(pm.steps);
+  console.log("\n— QED Private: paid on a zero-knowledge proof, re-verified independently —");
+  const z3 = pm.steps.find((x: any) => x.id === "Z3");
+  const tx = await pub.getTransaction({ hash: z3.tx.hash });
+  const { args } = decodeFunctionData({ abi: ProofEscrowAbi as Abi, data: tx.input }) as any;
+  const [jobId, spec, solution] = args as [bigint, Hex, Hex];
+  const [dataCommitment, universe, provider, vendorSig] = decodeAbiParameters([{ type: "uint256" }, { type: "bytes32" }, { type: "address" }, { type: "bytes" }], spec) as any;
+  const [a, b, c, wc, variance] = decodeAbiParameters([{ type: "uint256[2]" }, { type: "uint256[2][2]" }, { type: "uint256[2]" }, { type: "uint256" }, { type: "uint256" }], solution) as any;
+  const proof = { pi_a: [a[0].toString(), a[1].toString(), "1"], pi_b: [[b[0][1].toString(), b[0][0].toString()], [b[1][1].toString(), b[1][0].toString()], ["1", "0"]], pi_c: [c[0].toString(), c[1].toString(), "1"], protocol: "groth16", curve: "bn128" };
+  const signals = [wc, variance, dataCommitment, BigInt(provider)].map((x: bigint) => x.toString());
+  ok("O2", "the Groth16 proof verifies OFF-CHAIN with snarkjs against the committed verification key", await verifyOffchain(vk, { proof, publicSignals: signals }), `variance ${(Number(variance) / 1e36).toFixed(10)} · provider ${provider}`);
+  const signer = await recoverAddress({ hash: keccak256(new Uint8Array([...new TextEncoder().encode("\x19Ethereum Signed Message:\n32"), ...hexToBytes(attestationDigest(BigInt(chainId), dataCommitment, universe))])), signature: vendorSig });
+  ok("O2", "the data commitment carries Helix's attestation (signature recovered from calldata)", getAddress(signer) === getAddress(pm.actors.helix), `${dataCommitment.toString(16).slice(0, 12)}… attested by ${signer}`);
+  ok("O1", "the proof is bound to the QED agent, which sent the delivery", getAddress(provider) === getAddress(pm.actors.qed) && getAddress(tx.from) === getAddress(pm.actors.qed));
+  const job = (await pub.readContract({ address: k.escrow, abi: ProofEscrowAbi, functionName: "getJob", args: [jobId] })) as any;
+  ok("O2", "the same ProofEscrow that settled job #1 settled this job into QED's vault, recording the proof's digest", Number(job.status) === 2 && getAddress(job.payee) === getAddress(k.vault) && getAddress(job.verifier) === getAddress(k.privateVerifier) && job.solutionHash === keccak256(solution), `job #${jobId} · ${Number(job.price) / 1e6} tUSD → ${job.payee}`);
+  console.log("\n— QED Private: theorems with money on them —");
+  const balOf = (x: Address) => pub.readContract({ address: k.token, abi: TestUSDAbi, functionName: "balanceOf", args: [x] }) as Promise<bigint>;
+  const [obBal, mbBal] = [await balOf(k.optimalityBounty), await balOf(k.maximalityBounty)];
+  const refuted = [
+    ...((await pub.getContractEvents({ address: k.optimalityBounty, abi: OptimalityBountyAbi, eventName: "Refuted", fromBlock: BigInt(k.deployBlock) })) as any[]),
+    ...((await pub.getContractEvents({ address: k.maximalityBounty, abi: MaximalityBountyAbi, eventName: "Refuted", fromBlock: BigInt(k.deployBlock) })) as any[]),
+  ];
+  const ver = (await pub.readContract({ address: k.optimalityBounty, abi: OptimalityBountyAbi, functionName: "verifier" })) as Address;
+  ok("O4", "the optimality bounty guards the verifier that settled job #1", getAddress(ver) === getAddress(dep.verifier), ver);
+  ok("O3", "both bounties are still funded and nobody has refuted either theorem", refuted.length === 0 && obBal > 0n && mbBal > 0n, `${Number(obBal) / 1e6} + ${Number(mbBal) / 1e6} tUSD unclaimed today`);
+  const mal = pm.actors.mallory as Address;
+  const malIn = (await pub.getContractEvents({ address: k.token, abi: TestUSDAbi, eventName: "Transfer", args: { to: mal }, fromBlock: BigInt(k.deployBlock) })) as any[];
+  const fromUs = malIn.filter((e) => [k.escrow, k.optimalityBounty, k.maximalityBounty].map((x) => x.toLowerCase()).includes(e.args.from.toLowerCase()));
+  ok("O3", "Mallory received ZERO tUSD from the escrow or either bounty", fromUs.length === 0, `${malIn.length} faucet transfer(s) only`);
+}
+
+function hexToBytes(h: Hex): Uint8Array {
+  const s = h.slice(2);
+  return Uint8Array.from({ length: s.length / 2 }, (_, i) => parseInt(s.slice(2 * i, 2 * i + 2), 16));
 }
 
 main().catch((e) => {

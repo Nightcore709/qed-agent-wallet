@@ -199,6 +199,30 @@ td .n { color: var(--muted); font-size: var(--step--1); margin-top: 2px; max-wid
 .graphs figcaption b { color: var(--ink); font-weight: 600; }
 .graphs svg { width: 100%; height: auto; display: block; }
 .clr-rows { margin-top: 18px; }
+/* ── private by proof ── */
+.zk { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 900px) { .zk { grid-template-columns: 1fr; } }
+.ledgerpair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 14px; }
+.ledgerpair h3 { font-family: var(--sans); font-size: var(--step--1); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.ledgerpair .col { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.pubrow, .privrow { display: grid; gap: 2px; border-top: 1px solid var(--rule); padding-top: 8px; min-width: 0; }
+.pubrow span, .privrow span { font-size: var(--step--1); color: var(--muted); }
+.pubrow code { font-family: var(--mono); font-size: var(--step--1); color: var(--ink); overflow-wrap: anywhere; }
+.redact { display: flex; flex-wrap: wrap; gap: 4px; }
+.redact i { display: inline-block; height: 0.95em; border-radius: 2px; background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink) 70%, transparent) 0 3px, color-mix(in srgb, var(--ink) 55%, transparent) 3px 6px); }
+.privrow b { font-weight: 500; font-size: var(--step--1); }
+/* ── bounties ── */
+.bounty { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 18px; }
+.bounty .sheet { display: grid; gap: 14px; align-content: start; }
+.pool { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pool b { font-family: var(--serif); font-size: var(--step-3); font-weight: 500; font-variant-numeric: tabular-nums; }
+.pool span { color: var(--muted); font-size: var(--step--1); }
+.thm-stmt { font-family: var(--serif); font-size: var(--step-1); line-height: 1.35; }
+.tries { display: grid; gap: 8px; }
+.try { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; border-top: 1px solid var(--rule); padding-top: 8px; }
+.try .t { font-size: var(--step--1); }
+.try .t small { display: block; color: var(--muted); }
+.try .e { text-align: right; font-family: var(--mono); font-size: var(--step--1); color: var(--stamp); }
 
 /* ── honeypot ── */
 .hp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
@@ -242,6 +266,8 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       <a href="#ledger">Ledger</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#clearing">Clearing</a>
+      <a href="#private">Private</a>
+      <a href="#bounties">Bounties</a>
       <a href="#conversation">Conversation</a>
       <a href="#honeypot">Honeypot</a>
       <a href="#reproduce">Reproduce</a>
@@ -256,7 +282,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
     <div class="wrap">
       <div class="lede">
         <h1>An AI treasury that moves money only when it can prove it should.</h1>
-        <p>QED is an autonomous agent that runs a small quant business on Ethereum. It earns, spends, owes, clears its debts with other agents and gets attacked. Five statements about its money are checked against the chain every time this page loads.</p>
+        <p>QED is an autonomous agent that runs a small quant business on Ethereum. It earns, spends, owes, clears its debts with other agents, sells work on data it may never reveal, and gets attacked. Seven statements about its money are checked against the chain every time this page loads.</p>
       </div>
       <div class="theorems" id="theorems" aria-live="polite"></div>
       <div class="legend"><span><span class="sq"></span>holds on-chain at the block shown</span><span id="srcnote"></span></div>
@@ -318,6 +344,30 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
         <div class="sheet"><div class="kkt" id="clrfacts"></div></div>
       </div>
       <div class="ledger-wrap clr-rows"><table><thead><tr><th>Step</th><th>What happened</th><th>Signed by</th><th>Result</th><th>Transaction</th></tr></thead><tbody id="clrrows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="private">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Paid for a proof about data nobody saw</h2>
+        <p id="zknote">The same escrow that settled job #1 pays for a zero-knowledge proof that the portfolio is optimal for the vendor's attested data. The chain verifies the mathematics and never sees the data or the portfolio.</p>
+      </div>
+      <div class="zk">
+        <div class="sheet"><div class="ledgerpair" id="zkpair"></div></div>
+        <div class="sheet"><div class="kkt" id="zkfacts"></div></div>
+      </div>
+      <div class="ledger-wrap clr-rows"><table><thead><tr><th>Step</th><th>What happened</th><th>Signed by</th><th>Result</th><th>Transaction</th></tr></thead><tbody id="zkrows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="bounties">
+    <div class="wrap">
+      <div class="shead">
+        <h2>Theorems with money on them</h2>
+        <p>Two contracts each hold 1,000 tUSD and pay all of it, automatically, to anyone who refutes on-chain the theorem QED's money depends on. No judge, no committee: the contract checks the counterexample itself. If the mathematics is right, nobody can ever collect.</p>
+      </div>
+      <div class="bounty" id="bounty"></div>
     </div>
   </section>
 
@@ -411,16 +461,22 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
     const step = (id) => M.steps.find((s) => s.id === id);
     const txLink = (id, label) => { const s = step(id); return s && s.tx ? `<a class="hash txl" href="${txUrl(s.tx.hash)}" target="_blank" rel="noopener">${esc(label ?? short(s.tx.hash))}</a>` : ""; };
     const attacks = M.steps.filter((s) => s.tx && s.expect === "revert");
+    const isAttack = (s) => s.tx && s.expect === "revert" && s.attack;
+    const allAttacks = attacks.length + (D.clearing?.steps.filter(isAttack).length ?? 0) + (D.priv?.steps.filter(isAttack).length ?? 0);
     const fin = M.final ?? {};
 
     // ───────── four theorems ─────────
     let S = { v: { balance: fin.vault?.balance ?? 0, protectedBalance: fin.vault?.protected ?? 0, freeBalance: fin.vault?.free ?? 0, blastRadius24h: fin.vault?.blastRadius24h ?? 0 }, h: { balance: fin.honeypot?.balance ?? 0, protectedBalance: fin.honeypot?.protected ?? 0, freeBalance: fin.honeypot?.free ?? 0, blastRadius24h: fin.honeypot?.blastRadius24h ?? 0 }, block: Number(M.steps.at(-1)?.tx?.blockNumber ?? 0), live: false };
     const thms = [
       { id: "solv", stmt: () => `<var>B</var> ≥ <var>P</var>`, sub: "Vault balance covers every ring-fenced liability", val: () => `<b class="num">${usd(S.v.balance)} ≥ ${usd(S.v.protectedBalance)}</b>tUSD balance vs. ring-fenced` },
-      { id: "excl", stmt: () => `<var>L</var><sub>unapproved</sub> = 0`, sub: "Loss to any address the owner did not approve", val: () => `<b class="num">${attacks.length} attacks refused</b>0 tUSD reached the attacker` },
+      { id: "excl", stmt: () => `<var>L</var><sub>unapproved</sub> = 0`, sub: "Loss to any address the owner did not approve", val: () => `<b class="num">${allAttacks} attacks refused</b>0 tUSD reached the attacker, in any run` },
       { id: "bound", stmt: () => `<var>BR</var><sub>24h</sub> ≤ ${usd(S.v.blastRadius24h)}`, sub: "Worst case if the AI key and the co-signer key are both stolen", val: () => `<b class="num">${usd(S.v.blastRadius24h)} tUSD</b>computed by QEDLens, not by the AI` },
       { id: "opt", stmt: () => `<var>f</var>(<var>w</var>) − <var>f</var><sup>*</sup> ≤ ${(D.portfolio?.certificate?.optimalityBound ?? 1.5e-8).toExponential(1).replace("e-", " × 10<sup>−").replace(/$/, "</sup>")}`, sub: "The portfolio it was paid for is provably optimal", val: () => `<b class="num">gap ${D.portfolio?.certificate?.dualityGap ?? "0"}</b>KKT certificate checked on-chain` },
       { id: "clr", stmt: () => `Σ<var>x</var> = Σ<var>d</var>·<var>y</var>`, sub: "The clearing house cancelled the largest possible debt, moving no value", val: () => `<b class="num">${usd(S.c?.cleared ?? D.clearing?.final?.cleared ?? 0)} tUSD cleared</b>maximality certificate checked on-chain` },
+      ...(D.priv ? [
+        { id: "zk", stmt: () => `Verify(<var>π</var>, <var>C</var><sub>Σ</sub>, <var>C</var><sub>w</sub>) = 1`, sub: "Paid for an optimal portfolio on data the chain never saw", val: () => `<b class="num">${usd(D.priv.final.privateJob.price)} tUSD paid</b>Groth16 proof, verified on-chain` },
+        { id: "bty", stmt: () => `#refutations = 0`, sub: "Nobody has refuted either theorem, with money on offer", val: () => `<b class="num">${usd(S.b ?? (BigInt(D.priv.final.bounties.optimality) + BigInt(D.priv.final.bounties.maximality)))} tUSD unclaimed</b>two bounties, paid out by the contract itself` },
+      ] : []),
     ];
 
     function drawTheorems(pending) {
@@ -467,7 +523,13 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
           const gross = await rpc("eth_call", [{ to: D.clearing.contracts.clearing, data: D.selectors.grossOpen }, "latest"]);
           cl = { cleared: BigInt(cleared), grossOpen: BigInt(gross) };
         }
-        S = { v, h, c: cl, block: parseInt(blk, 16), live: true };
+        let b;
+        if (D.priv) {
+          const bal = async (a) => BigInt(await rpc("eth_call", [{ to: D.priv.contracts.token, data: D.selectors.balanceOf + pad(a) }, "latest"]));
+          b = (await bal(D.priv.contracts.optimalityBounty)) + (await bal(D.priv.contracts.maximalityBounty));
+          drawBounties([await bal(D.priv.contracts.optimalityBounty), await bal(D.priv.contracts.maximalityBounty)], parseInt(blk, 16));
+        }
+        S = { v, h, c: cl, b, block: parseInt(blk, 16), live: true };
       } catch (e) { /* snapshot from verified evidence */ }
       drawTheorems(false); stamp(); drawVaults();
       $("netdot").classList.toggle("live", S.live);
@@ -640,6 +702,71 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       }).join("");
     }
 
+    // ───────── private by proof ─────────
+    const PV = D.priv;
+    function stepRows(steps) {
+      return steps.filter((x) => !["setup", "deploy"].includes(x.phase)).map((x) => {
+        const res = !x.tx ? `<span class="offc">off-chain</span>` : x.tx.status === "success" ? `<span class="res ok">confirmed</span>` : `<span class="stampx">Refused</span><span class="err">${esc(x.error?.name ?? "")}</span>`;
+        const link = x.tx ? `<a class="hash" href="${txUrl(x.tx.hash)}" target="_blank" rel="noopener">${short(x.tx.hash)}</a><div class="n num">block ${Number(x.tx.blockNumber).toLocaleString("en-US")}</div>` : `<span class="offc">—</span>`;
+        return `<tr><td class="id">${esc(x.id)}</td><td><div class="t">${esc(x.title)}</div>${x.narrative ? `<div class="n">${esc(x.narrative)}</div>` : ""}</td><td>${esc(x.actor)}</td><td>${res}</td><td>${link}</td></tr>`;
+      }).join("");
+    }
+    const pstep = (id) => PV?.steps.find((x) => x.id === id);
+    const plink = (id, label) => { const st = pstep(id); return st && st.tx ? `<a class="hash txl" href="${txUrl(st.tx.hash)}" target="_blank" rel="noopener">${esc(label ?? short(st.tx.hash))}</a>` : ""; };
+    if (PV) {
+      const J = PV.final.privateJob;
+      const bars = (n, seed) => Array.from({ length: n }, (_, i) => `<i style="width:${2.2 + ((i * 7 + seed) % 5) * 0.55}em"></i>`).join("");
+      $("zkpair").innerHTML = `
+        <div class="col"><h3>On-chain, public</h3>
+          <div class="pubrow"><span>Data commitment, attested by Helix</span><code>${short(J.dataCommitment)}</code></div>
+          <div class="pubrow"><span>Portfolio commitment</span><code>${short(J.weightsCommitment)}</code></div>
+          <div class="pubrow"><span>Certified variance wᵀΣw</span><code>${(Number(J.variance) / 1e36).toFixed(10)}</code></div>
+          <div class="pubrow"><span>Proof bound to</span><code>QED agent ${short(PV.actors.qed)}</code></div>
+          <div class="pubrow"><span>Groth16 proof</span><code>256 bytes</code></div></div>
+        <div class="col"><h3>Never on-chain</h3>
+          <div class="privrow"><b>Covariance model, 21 entries</b><div class="redact" aria-label="redacted">${bars(12, 1)}</div></div>
+          <div class="privrow"><b>Portfolio weights, 6 sleeves</b><div class="redact" aria-label="redacted">${bars(6, 3)}</div></div>
+          <div class="privrow"><b>KKT multipliers ν, μ</b><div class="redact" aria-label="redacted">${bars(5, 2)}</div></div>
+          <div class="privrow"><b>Convexity witness L</b><div class="redact" aria-label="redacted">${bars(8, 4)}</div></div>
+          <div class="privrow"><span>Delivered to the client off-chain, checked against the commitment.</span></div></div>`;
+      const z3 = pstep("Z3");
+      $("zkfacts").innerHTML = `
+        <div class="row"><div class="l">Zero-knowledge statement<small>KKT certificate, convexity, exact budget, commitments</small></div><div class="r"><b>${J.constraints.toLocaleString("en-US")}</b> constraints</div></div>
+        <div class="row"><div class="l">Proving time<small>QED agent, one CPU</small></div><div class="r">${(J.provingMs / 1000).toFixed(1)} s</div></div>
+        <div class="row"><div class="l">Paid into QED's vault<small>by the escrow that settled job #1 ${plink("Z3", "(Z3)")}</small></div><div class="r"><b>${usd(J.price)}</b> tUSD</div></div>
+        <div class="row"><div class="l">Verification on-chain<small>attestation + Groth16 pairing check, whole delivery</small></div><div class="r">${z3?.tx ? Number(z3.tx.gasUsed).toLocaleString("en-US") + " gas" : "—"}</div></div>
+        <div class="row"><div class="l">Copied proof, another provider<small>ProofRejected ${plink("ZA1", "(ZA1)")}</small></div><div class="r" style="color:var(--stamp)">refused</div></div>
+        <div class="row"><div class="l">Lower variance than possible<small>ProofRejected ${plink("ZA2", "(ZA2)")}</small></div><div class="r" style="color:var(--stamp)">refused</div></div>
+        <div class="row"><div class="l">Proof about self-attested data<small>UntrustedDataAttestation ${plink("ZA3", "(ZA3)")}</small></div><div class="r" style="color:var(--stamp)">refused</div></div>`;
+      $("zkrows").innerHTML = stepRows(PV.steps.filter((x) => ["private", "private-attack"].includes(x.phase)));
+    }
+    function drawBounties(pools, block) {
+      if (!PV) return;
+      const err = (id) => pstep(id)?.error;
+      const sci = (x) => { const [m, e] = Math.abs(x).toExponential(1).split("e"); return `${m} × 10${String(Number(e)).replace(/-/g, "⁻").replace(/\d/g, (d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d])}`; };
+      const gap = (id) => { const e = err(id); if (!e || e.name !== "TheoremHolds" || e.args.length < 2) return e?.name ?? ""; const a = Number(e.args[0]) / 2e54, b = Number(e.args[1]) / 2e54; return a <= 0 ? `${sci(a)} worse than the certified portfolio; a claim needs > ${sci(b)} better` : `only ${sci(a)} better; a claim needs > ${sci(b)}`; };
+      const nm = (id) => { const e = err(id); return e ? (e.name === "TheoremHolds" ? `TheoremHolds(${e.args.map((x) => usd(x)).join(", ")})` : e.name) : ""; };
+      const tri = (id, t, sub, e) => `<div class="try"><div class="t">${t} ${plink(id, `(${id})`)}<small>${sub}</small></div><div class="e">${e}</div></div>`;
+      const src = block ? `read live from Sepolia, block ${block.toLocaleString("en-US")}` : "from the verified evidence";
+      $("bounty").innerHTML = `
+        <div class="sheet"><div class="pool"><b>${usd(pools[0])}</b><span>tUSD unclaimed · ${src}</span></div>
+          <p class="thm-stmt">For every portfolio <var>x</var> ≥ 0 with Σ<var>x</var> = 1, ½<var>w</var>ᵀΣ<var>w</var> − ½<var>x</var>ᵀΣ<var>x</var> ≤ τ(|ν| + 3 + τ) + ½nτ(2 + τ)², whenever the verifier accepted <var>w</var>.</p>
+          <p style="color:var(--muted);font-size:var(--step--1)">OptimalityBounty re-runs the verifier that settled job #1 ${M.contracts.verifier ? `<a class="hash" href="${addrUrl(M.contracts.verifier)}" target="_blank" rel="noopener">${short(M.contracts.verifier)}</a>` : ""}, then checks your portfolio in exact integers.</p>
+          <div class="tries">
+            ${tri("BA1", "Equal-weight portfolio", gap("BA1"), "TheoremHolds")}
+            ${tri("BA2", "QED's optimum, shifted 0.1%", gap("BA2"), "TheoremHolds")}
+            ${tri("BA3", "The forged 1/N certificate from job #2", "the verifier refuses it before any comparison", "DualityGapTooLarge")}
+          </div></div>
+        <div class="sheet"><div class="pool"><b>${usd(pools[1])}</b><span>tUSD unclaimed · ${src}</span></div>
+          <p class="thm-stmt">For every netting <var>x</var>′ that keeps every net position and 0 ≤ <var>x</var>′ ≤ <var>d</var>, Σ<var>x</var>′ ≤ Σ<var>d</var>·<var>y</var> = Σ<var>x</var>, whenever QEDClearing accepted <var>x</var>.</p>
+          <p style="color:var(--muted);font-size:var(--step--1)">MaximalityBounty applies QEDClearing's acceptance rule line for line, then checks your netting conserves every position.</p>
+          <div class="tries">
+            ${tri("BM1", "The naive 162 tUSD netting", "weak LP duality: no netting beats Σd·y", nm("BM1"))}
+            ${tri("BM2", "A 170 tUSD netting", "cancels 1 tUSD more of one debt, so a net position moves", "NetPositionChanged")}
+          </div></div>`;
+    }
+    if (PV) drawBounties([BigInt(PV.final.bounties.optimality), BigInt(PV.final.bounties.maximality)], 0);
+
     // ───────── conversation ─────────
     const C = D.conversation;
     if (C) {
@@ -691,15 +818,17 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       `git clone --recursive ${D.repo}`,
       `cd qed-agent-wallet && npm ci && forge build`,
       ``,
-      `forge test              # 82 Solidity tests, fuzz + stateful invariants`,
-      `npm run test:ts         # 45 TypeScript tests: TS≡Solidity parity, solver oracles, red-team`,
+      `forge test              # 104 Solidity tests: fuzz, stateful invariants, a real zk proof attacked`,
+      `npm run test:ts         # 50 TypeScript tests: TS≡Solidity parity, solver oracles, prover, red-team`,
       `npm run verify          # re-derives every on-chain claim from public Sepolia, no keys`,
       `npm run local           # the whole economy on a local chain, no keys or API needed`,
       `npm run local:clearing  # the clearing economy on a local chain`,
+      `npm run local:private   # zero-knowledge job + theorem bounties on a local chain`,
     ].join("\n");
     const names = { vault: "QEDVault (agent)", honeypotVault: "QEDVault (honeypot)", escrow: "ProofEscrow", verifier: "MinVarianceVerifier", lens: "QEDLens", token: "TestUSD" };
     $("contracts").innerHTML = Object.entries(names).map(([k, n]) => `<div><span>${n}</span><a class="hash" href="${addrUrl(M.contracts[k])}" target="_blank" rel="noopener">${short(M.contracts[k])}</a></div>`).join("");
     if (D.clearing) $("contracts").innerHTML += `<div><span>QEDClearing</span><a class="hash" href="${addrUrl(D.clearing.contracts.clearing)}" target="_blank" rel="noopener">${short(D.clearing.contracts.clearing)}</a></div>`;
+    if (D.priv) for (const [k, n] of [["privateVerifier", "PrivateMinVarianceVerifier"], ["groth16", "Groth16Verifier"], ["optimalityBounty", "OptimalityBounty"], ["maximalityBounty", "MaximalityBounty"]]) $("contracts").innerHTML += `<div><span>${n}</span><a class="hash" href="${addrUrl(D.priv.contracts[k])}" target="_blank" rel="noopener">${short(D.priv.contracts[k])}</a></div>`;
     $("foot").innerHTML = `QED · FinTechathon 2026, Topic F · <a href="${D.repo}" target="_blank" rel="noopener">source code</a> · testnet prototype with a valueless token, not audited.`;
   }
 })();

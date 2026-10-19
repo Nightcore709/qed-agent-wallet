@@ -8,6 +8,7 @@
 | Network | Ethereum Sepolia (chain id 11155111) |
 | Blocks | 11,948,657 → 11,949,339 |
 | Transactions | 55 (36 succeeded · 19 reverted **by design** — every one an attack or a paused-vault test) |
+| Plus Run 3 (zero-knowledge job, bounties) | 24 more transactions — [see below](#run-3--zero-knowledge-optimality-and-theorem-bounties-qed-private) |
 | Plus Run 2 (certified clearing) | 44 more transactions on a separate contract — [see below](#run-2--certified-clearing-of-an-agent-economy-qedclearing) |
 | Off-chain signed artefacts | 7 (mandate, quote, certificate, vendor release, conversation, red-team) — hashes anchored on-chain |
 | Total gas | 66,358,024 |
@@ -212,12 +213,66 @@ Final token balances equal each agent's net position: Northwind 0.00 · QED 28.0
 
 Set-up transactions of this run (funding, mints): [`0xda9bfc81…7390`](https://sepolia.etherscan.io/tx/0xda9bfc81ef90280d38398b52a2cc058acc61e294bddc52e4b2cde24665b87390), [`0x8e8c0c3f…f2b6`](https://sepolia.etherscan.io/tx/0x8e8c0c3fbbd424ab56f0c44dd8cbe1b8174339837331c174c692d843f161f2b6), [`0xbb7e24a6…a102`](https://sepolia.etherscan.io/tx/0xbb7e24a61ecd7c7c3aea3817f9b3bfed60f80c43df4e06e76fa7893e5c3ba102), [`0xd23466d2…5222`](https://sepolia.etherscan.io/tx/0xd23466d2916a25057e210c2dcacf62ed7717854b9f917a70cb0f657c14e55222), [`0xe0a46cd9…001a`](https://sepolia.etherscan.io/tx/0xe0a46cd9ee00d4bd75c4e667380565e7421856ce3b454fc877bfafaed7c5001a), [`0xd0ba9980…c4c9`](https://sepolia.etherscan.io/tx/0xd0ba998040e113ffbe795154e6e7c506e852759ba458c9dd849d05df7401c4c9), [`0x0ce9e106…3182`](https://sepolia.etherscan.io/tx/0x0ce9e10678cf321d62d730963f9936888d31d8accf7a0a9fc3f58c737e793182), [`0x3e69b56d…19f5`](https://sepolia.etherscan.io/tx/0x3e69b56dec22c6df6818baa963bd232e59d4a7dbf2aa99cb635c266d09f819f5), [`0x0dc85d8e…de39`](https://sepolia.etherscan.io/tx/0x0dc85d8eef72ead406909c624b562c7bc466775ba0f80fd80f2aee0baf51de39), [`0x5e9ad960…91dc`](https://sepolia.etherscan.io/tx/0x5e9ad9606da471456ca5a6645adc0883ec153c5f1d8cb0b5f2c725a1019a91dc), [`0xab31a916…1411`](https://sepolia.etherscan.io/tx/0xab31a91691b02300ffd157543af157448af76d2ea2eba777415faff47e451411), [`0x63e9af20…40d2`](https://sepolia.etherscan.io/tx/0x63e9af20b7996f1ef0eb55bfb6a684d516f93e9821ddf4336cd553d4f72140d2), [`0xe2af5f53…991b`](https://sepolia.etherscan.io/tx/0xe2af5f534249066f76827e14e15ee5026a1f509486a93be49845911ee006991b), [`0x97a1b6f6…7320`](https://sepolia.etherscan.io/tx/0x97a1b6f6cca08e93ff7670cb1461e172bfb30bfafda0541e6645237fe0fa7320).
 
+## Run 3 — zero-knowledge optimality and theorem bounties (QED Private)
+
+> `evidence/ethereum-sepolia/private/manifest.json`, `receipts.json`. Built on the main run's ProofEscrow, TestUSD and MinVarianceVerifier; `npm run verify` re-verifies the Groth16 proof off-chain with snarkjs, recovers the vendor's attestation from calldata and checks both bounty pools.
+
+| | |
+|---|---|
+| Blocks | 11,951,192 → 11,951,215 |
+| Transactions | 24 (16 succeeded · 8 reverted **by design**) |
+| Private job | job #3: 12.00 tUSD paid into QED's vault on a Groth16 proof (12,569 constraints, proved in 1.5 s) |
+| What the chain saw | data commitment `0x0ec573bb27cdf14a…` (attested by Helix), portfolio commitment `0x057717d386e492ea…`, variance 0.0015702689, provider |
+| Bounties | 1000.00 + 1000.00 tUSD unclaimed after every refutation attempt |
+
+| Contract | Address |
+|---|---|
+| Groth16Verifier | [`0xc04329693c7b464ab636107b31dcf6746e204e7b`](https://sepolia.etherscan.io/address/0xc04329693c7b464ab636107b31dcf6746e204e7b) |
+| PrivateMinVarianceVerifier | [`0x1270287aaf21f6cc939c255fc1ba294d9268b453`](https://sepolia.etherscan.io/address/0x1270287aaf21f6cc939c255fc1ba294d9268b453) |
+| OptimalityBounty | [`0xfc2129f0432538d034c5307299022b3d369eb677`](https://sepolia.etherscan.io/address/0xfc2129f0432538d034c5307299022b3d369eb677) |
+| MaximalityBounty | [`0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69`](https://sepolia.etherscan.io/address/0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69) |
+
+| Role | Address |
+|---|---|
+| deployer | [`0x94C938E642BbC657D5F45546E35268a70c936448`](https://sepolia.etherscan.io/address/0x94C938E642BbC657D5F45546E35268a70c936448) |
+| client | [`0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816`](https://sepolia.etherscan.io/address/0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816) |
+| qed | [`0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d`](https://sepolia.etherscan.io/address/0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d) |
+| helix | [`0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7`](https://sepolia.etherscan.io/address/0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7) |
+| sponsor | [`0x13958b9C4154996E6Db79f9a86c5765e0D6048AF`](https://sepolia.etherscan.io/address/0x13958b9C4154996E6Db79f9a86c5765e0D6048AF) |
+| mallory | [`0x56D161255Ced6863698eA3c6a886982088fa30a8`](https://sepolia.etherscan.io/address/0x56D161255Ced6863698eA3c6a886982088fa30a8) |
+
+| Step | What happened | Actor | Result | Transaction | Block | Gas |
+|---|---|---|---|---|---|---|
+| K3 | Deploy the Groth16 verifier generated from circuits/private_minvar.circom | Deployer | success | [`0xe7edce9a…85ea`](https://sepolia.etherscan.io/tx/0xe7edce9a4a9bf89fc6d1046fef3579319a827d7f755832a38a7d4ab78f9685ea) | 11951192 | 2,635,710 |
+| K4 | Deploy PrivateMinVarianceVerifier (registered data vendor: Helix) | Deployer | success | [`0xf28684ac…9868`](https://sepolia.etherscan.io/tx/0xf28684ac08a96aff82cfedb22957504a1197368053bc3ccd6ccadec423509868) | 11951193 | 3,420,169 |
+| K5 | Deploy OptimalityBounty on the verifier that settled job #1 | Deployer | success | [`0x2e91dbe5…cc1b`](https://sepolia.etherscan.io/tx/0x2e91dbe5950868d02f37b43b039e14ae28c7dbb026bed903e93de53d7e26cc1b) | 11951194 | 3,393,875 |
+| K6 | Deploy MaximalityBounty on the clearing house's acceptance rule | Deployer | success | [`0x487d5e0b…138a`](https://sepolia.etherscan.io/tx/0x487d5e0b70d56cafb5937ee57467d8ab649cebdcd7853ba0fa3e08a0eec0138a) | 11951195 | 4,400,401 |
+| B1 | QED funds the optimality bounty: 1,000 tUSD | Deployer | success | [`0x616b0fb1…3775`](https://sepolia.etherscan.io/tx/0x616b0fb1d9b09f0ff736eeeb36e50d6bc6a6c381f0eff9bc527c43a6b4303775) | 11951197 | 128,918 |
+| B2 | Atlas funds the maximality bounty: 1,000 tUSD | Atlas | success | [`0xdf74e4c8…d614`](https://sepolia.etherscan.io/tx/0xdf74e4c85864f21000f822c2e9b1c42f964e2b89e2ed8079529c525a66bfd614) | 11951199 | 128,918 |
+| V0 | Helix attests its Private Markets model by commitment only | Helix (data vendor) | off-chain | — | | |
+| Q1 | QED quotes 12 tUSD for the provably optimal private portfolio; Mallory undercuts at 8 | QED agent / Mallory | off-chain | — | | |
+| Z1 | Northwind funds job #3 in the same ProofEscrow: 12 tUSD, verifier = zero-knowledge | Northwind (client) | success | [`0xed610de8…70b3`](https://sepolia.etherscan.io/tx/0xed610de8e55518f91a3a8bb7dd3704a217b7146f5ad0d0a157d6cb265a7470b3) | 11951202 | 1,291,592 |
+| Z2 | Northwind also funds Mallory's cheaper job #4: 8 tUSD | Northwind (client) | success | [`0x8f0fe4d2…bf01`](https://sepolia.etherscan.io/tx/0x8f0fe4d279d8a6f0ce031eb7ddf39dfbf853c116d734e2d7bac77ca91080bf01) | 11951203 | 1,193,672 |
+| P1 | QED proves the portfolio optimal in zero knowledge (1.5 s on one CPU) | QED agent | off-chain | — | | |
+| Z3 | QED delivers the zero-knowledge proof: the escrow verifies it and pays 12 tUSD into QED's vault | QED agent | success | [`0xbb619bf0…2ec7`](https://sepolia.etherscan.io/tx/0xbb619bf09eebacd240514eab5ec4a03c189612954101b07c59a11fa56f612ec7) | 11951204 | 530,050 |
+| ZA1 | Mallory copies QED's proof from the public calldata into her own job | Mallory | **reverted** · `ProofRejected` | [`0xbe69abd9…d28e`](https://sepolia.etherscan.io/tx/0xbe69abd9db0d21661c45e34dcbb8351363917c534b180196eaaae1a607e6d28e) | 11951205 | 269,489 |
+| ZA2 | Mallory claims a lower variance than any portfolio can achieve | Mallory | **reverted** · `ProofRejected` | [`0x95426566…9431`](https://sepolia.etherscan.io/tx/0x95426566e07412babb0c55ffa3d8668e7fd1f02c80d69308bfa714755c599431) | 11951206 | 269,501 |
+| ZM | Mallory opens a self-dealt job #5 on a data set she attested herself | Mallory | success | [`0xd721136c…9a44`](https://sepolia.etherscan.io/tx/0xd721136c063be24cf99eda2ead3c9d36686eea44d0e2543c17912a117eb59a44) | 11951209 | 1,190,784 |
+| ZA3 | Mallory delivers a genuine proof about self-attested data | Mallory | **reverted** · `UntrustedDataAttestation` | [`0x35bbaa47…25b7`](https://sepolia.etherscan.io/tx/0x35bbaa47631852c780312e00431e77d28decb6bce43b5d8621f22fb2582625b7) | 11951210 | 62,360 |
+| BA1 | Mallory claims the 1,000 tUSD bounty with the equal-weight portfolio against QED's job #1 certificate | Mallory | **reverted** · `TheoremHolds` | [`0x6a584945…d19d`](https://sepolia.etherscan.io/tx/0x6a5849455a07b9fcf279d197b1ad2fe0de8d8b7d260328f54150c138b028d19d) | 11951211 | 219,644 |
+| BA2 | …and with QED's own optimum shifted by 0.1% | Mallory | **reverted** · `TheoremHolds` | [`0xb9fbcad2…e059`](https://sepolia.etherscan.io/tx/0xb9fbcad2715fa9675736bae047f69823abb1bbb1def5d0d973a0c0cb9fd9e059) | 11951212 | 219,344 |
+| BA3 | …and with the forged 1/N certificate the chain refused in job #2 (X17) | Mallory | **reverted** · `DualityGapTooLarge` | [`0x68e498bb…1c35`](https://sepolia.etherscan.io/tx/0x68e498bb76868c4caa1d48b98c0c8c1f5fdb0213122e73c37f24af7de2501c35) | 11951213 | 205,720 |
+| BM1 | Mallory claims the clearing bounty with the naive netting (162 tUSD) | Mallory | **reverted** · `TheoremHolds` | [`0x47ef93bf…62bb`](https://sepolia.etherscan.io/tx/0x47ef93bf3c1a6eea445dc7f0c1b6ccc4c013105c49da0b508130db38f06562bb) | 11951214 | 195,480 |
+| BM2 | …and with a 170 tUSD netting that cancels 1 tUSD more of Northwind's debt to QED | Mallory | **reverted** · `NetPositionChanged` | [`0xd5124345…af2a`](https://sepolia.etherscan.io/tx/0xd5124345468035c6409bcde3792f11ed994c062ba019d18bcb40744f8685af2a) | 11951215 | 195,480 |
+
+Set-up transactions of this run (faucet draws, approvals): [`0xe8c1aa8a…8086`](https://sepolia.etherscan.io/tx/0xe8c1aa8a621b54adce0b07685f0a6d873ff1f0abbd7fae73907da77ba0358086), [`0xa6c497bf…ba06`](https://sepolia.etherscan.io/tx/0xa6c497bf7a02d951bb9608946d8f1a1f751f522089dad81413fe92c14082ba06), [`0x0d750770…6e7a`](https://sepolia.etherscan.io/tx/0x0d75077043f93946407c8e83cf16834fe11a555b2a171317082a347e0a876e7a), [`0x52b9a61f…2552`](https://sepolia.etherscan.io/tx/0x52b9a61f848224009cad3042931ed73b0fe00183874ef26e1a7113179a6b2552), [`0x1f93f3a3…93a7`](https://sepolia.etherscan.io/tx/0x1f93f3a37b66e1c308b73d9d0fef7dee2355ca34c99dd43b4d83a66b261293a7), [`0x37f9ba83…feb2`](https://sepolia.etherscan.io/tx/0x37f9ba83d835d40411a6896b2172307d4b732249f9c21e8ebffe8c569b19feb2).
+
 ## How these transactions were produced — full disclosure
 
 Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs). The final phase was executed after rebuilding the replica by replaying the exact signed transactions already on Sepolia.
 
-* The relay fetched `relay/outbox-11155111.json`, `relay/outbox-11155111-b2.json` and `relay/outbox-11155111-clearing.json` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
-* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded).
+* The relay fetched `relay/outbox-11155111.json`, `relay/outbox-11155111-b2.json`, `relay/outbox-11155111-clearing.json` and `relay/outbox-11155111-private.json` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
+* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded); private run: 24/24 receipts matched.
 * Block timestamps differ by seconds between replica and Sepolia; no assertion depends on them (windows are 24 h, certificates live 2 h, deadlines are days).
 * Two earlier attempts under different keys failed and were abandoned: the first ran out of gas on deployment under Sepolia's state-creation repricing; in the second, one agent payment was under-provisioned with gas. The vault was slimmed (via-IR; views moved to QEDLens), every transaction now carries an explicit 16.7 M gas limit (only gas used is charged), and the canonical run above was executed under **fresh keys**, so it shares no state with those attempts.
 * Gas used on Sepolia differs from the replica because Sepolia prices state creation and calldata differently; the relay compared status and logs, not gas.

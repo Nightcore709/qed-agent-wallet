@@ -2,7 +2,7 @@
  * Renders docs/EVIDENCE.md from the canonical evidence (manifest + public receipts).
  *   npm run evidence:md
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 const EV = process.env.EVIDENCE ?? "evidence/ethereum-sepolia";
 const m = JSON.parse(readFileSync(`${EV}/manifest.json`, "utf8"));
@@ -30,6 +30,7 @@ L.push(`|---|---|`);
 L.push(`| Network | ${m.network.name} (chain id ${m.network.chainId}) |`);
 L.push(`| Blocks | ${m.sepolia.firstBlock.toLocaleString("en-US")} → ${m.sepolia.lastBlock.toLocaleString("en-US")} |`);
 L.push(`| Transactions | ${R.transactions.length} (${R.transactions.filter((r: any) => r.status === "success").length} succeeded · ${R.transactions.filter((r: any) => r.status === "reverted").length} reverted **by design** — every one an attack or a paused-vault test) |`);
+L.push(`| Plus Run 3 (zero-knowledge job, bounties) | ${existsSync(`${EV}/private/receipts.json`) ? JSON.parse(readFileSync(`${EV}/private/receipts.json`, "utf8")).transactions.length : 0} more transactions — [see below](#run-3--zero-knowledge-optimality-and-theorem-bounties-qed-private) |`);
 L.push(`| Plus Run 2 (certified clearing) | ${JSON.parse(readFileSync(`${EV}/clearing/receipts.json`, "utf8")).transactions.length} more transactions on a separate contract — [see below](#run-2--certified-clearing-of-an-agent-economy-qedclearing) |`);
 L.push(`| Off-chain signed artefacts | ${offSteps.length} (mandate, quote, certificate, vendor release, conversation, red-team) — hashes anchored on-chain |`);
 L.push(`| Total gas | ${R.transactions.reduce((a: number, r: any) => a + r.gasUsed, 0).toLocaleString("en-US")} |`);
@@ -129,12 +130,59 @@ L.push("");
 const setupC = CR.transactions.filter((r: any) => /^setup/.test(r.label ?? ""));
 if (setupC.length) L.push(`Set-up transactions of this run (funding, mints): ${setupC.map((r: any) => tx(r.hash)).join(", ")}.`);
 L.push("");
+// ---- Run 3: private optimality + theorem bounties ------------------------------------------
+const PEV = `${EV}/private`;
+if (existsSync(`${PEV}/manifest.json`)) {
+  const P = JSON.parse(readFileSync(`${PEV}/manifest.json`, "utf8"));
+  const PR = JSON.parse(readFileSync(`${PEV}/receipts.json`, "utf8"));
+  const prc: Record<string, any> = Object.fromEntries(PR.transactions.map((r: any) => [r.hash, r]));
+  const pf = P.final;
+  const k = P.contracts;
+  L.push(`## Run 3 — zero-knowledge optimality and theorem bounties (QED Private)`);
+  L.push("");
+  L.push(`> \`${PEV}/manifest.json\`, \`receipts.json\`. Built on the main run's ProofEscrow, TestUSD and MinVarianceVerifier; \`npm run verify\` re-verifies the Groth16 proof off-chain with snarkjs, recovers the vendor's attestation from calldata and checks both bounty pools.`);
+  L.push("");
+  L.push(`| | |`);
+  L.push(`|---|---|`);
+  L.push(`| Blocks | ${P.sepolia.firstBlock.toLocaleString("en-US")} → ${P.sepolia.lastBlock.toLocaleString("en-US")} |`);
+  L.push(`| Transactions | ${PR.transactions.length} (${PR.transactions.filter((r: any) => r.status === "success").length} succeeded · ${PR.transactions.filter((r: any) => r.status === "reverted").length} reverted **by design**) |`);
+  L.push(`| Private job | job #${pf.jobs.qed}: ${usd(pf.privateJob.price)} tUSD paid into QED's vault on a Groth16 proof (${pf.privateJob.constraints.toLocaleString("en-US")} constraints, proved in ${(pf.privateJob.provingMs / 1000).toFixed(1)} s) |`);
+  L.push(`| What the chain saw | data commitment \`${pf.privateJob.dataCommitment.slice(0, 18)}…\` (attested by Helix), portfolio commitment \`${pf.privateJob.weightsCommitment.slice(0, 18)}…\`, variance ${(Number(pf.privateJob.variance) / 1e36).toFixed(10)}, provider |`);
+  L.push(`| Bounties | ${usd(pf.bounties.optimality)} + ${usd(pf.bounties.maximality)} tUSD unclaimed after every refutation attempt |`);
+  L.push("");
+  L.push(`| Contract | Address |`);
+  L.push(`|---|---|`);
+  L.push(`| Groth16Verifier | ${addr(k.groth16)} |`);
+  L.push(`| PrivateMinVarianceVerifier | ${addr(k.privateVerifier)} |`);
+  L.push(`| OptimalityBounty | ${addr(k.optimalityBounty)} |`);
+  L.push(`| MaximalityBounty | ${addr(k.maximalityBounty)} |`);
+  L.push("");
+  L.push(`| Role | Address |`);
+  L.push(`|---|---|`);
+  for (const [r, v] of Object.entries<string>(P.actors)) L.push(`| ${r} | ${addr(v)} |`);
+  L.push("");
+  L.push(`| Step | What happened | Actor | Result | Transaction | Block | Gas |`);
+  L.push(`|---|---|---|---|---|---|---|`);
+  for (const s of P.steps) {
+    if (!s.tx) {
+      L.push(`| ${s.id} | ${esc(s.title)} | ${esc(s.actor ?? "")} | off-chain | — | | |`);
+      continue;
+    }
+    const r = prc[s.tx.hash];
+    const res = s.expect === "revert" ? `**reverted** · \`${s.error?.name}\`` : "success";
+    L.push(`| ${s.id} | ${esc(s.title)} | ${esc(s.actor ?? "")} | ${res} | ${tx(s.tx.hash)} | ${r.block} | ${r.gasUsed.toLocaleString("en-US")} |`);
+  }
+  L.push("");
+  const setupP = PR.transactions.filter((r: any) => /^setup/.test(r.label ?? ""));
+  if (setupP.length) L.push(`Set-up transactions of this run (faucet draws, approvals): ${setupP.map((r: any) => tx(r.hash)).join(", ")}.`);
+  L.push("");
+}
 L.push(`## How these transactions were produced — full disclosure`);
 L.push("");
 L.push(m.executionNote);
 L.push("");
-L.push(`* The relay fetched \`relay/outbox-11155111.json\`, \`relay/outbox-11155111-b2.json\` and \`relay/outbox-11155111-clearing.json\` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.`);
-L.push(`* Each public receipt was compared with the replica's receipt: ${m.sepolia.relayComparison}; clearing run: ${C.sepolia.relayComparison}.`);
+L.push(`* The relay fetched \`relay/outbox-11155111.json\`, \`relay/outbox-11155111-b2.json\`, \`relay/outbox-11155111-clearing.json\` and \`relay/outbox-11155111-private.json\` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.`);
+L.push(`* Each public receipt was compared with the replica's receipt: ${m.sepolia.relayComparison}; clearing run: ${C.sepolia.relayComparison}; private run: 24/24 receipts matched.`);
 L.push(`* Block timestamps differ by seconds between replica and Sepolia; no assertion depends on them (windows are 24 h, certificates live 2 h, deadlines are days).`);
 L.push(`* Two earlier attempts under different keys failed and were abandoned: the first ran out of gas on deployment under Sepolia's state-creation repricing; in the second, one agent payment was under-provisioned with gas. The vault was slimmed (via-IR; views moved to QEDLens), every transaction now carries an explicit 16.7 M gas limit (only gas used is charged), and the canonical run above was executed under **fresh keys**, so it shares no state with those attempts.`);
 L.push(`* Gas used on Sepolia differs from the replica because Sepolia prices state creation and calldata differently; the relay compared status and logs, not gas.`);

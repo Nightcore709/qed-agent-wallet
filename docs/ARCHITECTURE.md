@@ -28,7 +28,11 @@ flowchart LR
     LENS["QEDLens<br/>blast radius · snapshots · EIP-712 digests"]
     TOKEN["TestUSD (tUSD)"]
     CLEAR["QEDClearing<br/>proof-gated multilateral netting"]
+    PRIV["PrivateMinVarianceVerifier<br/>vendor attestation · Groth16"]
+    BOUNTY["OptimalityBounty · MaximalityBounty<br/>pay anyone who refutes the theorems"]
     ESCROW --> VERIFIER
+    ESCROW --> PRIV
+    BOUNTY -.re-runs.-> VERIFIER
     LENS -.reads.-> VAULT
   end
 
@@ -56,6 +60,8 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `ProofEscrow` | 5.6 KB | Agent-to-agent work. Provider-signed EIP-712 quote binds price, payee, client, verifier, problem hash, deadline. `deliver` pays iff `IProofVerifier.verify(spec, solution)` succeeds. Refund after deadline. |
 | `MinVarianceVerifier` | 2.4 KB | `IProofVerifier` for long-only minimum-variance portfolios: exact-integer KKT + PSD certificate check (docs/ALGORITHMS.md §4). |
 | `QEDClearing` | 5.3 KB | Proof-gated multilateral netting for agent economies. Members `join` (on-chain consent to the terms) and record debts as debtors; `net` is permissionless and executes only if net positions are unchanged, nothing is created, the snapshot is complete and current, and an exact LP-duality certificate proves the netting maximal (ALGORITHMS §9). |
+| `PrivateMinVarianceVerifier` + `Groth16Verifier` | 2.1 KB + 1.6 KB | `IProofVerifier` for the same problem **in zero knowledge**: checks the data vendor's attestation of a Poseidon commitment, binds the proof to its provider, then verifies a Groth16 proof of the KKT certificate (ALGORITHMS §10). Usable by the deployed `ProofEscrow` unchanged. |
+| `OptimalityBounty`, `MaximalityBounty` | 2.0 KB, 2.6 KB | Standing offers that pay their whole balance to anyone who refutes, on-chain, Theorem 4.4 (via the deployed verifier) or the netting maximality theorem (ALGORITHMS §11). No owner, no withdrawal. |
 | `TestUSD` | 2.1 KB | Valueless 6-decimal test token with a public 1 000 tUSD/day faucet for reviewers. |
 
 ### Off-chain (`agent/`, TypeScript, viem)
@@ -68,8 +74,11 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `brain/*` | inside agent | `AnthropicBrain` (live LLM) / `OfflineBrain`; `slots.ts` deterministic payment slot filling; `guard.ts` deterministic security layer; `evaluate.ts` red-team scoring |
 | `engine/minvar.ts` | inside agent | certifying solver + bit-exact TS checker |
 | `engine/economics.ts` | inside agent | pricing and acceptance rules |
+| `engine/privateMinvar.ts` | inside agent | fixed-point witness, Poseidon commitments, Groth16 prover (snarkjs), bit-exact mirror of every circuit constraint |
+| `circuits/private_minvar.circom` | build time | the zero-knowledge statement (12,569 constraints); `circuits/setup.sh` runs the two-phase trusted setup |
 | `engine/netting.ts` | inside agent | certifying netting solver (min-mean cycle cancelling + Bellman–Ford dual), bit-exact checker, naive greedy rival |
 | `scripts/clearing.ts` | orchestrator (5 member agents, QED prover, Mallory) | runs the clearing economy: gridlock, attacks, proven netting, settlement |
+| `scripts/private.ts` | orchestrator (Helix, Northwind, QED, Atlas, Mallory) | runs the private economy and the bounty challenges on the main run's escrow and verifier |
 | `scripts/live.ts` | orchestrator (owner, client, guardian, Mallory) | deploys and runs the whole economy, records evidence |
 | `scripts/verify.ts` | anyone · no keys | independent re-derivation of every on-chain claim |
 
@@ -144,7 +153,29 @@ sequenceDiagram
   M->>C: pay(id) in DAG order — each payer needs only its net debit (S1–S4)
 ```
 
-### 3.4 Defence in depth against a manipulated agent
+### 3.4 Private work, paid on a zero-knowledge proof (QED Private)
+
+```mermaid
+sequenceDiagram
+  participant H as Helix (data vendor)
+  participant C as Northwind (client)
+  participant A as QED agent
+  participant E as ProofEscrow (job #1's escrow)
+  participant P as PrivateMinVarianceVerifier
+  participant G as Groth16Verifier
+  H-->>A: covariance Σ (licensed, off-chain) + signed Poseidon commitment
+  A-->>C: EIP-712 quote: verifier = P, spec = (commitment, attestation, provider = QED)
+  C->>E: open(quote) — 12 tUSD escrowed
+  A->>A: optimum + KKT certificate in fixed point → Groth16 proof (1.5 s)
+  A->>E: deliver(spec, proof, weightsCommitment, variance)
+  E->>P: verify(spec, solution)
+  P->>P: Helix's attestation? public signals canonical?
+  P->>G: verifyProof(a, b, c, [weightsCommitment, variance, dataCommitment, QED])
+  E-->>A: 12 tUSD into QED's vault — Σ and w never on-chain
+  A-->>C: w + salt off-chain; the client re-hashes them to the commitment
+```
+
+### 3.5 Defence in depth against a manipulated agent
 
 | Layer | Who | Stops |
 |---|---|---|
@@ -198,6 +229,8 @@ can also run the economy directly against Sepolia: `RPC_URL=… CHAIN_ID=1115511
 | Deploy QEDClearing | 8 579 134 |
 | `QEDClearing.net` — 11 obligations, 5 members, certificate checked (N6) | 550 826 |
 | `QEDClearing.issue` (first / later) | 795 367 / ≈ 501 600 |
+| Deploy Groth16Verifier / PrivateMinVarianceVerifier | see `docs/EVIDENCE.md` (Run 3) |
+| `ProofEscrow.deliver` with a zero-knowledge proof (attestation + Groth16) | see `docs/EVIDENCE.md` (Run 3, Z3) |
 
 Sepolia's current schedule prices state creation far above the classic EVM (a plain ETH transfer to a fresh
 account costs ≈ 205 k gas); local replicas don't model this, so all broadcasts use an explicit 16.7 M gas limit
