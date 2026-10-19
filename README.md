@@ -3,7 +3,7 @@
 **An autonomous on-chain wallet in which the AI is allowed to be wrong, manipulated or stolen — and the money is still safe, because every payment carries a proof the chain checks.**
 
 FinTechathon 2026 · International Track · Topic F — Autonomous On-chain Wallet ·
-Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-agent-wallet/) · [Evidence](docs/EVIDENCE.md) · [Security self-assessment](docs/SECURITY.md) · [Algorithms](docs/ALGORITHMS.md) · [Architecture](docs/ARCHITECTURE.md)
+Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-agent-wallet/) · [Evidence](docs/EVIDENCE.md) · [Security self-assessment](docs/SECURITY.md) · [Algorithms](docs/ALGORITHMS.md) · [Architecture](docs/ARCHITECTURE.md) · PDFs: [technical documentation](docs/pdf/QED-Technical-Documentation.pdf), [security self-assessment](docs/pdf/QED-Security-Self-Assessment.pdf), [execution evidence](docs/pdf/QED-Execution-Evidence.pdf)
 
 [![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml)
 
