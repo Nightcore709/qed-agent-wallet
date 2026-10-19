@@ -45,3 +45,10 @@ Honest certificate passes and returns the variance; asymmetric covariance, negat
 * `QED_OFFLINE=1 npm run local` — the whole economy (deploy, fund, lifecycle, conversation, 18 attacks, honeypot, emergency) on a local chain, in CI.
 * `npm run verify` — independent re-verification of the public Sepolia evidence (bytecode, receipts, replayed revert errors, signatures, KKT re-check, live invariants), in CI on every push and daily.
 * `npm run redteam` — the corpus against the live language model alone and the guarded pipeline; report in `evidence/redteam/report.md`.
+
+## Clean-clone reproduction log
+
+| When (UTC) | Machine | Steps | Result |
+|---|---|---|---|
+| 2026-10-19 16:50 | Fresh Linux container with nothing installed (no Foundry, no keys, no prior state) | `git clone --recursive`, install Foundry 1.7.1 + solc 0.8.26 from their GitHub releases, `npm ci`, `forge build`, `forge test`, `npm run test:ts` | **67 / 67** Solidity tests and **42 / 42** TypeScript tests passed |
+| every push + daily | GitHub Actions `ubuntu-latest` | `.github/workflows/ci.yml`: Solidity suite, TypeScript suite, full local economy, `npm run verify` against public Sepolia | green |
