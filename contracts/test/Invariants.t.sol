@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TestUSD} from "../src/TestUSD.sol";
 import {QEDVault} from "../src/QEDVault.sol";
+import {QEDLens} from "../src/QEDLens.sol";
 
 /// @notice The adversary in this handler holds BOTH the AI agent key and the policy co-signer key,
 ///         and acts in arbitrary interleavings with the owner, creditors, the guardian and time.
@@ -12,6 +13,7 @@ import {QEDVault} from "../src/QEDVault.sol";
 contract CompromisedAgentHandler is Test {
     TestUSD public usd;
     QEDVault public vault;
+    QEDLens internal lens = new QEDLens();
     uint256 internal agentPk;
     uint256 internal cosignerPk;
     address public owner;
@@ -80,18 +82,18 @@ contract CompromisedAgentHandler is Test {
         address to = pool[rSeed % pool.length];
         amount = bound(amount, 1, 200e6);
         QEDVault.Certificate memory c = QEDVault.Certificate({
-            mandateHash: vault.hashMandate(m),
+            mandateHash: lens.hashMandate(m),
             recipient: to,
             amount: amount,
             dueAt: dueSeed % 3 == 0 ? uint64(block.timestamp + 1 + (dueSeed % 30 days)) : 0,
             intentId: keccak256(abi.encode("intent", ++nonce, tamper % 4 == 0 ? 0 : nonce)), // sometimes replays
             evidenceHash: bytes32(nonce),
             ref: 0,
-            notBefore: uint64(block.timestamp),
+            notBefore: uint64(vm.getBlockTimestamp()),
             expiresAt: uint64(block.timestamp + 1 hours),
             epoch: vault.epoch()
         });
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(cosignerPk, vault.certificateDigest(c));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(cosignerPk, lens.certificateDigest(vault, c));
         bytes memory cSig = abi.encodePacked(r, s, v);
         if (tamper % 5 == 1) c.amount += 1; // post-signature tampering
         if (tamper % 5 == 2) c.recipient = attacker;
@@ -202,7 +204,7 @@ contract CompromisedAgentHandler is Test {
     }
 
     function warp(uint256 secs) external {
-        vm.warp(block.timestamp + bound(secs, 1, 3 days));
+        vm.warp(vm.getBlockTimestamp() + bound(secs, 1, 3 days));
     }
 }
 
@@ -210,6 +212,7 @@ contract InvariantsTest is Test {
     TestUSD internal usd;
     QEDVault internal vault;
     CompromisedAgentHandler internal handler;
+    QEDLens internal lens = new QEDLens();
 
     uint256 internal ownerPk = 0xA11CE;
     uint256 internal agentPk = 0xA6E7;
@@ -250,14 +253,14 @@ contract InvariantsTest is Test {
                 maxPerPeriod: k == 0 ? 20e6 : 500e6,
                 period: 1 days,
                 maxTotal: k == 0 ? 60e6 : 10_000e6,
-                validFrom: uint64(block.timestamp),
+                validFrom: uint64(vm.getBlockTimestamp()),
                 validUntil: uint64(block.timestamp + 365 days),
                 epoch: 0,
                 requireCosign: true,
                 purpose: keccak256(abi.encode("mandate", k)),
                 salt: bytes32(k)
             });
-            (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPk, vault.mandateDigest(ms[k]));
+            (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPk, lens.mandateDigest(vault, ms[k]));
             sigs[k] = abi.encodePacked(r, s, v);
         }
 

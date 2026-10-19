@@ -3,7 +3,7 @@ pragma solidity 0.8.26;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
@@ -26,8 +26,9 @@ import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 ///         they can only be settled to, or released by, their creditor.
 ///
 ///         Because of this, the maximum loss under total compromise of the agent AND co-signer
-///         keys is computable on-chain at any block: see {blastRadius}.
-contract QEDVault is EIP712, ReentrancyGuard {
+///         keys is computable on-chain at any block: see {QEDLens-blastRadius}. (Read-only helpers
+///         live in QEDLens so that this enforcement contract stays small and auditable.)
+contract QEDVault is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -90,24 +91,6 @@ contract QEDVault is EIP712, ReentrancyGuard {
         bytes32 memo;
     }
 
-    /// @notice Everything a dashboard or counterparty needs, in one call.
-    struct Snapshot {
-        uint256 balance;
-        uint256 protectedBalance;
-        uint256 freeBalance;
-        uint256 dailyCap;
-        uint256 spentInWindow;
-        uint256 windowStart;
-        uint256 blastRadius24h;
-        uint256 openLiabilities;
-        uint256 liabilityCount;
-        uint64 epoch;
-        bool paused;
-        address owner;
-        address agent;
-        address cosigner;
-        address guardian;
-    }
 
     // ─────────────────────────────────────────────────────────────────────────────
     // Constants
@@ -133,6 +116,10 @@ contract QEDVault is EIP712, ReentrancyGuard {
     // ─────────────────────────────────────────────────────────────────────────────
 
     IERC20 public immutable asset;
+    uint256 private immutable _cachedChainId;
+    bytes32 private immutable _cachedDomainSeparator;
+    bytes32 private constant _DOMAIN_TYPEHASH =
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
     address public owner;
     address public pendingOwner;
@@ -150,7 +137,7 @@ contract QEDVault is EIP712, ReentrancyGuard {
     uint256 public totalProtected;
     uint256 public liabilityCount;
     uint256 public openLiabilities;
-    mapping(uint256 => Liability) public liabilities;
+    mapping(uint256 => Liability) internal liabilities;
 
     mapping(bytes32 => MandateState) public mandateState;
     mapping(bytes32 => bool) public intentUsed;
@@ -231,7 +218,9 @@ contract QEDVault is EIP712, ReentrancyGuard {
         address cosigner_,
         address guardian_,
         uint256 dailyCap_
-    ) EIP712("QEDVault", "1") {
+    ) {
+        _cachedChainId = block.chainid;
+        _cachedDomainSeparator = _buildDomainSeparator();
         if (
             address(asset_) == address(0) || owner_ == address(0) || agent_ == address(0)
                 || cosigner_ == address(0) || guardian_ == address(0)
@@ -274,7 +263,7 @@ contract QEDVault is EIP712, ReentrancyGuard {
         if (paused) revert VaultPaused();
         if (msg.sender != agent) revert NotAgent(msg.sender);
 
-        bytes32 mHash = hashMandate(m);
+        bytes32 mHash = _hashMandate(m);
         _checkMandate(m, mHash, ownerSig);
         _checkCertificate(m, mHash, c, cosignerSig);
 
@@ -439,64 +428,24 @@ contract QEDVault is EIP712, ReentrancyGuard {
         return bal > totalProtected ? bal - totalProtected : 0;
     }
 
-    /// @notice Provable worst-case loss within `horizon` seconds if the agent key AND the co-signer
-    ///         key are both fully compromised (owner key safe).
-    /// @dev    Every agent outflow is bounded by (a) free balance and (b) the global window cap.
-    ///         Fixed windows of length WINDOW: we sum the remaining capacity of the current window
-    ///         and the full capacity of every further window that starts inside the horizon.
-    ///         While paused, only the owner can resume, so the bound is zero.
-    ///         Note: compromised outflows can only reach payees the owner pre-approved in signed
-    ///         mandates — the loss to addresses NOT approved by the owner is always exactly zero.
-    function blastRadius(uint256 horizon) public view returns (uint256) {
-        if (paused) return 0;
-        uint256 free = freeBalance();
-        uint256 capacity;
-        uint256 currentEnd;
-        if (block.timestamp >= windowStart + WINDOW) {
-            // A new window would open at the next spend: full capacity now.
-            capacity = dailyCap;
-            currentEnd = block.timestamp + WINDOW;
-        } else {
-            capacity = dailyCap > spentInWindow ? dailyCap - spentInWindow : 0;
-            currentEnd = windowStart + WINDOW;
-        }
-        uint256 horizonEnd = block.timestamp + horizon;
-        if (horizonEnd >= currentEnd) {
-            // Each later window opens no earlier than the previous one closes. Counting is
-            // inclusive of a window opening exactly at the horizon: a deliberately conservative bound.
-            uint256 extraWindows = (horizonEnd - currentEnd) / WINDOW + 1;
-            capacity += extraWindows * dailyCap;
-        }
-        return capacity < free ? capacity : free;
-    }
-
-    function snapshot() external view returns (Snapshot memory s) {
-        s.balance = asset.balanceOf(address(this));
-        s.protectedBalance = totalProtected;
-        s.freeBalance = freeBalance();
-        s.dailyCap = dailyCap;
-        s.spentInWindow = block.timestamp >= windowStart + WINDOW ? 0 : spentInWindow;
-        s.windowStart = windowStart;
-        s.blastRadius24h = blastRadius(1 days);
-        s.openLiabilities = openLiabilities;
-        s.liabilityCount = liabilityCount;
-        s.epoch = epoch;
-        s.paused = paused;
-        s.owner = owner;
-        s.agent = agent;
-        s.cosigner = cosigner;
-        s.guardian = guardian;
-    }
-
     function getLiability(uint256 id) external view returns (Liability memory) {
         return liabilities[id];
     }
 
-    function domainSeparator() external view returns (bytes32) {
-        return _domainSeparatorV4();
+    /// @notice EIP-712 domain separator ("QEDVault", "1", chainid, this). Recomputed if the chain forks.
+    function domainSeparator() public view returns (bytes32) {
+        return block.chainid == _cachedChainId ? _cachedDomainSeparator : _buildDomainSeparator();
     }
 
-    function hashMandate(Mandate calldata m) public pure returns (bytes32) {
+    function _buildDomainSeparator() private view returns (bytes32) {
+        return keccak256(abi.encode(_DOMAIN_TYPEHASH, keccak256("QEDVault"), keccak256("1"), block.chainid, address(this)));
+    }
+
+    function _hashTypedDataV4(bytes32 structHash) internal view returns (bytes32) {
+        return MessageHashUtils.toTypedDataHash(domainSeparator(), structHash);
+    }
+
+    function _hashMandate(Mandate calldata m) internal pure returns (bytes32) {
         return keccak256(
             abi.encode(
                 MANDATE_TYPEHASH,
@@ -517,7 +466,7 @@ contract QEDVault is EIP712, ReentrancyGuard {
         );
     }
 
-    function hashCertificate(Certificate calldata c) public pure returns (bytes32) {
+    function _hashCertificate(Certificate calldata c) internal pure returns (bytes32) {
         return keccak256(
             abi.encode(
                 CERTIFICATE_TYPEHASH,
@@ -533,16 +482,6 @@ contract QEDVault is EIP712, ReentrancyGuard {
                 c.epoch
             )
         );
-    }
-
-    /// @notice EIP-712 digest the owner signs for a mandate.
-    function mandateDigest(Mandate calldata m) external view returns (bytes32) {
-        return _hashTypedDataV4(hashMandate(m));
-    }
-
-    /// @notice EIP-712 digest the co-signer signs for a certificate.
-    function certificateDigest(Certificate calldata c) external view returns (bytes32) {
-        return _hashTypedDataV4(hashCertificate(c));
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -570,7 +509,7 @@ contract QEDVault is EIP712, ReentrancyGuard {
         if (c.mandateHash != mHash) revert CertificateMandateMismatch(c.mandateHash, mHash);
         // Authenticity first: any post-signature change to ANY field fails here, before anything else.
         if (m.requireCosign) {
-            if (!SignatureChecker.isValidSignatureNow(cosigner, _hashTypedDataV4(hashCertificate(c)), cosignerSig)) {
+            if (!SignatureChecker.isValidSignatureNow(cosigner, _hashTypedDataV4(_hashCertificate(c)), cosignerSig)) {
                 revert BadCosignerSignature();
             }
         }

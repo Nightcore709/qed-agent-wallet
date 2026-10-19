@@ -66,6 +66,7 @@ export interface Deployment {
   verifier: Address;
   escrow: Address;
   vault: Address;
+  lens: Address;
   honeypotVault: Address;
   deployBlock: string;
   txs: Record<string, Hex>;

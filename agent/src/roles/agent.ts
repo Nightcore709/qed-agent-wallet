@@ -13,7 +13,7 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { getAddress, keccak256, recoverMessageAddress, toHex, type Address, type Hex, type LocalAccount } from "viem";
-import { ProofEscrowAbi, QEDVaultAbi } from "../abi/contracts.js";
+import { ProofEscrowAbi, QEDLensAbi, QEDVaultAbi } from "../abi/contracts.js";
 import { fn, fmtUsd, type Chain$, type TxResult } from "../chain.js";
 import { evaluateJob, type JobEvaluation } from "../engine/economics.js";
 import { certify, checkCertificate, wadToNumber, type MinVarSpec } from "../engine/minvar.js";
@@ -26,6 +26,7 @@ import type { CertRequest, CertResponse } from "./cosigner.js";
 
 export interface AgentConfig {
   vault: Address;
+  lens: Address;
   escrow: Address;
   verifier: Address;
   token: Address;
@@ -108,7 +109,7 @@ export class QEDAgent {
   }
 
   async treasury() {
-    const s = (await this.chain.pub.readContract({ address: this.cfg.vault, abi: QEDVaultAbi, functionName: "snapshot" })) as any;
+    const s = (await this.chain.pub.readContract({ address: this.cfg.lens, abi: QEDLensAbi, functionName: "snapshot", args: [this.cfg.vault] })) as any;
     return {
       balance: BigInt(s.balance),
       protectedBalance: BigInt(s.protectedBalance),

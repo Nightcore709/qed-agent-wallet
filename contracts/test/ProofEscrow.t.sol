@@ -121,7 +121,7 @@ contract ProofEscrowTest is Base {
         escrow.open(t, qSig);
 
         t = q;
-        t.deliverBy = uint64(block.timestamp + 1 minutes);
+        t.deliverBy = uint64(vm.getBlockTimestamp() + 1 minutes);
         vm.prank(client);
         vm.expectRevert(ProofEscrow.BadProviderSignature.selector);
         escrow.open(t, qSig);
@@ -142,7 +142,7 @@ contract ProofEscrowTest is Base {
         escrow.open(q2, s2);
         vm.stopPrank();
 
-        vm.warp(block.timestamp + 2 hours);
+        vm.warp(vm.getBlockTimestamp() + 2 hours);
         vm.prank(client);
         vm.expectRevert(abi.encodeWithSelector(ProofEscrow.QuoteExpired.selector, q2.validUntil));
         escrow.open(q2, s2);

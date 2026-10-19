@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 const names = [
   ["TestUSD", "TestUSD.sol"],
   ["QEDVault", "QEDVault.sol"],
+  ["QEDLens", "QEDLens.sol"],
   ["ProofEscrow", "ProofEscrow.sol"],
   ["MinVarianceVerifier", "MinVarianceVerifier.sol"],
 ];

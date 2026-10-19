@@ -75,6 +75,11 @@ export interface FeeOverride {
   maxPriorityFeePerGas: bigint;
 }
 
+/** Optional fixed gas limit for every transaction (GAS_LIMIT env). Used for networks whose gas schedule
+ *  differs from the local EVM used for simulation (e.g. Sepolia's state-creation repricing): only gas
+ *  actually used is charged, and our contracts contain no gas-dependent logic. */
+const FIXED_GAS = process.env.GAS_LIMIT ? BigInt(process.env.GAS_LIMIT) : undefined;
+
 export class Chain$ {
   readonly pub: PublicClient;
   readonly chain: Chain;
@@ -106,7 +111,7 @@ export class Chain$ {
     const data = (args.length ? encodeDeployData({ abi, bytecode, args } as any) : bytecode) as Hex;
     await this.syncClock();
     const est = await this.pub.estimateGas({ account, data });
-    const hash = await this.wallet(account).sendTransaction({ account, chain: this.chain, data, gas: (est * 12n) / 10n + 50_000n, ...(this.fees ?? {}) } as any);
+    const hash = await this.wallet(account).sendTransaction({ account, chain: this.chain, data, gas: FIXED_GAS ?? (est * 12n) / 10n + 50_000n, ...(this.fees ?? {}) } as any);
     const r = await this.pub.waitForTransactionReceipt({ hash, confirmations: this.confirmations, timeout: 180_000 });
     if (r.status !== "success" || !r.contractAddress) throw new Error(`deployment ${hash} failed`);
     return { ...this.toResult(r, account.address), address: r.contractAddress };
@@ -116,7 +121,7 @@ export class Chain$ {
   async send(account: LocalAccount, to: Address, data: Hex, opts: { value?: bigint; gas?: bigint } = {}): Promise<TxResult> {
     await this.syncClock();
     const est = opts.gas ?? (await this.pub.estimateGas({ account, to, data, value: opts.value }));
-    const gas = opts.gas ?? (est * 13n) / 10n + 20_000n;
+    const gas = FIXED_GAS ?? opts.gas ?? (est * 13n) / 10n + 20_000n;
     const hash = await this.wallet(account).sendTransaction({
       account,
       chain: this.chain,
@@ -136,7 +141,8 @@ export class Chain$ {
    * Broadcast a transaction that MUST revert. First simulates it to capture the precise custom error,
    * then sends it on-chain with an explicit gas limit so the failure is recorded in a public receipt.
    */
-  async sendExpectingRevert(account: LocalAccount, to: Address, data: Hex, gas = 700_000n): Promise<TxResult> {
+  async sendExpectingRevert(account: LocalAccount, to: Address, data: Hex, gasArg = 700_000n): Promise<TxResult> {
+    const gas = FIXED_GAS ?? gasArg;
     const error = await this.simulateError(account.address, to, data);
     if (!error) throw new Error("expected a revert but simulation succeeded — refusing to broadcast");
     await this.syncClock();

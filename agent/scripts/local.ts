@@ -32,8 +32,12 @@ async function main() {
     }
   }
   // Same starting ETH as the real deployer (0.05 Sepolia ETH from the faucet); every other role starts at 0.
-  const startBal = parseEther(process.env.DEPLOYER_START_ETH ?? "0.05");
+  const startBal = process.env.DEPLOYER_START_WEI ? BigInt(process.env.DEPLOYER_START_WEI) : parseEther(process.env.DEPLOYER_START_ETH ?? "0.05");
   await (pub as any).request({ method: "anvil_setBalance", params: [process.env.DEPLOYER_ADDR, `0x${startBal.toString(16)}`] });
+  if (process.env.DEPLOYER_START_NONCE) {
+    // mirror the public chain exactly: nonces already used there must be used here too
+    await (pub as any).request({ method: "anvil_setNonce", params: [process.env.DEPLOYER_ADDR, `0x${Number(process.env.DEPLOYER_START_NONCE).toString(16)}`] });
+  }
   await (pub as any).request({ method: "evm_setNextBlockTimestamp", params: [`0x${Math.floor(Date.now() / 1000).toString(16)}`] });
   await (pub as any).request({ method: "evm_mine", params: [] });
   const startBlock = await pub.getBlockNumber();
@@ -43,8 +47,9 @@ async function main() {
     RPC_URL: rpc,
     CHAIN_ID: String(chainId),
     SHADOW: "1",
-    MAX_FEE_GWEI: process.env.MAX_FEE_GWEI ?? "2",
-    PRIORITY_FEE_GWEI: process.env.PRIORITY_FEE_GWEI ?? "0.1",
+    MAX_FEE_GWEI: process.env.MAX_FEE_GWEI ?? "0.02",
+    PRIORITY_FEE_GWEI: process.env.PRIORITY_FEE_GWEI ?? "0.01",
+    GAS_LIMIT: process.env.GAS_LIMIT ?? (shadowOf ? "16000000" : ""),
     LIABILITY_DELAY_S: process.env.LIABILITY_DELAY_S ?? (shadowOf ? "1800" : "90"),
     MALLORY_JOB_WINDOW_S: process.env.MALLORY_JOB_WINDOW_S ?? (shadowOf ? "1500" : "60"),
     EVIDENCE_DIR: process.env.EVIDENCE_DIR ?? (shadowOf ? `evidence/shadow-${chainId}` : "evidence/local"),

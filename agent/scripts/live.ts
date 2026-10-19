@@ -11,7 +11,7 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { keccak256, parseEther, toHex, type Address, type Hex, type LocalAccount } from "viem";
-import { MinVarianceVerifierAbi, MinVarianceVerifierBytecode, ProofEscrowAbi, ProofEscrowBytecode, QEDVaultAbi, QEDVaultBytecode, TestUSDAbi, TestUSDBytecode } from "../src/abi/contracts.js";
+import { MinVarianceVerifierAbi, MinVarianceVerifierBytecode, ProofEscrowAbi, ProofEscrowBytecode, QEDLensAbi, QEDLensBytecode, QEDVaultAbi, QEDVaultBytecode, TestUSDAbi, TestUSDBytecode } from "../src/abi/contracts.js";
 import { fn, fmtUsd, sleep, type TxResult } from "../src/chain.js";
 import { account, chain, deploymentPath, EXPLORERS, loadEnvFile, NETWORK_NAMES, rpcConfig, type Deployment } from "../src/config.js";
 import { Evidence } from "../src/evidence.js";
@@ -99,7 +99,9 @@ async function main() {
   ev.tx("D4", { phase: "deploy", title: "Deploy QEDVault for the QED agent", narrative: "Owner (cold), agent (hot AI key), independent co-signer and guardian are four different keys. Global agent cap 25 tUSD / 24h.", actor: "Deployer", outcomes: ["O1", "O3", "O4"] }, d3);
   const d4 = await c.deploy(K.deployer, QEDVaultAbi as any, QEDVaultBytecode as Hex, [d0.address, K.hpOwner.address, K.hpAgent.address, K.hpCosigner.address, K.guardian.address, U(1)]);
   ev.tx("D5", { phase: "deploy", title: "Deploy the HONEYPOT vault (agent + co-signer keys published)", narrative: "A second vault whose AI key and co-signer key are public. Global cap 1 tUSD / 24h.", actor: "Deployer", outcomes: ["O3", "O4"] }, d4);
-  const token = d0.address, verifier = d1.address, escrow = d2.address, vault = d3.address, hpVault = d4.address;
+  const d5 = await c.deploy(K.deployer, QEDLensAbi as any, QEDLensBytecode as Hex);
+  ev.tx("D6", { phase: "deploy", title: "Deploy QEDLens (stateless on-chain views: blast radius, snapshots, EIP-712 digests)", narrative: "Read-only helpers live here so the enforcement contract stays small; anyone can recompute every value.", actor: "Deployer", outcomes: ["O3", "O4"] }, d5);
+  const token = d0.address, verifier = d1.address, escrow = d2.address, vault = d3.address, hpVault = d4.address, lens = d5.address;
 
   const dep: Deployment = {
     chainId,
@@ -109,9 +111,10 @@ async function main() {
     verifier,
     escrow,
     vault,
+    lens,
     honeypotVault: hpVault,
     deployBlock: d0.blockNumber.toString(),
-    txs: { token: d0.hash, verifier: d1.hash, escrow: d2.hash, vault: d3.hash, honeypotVault: d4.hash },
+    txs: { token: d0.hash, verifier: d1.hash, escrow: d2.hash, vault: d3.hash, honeypotVault: d4.hash, lens: d5.hash },
   };
   mkdirSync("deployments", { recursive: true });
   writeFileSync(deploymentPath(chainId), JSON.stringify(dep, null, 2));
@@ -126,7 +129,7 @@ async function main() {
     [K.hpOwner, "0.002"],
     [K.hpAgent, "0.002"],
   ];
-  for (const [a, eth] of gas) await c.send(K.deployer, a.address, "0x", { value: parseEther(eth), gas: 21_000n });
+  for (const [a, eth] of gas) await c.send(K.deployer, a.address, "0x", { value: parseEther(eth) });
   for (const [who, amt] of [[K.owner.address, 100], [K.client.address, 100], [K.hpOwner.address, 100]] as const) {
     await c.send(K.deployer, token, fn(TestUSDAbi, "mint", [who, U(amt)]));
   }
@@ -317,7 +320,7 @@ async function main() {
   atk("X10", "Replay the exact genuine certificate", { class: "replay", threat: "Double-spend an authorisation", defence: "Single-use intentId", layer: "QEDVault" }, await c.sendExpectingRevert(K.agent, vault, xpay(real.m, real.ownerSig, real.cert, real.cosignerSig)));
 
   // X11–X12: both hot keys, inside the mandate, try to breach solvency and the window cap
-  const snap = (await c.pub.readContract({ address: vault, abi: QEDVaultAbi, functionName: "snapshot" })) as any;
+  const snap = (await c.pub.readContract({ address: lens, abi: QEDLensAbi, functionName: "snapshot", args: [vault] })) as any;
   const free = BigInt(snap.freeBalance);
   const windowLeft = BigInt(snap.dailyCap) - BigInt(snap.spentInWindow);
   const drain = await certFor(kit, K.creditor.address, free + U(1), "x11");
@@ -392,8 +395,8 @@ async function main() {
   ev.tx("P4", { phase: "emergency", title: "Owner reviews and unpauses", narrative: "Only the owner can resume the agent.", actor: "Owner", outcomes: ["O3"] }, await c.send(K.owner, vault, fn(QEDVaultAbi, "unpause")));
 
   // ═════════════════════════════ final state ═════════════════════════════
-  const fin = (await c.pub.readContract({ address: vault, abi: QEDVaultAbi, functionName: "snapshot" })) as any;
-  const hpFin = (await c.pub.readContract({ address: hpVault, abi: QEDVaultAbi, functionName: "snapshot" })) as any;
+  const fin = (await c.pub.readContract({ address: lens, abi: QEDLensAbi, functionName: "snapshot", args: [vault] })) as any;
+  const hpFin = (await c.pub.readContract({ address: lens, abi: QEDLensAbi, functionName: "snapshot", args: [hpVault] })) as any;
   ev.meta.final = {
     vault: { balance: fin.balance, protected: fin.protectedBalance, free: fin.freeBalance, blastRadius24h: fin.blastRadius24h, liabilityCount: fin.liabilityCount },
     honeypot: { balance: hpFin.balance, protected: hpFin.protectedBalance, free: hpFin.freeBalance, blastRadius24h: hpFin.blastRadius24h },

@@ -10,7 +10,7 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { getAddress, keccak256, recoverMessageAddress, toHex, type Address, type Hex, type LocalAccount } from "viem";
-import { ProofEscrowAbi, QEDVaultAbi } from "../abi/contracts.js";
+import { ProofEscrowAbi, QEDLensAbi, QEDVaultAbi } from "../abi/contracts.js";
 import type { Chain$ } from "../chain.js";
 import { mandateHash, signCertificate, type Certificate, type Mandate } from "../protocol/eip712.js";
 import { canonical, hashRecord, invoiceDigest, type Invoice } from "../protocol/records.js";
@@ -55,6 +55,7 @@ export const ownerInstructionMessage = (vault: Address, payee: Address, amount: 
 
 export interface CosignerConfig {
   vault: Address;
+  lens: Address;
   escrow: Address;
   owner: Address;
   vendorKeys: Record<string, Address>; // payee address → address that must sign its invoices
@@ -85,13 +86,13 @@ export class PolicyEngine {
     const pub = this.chain.pub;
     const block = await pub.getBlock();
     const now = Number(block.timestamp);
-    const snap = (await pub.readContract({ address: this.cfg.vault, abi: QEDVaultAbi, functionName: "snapshot" })) as any;
+    const snap = (await pub.readContract({ address: this.cfg.lens, abi: QEDLensAbi, functionName: "snapshot", args: [this.cfg.vault] })) as any;
     const mHash = mandateHash(req.mandate);
     const checks: Check[] = [];
     const add = (id: string, name: string, pass: boolean, detail: string) => checks.push({ id, name, pass, detail });
 
     // C1–C3: authority (re-verified independently of the agent and of the vault)
-    const digest = (await pub.readContract({ address: this.cfg.vault, abi: QEDVaultAbi, functionName: "mandateDigest", args: [req.mandate as any] } as any)) as Hex;
+    const digest = (await pub.readContract({ address: this.cfg.lens, abi: QEDLensAbi, functionName: "mandateDigest", args: [this.cfg.vault, req.mandate as any] } as any)) as Hex;
     const { recoverAddress } = await import("viem");
     const signer = await recoverAddress({ hash: digest, signature: req.ownerSig }).catch(() => "0x0" as Address);
     add("C1", "Mandate signed by the vault owner", getAddress(signer) === getAddress(snap.owner), `recovered ${signer}`);

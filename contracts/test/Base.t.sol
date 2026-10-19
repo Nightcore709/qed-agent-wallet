@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TestUSD} from "../src/TestUSD.sol";
 import {QEDVault} from "../src/QEDVault.sol";
+import {QEDLens} from "../src/QEDLens.sol";
 import {ProofEscrow} from "../src/ProofEscrow.sol";
 import {MinVarianceVerifier} from "../src/verifiers/MinVarianceVerifier.sol";
 
@@ -13,6 +14,7 @@ import {MinVarianceVerifier} from "../src/verifiers/MinVarianceVerifier.sol";
 abstract contract Base is Test {
     TestUSD internal usd;
     QEDVault internal vault;
+    QEDLens internal lens;
     ProofEscrow internal escrow;
     MinVarianceVerifier internal verifier;
 
@@ -58,6 +60,7 @@ abstract contract Base is Test {
         vm.label(attacker, "attacker");
 
         usd = new TestUSD();
+        lens = new QEDLens();
         vault = new QEDVault(IERC20(address(usd)), owner, agent, cosigner, guardian, DAILY_CAP);
         escrow = new ProofEscrow();
         verifier = new MinVarianceVerifier();
@@ -67,7 +70,7 @@ abstract contract Base is Test {
         vm.startPrank(owner);
         usd.approve(address(vault), type(uint256).max);
         vault.deposit(100 * USD);
-        liabilityId = vault.ringFence(creditor, 70 * USD, uint64(block.timestamp + 7 days), keccak256("compute bill"));
+        liabilityId = vault.ringFence(creditor, 70 * USD, uint64(vm.getBlockTimestamp() + 7 days), keccak256("compute bill"));
         vm.stopPrank();
     }
 
@@ -87,8 +90,8 @@ abstract contract Base is Test {
             maxPerPeriod: 20 * USD,
             period: 1 days,
             maxTotal: 60 * USD,
-            validFrom: uint64(block.timestamp),
-            validUntil: uint64(block.timestamp + 7 days),
+            validFrom: uint64(vm.getBlockTimestamp()),
+            validUntil: uint64(vm.getBlockTimestamp() + 7 days),
             epoch: vault.epoch(),
             requireCosign: true,
             purpose: keccak256("Buy licensed market data for certified portfolio jobs"),
@@ -109,8 +112,8 @@ abstract contract Base is Test {
             intentId: intentId,
             evidenceHash: keccak256(abi.encode("decision-record", intentId)),
             ref: keccak256("INV-0001"),
-            notBefore: uint64(block.timestamp),
-            expiresAt: uint64(block.timestamp + 1 hours),
+            notBefore: uint64(vm.getBlockTimestamp()),
+            expiresAt: uint64(vm.getBlockTimestamp() + 1 hours),
             epoch: vault.epoch()
         });
     }
@@ -120,7 +123,7 @@ abstract contract Base is Test {
     }
 
     function hashMandateExt(QEDVault.Mandate calldata m) external view returns (bytes32) {
-        return vault.hashMandate(m);
+        return lens.hashMandate(m);
     }
 
     function _signMandate(uint256 pk, QEDVault.Mandate memory m) internal view returns (bytes memory) {
@@ -130,11 +133,11 @@ abstract contract Base is Test {
     }
 
     function mandateDigestExt(QEDVault.Mandate calldata m) external view returns (bytes32) {
-        return vault.mandateDigest(m);
+        return lens.mandateDigest(vault, m);
     }
 
     function _signCert(uint256 pk, QEDVault.Certificate memory c) internal view returns (bytes memory) {
-        bytes32 digest = vault.certificateDigest(c);
+        bytes32 digest = lens.certificateDigest(vault, c);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(pk, digest);
         return abi.encodePacked(r, s, v);
     }
@@ -158,8 +161,8 @@ abstract contract Base is Test {
             price: price,
             verifier: address(verifier),
             specHash: specHash,
-            deliverBy: uint64(block.timestamp + 1 days),
-            validUntil: uint64(block.timestamp + 1 hours),
+            deliverBy: uint64(vm.getBlockTimestamp() + 1 days),
+            validUntil: uint64(vm.getBlockTimestamp() + 1 hours),
             quoteId: quoteId
         });
     }

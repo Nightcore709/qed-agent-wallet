@@ -3,6 +3,7 @@ pragma solidity 0.8.26;
 
 import {Base} from "./Base.t.sol";
 import {QEDVault} from "../src/QEDVault.sol";
+import {QEDLens} from "../src/QEDLens.sol";
 import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -59,7 +60,7 @@ contract QEDVaultTest is Base {
 
     function test_ForwardPaymentCreatesRingFencedPromise() public {
         QEDVault.Certificate memory c = _cert(m, vendor, 8 * USD, keccak256("promise-1"));
-        c.dueAt = uint64(block.timestamp + 2 days);
+        c.dueAt = uint64(vm.getBlockTimestamp() + 2 days);
         uint256 id = _pay(m, mSig, c, _signCert(cosignerPk, c));
 
         assertEq(id, 2);
@@ -70,7 +71,7 @@ contract QEDVaultTest is Base {
         assertEq(l.createdBy, agent);
 
         // The agent cannot take its promise back: the vendor is paid at maturity by anyone.
-        vm.warp(block.timestamp + 2 days);
+        vm.warp(vm.getBlockTimestamp() + 2 days);
         vm.prank(attacker);
         vault.settle(id);
         assertEq(usd.balanceOf(vendor), 8 * USD);
@@ -82,11 +83,11 @@ contract QEDVaultTest is Base {
         usd.mint(address(v2), 50 * USD);
         QEDVault.Mandate memory m2 = _mandate(_payees(vendor));
         m2.vault = address(v2);
-        bytes32 digest = v2.mandateDigest(m2);
+        bytes32 digest = lens.mandateDigest(v2, m2);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPk, digest);
         QEDVault.Certificate memory c = _cert(m2, vendor, 3 * USD, keccak256("1271"));
-        c.mandateHash = v2.hashMandate(m2);
-        (uint8 v2_, bytes32 r2, bytes32 s2) = vm.sign(cosignerPk, v2.certificateDigest(c));
+        c.mandateHash = lens.hashMandate(m2);
+        (uint8 v2_, bytes32 r2, bytes32 s2) = vm.sign(cosignerPk, lens.certificateDigest(v2, c));
         vm.prank(agent);
         v2.executePayment(m2, abi.encodePacked(r, s, v), c, abi.encodePacked(r2, s2, v2_));
         assertEq(usd.balanceOf(vendor), 3 * USD);
@@ -118,7 +119,7 @@ contract QEDVaultTest is Base {
     function test_Revert_TamperedDueDateOrEvidence() public {
         QEDVault.Certificate memory c = _cert(m, vendor, 6 * USD, keccak256("t3"));
         bytes memory cSig = _signCert(cosignerPk, c);
-        c.dueAt = uint64(block.timestamp + 1 days);
+        c.dueAt = uint64(vm.getBlockTimestamp() + 1 days);
         vm.expectRevert(QEDVault.BadCosignerSignature.selector);
         _pay(m, mSig, c, cSig);
         c.dueAt = 0;
@@ -130,7 +131,7 @@ contract QEDVaultTest is Base {
     function test_Revert_TamperedMandateScope() public {
         QEDVault.Certificate memory c = _cert(m, vendor, 6 * USD, keccak256("t4"));
         m.maxPerPayment = 1_000 * USD; // agent inflates its own authority
-        c.mandateHash = vault.hashMandate(m);
+        c.mandateHash = lens.hashMandate(m);
         bytes memory cSig = _signCert(cosignerPk, c);
         vm.expectRevert(QEDVault.BadOwnerSignature.selector);
         _pay(m, mSig, c, cSig);
@@ -196,7 +197,7 @@ contract QEDVaultTest is Base {
 
     function test_Revert_PromiseCannotOverCommit() public {
         QEDVault.Certificate memory c = _cert(m, vendor, 10 * USD, keccak256("oc"));
-        c.dueAt = uint64(block.timestamp + 1 days);
+        c.dueAt = uint64(vm.getBlockTimestamp() + 1 days);
         vm.prank(owner);
         vault.withdraw(owner, 25 * USD); // free: 5
         bytes memory cSig = _signCert(cosignerPk, c);
@@ -224,7 +225,7 @@ contract QEDVaultTest is Base {
         address factor = makeAddr("factor");
         vm.prank(creditor);
         vault.assign(liabilityId, factor); // receivable sold to a factor
-        vm.warp(block.timestamp + 7 days);
+        vm.warp(vm.getBlockTimestamp() + 7 days);
         vault.settle(liabilityId);
         assertEq(usd.balanceOf(factor), 70 * USD);
     }
@@ -238,10 +239,10 @@ contract QEDVaultTest is Base {
 
     function test_SettleOnlyWhenDue_ByAnyone() public {
         vm.expectRevert(
-            abi.encodeWithSelector(QEDVault.NotDueYet.selector, liabilityId, uint64(block.timestamp + 7 days))
+            abi.encodeWithSelector(QEDVault.NotDueYet.selector, liabilityId, uint64(vm.getBlockTimestamp() + 7 days))
         );
         vault.settle(liabilityId);
-        vm.warp(block.timestamp + 7 days);
+        vm.warp(vm.getBlockTimestamp() + 7 days);
         vm.prank(attacker); // a stranger triggering settlement only ever pays the creditor
         vault.settle(liabilityId);
         assertEq(usd.balanceOf(creditor), 70 * USD);
@@ -269,7 +270,7 @@ contract QEDVaultTest is Base {
         vm.expectRevert(abi.encodeWithSelector(QEDVault.ExceedsMandatePeriodCap.selector, 1 * USD, 0));
         _pay(m, mSig, c3, c3Sig);
 
-        vm.warp(block.timestamp + 1 days);
+        vm.warp(vm.getBlockTimestamp() + 1 days);
         usd.mint(address(vault), 10 * USD);
         c3 = _cert(m, vendor, 1 * USD, keccak256("pc4"));
         _pay(m, mSig, c3, _signCert(cosignerPk, c3));
@@ -303,13 +304,13 @@ contract QEDVaultTest is Base {
     // ═══════════════════════════════ validity windows, epochs, revocation ═══════════════════════════════
 
     function test_Revert_MandateExpiredOrNotYetValid() public {
-        vm.warp(block.timestamp + 8 days);
+        vm.warp(vm.getBlockTimestamp() + 8 days);
         usd.mint(address(vault), 1); // keep state irrelevant
         QEDVault.Certificate memory c = _cert(m, vendor, 1 * USD, keccak256("e1"));
-        c.mandateHash = vault.hashMandate(m);
+        c.mandateHash = lens.hashMandate(m);
         bytes memory cSig = _signCert(cosignerPk, c);
         vm.expectRevert(
-            abi.encodeWithSelector(QEDVault.MandateNotActive.selector, m.validFrom, m.validUntil, block.timestamp)
+            abi.encodeWithSelector(QEDVault.MandateNotActive.selector, m.validFrom, m.validUntil, vm.getBlockTimestamp())
         );
         _pay(m, mSig, c, cSig);
     }
@@ -317,9 +318,9 @@ contract QEDVaultTest is Base {
     function test_Revert_CertificateExpired() public {
         QEDVault.Certificate memory c = _cert(m, vendor, 1 * USD, keccak256("ce"));
         bytes memory cSig = _signCert(cosignerPk, c);
-        vm.warp(block.timestamp + 2 hours);
+        vm.warp(vm.getBlockTimestamp() + 2 hours);
         vm.expectRevert(
-            abi.encodeWithSelector(QEDVault.CertificateNotActive.selector, c.notBefore, c.expiresAt, block.timestamp)
+            abi.encodeWithSelector(QEDVault.CertificateNotActive.selector, c.notBefore, c.expiresAt, vm.getBlockTimestamp())
         );
         _pay(m, mSig, c, cSig);
     }
@@ -334,7 +335,7 @@ contract QEDVaultTest is Base {
     }
 
     function test_Revert_RevokedMandate() public {
-        bytes32 h = vault.hashMandate(m);
+        bytes32 h = lens.hashMandate(m);
         vm.prank(owner);
         vault.revokeMandate(h);
         QEDVault.Certificate memory c = _cert(m, vendor, 1 * USD, keccak256("rv"));
@@ -361,7 +362,7 @@ contract QEDVaultTest is Base {
         QEDVault other = new QEDVault(IERC20(address(usd)), owner, agent, cosigner, guardian, DAILY_CAP);
         QEDVault.Mandate memory mo = _mandate(_payees(vendor));
         mo.vault = address(other);
-        bytes32 d = other.mandateDigest(mo);
+        bytes32 d = lens.mandateDigest(other, mo);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPk, d);
         QEDVault.Certificate memory c = _cert(m, vendor, 1 * USD, keccak256("xv"));
         bytes memory cSig = _signCert(cosignerPk, c);
@@ -377,7 +378,7 @@ contract QEDVaultTest is Base {
         vm.expectRevert(abi.encodeWithSelector(QEDVault.NotOwner.selector, agent));
         vault.withdraw(agent, 1);
         vm.expectRevert(abi.encodeWithSelector(QEDVault.NotOwner.selector, agent));
-        vault.ringFence(agent, 1, uint64(block.timestamp + 1 days), 0);
+        vault.ringFence(agent, 1, uint64(vm.getBlockTimestamp() + 1 days), 0);
         vm.expectRevert(abi.encodeWithSelector(QEDVault.NotOwner.selector, agent));
         vault.setDailyCap(type(uint256).max);
         vm.expectRevert(abi.encodeWithSelector(QEDVault.NotOwner.selector, agent));
@@ -413,9 +414,9 @@ contract QEDVaultTest is Base {
         vm.prank(guardian);
         vm.expectRevert(abi.encodeWithSelector(QEDVault.NotOwner.selector, guardian));
         vault.unpause();
-        assertEq(vault.blastRadius(30 days), 0, "paused vault has zero blast radius");
+        assertEq(lens.blastRadius(vault, 30 days), 0, "paused vault has zero blast radius");
 
-        vm.warp(block.timestamp + 7 days);
+        vm.warp(vm.getBlockTimestamp() + 7 days);
         vault.settle(liabilityId); // pausing stops the AI, never the creditors
         assertEq(usd.balanceOf(creditor), 70 * USD);
 
@@ -441,23 +442,23 @@ contract QEDVaultTest is Base {
     // ═══════════════════════════════ blast radius (compromise-bounded loss) ═══════════════════════════════
 
     function test_BlastRadius() public {
-        assertEq(vault.blastRadius(1 hours), 25 * USD, "min(free=30, cap=25)");
-        assertEq(vault.blastRadius(1 days), 30 * USD, "a 2nd window can open at +24h: min(30, 50)");
-        assertEq(vault.blastRadius(3 days), 30 * USD, "capped by free balance");
+        assertEq(lens.blastRadius(vault, 1 hours), 25 * USD, "min(free=30, cap=25)");
+        assertEq(lens.blastRadius(vault, 1 days), 30 * USD, "a 2nd window can open at +24h: min(30, 50)");
+        assertEq(lens.blastRadius(vault, 3 days), 30 * USD, "capped by free balance");
 
         QEDVault.Certificate memory c = _cert(m, vendor, 10 * USD, keccak256("br"));
         _pay(m, mSig, c, _signCert(cosignerPk, c));
         // free 20, window remaining 15 now; a further full window opens inside 24h
-        assertEq(vault.blastRadius(1 hours), 15 * USD);
-        assertEq(vault.blastRadius(1 days), 20 * USD);
+        assertEq(lens.blastRadius(vault, 1 hours), 15 * USD);
+        assertEq(lens.blastRadius(vault, 1 days), 20 * USD);
 
         vm.prank(owner);
         vault.setDailyCap(2 * USD);
-        assertEq(vault.blastRadius(1 hours), 0, "already spent above new cap");
-        assertEq(vault.blastRadius(1 days), 2 * USD);
-        assertEq(vault.blastRadius(5 days), 10 * USD);
+        assertEq(lens.blastRadius(vault, 1 hours), 0, "already spent above new cap");
+        assertEq(lens.blastRadius(vault, 1 days), 2 * USD);
+        assertEq(lens.blastRadius(vault, 5 days), 10 * USD);
 
-        QEDVault.Snapshot memory s = vault.snapshot();
+        QEDLens.Snapshot memory s = lens.snapshot(vault);
         assertEq(s.protectedBalance, 70 * USD);
         assertEq(s.freeBalance, 20 * USD);
         assertEq(s.blastRadius24h, 2 * USD);
@@ -472,12 +473,12 @@ contract QEDVaultTest is Base {
         wide.maxPerPeriod = 1_000 * USD;
         wide.maxTotal = 1_000 * USD;
         bytes memory wSig = _signMandate(ownerPk, wide);
-        uint256 bound = vault.blastRadius(1 hours);
+        uint256 bound = lens.blastRadius(vault, 1 hours);
         uint256 before = usd.balanceOf(address(vault)) - vault.totalProtected();
         for (uint256 i; i < uint256(n) % 12; ++i) {
             uint256 amt = (uint256(keccak256(abi.encode(seed, i))) % (40 * USD)) + 1;
             QEDVault.Certificate memory c = _cert(wide, vendor, amt, keccak256(abi.encode(seed, "i", i)));
-            if (i % 3 == 0) c.dueAt = uint64(block.timestamp + 1 days);
+            if (i % 3 == 0) c.dueAt = uint64(vm.getBlockTimestamp() + 1 days);
             bytes memory cSig = _signCert(cosignerPk, c);
             vm.prank(agent);
             try vault.executePayment(wide, wSig, c, cSig) {} catch {}

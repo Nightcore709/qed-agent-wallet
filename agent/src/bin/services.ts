@@ -22,6 +22,7 @@ async function main() {
   if (role === "cosigner") {
     const engine = new PolicyEngine(c, account("COSIGNER"), {
       vault: dep.vault,
+      lens: dep.lens,
       escrow: dep.escrow,
       owner: shared.owner,
       vendorKeys: { [String(shared.vendor).toLowerCase()]: shared.vendor, [String(shared.creditor).toLowerCase()]: shared.creditor },
@@ -46,6 +47,7 @@ async function main() {
   } else if (role === "agent") {
     const a = new QEDAgent(c, account("AGENT"), makeBrain(), {
       vault: dep.vault,
+      lens: dep.lens,
       escrow: dep.escrow,
       verifier: dep.verifier,
       token: dep.token,
