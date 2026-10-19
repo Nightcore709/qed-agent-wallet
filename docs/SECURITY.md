@@ -40,6 +40,15 @@ ProofEscrow tiers: provider signs quotes and is the only party that may `deliver
 provider-signed quote; anyone may `refund` after the deadline (funds go to the client only); the provider may
 release the client early. MinVarianceVerifier and QEDLens are stateless and privilege-free.
 
+QEDClearing tiers (no owner, no admin, no upgrade path):
+
+| Capability | Member | Anyone | Notes |
+|---|:-:|:-:|---|
+| `join` | ✓ (self only) | ✓ | emits the hash of the netting terms: explicit, on-chain consent |
+| `issue` an obligation | ✓ as **debtor** only | ✗ | nobody can create a debt for someone else |
+| `pay` an obligation | ✓ as **debtor** only | ✗ | tokens move debtor → creditor, nowhere else |
+| `net` (submit a netting) | ✓ | ✓ | permissionless, because the contract enforces: unchanged net positions, no new claims, full snapshot, maximality proof |
+
 Off-chain tiers: each role runs as a separate OS process that receives exactly one private key in its environment
 (`agent/scripts/live.ts → spawnRole`). The language model never receives any key, address book mutation rights or
 tool that can sign.
@@ -60,9 +69,14 @@ tool that can sign.
 | I10 | Escrow pays only for ε-optimal work | KKT certificate check (Theorem §4.4) | 3×2000-run fuzz incl. "accepted ⇒ ε-optimal"; Sepolia X17, X18 |
 | I11 | Clients can't underpay / redirect, providers can't swap the problem | quote binds price, payee, verifier, spec hash, deadline | `test_Revert_ClientTampers*`; Sepolia X2, X3 |
 | I12 | Purchased data is the data the job committed to | `job.specHash == invoice.dataCommitment`, re-hashed by the agent | co-signer C8; agent `fulfil()` |
+| I13 | A netting never changes any member's net position | per-member conservation check | `test_Revert_ShiftingValueBetweenMembers`; 2,000-run cycle fuzz; Sepolia N2; `npm run verify` |
+| I14 | A netting never erases more than is owed and never creates a claim | 0 ≤ x ≤ d; amounts only decrease | `test_Revert_CancellingMoreThanOwed`; Sepolia N3 |
+| I15 | Only a provably maximal netting executes | LP-duality certificate, Σx = Σd·y, exact integers | 60 random economies; TS solver = exhaustive oracle on 150 economies; Sepolia N1, N5 |
+| I16 | A proof covers the whole, current state | every open id, current amounts | `test_Revert_HidingAnObligation`, `StaleAmounts_AndReplay`; Sepolia N4, N7 |
 
-Test totals: **67 Solidity tests** (unit, fuzz, stateful invariants — ≈344 000 adversarial calls per CI run),
-**42 TypeScript tests** (TS ≡ Solidity parity on a live node, solver vs. 20 000-sample oracle, 35-case red-team).
+Test totals: **82 Solidity tests** (unit, fuzz, stateful invariants — ≈350 000 adversarial calls per CI run,
+plus 60 random clearing economies), **45 TypeScript tests** (TS ≡ Solidity parity on a live node, portfolio solver vs.
+a 20 000-sample oracle, netting solver vs. an exhaustive oracle, 32-case red-team).
 
 ## 4. Threat model
 
@@ -106,6 +120,9 @@ payees ≤ 32; Elevation of privilege → single-function agent key, owner-only 
 | K12 | **Execution topology**: our build sandbox had no RPC egress. Transactions were signed in the sandbox against a wall-clock-synchronised local replica of Sepolia, then the identical signed bytes were broadcast via a browser relay; every public receipt was compared with the replica's (status + logs). Two earlier attempts failed (gas schedule; one under-provisioned agent transaction) and were superseded by a run under fresh keys. | Info | Disclosed in `docs/EVIDENCE.md`; `npm run verify` re-derives every claim from the public chain; the canonical run is self-contained. |
 | K13 | Unaudited prototype on a testnet with a valueless token. | — | Do not use with real funds. |
 | K14 | Honeypot keys are public: anyone can spend ≤ 1 tUSD/day of honeypot free balance to CloudCo. | Expected | That is the demonstration of a bounded blast radius. |
+| K15 | **Clearing griefing**: a member can issue many tiny obligations (≤ 128 open) or front-run a netting with a new obligation, making a submitted proof stale. | Low | Fails safe (`IncompleteSnapshot` / `StaleAmount`); the prover recomputes in milliseconds. Roadmap: per-member caps, a proposal window. |
+| K16 | **Netting changes counterparties' credit mix** only by shrinking it: claims are reduced, never re-assigned, but a member loses a specific receivable it might have preferred to keep. | Low | Disclosed in the on-chain terms every member signs by joining. |
+| K17 | Clearing obligations are acknowledgements, not escrowed funds: a debtor can still default on what remains after netting. | Medium | Netting minimises what must be paid; pairing it with QEDVault ring-fencing is the roadmap. |
 
 ## 6. Incident response
 

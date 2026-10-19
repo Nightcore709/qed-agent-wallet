@@ -1,0 +1,1371 @@
+{
+  "schema": "qed.evidence/v1",
+  "run": "clearing",
+  "network": {
+    "chainId": 11155111,
+    "name": "Ethereum Sepolia",
+    "explorer": "https://sepolia.etherscan.io"
+  },
+  "startedAt": "2026-10-19T17:12:22.114Z",
+  "actors": {
+    "deployer": "0x94C938E642BbC657D5F45546E35268a70c936448",
+    "northwind": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+    "qed": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+    "cloudco": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+    "helix": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+    "atlas": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+    "mallory": "0x56D161255Ced6863698eA3c6a886982088fa30a8"
+  },
+  "contracts": {
+    "token": "0x6753a8ea4560f07534bcfbca2dea790afb9552d4",
+    "clearing": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+    "deployBlock": "2"
+  },
+  "final": {
+    "gross": "200000000",
+    "cash": "28000000",
+    "cleared": "169000000",
+    "greedyCleared": "162000000",
+    "settledWithTokens": "31000000",
+    "openObligations": "0",
+    "balances": {
+      "Northwind": "0",
+      "QED": "28000000",
+      "CloudCo": "0",
+      "Helix": "0",
+      "Atlas": "0"
+    },
+    "netPositions": {
+      "Northwind": "-18000000",
+      "QED": "28000000",
+      "CloudCo": "-3000000",
+      "Helix": "-4000000",
+      "Atlas": "-3000000"
+    }
+  },
+  "finishedAt": "2026-10-19T17:12:23.065Z",
+  "steps": [
+    {
+      "phase": "deploy",
+      "title": "Deploy the clearing run's TestUSD (valueless; minter = this run's deployer)",
+      "narrative": "A separate instance so the run can give each agent exactly the cash it holds in the scenario.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "K1",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0x627457ae40dae71779b7af6466b541ce7ee5dcee8e759f140b288134096d5865",
+        "status": "success",
+        "blockNumber": "11949578",
+        "gasUsed": "3716239",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "2",
+          "gasUsed": "568257"
+        },
+        "timestamp": 1792429992
+      },
+      "events": [],
+      "at": "2026-10-19T17:12:22.208Z"
+    },
+    {
+      "phase": "deploy",
+      "title": "Deploy QEDClearing (proof-gated multilateral netting)",
+      "narrative": "Executes a netting only if net positions are unchanged, nothing is created, and an LP-duality certificate proves no larger netting exists.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "id": "K2",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0x58efadf2d07971cc0c00998dea4dba71e0ce4298c82589901c80bf0918f1d140",
+        "status": "success",
+        "blockNumber": "11949578",
+        "gasUsed": "8579134",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "3",
+          "gasUsed": "1232082"
+        },
+        "timestamp": 1792429992
+      },
+      "events": [],
+      "at": "2026-10-19T17:12:22.242Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Northwind joins the clearing house",
+      "narrative": "Joining is on-chain consent to the TERMS: any netting that leaves my net position unchanged, creates no new claim, and is proven maximal.",
+      "actor": "Northwind",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "J1",
+      "expect": "success",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0x73dc94e32ef12ceeb4783031cd16c02bb37298c27da3034dee39090a6ce603ab",
+        "status": "success",
+        "blockNumber": "11949579",
+        "gasUsed": "348185",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "14",
+          "gasUsed": "90125"
+        },
+        "timestamp": 1792430004
+      },
+      "events": [
+        {
+          "name": "Joined",
+          "args": {
+            "member": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "index": "0",
+            "terms": "0x184b1e9d42839cc7f847b0e72eef6283c5a2e8ce039ce8b78c92c3d972851d11"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.449Z"
+    },
+    {
+      "phase": "setup",
+      "title": "QED joins the clearing house",
+      "narrative": "Joining is on-chain consent to the TERMS: any netting that leaves my net position unchanged, creates no new claim, and is proven maximal.",
+      "actor": "QED",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "J2",
+      "expect": "success",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "tx": {
+        "hash": "0xba6205899c72ecc244e8b103f1549e7398a5ecc5837d96c2802455d20495537d",
+        "status": "success",
+        "blockNumber": "11949580",
+        "gasUsed": "250265",
+        "from": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "15",
+          "gasUsed": "73025"
+        },
+        "timestamp": 1792430016
+      },
+      "events": [
+        {
+          "name": "Joined",
+          "args": {
+            "member": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "index": "1",
+            "terms": "0x184b1e9d42839cc7f847b0e72eef6283c5a2e8ce039ce8b78c92c3d972851d11"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.463Z"
+    },
+    {
+      "phase": "setup",
+      "title": "CloudCo joins the clearing house",
+      "narrative": "Joining is on-chain consent to the TERMS: any netting that leaves my net position unchanged, creates no new claim, and is proven maximal.",
+      "actor": "CloudCo",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "J3",
+      "expect": "success",
+      "actorAddress": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+      "tx": {
+        "hash": "0x4e6748d972d6ad000f08e396aac81d325e7797765c019900cbe40c9c9fa6aa6b",
+        "status": "success",
+        "blockNumber": "11949581",
+        "gasUsed": "250265",
+        "from": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "16",
+          "gasUsed": "73025"
+        },
+        "timestamp": 1792430028
+      },
+      "events": [
+        {
+          "name": "Joined",
+          "args": {
+            "member": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "index": "2",
+            "terms": "0x184b1e9d42839cc7f847b0e72eef6283c5a2e8ce039ce8b78c92c3d972851d11"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.480Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Helix joins the clearing house",
+      "narrative": "Joining is on-chain consent to the TERMS: any netting that leaves my net position unchanged, creates no new claim, and is proven maximal.",
+      "actor": "Helix",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "J4",
+      "expect": "success",
+      "actorAddress": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+      "tx": {
+        "hash": "0x2b3c68eeea83db6530dd03a7084404dedea5268fdee33dcf8eb337aaf9f86229",
+        "status": "success",
+        "blockNumber": "11949582",
+        "gasUsed": "250265",
+        "from": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "17",
+          "gasUsed": "73025"
+        },
+        "timestamp": 1792430040
+      },
+      "events": [
+        {
+          "name": "Joined",
+          "args": {
+            "member": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "index": "3",
+            "terms": "0x184b1e9d42839cc7f847b0e72eef6283c5a2e8ce039ce8b78c92c3d972851d11"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.498Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Atlas joins the clearing house",
+      "narrative": "Joining is on-chain consent to the TERMS: any netting that leaves my net position unchanged, creates no new claim, and is proven maximal.",
+      "actor": "Atlas",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "J5",
+      "expect": "success",
+      "actorAddress": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+      "tx": {
+        "hash": "0x03e19549ce47485cd58c9a2a3ce2f07c4ec3ebd18c3ba0500557b2e5d68c30ca",
+        "status": "success",
+        "blockNumber": "11949583",
+        "gasUsed": "250265",
+        "from": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "18",
+          "gasUsed": "73025"
+        },
+        "timestamp": 1792430052
+      },
+      "events": [
+        {
+          "name": "Joined",
+          "args": {
+            "member": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "index": "4",
+            "terms": "0x184b1e9d42839cc7f847b0e72eef6283c5a2e8ce039ce8b78c92c3d972851d11"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.522Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Northwind owes QED 40 tUSD (portfolio subscription)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "Northwind",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I1",
+      "expect": "success",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0x7b808c9a6286edc43bde1d7523deb6e90bae4005f23e54f16747de6667093cee",
+        "status": "success",
+        "blockNumber": "11949584",
+        "gasUsed": "795367",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "19",
+          "gasUsed": "185327"
+        },
+        "timestamp": 1792430064
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "1",
+            "debtor": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "creditor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "amount": "40000000",
+            "dueAt": "1795021942",
+            "memo": "0xddc73eae2e9d40ebda1da4632ab482898897ad0f387c18cf21d1b157e3033761"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.547Z"
+    },
+    {
+      "phase": "setup",
+      "title": "QED owes CloudCo 30 tUSD (GPU compute)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "QED",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I2",
+      "expect": "success",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "tx": {
+        "hash": "0xbd67bb551b90bc4b70d574770c078d26207ec0abc86d76a61a96a42b733aa165",
+        "status": "success",
+        "blockNumber": "11949585",
+        "gasUsed": "501607",
+        "from": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "20",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430076
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "2",
+            "debtor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "creditor": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "amount": "30000000",
+            "dueAt": "1795021942",
+            "memo": "0x887dc769eb7121712f0552043291d7300fc0d8f81c3f8a98f9e76ad5591900d2"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.567Z"
+    },
+    {
+      "phase": "setup",
+      "title": "CloudCo owes Helix 25 tUSD (data licence)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "CloudCo",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I3",
+      "expect": "success",
+      "actorAddress": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+      "tx": {
+        "hash": "0xadfa6dc4fca51fa59d56eb2e73ad9f69a402bd2310f97b35477fa9392b8f8c32",
+        "status": "success",
+        "blockNumber": "11949586",
+        "gasUsed": "501619",
+        "from": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "21",
+          "gasUsed": "134039"
+        },
+        "timestamp": 1792430088
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "3",
+            "debtor": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "creditor": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "amount": "25000000",
+            "dueAt": "1795021942",
+            "memo": "0xe83f191eb0d38e093d0a792e585f01e2bea23bbaf8934a7c5284ecebb73f5f5c"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.586Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Helix owes Northwind 20 tUSD (advisory fees)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "Helix",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I4",
+      "expect": "success",
+      "actorAddress": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+      "tx": {
+        "hash": "0x8b216187fec7e6523d9688951e0960ff63f9148aeb8056ee65d091f5ac7675e5",
+        "status": "success",
+        "blockNumber": "11949587",
+        "gasUsed": "501607",
+        "from": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "22",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430100
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "4",
+            "debtor": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "creditor": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "amount": "20000000",
+            "dueAt": "1795021942",
+            "memo": "0xdf21e7877d063bbec47628bd70cc98c7852c1c801a5f22de872c9d9203a868b8"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.611Z"
+    },
+    {
+      "phase": "setup",
+      "title": "QED owes Helix 15 tUSD (risk model)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "QED",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I5",
+      "expect": "success",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "tx": {
+        "hash": "0x7a0649e140e840ec971dc5b4eeb59d3ee59f81fc2f13ba79de573e3bedbb680f",
+        "status": "success",
+        "blockNumber": "11949588",
+        "gasUsed": "501607",
+        "from": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "23",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430112
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "5",
+            "debtor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "creditor": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "amount": "15000000",
+            "dueAt": "1795021942",
+            "memo": "0xb69f65a89648b28a9a3b11363deb77b5b57bdcc5ef0ea397f4168d77f62b7a64"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.630Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Helix owes QED 15 tUSD (model validation)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "Helix",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I6",
+      "expect": "success",
+      "actorAddress": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+      "tx": {
+        "hash": "0x280d6f9475466177c7c82bf4b819cd9ab5e9841fd081740ffd871a793f364d71",
+        "status": "success",
+        "blockNumber": "11949589",
+        "gasUsed": "501607",
+        "from": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "24",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430124
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "6",
+            "debtor": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "creditor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "amount": "15000000",
+            "dueAt": "1795021942",
+            "memo": "0x2eef9dff97768245ec6e7a19048ab71ce07cc4b9b6d0f8736458d112e5eb2604"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.653Z"
+    },
+    {
+      "phase": "setup",
+      "title": "CloudCo owes Northwind 12 tUSD (volume rebate)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "CloudCo",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I7",
+      "expect": "success",
+      "actorAddress": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+      "tx": {
+        "hash": "0x59af539e8cd4c01816fd77e11f600c43b2e431d21ecbf3003e5f0fe97619e0c0",
+        "status": "success",
+        "blockNumber": "11949590",
+        "gasUsed": "501595",
+        "from": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "25",
+          "gasUsed": "134015"
+        },
+        "timestamp": 1792430136
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "7",
+            "debtor": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "creditor": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "amount": "12000000",
+            "dueAt": "1795021942",
+            "memo": "0xa82ccad91dddc67d068a1f7fd8faeff53ab8d795f2dc1cbcb64f6a16d382ecca"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.670Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Northwind owes CloudCo 10 tUSD (hosting)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "Northwind",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I8",
+      "expect": "success",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0x57bc03f70e9bb321b9a5c64dc31b4786fa70e4a8d3f4b9eb7c7ab5a855d61398",
+        "status": "success",
+        "blockNumber": "11949591",
+        "gasUsed": "501607",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "26",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430148
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "8",
+            "debtor": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "creditor": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "amount": "10000000",
+            "dueAt": "1795021942",
+            "memo": "0x4333f9b04042e94b459133697f30e2f0c2875c792a2409426c9118b18f1f5a65"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.688Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Atlas owes QED 18 tUSD (backtests)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "Atlas",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I9",
+      "expect": "success",
+      "actorAddress": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+      "tx": {
+        "hash": "0xf5c02f7afb450a8625877d696bb939892eb821f965b2a1b12cbb2a5d3402e673",
+        "status": "success",
+        "blockNumber": "11949592",
+        "gasUsed": "501619",
+        "from": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "27",
+          "gasUsed": "134039"
+        },
+        "timestamp": 1792430160
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "9",
+            "debtor": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "creditor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "amount": "18000000",
+            "dueAt": "1795021942",
+            "memo": "0x8399beeeccb818182eddd3c1f37c7a30d2411a998186789ecd060f4d5d5981f3"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.708Z"
+    },
+    {
+      "phase": "setup",
+      "title": "Helix owes Atlas 9 tUSD (data cleaning)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "Helix",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I10",
+      "expect": "success",
+      "actorAddress": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+      "tx": {
+        "hash": "0x8bfe4d582ba28fc0c742169b496e327074af23e9cefa081e2a21b2dc5e93b7a2",
+        "status": "success",
+        "blockNumber": "11949593",
+        "gasUsed": "501607",
+        "from": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "28",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430172
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "10",
+            "debtor": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "creditor": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "amount": "9000000",
+            "dueAt": "1795021942",
+            "memo": "0xe0f9975d87f72610a02df6a5eaf9899a68feb3b4408e5d8eec8c2b3db763b188"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.729Z"
+    },
+    {
+      "phase": "setup",
+      "title": "CloudCo owes Atlas 6 tUSD (labelling)",
+      "narrative": "Recorded by the debtor's own key: nobody can create a debt for someone else.",
+      "actor": "CloudCo",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "I11",
+      "expect": "success",
+      "actorAddress": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+      "tx": {
+        "hash": "0x0ed4ee5633f2e1f4ba1c79db2383978e5e2954de9b1b174f5e768462b00cee96",
+        "status": "success",
+        "blockNumber": "11949594",
+        "gasUsed": "501607",
+        "from": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "29",
+          "gasUsed": "134027"
+        },
+        "timestamp": 1792430184
+      },
+      "events": [
+        {
+          "name": "Issued",
+          "args": {
+            "id": "11",
+            "debtor": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "creditor": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "amount": "6000000",
+            "dueAt": "1795021942",
+            "memo": "0xc206f921311dbe2c8ccb861b4899c03a7c1dac9c538374355ff77e3a512a7c3e"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.745Z"
+    },
+    {
+      "phase": "gridlock",
+      "title": "Gridlock: Northwind tries to pay its 40 tUSD debt gross, but holds 18",
+      "narrative": "With 200 tUSD of debt and 28 tUSD of cash between them, the five agents cannot settle gross. Every one of them is solvent on a net basis.",
+      "actor": "Northwind",
+      "outcomes": [
+        "O4"
+      ],
+      "expect": "revert",
+      "id": "G1",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0x7d86cdc9dca5a548c5eba0b2a3725466a467d09484f8a8bb04230421bef33b2c",
+        "status": "reverted",
+        "blockNumber": "11949599",
+        "gasUsed": "87944",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "34",
+          "gasUsed": "57544"
+        },
+        "timestamp": 1792430244
+      },
+      "events": [],
+      "error": {
+        "name": "ERC20InsufficientBalance",
+        "args": [
+          "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+          "18000000",
+          "40000000"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.824Z"
+    },
+    {
+      "phase": "proof",
+      "title": "QED agent proves the maximal netting: 169.00 of 200.00 tUSD can be cancelled",
+      "narrative": "Minimum-mean cycle cancelling (Goldberg–Tarjan, Karp) in 1.1 ms; dual certificate from residual shortest paths: Σx = 169.00 = Σd·y = 169.00. A naive shortest-cycle-first netting reaches only 162.00.",
+      "actor": "QED agent",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "P0",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-19T17:12:22.830Z"
+    },
+    {
+      "phase": "clearing-attack",
+      "title": "Lazy netting (shortest cycles first): cancels 162.00, not 169.00",
+      "narrative": "A conservation-valid but suboptimal netting leaves avoidable debt → Dual bound exceeds the amount cleared: NotProvablyMaximal",
+      "actor": "Mallory / rival clearing bot",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "attack": {
+        "class": "fake_work",
+        "threat": "A conservation-valid but suboptimal netting leaves avoidable debt",
+        "defence": "Dual bound exceeds the amount cleared: NotProvablyMaximal",
+        "layer": "QEDClearing"
+      },
+      "expect": "revert",
+      "id": "N1",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x1b62ae8cbdd1fcaacda3f3305b880e75b504c712575389e7ad780c69c4724976",
+        "status": "reverted",
+        "blockNumber": "11949600",
+        "gasUsed": "162976",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "35",
+          "gasUsed": "161776"
+        },
+        "timestamp": 1792430256
+      },
+      "events": [],
+      "error": {
+        "name": "NotProvablyMaximal",
+        "args": [
+          "162000000",
+          "169000000"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.849Z"
+    },
+    {
+      "phase": "clearing-attack",
+      "title": "Netting that quietly cancels 1 tUSD more of Northwind's debt to QED",
+      "narrative": "Move value between members inside a netting → Every member's net position must be exactly unchanged: NetPositionChanged",
+      "actor": "Mallory / rival clearing bot",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "attack": {
+        "class": "liability_violation",
+        "threat": "Move value between members inside a netting",
+        "defence": "Every member's net position must be exactly unchanged: NetPositionChanged",
+        "layer": "QEDClearing"
+      },
+      "expect": "revert",
+      "id": "N2",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x29c4ef66a5eb98558fce184b0058cf295bc39e095e8eccf58ec6ba99172b3eaf",
+        "status": "reverted",
+        "blockNumber": "11949600",
+        "gasUsed": "164780",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "36",
+          "gasUsed": "163580"
+        },
+        "timestamp": 1792430256
+      },
+      "events": [],
+      "error": {
+        "name": "NetPositionChanged",
+        "args": [
+          "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+          "1000000"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.866Z"
+    },
+    {
+      "phase": "clearing-attack",
+      "title": "Netting that cancels more than an obligation is worth",
+      "narrative": "Erase more debt than exists → ExceedsObligation",
+      "actor": "Mallory / rival clearing bot",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "attack": {
+        "class": "liability_violation",
+        "threat": "Erase more debt than exists",
+        "defence": "ExceedsObligation",
+        "layer": "QEDClearing"
+      },
+      "expect": "revert",
+      "id": "N3",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x96a304a4c3fbb50c325a43e983a61f5c02aa93f7da499b4eb1aec6aed77fbdfb",
+        "status": "reverted",
+        "blockNumber": "11949600",
+        "gasUsed": "138136",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "37",
+          "gasUsed": "61264"
+        },
+        "timestamp": 1792430256
+      },
+      "events": [],
+      "error": {
+        "name": "ExceedsObligation",
+        "args": [
+          "2",
+          "30000001",
+          "30000000"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.890Z"
+    },
+    {
+      "phase": "clearing-attack",
+      "title": "Netting over a snapshot that hides one obligation",
+      "narrative": "Prove maximality on a doctored state → The proof must cover every open obligation: IncompleteSnapshot",
+      "actor": "Mallory / rival clearing bot",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "attack": {
+        "class": "signed_terms_tampering",
+        "threat": "Prove maximality on a doctored state",
+        "defence": "The proof must cover every open obligation: IncompleteSnapshot",
+        "layer": "QEDClearing"
+      },
+      "expect": "revert",
+      "id": "N4",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xd6c3f25ca5f8f38664907cb3065a61c41b184e14e584c90747616ce6ece04c9c",
+        "status": "reverted",
+        "blockNumber": "11949600",
+        "gasUsed": "129944",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "38",
+          "gasUsed": "45680"
+        },
+        "timestamp": 1792430256
+      },
+      "events": [],
+      "error": {
+        "name": "IncompleteSnapshot",
+        "args": [
+          "10",
+          "11"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.905Z"
+    },
+    {
+      "phase": "clearing-attack",
+      "title": "Forged certificate: drop a dual multiplier to fake a smaller bound",
+      "narrative": "Claim optimality with an invalid proof → DualInfeasible",
+      "actor": "Mallory / rival clearing bot",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "attack": {
+        "class": "fake_work",
+        "threat": "Claim optimality with an invalid proof",
+        "defence": "DualInfeasible",
+        "layer": "QEDClearing"
+      },
+      "expect": "revert",
+      "id": "N5",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xa7d7e7bcb0303b4c3e7267e1c6d3de472f7ff1bb2a1bddf628de4ccfdeedef8a",
+        "status": "reverted",
+        "blockNumber": "11949600",
+        "gasUsed": "138136",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "39",
+          "gasUsed": "68914"
+        },
+        "timestamp": 1792430256
+      },
+      "events": [],
+      "error": {
+        "name": "DualInfeasible",
+        "args": [
+          "2"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.921Z"
+    },
+    {
+      "phase": "clearing",
+      "title": "Proven-maximal netting executes: 169.00 tUSD of debt cancelled, 200.00 → 31.00",
+      "narrative": "No token moved. Every agent's receivables and payables fell by the same amount; no new claim was created; the contract checked the LP-duality certificate.",
+      "actor": "QED agent",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "N6",
+      "expect": "success",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "tx": {
+        "hash": "0x46288ece141a762a1889eb8e4692b6a19719643b341e0dd31a1e4166c51a05a2",
+        "status": "success",
+        "blockNumber": "11949601",
+        "gasUsed": "550826",
+        "from": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "40",
+          "gasUsed": "287186"
+        },
+        "timestamp": 1792430268
+      },
+      "events": [
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "1",
+            "cancelled": "22000000",
+            "remaining": "18000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "2",
+            "cancelled": "30000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "3",
+            "cancelled": "25000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "4",
+            "cancelled": "20000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "5",
+            "cancelled": "15000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "6",
+            "cancelled": "11000000",
+            "remaining": "4000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "7",
+            "cancelled": "12000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "8",
+            "cancelled": "10000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "9",
+            "cancelled": "12000000",
+            "remaining": "6000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "10",
+            "cancelled": "9000000",
+            "remaining": "0"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Reduced",
+          "args": {
+            "round": "1",
+            "id": "11",
+            "cancelled": "3000000",
+            "remaining": "3000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        },
+        {
+          "name": "Netted",
+          "args": {
+            "round": "1",
+            "prover": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "obligations": "11",
+            "grossBefore": "200000000",
+            "cleared": "169000000",
+            "grossAfter": "31000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:22.954Z"
+    },
+    {
+      "phase": "clearing-attack",
+      "title": "Replay the executed netting",
+      "narrative": "Apply the same proof twice → The state changed, so the snapshot no longer matches: IncompleteSnapshot",
+      "actor": "Mallory / rival clearing bot",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "attack": {
+        "class": "replay",
+        "threat": "Apply the same proof twice",
+        "defence": "The state changed, so the snapshot no longer matches: IncompleteSnapshot",
+        "layer": "QEDClearing"
+      },
+      "expect": "revert",
+      "id": "N7",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x4588659bad4770f283e3600885b6dabbb95e8b734fb5c27c14ac491acc2e4df5",
+        "status": "reverted",
+        "blockNumber": "11949602",
+        "gasUsed": "138136",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "41",
+          "gasUsed": "47200"
+        },
+        "timestamp": 1792430280
+      },
+      "events": [],
+      "error": {
+        "name": "IncompleteSnapshot",
+        "args": [
+          "11",
+          "4"
+        ]
+      },
+      "at": "2026-10-19T17:12:22.973Z"
+    },
+    {
+      "phase": "settlement",
+      "title": "Northwind pays QED the remaining 18.00 tUSD",
+      "narrative": "Paid in an order where every payer has first been paid; each agent needs only its net debit in cash.",
+      "actor": "Northwind",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "S1",
+      "expect": "success",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0x8e6ffd33285277503602a5b46743e6acda21ce9f42270a76939feb916781358c",
+        "status": "success",
+        "blockNumber": "11949687",
+        "gasUsed": "190980",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "42",
+          "gasUsed": "79376"
+        },
+        "timestamp": 1792431300
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "to": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "value": "18000000"
+          },
+          "address": "0x6753a8ea4560f07534bcfbca2dea790afb9552d4"
+        },
+        {
+          "name": "Paid",
+          "args": {
+            "id": "1",
+            "debtor": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "creditor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "amount": "18000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:23.007Z"
+    },
+    {
+      "phase": "settlement",
+      "title": "CloudCo pays Atlas the remaining 3.00 tUSD",
+      "narrative": "Paid in an order where every payer has first been paid; each agent needs only its net debit in cash.",
+      "actor": "CloudCo",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "S2",
+      "expect": "success",
+      "actorAddress": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+      "tx": {
+        "hash": "0x8be4b11f1c7f0e70ef674bd23583e97dd771ea6ab389a5c22716983460d38ebf",
+        "status": "success",
+        "blockNumber": "11949688",
+        "gasUsed": "93060",
+        "from": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "43",
+          "gasUsed": "62276"
+        },
+        "timestamp": 1792431312
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "to": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "value": "3000000"
+          },
+          "address": "0x6753a8ea4560f07534bcfbca2dea790afb9552d4"
+        },
+        {
+          "name": "Paid",
+          "args": {
+            "id": "11",
+            "debtor": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+            "creditor": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "amount": "3000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:23.022Z"
+    },
+    {
+      "phase": "settlement",
+      "title": "Helix pays QED the remaining 4.00 tUSD",
+      "narrative": "Paid in an order where every payer has first been paid; each agent needs only its net debit in cash.",
+      "actor": "Helix",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "S3",
+      "expect": "success",
+      "actorAddress": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+      "tx": {
+        "hash": "0xe8af7d6900333b6d7f461aa432bf03feeea17546eb3947b486a6d9b998360648",
+        "status": "success",
+        "blockNumber": "11949689",
+        "gasUsed": "93060",
+        "from": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "44",
+          "gasUsed": "62276"
+        },
+        "timestamp": 1792431324
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "to": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "value": "4000000"
+          },
+          "address": "0x6753a8ea4560f07534bcfbca2dea790afb9552d4"
+        },
+        {
+          "name": "Paid",
+          "args": {
+            "id": "6",
+            "debtor": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+            "creditor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "amount": "4000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:23.039Z"
+    },
+    {
+      "phase": "settlement",
+      "title": "Atlas pays QED the remaining 6.00 tUSD",
+      "narrative": "Paid in an order where every payer has first been paid; each agent needs only its net debit in cash.",
+      "actor": "Atlas",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "S4",
+      "expect": "success",
+      "actorAddress": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+      "tx": {
+        "hash": "0xb69b59c99d14062acb126d36036f72850ed6671c45e11ba23bd0da04022aa654",
+        "status": "success",
+        "blockNumber": "11949690",
+        "gasUsed": "91741",
+        "from": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+        "to": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2",
+        "replica": {
+          "blockNumber": "45",
+          "gasUsed": "55901"
+        },
+        "timestamp": 1792431336
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "to": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "value": "6000000"
+          },
+          "address": "0x6753a8ea4560f07534bcfbca2dea790afb9552d4"
+        },
+        {
+          "name": "Paid",
+          "args": {
+            "id": "9",
+            "debtor": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "creditor": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "amount": "6000000"
+          },
+          "address": "0x7b7de15772198d82d07019fc816cffc52e7d6ad2"
+        }
+      ],
+      "at": "2026-10-19T17:12:23.057Z"
+    }
+  ],
+  "sepolia": {
+    "firstBlock": 11949578,
+    "lastBlock": 11949690,
+    "transactions": 44,
+    "reverted": 7,
+    "receipts": "receipts.json",
+    "relayComparison": "44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded)"
+  },
+  "executionNote": "Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs)."
+}

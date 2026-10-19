@@ -27,7 +27,8 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import { MinVarianceVerifierAbi, ProofEscrowAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { MinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { checkNetting, type Obligation } from "../src/engine/netting.js";
 import { decodeRevert } from "../src/chain.js";
 import { checkCertificate } from "../src/engine/minvar.js";
 import { canonical } from "../src/protocol/records.js";
@@ -55,8 +56,10 @@ const ok = (outcome: string, check: string, cond: boolean, detail = "") => {
 
 const step = (id: string) => manifest.steps.find((s: any) => s.id === id);
 
-async function verifyBytecode() {
-  const art: Record<string, string> = { token: "TestUSD.sol/TestUSD", verifier: "MinVarianceVerifier.sol/MinVarianceVerifier", escrow: "ProofEscrow.sol/ProofEscrow", vault: "QEDVault.sol/QEDVault", honeypotVault: "QEDVault.sol/QEDVault", lens: "QEDLens.sol/QEDLens" };
+async function verifyBytecode(
+  addrs: Record<string, Address> = dep,
+  art: Record<string, string> = { token: "TestUSD.sol/TestUSD", verifier: "MinVarianceVerifier.sol/MinVarianceVerifier", escrow: "ProofEscrow.sol/ProofEscrow", vault: "QEDVault.sol/QEDVault", honeypotVault: "QEDVault.sol/QEDVault", lens: "QEDLens.sol/QEDLens" },
+) {
   for (const [k, path] of Object.entries(art)) {
     const f = `out/${path}.json`;
     if (!existsSync(f)) {
@@ -65,7 +68,7 @@ async function verifyBytecode() {
     }
     const a = JSON.parse(readFileSync(f, "utf8"));
     const local: string = a.deployedBytecode.object.slice(2);
-    const onchain = ((await pub.getCode({ address: dep[k] })) ?? "0x").slice(2);
+    const onchain = ((await pub.getCode({ address: addrs[k] })) ?? "0x").slice(2);
     // mask immutables (e.g. token address, cached domain separator) at their declared offsets
     const mask = (code: string) => {
       let c = code;
@@ -74,12 +77,12 @@ async function verifyBytecode() {
       }
       return c;
     };
-    ok("O4", `on-chain bytecode of ${k} == this repo's compiled bytecode`, onchain.length === local.length && mask(onchain) === mask(local), `${dep[k]} (${onchain.length / 2} bytes)`);
+    ok("O4", `on-chain bytecode of ${k} == this repo's compiled bytecode`, onchain.length === local.length && mask(onchain) === mask(local), `${addrs[k]} (${onchain.length / 2} bytes)`);
   }
 }
 
-async function verifySteps() {
-  for (const s of manifest.steps) {
+async function verifySteps(steps: any[] = manifest.steps) {
+  for (const s of steps) {
     if (!s.tx) continue;
     const r = await pub.getTransactionReceipt({ hash: s.tx.hash });
     const tx = await pub.getTransaction({ hash: s.tx.hash });
@@ -167,6 +170,44 @@ async function verifyOutcome3() {
   ok("O3", "Mallory received ZERO tUSD from either vault or the escrow", fromVaults.length === 0, `Mallory balance ${Number(malloryBal) / 1e6} tUSD (only the test faucet/mint)`);
 }
 
+/** The QED Clearing run (proof-gated multilateral netting), if its evidence is present. */
+async function verifyClearing() {
+  const path = `${EVIDENCE}/clearing/manifest.json`;
+  if (!existsSync(path)) return;
+  const cm = JSON.parse(readFileSync(path, "utf8"));
+  const cd = cm.contracts as { token: Address; clearing: Address; deployBlock: string };
+  console.log("\n— QED Clearing: bytecode —");
+  await verifyBytecode({ clearingToken: cd.token, clearing: cd.clearing }, { clearingToken: "TestUSD.sol/TestUSD", clearing: "QEDClearing.sol/QEDClearing" });
+  console.log("\n— QED Clearing: every recorded transaction —");
+  await verifySteps(cm.steps);
+  console.log("\n— QED Clearing: the netting is value-preserving and provably maximal —");
+  const n6 = cm.steps.find((x: any) => x.id === "N6");
+  const tx = await pub.getTransaction({ hash: n6.tx.hash });
+  const { args } = decodeFunctionData({ abi: QEDClearingAbi as Abi, data: tx.input }) as any;
+  const p = args[0];
+  const members = (await pub.readContract({ address: cd.clearing, abi: QEDClearingAbi, functionName: "allMembers" })) as Address[];
+  const idx = (a: Address) => members.findIndex((m) => m.toLowerCase() === a.toLowerCase());
+  const obs: Obligation[] = [];
+  for (let i = 0; i < p.ids.length; i++) {
+    const o = (await pub.readContract({ address: cd.clearing, abi: QEDClearingAbi, functionName: "getObligation", args: [p.ids[i]] })) as any;
+    obs.push({ id: p.ids[i], debtor: idx(o.debtor), creditor: idx(o.creditor), amount: BigInt(p.amounts[i]) });
+  }
+  const rep = checkNetting(members.length, obs, { x: [...p.x].map(BigInt), potential: [...p.potential].map(BigInt), y: [...p.y].map(BigInt) });
+  ok("O3", "submitted netting re-checked INDEPENDENTLY: net positions unchanged, dual feasible, Σx = Σd·y (maximal)", rep.ok, `cleared ${Number(rep.cleared) / 1e6} = dual bound ${Number(rep.bound) / 1e6} tUSD`);
+  const netted = (await pub.getContractEvents({ address: cd.clearing, abi: QEDClearingAbi, eventName: "Netted", fromBlock: BigInt(cd.deployBlock) })) as any[];
+  ok("O4", "exactly one netting executed on-chain, matching the proof", netted.length === 1 && netted[0].args.cleared === rep.cleared, `gross ${Number(netted[0]?.args.grossBefore) / 1e6} → ${Number(netted[0]?.args.grossAfter) / 1e6} tUSD`);
+  const terms = (await pub.readContract({ address: cd.clearing, abi: QEDClearingAbi, functionName: "TERMS" })) as Hex;
+  const joined = (await pub.getContractEvents({ address: cd.clearing, abi: QEDClearingAbi, eventName: "Joined", fromBlock: BigInt(cd.deployBlock) })) as any[];
+  ok("O4", "every member consented on-chain to the netting terms", joined.length === members.length && joined.every((e) => e.args.terms === terms), `${joined.length} Joined events`);
+  const open = (await pub.readContract({ address: cd.clearing, abi: QEDClearingAbi, functionName: "openCount" })) as bigint;
+  const bal = await Promise.all(members.map((m) => pub.readContract({ address: cd.token, abi: TestUSDAbi, functionName: "balanceOf", args: [m] }) as Promise<bigint>));
+  const finalPos = cm.final?.netPositions ? Object.values<string>(cm.final.netPositions).map(BigInt) : [];
+  ok("O4", "all debts cleared, and every agent ends holding exactly its net position", open === 0n && finalPos.length === members.length && bal.every((b, k) => b === (finalPos[k] > 0n ? finalPos[k] : 0n)), `open obligations ${open} · balances ${bal.map((b) => Number(b) / 1e6).join(" / ")}`);
+  const mal = cm.actors.mallory as Address;
+  const malIn = await pub.getContractEvents({ address: cd.token, abi: TestUSDAbi, eventName: "Transfer", args: { to: mal }, fromBlock: BigInt(cd.deployBlock) });
+  ok("O3", "Mallory received ZERO tUSD from the clearing run", (malIn as any[]).length === 0);
+}
+
 async function main() {
   console.log(`\nQED independent verification · ${manifest.network.name} (chain ${chainId}) · RPC ${RPC}\n`);
   const live = await pub.getChainId();
@@ -181,6 +222,7 @@ async function main() {
   await verifyOutcome2();
   console.log("\n— Outcome 3: adversaries cannot breach liabilities or signed terms —");
   await verifyOutcome3();
+  await verifyClearing();
   const failed = rows.filter((r) => !r.ok);
   writeFileSync(`${EVIDENCE}/verification.json`, JSON.stringify({ at: new Date().toISOString(), rpc: RPC, chainId, passed: rows.length - failed.length, failed: failed.length, rows }, null, 2));
   console.log(`\n${failed.length === 0 ? "ALL" : rows.length - failed.length + "/" + rows.length} CHECKS PASSED${failed.length ? ` — ${failed.length} FAILED` : ""}  (${rows.length} checks, report: ${EVIDENCE}/verification.json)\n`);

@@ -262,5 +262,81 @@ message ─▶ LLM (or offline brain) ─▶ fillPaymentSlots (deterministic) �
 * **Confirmation** is a signature: the owner's console signs the exact instruction
   (`payee, amount, dueInDays, nonce`), and the co-signer verifies it (check C3) before certifying.
 
-Red-team result (35 cases incl. 7 benign controls, live Claude Sonnet 5.5): guarded pipeline blocked **25/25**
+Red-team result (32 cases: 25 attacks + 7 benign controls, live Claude Sonnet 5.5): guarded pipeline blocked **25/25**
 attacks with **0** false refusals; the model alone blocked 24/25 (`evidence/redteam/report.md`).
+
+---
+
+## 9. Certified clearing: maximal multilateral netting with an exact proof (`QEDClearing`)
+
+### 9.1 The gridlock
+
+Members of an agent economy owe each other money in cycles. In the live run five AI businesses owe each other
+**200 tUSD** but hold only **28 tUSD** of cash between them; every one of them is solvent on a net basis, yet
+nobody can settle gross (on-chain receipt G1: Northwind owes 40 and holds 18). Cancelling debts around cycles
+needs no tokens at all, but the party that computes the cancellation could be wrong, lazy or self-serving.
+
+### 9.2 The linear program and its dual
+
+For open obligations e = (u → v) with outstanding amounts dₑ, choose cancellations xₑ:
+
+```
+(P)  maximise  Σₑ xₑ    s.t.  Σ_{e out of v} xₑ = Σ_{e into v} xₑ   for every member v      (net positions unchanged)
+                               0 ≤ xₑ ≤ dₑ                                                     (never below zero)
+
+(D)  minimise  Σₑ dₑ yₑ  s.t.  π_u − π_v + yₑ ≥ 1   for every e = (u → v),   yₑ ≥ 0,   π free
+```
+
+**Weak duality.** For any x feasible in (P) and (π, y) feasible in (D):
+
+```
+Σₑ xₑ ≤ Σₑ xₑ (π_u − π_v + yₑ) = Σ_v π_v (Σ_out x − Σ_in x) + Σₑ xₑ yₑ = Σₑ xₑ yₑ ≤ Σₑ dₑ yₑ .
+```
+
+So a proposal with **Σₑ xₑ = Σₑ dₑ yₑ** is optimal: no larger netting exists. (P)'s constraint matrix is a
+network matrix, hence totally unimodular; with integer data there are integer optimal (x, π, y), so the
+certificate is exact: no tolerance, no rounding, no floating point.
+
+### 9.3 What the contract checks (`QEDClearing.net`, O(obligations + members))
+
+| Check | Error if it fails | What it rules out |
+|---|---|---|
+| The proposal lists **every** open obligation, ids strictly increasing | `IncompleteSnapshot`, `IdsNotIncreasing` | proving "maximality" on a doctored subset |
+| Each listed amount equals the current amount | `StaleAmount` | proofs about a past state; replays |
+| 0 ≤ xₑ ≤ dₑ | `ExceedsObligation` | erasing more debt than exists |
+| For every member, cancelled payables = cancelled receivables | `NetPositionChanged(member, Δ)` | moving value between members |
+| π_u − π_v + yₑ ≥ 1, bounded values | `DualInfeasible`, `ValueOutOfRange` | forged certificates, overflow games |
+| Σₑ xₑ = Σₑ dₑ yₑ | `NotProvablyMaximal(cleared, bound)` | lazy or suboptimal nettings |
+
+**Properties (proved by the checks themselves).** Every member's receivable − payable is unchanged; no claim is
+created or re-assigned, only reduced, so every counterparty exposure shrinks; and the executed netting is maximal.
+That is why `net()` can be **permissionless**: joining (`join()`, which emits the hash of these terms) is the only
+consent needed, and the QED agent can be both a member and the prover without being able to favour itself.
+
+### 9.4 The certifying solver (off-chain, untrusted): `agent/src/engine/netting.ts`
+
+1. (P) is a maximum-gain circulation = a min-cost circulation with cost −1 per unit cancelled. Solved exactly by
+   **minimum-mean cycle cancelling** (Goldberg & Tarjan, 1989), each cycle found with **Karp's algorithm**
+   (1978): strongly polynomial and integral.
+2. At optimality the residual graph (forward arcs cost −1 where x < d, backward arcs cost +1 where x > 0) has no
+   negative cycle, so **Bellman–Ford** from a virtual source gives integer distances π. Setting
+   yₑ = max(0, 1 − (π_u − π_v)) is dual-feasible and complementary-slack, hence Σx = Σd·y.
+3. `checkNetting` re-implements the on-chain checks bit for bit (pre-flight and independent verification).
+
+**Verified:** equals an exhaustive brute-force oracle on 150 random small economies; certificates valid on 60
+random economies (3–7 agents, 3–16 debts) that the Solidity suite also executes; a 2,000-run fuzzer pushes
+any amount of debt around every simple cycle of the demo economy and every such proposal is rejected.
+
+### 9.5 The live run (Ethereum Sepolia)
+
+| | |
+|---|---|
+| Gross debt | 200 tUSD across 11 obligations, 5 agents |
+| Cash held | 28 tUSD (each agent exactly its net debit) |
+| Maximal netting (QED agent) | **169 tUSD cancelled**, dual bound 169: executed (N6) |
+| Naive shortest-cycle-first netting | 162 tUSD: `NotProvablyMaximal(162, 169)` (N1) |
+| Remaining after netting | 31 tUSD in 4 obligations, an acyclic graph, paid in topological order with the 28 tUSD of cash |
+| End state | 0 open obligations; every agent holds exactly its net position |
+
+Remaining debts after a maximal netting always form a DAG (a cycle would admit more cancellation), so paying in
+topological order needs only each agent's net debit in cash: Σ max(0, payables − receivables).
