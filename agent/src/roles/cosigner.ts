@@ -18,6 +18,7 @@ import type { Check } from "../engine/economics.js";
 import { POLICY } from "../engine/economics.js";
 import { solve, type Hop } from "../engine/execution.js";
 import { hashOrder, readVenues, type Order } from "./trader.js";
+import { decideTranche, impactBps, observeTreasury, policyMessage, type TreasuryPolicy } from "./treasury.js";
 import { QEDExecutionAbi } from "../abi/contracts.js";
 
 export type CertRequest =
@@ -64,7 +65,11 @@ export interface TradeRequest {
   amountIn: bigint;
   instruction: string;
   nonce: string;
-  instructionSig: Hex;
+  /** Either the owner's signature on this exact conversion… */
+  instructionSig?: Hex;
+  /** …or a standing owner-signed treasury policy under which the agent decided on its own. */
+  policy?: TreasuryPolicy;
+  policySig?: Hex;
   brainEngine: string;
 }
 
@@ -77,6 +82,7 @@ export const TRADE_POLICY = {
   slippageBps: 100, //       the order's floor: the co-signer's own optimal quote less 1%
   tolerancePpm: 1, //         best-execution tolerance written into the order
   maxRateDeviationBps: 300, //  quoted rate within 3% of the depth-weighted direct mid (manipulation screen)
+  maxTolerancePpm: 100, //      τ grows with the honest router's own measured gap (dislocated markets), never beyond this
 };
 
 export const ownerTradeMessage = (vault: Address, amountIn: bigint, tokenIn: Address, tokenOut: Address, recipient: Address, nonce: string) =>
@@ -239,9 +245,25 @@ export class PolicyEngine {
     const signer = await recoverAddress({ hash: digest, signature: req.ownerSig }).catch(() => "0x0" as Address);
     add("C1", "Mandate signed by the vault owner", getAddress(signer) === getAddress(snap.owner), `recovered ${signer}`);
     add("C2", "Mandate active and current epoch", now >= Number(req.mandate.validFrom) && now <= Number(req.mandate.validUntil) && BigInt(snap.epoch) === req.mandate.epoch, `epoch ${snap.epoch}`);
-    const msg = ownerTradeMessage(this.cfg.vault, req.amountIn, req.tokenIn, req.tokenOut, req.recipient, req.nonce);
-    const s = await recoverMessageAddress({ message: msg, signature: req.instructionSig }).catch(() => "0x0" as Address);
-    add("C3", "Conversion confirmed by the owner's signature", getAddress(s) === getAddress(snap.owner), `instruction signer ${s}`);
+    let policyCheck: { amountIn: bigint; reason: string } | undefined;
+    if (req.policy) {
+      const p = req.policy;
+      const s = await recoverMessageAddress({ message: policyMessage(p), signature: req.policySig ?? "0x" }).catch(() => "0x0" as Address);
+      const fits = getAddress(p.vault) === getAddress(this.cfg.vault) && getAddress(p.reserve) === getAddress(req.recipient) && getAddress(p.tokenIn) === getAddress(req.tokenIn) && getAddress(p.tokenOut) === getAddress(req.tokenOut);
+      add("C3", "Standing treasury policy signed by the owner, current, and covering this conversion", getAddress(s) === getAddress(snap.owner) && BigInt(now) <= p.validUntil && fits, `policy signer ${s}, valid until ${new Date(Number(p.validUntil) * 1000).toISOString()}`);
+      // P1–P2: the co-signer re-derives the agent's decision from the chain and the policy, and allows no more
+      const view = await observeTreasury(pub, p, req.module, POLICY.reserveBuffer);
+      const own = decideTranche(view.venues, p, view.reserveFree, view.available, req.mandate.maxPerPayment);
+      policyCheck = { amountIn: own.amountIn, reason: own.reason };
+      add("P1", "Independent decision under the policy: a shortfall exists and a tranche is due", own.action === "convert", `reserve free ${view.reserveFree} vs target ${p.targetFree}; ${own.reason}`);
+      add("P2", "Requested tranche no larger than the co-signer's own decision", own.action === "convert" && req.amountIn <= own.amountIn && req.amountIn >= p.minTranche, `requested ${req.amountIn} ≤ allowed ${own.amountIn}`);
+      const ib = impactBps(view.venues, req.tokenIn, req.tokenOut, req.amountIn);
+      add("P3", "Execution cost within the policy's impact limit", ib <= p.maxImpactBps, `${ib.toFixed(1)} bps ≤ ${p.maxImpactBps} bps`);
+    } else {
+      const msg = ownerTradeMessage(this.cfg.vault, req.amountIn, req.tokenIn, req.tokenOut, req.recipient, req.nonce);
+      const s = await recoverMessageAddress({ message: msg, signature: req.instructionSig ?? "0x" }).catch(() => "0x0" as Address);
+      add("C3", "Conversion confirmed by the owner's signature", getAddress(s) === getAddress(snap.owner), `instruction signer ${s}`);
+    }
     add("C6", "Instruction nonce not seen before", !this.seenNonces.has(req.nonce), req.nonce);
     add("C9", "Recipient is listed in the owner's mandate", req.mandate.payees.some((p) => getAddress(p) === getAddress(req.recipient)), req.recipient);
     add("C9b", "Execution module is the vault's agent and a mandate payee", getAddress(snap.agent) === getAddress(req.module) && req.mandate.payees.some((p) => getAddress(p) === getAddress(req.module)), `agent ${snap.agent}`);
@@ -269,7 +291,9 @@ export class PolicyEngine {
       tokenOut: getAddress(req.tokenOut),
       recipient: getAddress(req.recipient),
       minOut: (own.sim.amountOut * BigInt(10_000 - TRADE_POLICY.slippageBps)) / 10_000n,
-      tolerancePpm: TRADE_POLICY.tolerancePpm,
+      // τ: 1 ppm normally; on a dislocated market the honest route itself cannot get closer than its measured gap
+      // (an arbitrage leg must be split in time), so τ follows twice that gap, capped.
+      tolerancePpm: Math.min(TRADE_POLICY.maxTolerancePpm, Math.max(TRADE_POLICY.tolerancePpm, Math.ceil(2 * own.gapPpm))),
       venueSetHash,
     };
     const approved = checks.every((c) => c.pass);
@@ -282,7 +306,7 @@ export class PolicyEngine {
       vault: this.cfg.vault,
       block: { number: block.number, timestamp: now },
       mandateHash: mHash,
-      request: { kind: "trade", instruction: req.instruction, brainEngine: req.brainEngine, nonce: req.nonce, tokenIn: req.tokenIn, tokenOut: req.tokenOut, amountIn: req.amountIn, recipient: req.recipient },
+      request: { kind: req.policy ? "policy-trade" : "trade", instruction: req.instruction, brainEngine: req.brainEngine, nonce: req.nonce, tokenIn: req.tokenIn, tokenOut: req.tokenOut, amountIn: req.amountIn, recipient: req.recipient, policy: req.policy ?? null, policyDecision: policyCheck ?? null },
       quote: { amountOut: own.sim.amountOut, bound: own.bound, gapPpm: own.gapPpm, route: own.route, nu: own.nu },
       order,
       payment: { payee: req.module, amount: req.amountIn, dueAt: 0n, intentId, ref },

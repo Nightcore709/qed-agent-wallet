@@ -30,3 +30,5 @@ circuits/build/private_minvar_1.zkey
 circuits/build/private_minvar_2.zkey
 evidence/local-execution/
 evidence/shadow-execution/
+evidence/shadow-execution-bounty/
+evidence/shadow-execution-policy/

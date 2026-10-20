@@ -14,7 +14,8 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import { getAddress, keccak256, parseEther, toHex, type Address, type Hex, type LocalAccount } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { ExecutionBountyAbi, ExecutionBountyBytecode, QEDLensBytecode, TestUSDAbi, TestUSDBytecode } from "../src/abi/contracts.js";
+import { ExecutionBountyAbi, ExecutionBountyBytecode, TestUSDAbi } from "../src/abi/contracts.js";
+import { rebuildFromOutboxes } from "../src/replica.js";
 import { fn, fmtUsd } from "../src/chain.js";
 import { chain, EXPLORERS, loadEnvFile, NETWORK_NAMES, rpcConfig } from "../src/config.js";
 import { Evidence } from "../src/evidence.js";
@@ -31,27 +32,12 @@ const OUT = process.env.EVIDENCE_DIR ?? "evidence/shadow-execution-bounty";
 mkdirSync(OUT, { recursive: true });
 const c = chain();
 const ev = new Evidence(OUT);
-const rpc = (method: string, params: unknown[]) => (c.pub as any).request({ method, params });
 const MAIN = JSON.parse(readFileSync("evidence/ethereum-sepolia/manifest.json", "utf8")).contracts;
 const RUN4 = JSON.parse(readFileSync("evidence/ethereum-sepolia/execution/manifest.json", "utf8"));
-const outbox4 = JSON.parse(readFileSync("relay/outbox-11155111-execution.json", "utf8"));
 
 async function rebuildRun4() {
-  const runtime = async (bytecode: Hex) => (await c.pub.call({ data: bytecode })).data as Hex;
-  await rpc("anvil_setCode", [MAIN.token, await runtime(TestUSDBytecode as Hex)]);
-  await rpc("anvil_setCode", [MAIN.lens, await runtime(QEDLensBytecode as Hex)]);
-  const start = JSON.parse(process.env.START_STATE ?? "{}") as Record<string, { nonce: number; wei: string }>;
-  for (const [addr, s] of Object.entries(start)) {
-    await rpc("anvil_setNonce", [addr, toHex(s.nonce)]);
-    await rpc("anvil_setBalance", [addr, toHex(BigInt(s.wei))]);
-  }
-  for (const t of outbox4) {
-    await c.syncClock();
-    const h = (await rpc("eth_sendRawTransaction", [t.raw])) as Hex;
-    const r = await c.pub.waitForTransactionReceipt({ hash: h });
-    if (h.toLowerCase() !== t.hash.toLowerCase() || r.status !== t.shadowStatus) throw new Error(`replay diverged at ${t.i}: ${r.status} vs ${t.shadowStatus}`);
-  }
-  console.log(`replayed Run 4: ${outbox4.length} signed transactions, identical hashes and statuses`);
+  const n = await rebuildFromOutboxes(c, MAIN, JSON.parse(process.env.START_STATE ?? "{}"), ["relay/outbox-11155111-execution.json"]);
+  console.log(`replayed Run 4: ${n} signed transactions, identical hashes and statuses`);
 }
 
 async function main() {
