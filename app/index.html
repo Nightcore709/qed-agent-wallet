@@ -211,6 +211,8 @@ td .n { color: var(--muted); font-size: var(--step--1); margin-top: 2px; max-wid
 .bx svg { width: 100%; height: auto; display: block; overflow: visible; }
 .bx svg text, .strip svg text { font-family: var(--sans); fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-width: 4px; stroke-linejoin: round; }
 .figscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.swipe { display: none; }
+@media (max-width: 560px) { .swipe { display: block; margin: 4px 0 2px; font-size: 0.75rem; color: var(--muted); } }
 .figscroll svg { min-width: 460px; }
 .strip .figscroll svg { min-width: 680px; }
 .bx svg .muted { fill: var(--muted); }
@@ -234,6 +236,13 @@ td .n { color: var(--muted); font-size: var(--step--1); margin-top: 2px; max-wid
 .lane .st::before { content: ""; position: absolute; top: -7px; left: 0; width: 11px; height: 11px; border-radius: 1px; background: var(--rule); }
 .lane .st.ok::before { background: var(--proof); }
 .lane .st.no::before { background: var(--stamp); }
+.states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 22px; margin-top: 6px; }
+.states .sx { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.states .sx b { display: flex; align-items: center; gap: 9px; font-size: var(--step--1); font-weight: 600; }
+.states .sx i { flex: none; width: 11px; height: 11px; border-radius: 1px; background: var(--rule); }
+.states .sx.ok i { background: var(--proof); } .states .sx.no i { background: var(--stamp); } .states .sx.wait i { background: transparent; border: 2px dashed var(--muted); width: 11px; height: 11px; box-sizing: border-box; }
+.states .sx span { padding-left: 20px; font-size: 0.78rem; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 720px) { .states { grid-template-columns: 1fr; } }
 @media (max-width: 720px) { .lane { grid-template-columns: 1fr; } .lane .st { border-top: 0; border-left: 3px solid var(--rule); padding: 6px 0 10px 14px; } .lane .st.ok { border-left-color: var(--proof); } .lane .st.no { border-left-color: var(--stamp); } .lane .st::before { top: 8px; left: -7px; } }
 /* ── private by proof ── */
 .zk { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; }
@@ -833,7 +842,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       }).join("");
       const nu = P.nu, nuOf = (s) => { const k = Object.keys(nu).find((a) => sym(a) === s); const v = Number(nu[k]) * 10 ** (dec[s] - 6); return s === "tEUR" ? "1" : v >= 100 ? v.toLocaleString("en-US", { maximumFractionDigits: 1 }) : v.toFixed(6); };
       const nodes = Object.entries(pos).map(([s, [x, y]]) => `<rect x="${x - 34}" y="${y - 17}" width="68" height="34" rx="4" style="fill:var(--sheet);stroke:var(--ink)"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="600">${s}</text><text x="${x}" y="${s === "tETH" ? y - 25 : y + 34}" text-anchor="middle" font-size="12" style="font-family:var(--serif);font-style:italic">ν = ${nuOf(s)} tEUR</text>`).join("");
-      $("bxroute").innerHTML = `<figcaption><b>Conversion E1</b> · 20 tUSD → ${eur(out)} tEUR, routed over ${new Set(P.route.map((h) => h.venue)).size} venues and a two-hop path ${xlink("E1", "(E1)")}</figcaption><div class="figscroll"><svg viewBox="0 0 520 330" role="img" aria-label="Route of conversion E1 through five venues; the proof is one price per token">${edges}${nodes}</svg></div><figcaption>Line width: amount routed. The three prices ν are the proof: from them and the live reserves the contract computes an upper bound for <i>every</i> route, including the dashed venue the agent did not use.</figcaption>`;
+      $("bxroute").innerHTML = `<figcaption><b>Conversion E1</b> · 20 tUSD → ${eur(out)} tEUR, routed over ${new Set(P.route.map((h) => h.venue)).size} venues and a two-hop path ${xlink("E1", "(E1)")}</figcaption><p class="swipe" aria-hidden="true">Swipe sideways for the whole figure →</p><div class="figscroll"><svg viewBox="0 0 520 330" role="img" aria-label="Route of conversion E1 through five venues; the proof is one price per token">${edges}${nodes}</svg></div><figcaption>Line width: amount routed. The three prices ν are the proof: from them and the live reserves the contract computes an upper bound for <i>every</i> route, including the dashed venue the agent did not use.</figcaption>`;
       // ── facts ──
       const e2 = xstep("E2");
       $("bxfacts").innerHTML = `
@@ -860,7 +869,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       const ticks = [0, 25, 50, 75, 100, 125].map((t) => `<line x1="${xOf(t)}" x2="${xOf(t)}" y1="40" y2="120" style="stroke:var(--rule)"/><text x="${xOf(t)}" y="138" text-anchor="middle" font-size="11" class="muted">${t === 0 ? "bound" : "−" + t + " bp"}</text>`).join("");
       const marks = pts.map((p, i) => { const b = bps(p.v); const x = xOf(b); const y = 62 + i * 16; const col = p.ok ? "var(--proof)" : "var(--stamp)"; return `<circle cx="${x}" cy="${y}" r="5" style="fill:${col}"/><text x="${x + (b > 90 ? 9 : -9)}" y="${y + 4}" text-anchor="${b > 90 ? "start" : "end"}" font-size="12">${esc(p.t)} · ${b < 1 ? b.toFixed(b < 0.01 ? 4 : 2) : b.toFixed(1)} bp ${p.ok ? "· accepted" : "· refused"}</text>`; }).join("");
       $("bxstrip").innerHTML = `<figcaption><b>One co-signed order, four routes.</b> A wallet that only enforces a minimum output accepts everything in the red band. QED accepts only the sliver at the bound.</figcaption>
-        <div class="figscroll"><svg viewBox="0 0 ${W} 150" role="img" aria-label="Shortfall of each route below the bound, in basis points">
+        <p class="swipe" aria-hidden="true">Swipe sideways for the whole figure →</p><div class="figscroll"><svg viewBox="0 0 ${W} 150" role="img" aria-label="Shortfall of each route below the bound, in basis points">
           <rect x="${xOf(fl)}" y="44" width="${xOf(0) - xOf(fl)}" height="72" class="zone-floor"/>
           <text x="${xOf(fl) + 6}" y="36" font-size="11" style="fill:var(--stamp)">minimum-output wallet accepts (floor −${fl.toFixed(0)} bp)</text>
           <rect x="${xOf(0) - 2}" y="44" width="4" height="72" class="zone-qed"/>
@@ -883,7 +892,19 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
         <div class="lane" aria-label="Order 1">${st("ok", "Proposed", "owner, in words; read by the model, fixed by the guard")}${st("ok", "Evaluated", `${P.alternatives.length} routes compared, bound pre-flighted`)}${st("ok", "Authorized", "owner signature + co-signer certificate on the order")}${st("ok", "Submitted", "operator key → QEDExecution")}${st("ok", "Confirmed", `block ${Number(e1?.tx?.blockNumber ?? 0).toLocaleString("en-US")} · ${gapPpm.toFixed(2)} ppm ${xlink("E1", "(E1)")}`)}</div>
         <h3>A signed order meets a front-runner (order 3)</h3>
         <div class="lane" aria-label="Order 3">${st("ok", "Proposed", "owner: another 20 tUSD")}${st("ok", "Authorized", `floor ${eur(o3.order.minOut, 2)} tEUR`)}${st("no", "Front-run", `Mallory buys tEUR first ${xlink("M1", "(M1–M4)")}`)}${st("no", "Reverted", `InsufficientOutput: ${eur(xstep("EA8").error.args[0], 2)} < ${eur(xstep("EA8").error.args[1], 2)} ${xlink("EA8", "(EA8)")}`)}${st("wait", "Declined", "agent re-plans, refuses to trade into a moved market")}</div>
-        ${EX.policyRun ? policyLane() : ""}`;
+        ${EX.policyRun ? policyLane() : ""}
+        <h3>Every state a transaction can be in here, with the step that shows it</h3>
+        <div class="states" role="list">${[
+          ["ok", "Proposed", "an action is put forward: the owner's words (A1) or the agent's own decision under the policy (T1)"],
+          ["ok", "Simulated", "route run in the pools' integer arithmetic and pre-flighted against the on-chain bound; nothing is sent (A3)"],
+          ["ok", "Evaluated", "the co-signer re-derives and re-quotes from the chain: 14 checks, one hashed record (C1)"],
+          ["no", "Rejected", "refused before any transaction exists: over-sized tranche (PA1), moved market (A10)"],
+          ["ok", "Authorized", "certificate signed on hash(order): recipient, floor, τ and venue set fixed"],
+          ["ok", "Submitted", "signed by the operator key alone and broadcast"],
+          ["wait", "Pending", `in the mempool, not yet in a block: where a front-runner strikes ${xlink("M1", "(M1–M4)")}`],
+          ["ok", "Confirmed", `mined, succeeded, BestExecution logged; the reserve re-read ${xlink("PE1", "(PE1)")}`],
+          ["no", "Reverted", `mined and refused with its designed error ${xlink("EA1", "(EA1 NotBestExecution)")}`],
+        ].map(([c, b, t]) => `<div class="sx ${c}" role="listitem"><b><i></i>${b}</b><span>${t}</span></div>`).join("")}</div>`;
       $("bxrows").innerHTML = stepRows(EX.steps.filter((x) => ["conversion", "attack", "market", "policy", "bounty"].includes(x.phase)));
     }
     function drawBounties(pools, block) {
