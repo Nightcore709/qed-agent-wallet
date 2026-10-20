@@ -27,7 +27,7 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import { MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { ExecutionBountyAbi, MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
 import { dualBound, simulate, solve, type Hop, type VenueState } from "../src/engine/execution.js";
 import { hashOrder, readVenues } from "../src/roles/trader.js";
 import { encodeAbiParameters } from "viem";
@@ -351,6 +351,16 @@ async function verifyExecution() {
   const mal = em.actors.mallory as Address;
   const fromModule = (await pub.getContractEvents({ address: k.eur, abi: TestUSDAbi, eventName: "Transfer", args: { from: k.execution }, fromBlock: BigInt(k.deployBlock) })) as any[];
   ok("O3", "every tEUR the module ever sent went to the euro reserve; none to Mallory", fromModule.length >= 2 && fromModule.every((x) => getAddress(x.args.to) === getAddress(k.reserve)) && !fromModule.some((x) => getAddress(x.args.to) === getAddress(mal)), `${fromModule.length} transfers`);
+  const kb = (em.contracts as any).executionBounty as Address | undefined;
+  if (kb) {
+    console.log("\n— QED Execute: money on Theorem 12.3 —");
+    await verifyBytecode({ executionBounty: kb }, { executionBounty: "ExecutionBounty.sol/ExecutionBounty" });
+    const src = (await pub.readContract({ address: kb, abi: ExecutionBountyAbi, functionName: "execution" })) as Address;
+    const poolNow = await bal(k.usd, kb);
+    const refuted = (await pub.getContractEvents({ address: kb, abi: ExecutionBountyAbi, eventName: "Refuted", fromBlock: BigInt(em.bounty.deployBlock) })) as any[];
+    ok("O4", "the execution bounty takes its bound from the deployed QEDExecution", getAddress(src) === getAddress(k.execution), src);
+    ok("O3", "the execution bounty is still funded and nobody has refuted Theorem 12.3", refuted.length === 0 && poolNow > 0n, `${Number(poolNow) / 1e6} tUSD unclaimed today`);
+  }
   const l = (await pub.readContract({ address: k.reserve, abi: QEDVaultAbi, functionName: "getLiability", args: [1n] })) as any;
   ok("O3", "the euro reserve ring-fences 15 tEUR for CloudCo", getAddress(l.creditor) === getAddress(em.actors.cloudco) && l.amount === 15_000_000n && Number(l.status) === 1, `liability #1 · due ${new Date(Number(l.dueAt) * 1000).toISOString().slice(0, 10)}`);
 }

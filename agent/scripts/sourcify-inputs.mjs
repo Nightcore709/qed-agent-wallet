@@ -30,6 +30,7 @@ const targets = {
   QEDExecution: "contracts/src/QEDExecution.sol",
   CPMMPool: "contracts/src/venues/CPMMPool.sol",
   TestToken: "contracts/src/venues/TestToken.sol",
+  ExecutionBounty: "contracts/src/bounties/ExecutionBounty.sol",
 };
 mkdirSync("verification", { recursive: true });
 for (const [name, file] of Object.entries(targets)) {

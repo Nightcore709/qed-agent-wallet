@@ -17,7 +17,8 @@
     "lp2": "0x8f45490746F6704224D89D20911bB2aE93063d0a",
     "lp3": "0xA5FC8fA91280cF2d15DFf3D8EF9FE797952725dC",
     "mallory": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
-    "cloudco": "0x0418CfE812572f01535Fb260b6a77dAb5704D737"
+    "cloudco": "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+    "lp4": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4"
   },
   "contracts": {
     "usd": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
@@ -34,7 +35,8 @@
     "reserve": "0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53",
     "execution": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
     "lens": "0x846186F21227793760429696bb4FD7490236F101",
-    "deployBlock": "11952692"
+    "deployBlock": "11952692",
+    "executionBounty": "0x3148f3710f4e4f700dbf359f63e9e116e6e319c4"
   },
   "venues": [
     {
@@ -3270,15 +3272,271 @@
       "offchain": true,
       "expect": "success",
       "at": "2026-10-20T03:43:23.889Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "Deploy ExecutionBounty on the live QEDExecution",
+      "narrative": "Pays everything it holds to anyone whose route, on the live venues, beats the bound that the deployed module computes for the same input and prices.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "id": "XB1",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0x35827387ac189ca86e18a3c40aea958d8f7a96dfc8484158bc9241f44c9b01f2",
+        "status": "success",
+        "blockNumber": "11952779",
+        "gasUsed": "5997780",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "54",
+          "gasUsed": "870810"
+        },
+        "timestamp": 1792468896
+      },
+      "events": [],
+      "at": "2026-10-20T04:01:04.699Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "Deployer sends Sepolia ETH for gas to a fourth liquidity provider",
+      "narrative": "Gas only.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "XB2",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0xa0b2f08b761ec3ed6b83386e86185d635c33fbc05f40d28bfb5a1b733be41baf",
+        "status": "success",
+        "blockNumber": "11952780",
+        "gasUsed": "204600",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": "0xbfcd82deeb70295775f60df4eb5fcc19b96206e4",
+        "replica": {
+          "blockNumber": "55",
+          "gasUsed": "21000"
+        },
+        "timestamp": 1792468908
+      },
+      "events": [],
+      "at": "2026-10-20T04:01:04.712Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "LP4 draws 1,000 tUSD from the public faucet",
+      "narrative": "The bounty is funded from the same faucet anyone can use.",
+      "actor": "LP4",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "XB3",
+      "expect": "success",
+      "actorAddress": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4",
+      "tx": {
+        "hash": "0xc48900c2f148b15bdf8428013cbadfdb6613b9db1ceef355dd90243ff5b6d4b2",
+        "status": "success",
+        "blockNumber": "11952781",
+        "gasUsed": "250123",
+        "from": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4",
+        "to": "0x7adb609421e30b3df3063ff2de9d425564893f35",
+        "replica": {
+          "blockNumber": "56",
+          "gasUsed": "72883"
+        },
+        "timestamp": 1792468920
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4",
+            "value": "1000000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        }
+      ],
+      "at": "2026-10-20T04:01:04.728Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "LP4 funds the execution bounty: 1,000 tUSD",
+      "narrative": "Money on Theorem 12.3: no route beats B(ν).",
+      "actor": "LP4",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "XB4",
+      "expect": "success",
+      "actorAddress": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4",
+      "tx": {
+        "hash": "0x66d22910e880a42ffba5cfe006240387f66c2f7d106b1e6e72dd32862981b780",
+        "status": "success",
+        "blockNumber": "11952781",
+        "gasUsed": "128918",
+        "from": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4",
+        "to": "0x7adb609421e30b3df3063ff2de9d425564893f35",
+        "replica": {
+          "blockNumber": "57",
+          "gasUsed": "46514"
+        },
+        "timestamp": 1792468920
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4",
+            "to": "0x3148F3710f4e4F700DBf359f63e9E116e6e319c4",
+            "value": "1000000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        }
+      ],
+      "at": "2026-10-20T04:01:04.745Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "Mallory claims with the optimal route for 20 tUSD (16.920559 tEUR) and its own price proof",
+      "narrative": "Beat the bound with the best route there is → the contract recomputes the bound with the deployed module and executes the route on its own funds: TheoremHolds(output, bound)",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Beat the bound with the best route there is",
+        "defence": "Weak duality, path deficiency and upward rounding: TheoremHolds",
+        "layer": "ExecutionBounty"
+      },
+      "expect": "revert",
+      "id": "XA1",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x05813963ca47b352664df1f66813e7f2c45aeb7636f45ed841b3287537246b4e",
+        "status": "reverted",
+        "blockNumber": "11952782",
+        "gasUsed": "550183",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x3148f3710f4e4f700dbf359f63e9e116e6e319c4",
+        "replica": {
+          "blockNumber": "58",
+          "gasUsed": "406183"
+        },
+        "timestamp": 1792468932
+      },
+      "events": [],
+      "error": {
+        "name": "TheoremHolds",
+        "args": [
+          "16920559",
+          "16920990"
+        ]
+      },
+      "at": "2026-10-20T04:01:04.786Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "…with prices lowered 3% to shrink the bound",
+      "narrative": "Choose prices that understate the bound → the contract recomputes the bound with the deployed module and executes the route on its own funds: TheoremHolds(output, bound)",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Choose prices that understate the bound",
+        "defence": "Weak duality, path deficiency and upward rounding: TheoremHolds",
+        "layer": "ExecutionBounty"
+      },
+      "expect": "revert",
+      "id": "XA2",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x3624e1698c28a02ce5fa5e0b24bc22250b37625bce6dfeafbef3a1a25829a809",
+        "status": "reverted",
+        "blockNumber": "11952782",
+        "gasUsed": "380442",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x3148f3710f4e4f700dbf359f63e9e116e6e319c4",
+        "replica": {
+          "blockNumber": "59",
+          "gasUsed": "291642"
+        },
+        "timestamp": 1792468932
+      },
+      "events": [],
+      "error": {
+        "name": "TheoremHolds",
+        "args": [
+          "16485670",
+          "17248630"
+        ]
+      },
+      "at": "2026-10-20T04:01:04.807Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "…with the whole 1,000 tUSD pool in one optimal trade (535.11 tEUR)",
+      "narrative": "Look for rounding or overflow trouble at size → the contract recomputes the bound with the deployed module and executes the route on its own funds: TheoremHolds(output, bound)",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Look for rounding or overflow trouble at size",
+        "defence": "Weak duality, path deficiency and upward rounding: TheoremHolds",
+        "layer": "ExecutionBounty"
+      },
+      "expect": "revert",
+      "id": "XA3",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xdc6140ae9fd9d562a9a929d9bc154ad91a690c3d38fe1a1f44b5c3cdd78ab3e2",
+        "status": "reverted",
+        "blockNumber": "11952782",
+        "gasUsed": "520345",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x3148f3710f4e4f700dbf359f63e9e116e6e319c4",
+        "replica": {
+          "blockNumber": "60",
+          "gasUsed": "383645"
+        },
+        "timestamp": 1792468932
+      },
+      "events": [],
+      "error": {
+        "name": "TheoremHolds",
+        "args": [
+          "535107236",
+          "535107238"
+        ]
+      },
+      "at": "2026-10-20T04:01:04.824Z"
     }
   ],
   "sepolia": {
     "firstBlock": 11952692,
-    "lastBlock": 11952714,
-    "transactions": 52,
-    "reverted": 8,
+    "lastBlock": 11952782,
+    "transactions": 59,
+    "reverted": 11,
     "receipts": "receipts.json",
-    "relayComparison": "52/52 receipts matched the replica (status + logs; EIP-7708 system logs excluded)"
+    "relayComparison": "59/59 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Run 4b replayed Run 4's signed bytes on the replica first"
   },
-  "executionNote": "Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs)."
+  "executionNote": "Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs).",
+  "bounty": {
+    "pool": "1000000000",
+    "attempts": 3,
+    "refuted": 0,
+    "priceOne": "1000000000000000000000000000000000000",
+    "deployBlock": "11952779"
+  }
 }
