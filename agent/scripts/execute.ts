@@ -213,7 +213,8 @@ async function main() {
     fn(QEDExecutionAbi, "trade", [mandate, ownerSig, r.certificate, r.signature, order, hopsForChain(route), pricesForChain(prices)]);
 
   // conversion #1
-  const instr1 = "Move 20 tUSD of this month's revenue into the euro reserve — CloudCo's euro invoices are due next week.";
+  // Browser demo forwards an owner instruction without expanding the original signed mandate.
+  const instr1 = process.env.QED_DEMO_INSTRUCTION ?? "Move 20 tUSD of this month's revenue into the euro reserve — CloudCo's euro invoices are due next week.";
   const amt1 = await instruct("A1", instr1);
   const r1 = await review("A2", amt1, instr1, `exec-1-${chainId}`);
   const tp1 = await planTrade(c.pub, exec.address, usd, EUR, amt1);
