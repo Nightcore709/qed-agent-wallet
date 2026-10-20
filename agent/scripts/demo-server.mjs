@@ -28,20 +28,36 @@ const quotas = new Map();
 let active = null;
 const MAX_BODY = 3000;
 
+// The client can propose amounts; only the signed owner mandate can authorize them.
+// This allowlist narrows the *demo objective*, not the numerical amount.
+const PAYMENT_CAP_MICRO = 25_000_000n;
+function parseRequestedAmount(text) {
+  if(typeof text!=="string")return {error:"Enter a financial instruction."};
+  // Strictly parse each explicitly denominated test-dollar amount. Ambiguity is refused,
+  // including two numbers with different values or a number without token units.
+  const matches=[...text.matchAll(/\b(\d{1,9}(?:\.\d{1,6})?)\s*(?:tUSD|test\s*(?:USD|dollars?))\b/gi)];
+  if(matches.length!==1)return {error:"Specify one unambiguous amount in tUSD (for example, 10 tUSD)."};
+  const [whole,fract=""]=matches[0][1].split(".");
+  return {amount:BigInt(whole)*1_000_000n+BigInt(fract.padEnd(6,"0"))};
+}
 export function validateRun(input) {
   if (!input || typeof input !== "object") return "Invalid request.";
   if (!Object.hasOwn(SCENARIOS, input.scenario)) return "Select a supported demonstration.";
   if (input.scenario === "execution") {
     const s = input.instruction;
-    if (typeof s !== "string" || s.length > 240 || s.length < 12) return "Enter a concise financial instruction.";
-    // The tested scenario starts with an owner-authorized 20 tUSD conversion.
-    // We do not pretend to permit changing the owner mandate via natural language.
-    if (!/\b(?:convert|move|top up|sweep|exchange|swap)\b/i.test(s) ||
-        !/\b(?:reserve|euro)\b/i.test(s) ||
-        !/\b20(?:\.0+)?\s*(?:tusd|test(?:\s+)?dollars?)\b/i.test(s))
-      return "This bounded demo supports moving exactly 20 tUSD to the euro reserve. Other instructions cannot authorize a transfer.";
+    if (typeof s !== "string" || s.length > 240 || s.length < 12) return "Enter a concise financial instruction (12–240 characters).";
     if (/(?:ignore|override|bypass|disable|secret|private key|withdraw to|send to|unapproved|change (?:the )?(?:owner|limit|payee))/i.test(s))
-      return "This request attempts to alter security boundaries. No transaction will be submitted.";
+      return "Policy-escalation request refused. Only the owner can change a signed mandate; no transaction was submitted.";
+    if (!/\b(?:convert|move|top up|sweep|exchange|swap)\b/i.test(s) ||
+        !/\b(?:reserve|euro)\b/i.test(s))
+      return "The demo owner authorized tUSD → euro-reserve conversions only. Other financial objectives require a separate signed mandate.";
+    const a=parseRequestedAmount(s);
+    if(a.error)return a.error;
+    if(a.amount<=0n)return "An execution amount must be greater than zero.";
+    if(a.amount>PAYMENT_CAP_MICRO)
+      return "Owner mandate refuses this payment: "+(Number(a.amount)/1e6).toLocaleString("en-US")+" tUSD exceeds the signed per-payment limit of 25 tUSD. The AI cannot raise it. Ask the owner to sign a new mandate.";
+    // Certified execution tolerances and pool liquidity determine whether any given
+    // positive amount can actually settle. We never promise one will succeed.
   }
   if (input.impact !== undefined && ![50,150].includes(input.impact)) return "Supported impact policies: 50 or 150 basis points.";
   return null;
