@@ -18,10 +18,10 @@ deck and PDFs, GitHub Pages ledger). Statuses: PASS / PARTIAL / FAIL / BLOCKED /
 | Scripted economies | Run paid work/escrow, clearing, zero-knowledge, full execution on a fresh chain | `privacy` scenario through the API: exit 0, 21 steps, 16 s | PASS (local) |
 | UI | Responsive fixes (no horizontal scroll at 390 px in any view), buttons, formula, suggestion row | Playwright screenshots at 1440 and 390 px of all seven views; agent flow driven in a browser | PASS (local render) |
 | Public deployment | Railway `qed-judges-preview-production.up.railway.app`, redeployed from the branch | 13:23 UTC, from an external browser: new UI served; `/api/health` sandbox ready; question → check (no execution); 10 and 22.5 tUSD executed (blocks 34–35); 80 refused; inferior route reverted `NotBestExecution`; policy target 40 → tick converted, next tick stopped; scripted clearing economy exit 0 (31 steps, 7 reverts); UI flow "Convert 15 tUSD" confirmed on-chain; sandbox reset afterwards | PASS (offline parser; no model key on Railway) |
-| CI | `test:demo:e2e` now includes the sandbox test | `e06b48b`: Solidity PASS, verify PASS, agent job FAIL in the e2e step (log not readable here); local e2e PASS (2/2); diagnostics added | PARTIAL |
+| CI | `test:demo:e2e` runs the sandbox test and the scripted e2e one at a time; agent job pins Foundry 1.7.1 (as the Docker image) | `690e416`: agent job PASS (type-check, 60 TS tests, `test:demo`, `test:demo:e2e`, all four local economies, benchmarks); Sepolia verify PASS; Solidity job PASS on earlier branch commits with unchanged contracts. Cause of the earlier red: CI installed a newer Foundry than 1.7.1 | PASS |
 
 ## Remaining
 
 1. Done: Railway redeployed and verified end to end (see table).
 2. Optional: add `ANTHROPIC_API_KEY` as a Railway service variable for live Claude (capped at 400 calls).
-3. Confirm CI green on the branch head.
+3. Done: CI green on `690e416` (agent + verify; Solidity unchanged).

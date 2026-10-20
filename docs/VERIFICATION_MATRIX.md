@@ -21,5 +21,5 @@ session; NOT VERIFIED = no evidence. "Local" means a local Anvil chain, never Se
 | UI responsive, no horizontal scroll | PASS (local) | Playwright at 390 px, all views |
 | Public HTTPS app serves the new build | PASS | title "QED — AI can decide…", `/api/health` `"sandbox":"ready"`, 13:23 UTC |
 | Public end-to-end (browser → receipt) | PASS | external browser: 10, 22.5 and 15 tUSD executed with receipts; 80 refused; `NotBestExecution` revert; policy stop; scripted clearing run exit 0 |
-| `test:demo:e2e` on CI | PARTIAL | local pass; CI failure on `e06b48b` under investigation |
+| `test:demo:e2e` on CI | PASS | agent job success on `690e416` after pinning Foundry 1.7.1 |
 | Multi-tenant isolation, key management, audit | NOT VERIFIED | shared sandbox, dev keys, not audited — testnet prototype only |
