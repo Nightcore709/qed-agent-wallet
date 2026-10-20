@@ -9,6 +9,7 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { makeBrain, guard } from "../src/brain/index.js";
 
 const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const EVIDENCE = join(ROOT, "evidence", "demo-runs");
@@ -25,6 +26,9 @@ const SCENARIOS = Object.freeze({
 });
 const sessions = new Map();
 const quotas = new Map();
+const chatQuotas=new Map();
+const MAX_TOTAL_RUNS=Number(process.env.QED_MAX_DEMO_RUNS??40);
+let totalRunCount=0;
 let active = null;
 const MAX_BODY = 3000;
 
@@ -113,6 +117,17 @@ function report(run) {
     error:run.error||null
   };
 }
+function mayChat(req){
+  const ip=req.socket.remoteAddress||"anonymous",now=Date.now();
+  const prev=(chatQuotas.get(ip)||[]).filter(t=>now-t<3600000);
+  if(prev.length>=12)return false;
+  prev.push(now);chatQuotas.set(ip,prev);return true;
+}
+function readOnlyContext(){
+  // No chain session means no treasury; never invent balances or approvals.
+  return { balance:0n,protectedBalance:0n,free:0n,blastRadius24h:0n,dailyCap:25_000_000n,
+    spentInWindow:0n,paused:false,payees:[] };
+}
 function mayRun(req) {
   // Deliberately conservative; never trust X-Forwarded-For from the public internet.
   const ip=req.socket.remoteAddress||"anonymous";
@@ -200,10 +215,34 @@ export function createDemoServer() {
     }
     if(method==="GET" && parts.join("/")==="api/health")
       return json(res,200,{status:"ok",mode:PUBLIC?"public-bounded-demo":"localhost",network:"Anvil 31337",modelConfigured:!!process.env.ANTHROPIC_API_KEY,active:!!active});
+    if(method==="POST" && parts.join("/")==="api/chat"){
+      if(!mayChat(req))return json(res,429,{error:"Read-only agent question limit: 12 per hour per connection."});
+      let input;try{input=await body(req);}catch{return json(res,400,{error:"Invalid request."});}
+      if(typeof input?.message!=="string"||input.message.trim().length<2||input.message.length>1000)
+        return json(res,422,{error:"Enter a question between 2 and 1,000 characters."});
+      // This pathway NEVER starts a signing process or submits a transaction.
+      // It only interprets the request and produces an independently guarded proposal.
+      const message=input.message.trim();
+      if(/(?:balance|how much|reserve|available|spent|status|holdings)/i.test(message)&&!active)
+        return json(res,200,{engine:"local-state-gate",intent:"status",reply:"No funded local blockchain session is currently running. Run a permitted conversion to generate real balances and receipts. Historic public Sepolia values are separate from this demo.",flags:[],proposedAction:null,requiresOwnerAuthorization:false});
+      try{
+        const brain=makeBrain();
+        const {result,transcript}=await brain.interpret(message,readOnlyContext(),"owner");
+        const decision=guard(message,result,readOnlyContext(),25_000_000n);
+        const proposal=decision.proposal?.kind==="pay" ? {
+          type:"pay",payeeLabel:decision.proposal.payeeLabel,
+          amountTUSD:decision.proposal.amount?Number(decision.proposal.amount)/1e6:null
+        }:null;
+        return json(res,200,{engine:transcript.engine,intent:decision.intent,reply:decision.reply,
+          flags:decision.flags,proposedAction:proposal,requiresOwnerAuthorization:!!decision.needsConfirmation,
+          execution:"none",notice:"Read-only QED language-layer evaluation. The signed mandate and on-chain contracts alone authorize execution."});
+      }catch{return json(res,503,{error:"The agent interpretation service is unavailable. No transaction was attempted."});}
+    }
     if(method==="GET" && parts.join("/")==="api/latest")
       return json(res,200,{run:active?.id||(Array.from(sessions.values()).at(-1)?.id??null)});
     if(method==="POST" && parts.join("/")==="api/run"){
       if(active)return json(res,409,{error:"A local blockchain run is already in progress. Wait for it to complete."});
+      if(totalRunCount>=MAX_TOTAL_RUNS)return json(res,429,{error:"Global public demo budget exhausted; no additional execution may be started."});
       if(!mayRun(req))return json(res,429,{error:"Demo limit reached: four runs per hour per connection."});
       let input;try{input=await body(req);}catch(e){return json(res,400,{error:"Invalid request body."});}
       const problem=validateRun(input);
@@ -215,6 +254,7 @@ export function createDemoServer() {
       sessions.set(id,run);
       // Do not create unlimited in-memory history.
       if(sessions.size>12){for(const [key,r] of sessions){if(r!==active && r!==run){sessions.delete(key);break;}}}
+      totalRunCount++;
       startRun(run,input);
       return json(res,202,{id,status:"running",url:"/api/run/"+id});
     }
