@@ -75,6 +75,14 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
 .dot.live { background: var(--proof); box-shadow: 0 0 0 0 var(--proof); animation: pulse 2.4s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--proof) 50%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (min-width: 721px) {
+  .bar .wrap { flex-wrap: nowrap; }
+  .bar nav { flex: 1 1 auto; min-width: 0; flex-wrap: nowrap; overflow-x: auto; gap: 13px; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 94%, transparent); mask-image: linear-gradient(90deg, #000 94%, transparent); }
+  .bar nav::-webkit-scrollbar { display: none; }
+  .bar nav a { white-space: nowrap; }
+  .net { white-space: nowrap; flex: none; }
+  .theme { flex: none; }
+}
 .theme { border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: var(--step--1); cursor: pointer; }
 
 /* ── hero: the four theorems ── */
@@ -275,6 +283,13 @@ pre { margin: 0; background: color-mix(in srgb, var(--ink) 5%, var(--sheet)); bo
 footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1); }
 
 @media (max-width: 720px) {
+  .bar .wrap { gap: 6px 12px; padding-block: 8px; }
+  .bar nav { order: 3; width: 100%; flex-wrap: nowrap; overflow-x: auto; gap: 16px; padding-bottom: 2px; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .bar nav::-webkit-scrollbar { display: none; }
+  .bar nav a { white-space: nowrap; }
+  .net { font-size: 0.75rem; min-width: 0; overflow: hidden; }
+  .net #netlabel { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar .wrap { flex-wrap: wrap; }
   .thm { grid-template-columns: 2.2rem minmax(0, 1fr) 1.6rem; }
   .thm .val { grid-column: 2 / 3; }
   .thm .qed { grid-row: 1; grid-column: 3; }
@@ -316,7 +331,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
     <div class="wrap">
       <div class="lede">
         <h1>An AI treasury that moves money only when it can prove it should.</h1>
-        <p>QED is an autonomous agent that runs a small quant business on Ethereum. It earns, spends, owes, clears its debts with other agents, sells work on data it may never reveal, and gets attacked. Seven statements about its money are checked against the chain every time this page loads.</p>
+        <p>QED is an autonomous agent that runs a small quant business on Ethereum. It earns, spends, converts currencies at a provably best price, owes, clears its debts with other agents, sells work on data it may never reveal, and gets attacked. Eight statements about its money are checked against the chain every time this page loads.</p>
       </div>
       <div class="theorems" id="theorems" aria-live="polite"></div>
       <div class="legend"><span><span class="sq"></span>holds on-chain at the block shown</span><span id="srcnote"></span></div>
@@ -584,7 +599,8 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
       } catch (e) { /* snapshot from verified evidence */ }
       drawTheorems(false); stamp(); drawVaults();
       $("netdot").classList.toggle("live", S.live);
-      $("netlabel").textContent = `${M.network.name} · block ${S.block.toLocaleString("en-US")}${S.live ? "" : " (snapshot)"}`;
+      $("netlabel").textContent = `${M.network.name.replace("Ethereum ", "")} · #${S.block.toLocaleString("en-US")}`;
+      $("netlabel").title = `${M.network.name}, block ${S.block.toLocaleString("en-US")}: ${S.live ? "read live from a public RPC" : "snapshot from the verified evidence (live RPC unreachable)"}`;
       $("srcnote").textContent = S.live ? "read live from a public Sepolia node just now" : "values from the verified evidence snapshot; open the GitHub Pages version for live reads";
     })();
 
@@ -860,13 +876,24 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
           <text x="${xOf(0)}" y="36" text-anchor="end" font-size="11" style="fill:var(--proof)">QED accepts: ≤ 1 ppm</text>
           ${ticks}${marks}
         </svg></div>`;
+      // ── the agent decides under a standing policy (Run 4c) ──
+      function policyLane() {
+        const pr = EX.policyRun, pol = pr.policy, tk = pr.ticks;
+        const t1 = tk[0], t2 = tk[1];
+        const pe = (id) => xstep(id);
+        const out = (id) => { const x = pe(id); const m = /→ ([\d.,]+) tEUR/.exec(x?.title ?? ""); return m ? m[1] : "—"; };
+        return `<h3>The agent decides: one owner-signed policy, agent-initiated trades (Run 4c)</h3>
+          <div class="lane" aria-label="Policy run">${st("ok", "Policy signed", `keep ≥ ${eur(pol.targetFree, 2)} tEUR free; ≤ ${pol.maxImpactBps / 100}% cost per tranche`)}${st("no", "Over-reach refused", `a 25 tUSD request: co-signer re-derives less (PA1)`)}${st("ok", "Tranche 1", `${eur(t1.amountIn, 2)} tUSD, limited by market impact → ${out("PE1")} tEUR ${xlink("PE1", "(PE1)")}`)}${st("ok", "Tranche 2", `${eur(t2.amountIn, 2)} tUSD, limited by need → ${out("PE2")} tEUR ${xlink("PE2", "(PE2)")}`)}${st("ok", "Target met", "reserve free = 45.00 tEUR; the agent stops on its own")}</div>`;
+      }
       // ── lifecycle ──
       const st = (cls, b, s) => `<div class="st ${cls}"><b>${b}</b><span>${s}</span></div>`;
       const o3 = EX.orders["3"];
-      $("bxlife").innerHTML = `<h3>Trade lifecycle, as it happened</h3>
+      $("bxlife").innerHTML = `<h3>Owner-instructed conversion (E1), as it happened</h3>
         <div class="lane" aria-label="Order 1">${st("ok", "Proposed", "owner, in words; read by the model, fixed by the guard")}${st("ok", "Evaluated", `${P.alternatives.length} routes compared, bound pre-flighted`)}${st("ok", "Authorized", "owner signature + co-signer certificate on the order")}${st("ok", "Submitted", "operator key → QEDExecution")}${st("ok", "Confirmed", `block ${Number(e1?.tx?.blockNumber ?? 0).toLocaleString("en-US")} · ${gapPpm.toFixed(2)} ppm ${xlink("E1", "(E1)")}`)}</div>
-        <div class="lane" aria-label="Order 3">${st("ok", "Proposed", "owner: another 20 tUSD")}${st("ok", "Authorized", `floor ${eur(o3.order.minOut, 2)} tEUR`)}${st("no", "Front-run", `Mallory buys tEUR first ${xlink("M1", "(M1–M4)")}`)}${st("no", "Reverted", `InsufficientOutput: ${eur(xstep("EA8").error.args[0], 2)} < ${eur(xstep("EA8").error.args[1], 2)} ${xlink("EA8", "(EA8)")}`)}${st("wait", "Declined", "agent re-plans, refuses to trade into a moved market")}</div>`;
-      $("bxrows").innerHTML = stepRows(EX.steps.filter((x) => ["conversion", "attack", "market"].includes(x.phase)));
+        <h3>A signed order meets a front-runner (order 3)</h3>
+        <div class="lane" aria-label="Order 3">${st("ok", "Proposed", "owner: another 20 tUSD")}${st("ok", "Authorized", `floor ${eur(o3.order.minOut, 2)} tEUR`)}${st("no", "Front-run", `Mallory buys tEUR first ${xlink("M1", "(M1–M4)")}`)}${st("no", "Reverted", `InsufficientOutput: ${eur(xstep("EA8").error.args[0], 2)} < ${eur(xstep("EA8").error.args[1], 2)} ${xlink("EA8", "(EA8)")}`)}${st("wait", "Declined", "agent re-plans, refuses to trade into a moved market")}</div>
+        ${EX.policyRun ? policyLane() : ""}`;
+      $("bxrows").innerHTML = stepRows(EX.steps.filter((x) => ["conversion", "attack", "market", "policy", "bounty"].includes(x.phase)));
     }
     function drawBounties(pools, block) {
       if (!PV) return;

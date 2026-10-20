@@ -65,6 +65,8 @@ const exec = exManifest
       venues: exManifest.venues,
       orders: exManifest.orders,
       plans: { A3: exManifest.plans.A3, A6: exManifest.plans.A6 },
+      policyRun: exManifest.policyRun,
+      bounty: exManifest.bounty,
       steps: exManifest.steps.map((s: any) => ({ ...s, events: undefined })),
     }
   : undefined;
