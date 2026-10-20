@@ -1,7 +1,8 @@
 # QED — Security Design & Self-Assessment
 
-> Scope: `contracts/src/*` (QEDVault, QEDLens, ProofEscrow, MinVarianceVerifier, QEDClearing, TestUSD) and the off-chain
-> agent system in `agent/`. Status: **testnet prototype, not externally audited.** Every claim below links to a
+> Scope: `contracts/src/*` (QEDVault, QEDLens, QEDExecution, ProofEscrow, MinVarianceVerifier,
+> PrivateMinVarianceVerifier, QEDClearing, the three bounties, CPMMPool, TestUSD, TestToken) and the off-chain agent
+> system in `agent/`. Status: **testnet prototype, not externally audited.** Every claim below links to a
 > test, an invariant, or a public Sepolia transaction.
 
 ## 1. Security thesis
@@ -18,6 +19,10 @@ money independent of the AI's behaviour:
    optimality check.
 4. **We publish the keys.** The honeypot vault's agent and co-signer private keys are in the repo
    (`evidence/ethereum-sepolia/honeypot.json`). Its 90 tUSD ring-fence is protected by the contract, not by secrecy.
+5. **A trade's quality is a precondition, not a report.** `QEDExecution` refuses any conversion whose measured
+   output is more than τ = 1 ppm below the best output *any* route through the owner's venues could have produced
+   from the same state. A compromised agent key can no longer leak value through routing; under a slippage-only
+   policy it could leak up to the whole tolerance on every trade (`docs/BENCHMARKS.md` B1).
 
 ## 2. Permission tiers (implemented in `QEDVault.sol`)
 
@@ -49,7 +54,20 @@ QEDClearing tiers (no owner, no admin, no upgrade path):
 | `pay` an obligation | ✓ as **debtor** only | ✗ | tokens move debtor → creditor, nowhere else |
 | `net` (submit a netting) | ✓ | ✓ | permissionless, because the contract enforces: unchanged net positions, no new claims, full snapshot, maximality proof |
 
-PrivateMinVarianceVerifier, OptimalityBounty and MaximalityBounty have no owner, no admin and no upgrade path.
+QEDExecution tiers (one module per vault; it is the vault's `agent`):
+
+| Capability | Vault owner | Operator (AI hot key) | Co-signer | Anyone |
+|---|:-:|:-:|:-:|:-:|
+| `setVenues` (the venue set every proof must range over) | **✓** (invalidates outstanding orders) | ✗ | ✗ | ✗ |
+| `setOperator` (rotate the AI key) | **✓** | ✗ | ✗ | ✗ |
+| `trade` | ✗ | **✓** only with a mandate, a certificate whose `ref` is the order hash, and a passing proof | ✗ (signs the order's certificate) | ✗ |
+| `pay` (forward an ordinary payment) | ✗ | **✓** | ✗ | ✗ |
+| `quoteBound`, `venues`, `hashOrder` | ✓ | ✓ | ✓ | **✓** (views) |
+
+CPMMPool has no owner (liquidity by transfer + `sync`, no LP shares); TestToken's only privilege is the deployer's
+`mint` on a valueless token.
+
+PrivateMinVarianceVerifier, OptimalityBounty, MaximalityBounty and ExecutionBounty have no owner, no admin and no upgrade path.
 The private verifier's only configuration is fixed at deployment (the Groth16 verifier and the data vendor's
 attestation key). A bounty's only outflow is `claim`, which pays the caller only when its theorem is refuted;
 nobody, including the deployer, can withdraw a bounty pool.
@@ -82,11 +100,27 @@ tool that can sign.
 | I18 | A valid proof is useless to anyone but its author | `provider` is a public input bound into the proof | `test_StolenProofIsUselessToAnotherProvider`; Sepolia ZA1 |
 | I19 | The chain learns nothing about the model or the portfolio beyond two commitments and the variance | zero knowledge of Groth16; Poseidon commitments with 248-bit salts | by construction; `npm run verify` re-verifies the proof from public signals only |
 | I20 | Theorems 4.4 and 9.2 are falsifiable on-chain by anyone, for money | `OptimalityBounty`, `MaximalityBounty` | positive controls pay against unsound rules; differential test vs `QEDClearing` on 60 economies; 2×2,000-run fuzz; Sepolia BA1–BA3, BM1–BM2; pools checked daily by `npm run verify` |
+| I21 | Every executed conversion delivered at least (1 − τ) of the best output any route through the owner's venues could have produced, from the state it executed on | weak-duality bound B̂(ν) computed on-chain with upward rounding; output measured as a balance change (§12 ALGORITHMS) | 2×2,000-run soundness fuzz (random and near-optimal routes never beat the bound); bit-exact parity with the TS solver; TS weak-duality test (12,000 route/price pairs); Sepolia E1, E2, EA1–EA3; `npm run verify` recomputes the bound from pre-trade reserves |
+| I22 | A conversion's output reaches only an owner-approved recipient, and the module holds nothing between transactions | recipient ∈ mandate payees; leftovers revert; unspent input returns to the vault | `test_recipientMustBeInTheOwnerMandate`, `test_leftoverIntermediate_isRejected`; Sepolia EA4; `npm run verify` checks the module's balances are zero and every tEUR it sent went to the reserve |
+| I23 | The order (recipient, floor, tolerance, venue set) cannot be changed after the co-signer approved it | certificate `ref` = order hash; venue-set hash in the order | `test_tamperedOrder_isRejected`, `test_venueChangeInvalidatesOutstandingOrders`; Sepolia EA6 |
+| I24 | Routing through the module weakens none of the vault's guarantees | funds arrive only via `executePayment` in the same transaction; QEDVault bytecode unchanged | `test_vaultLimitsReplayAndPauseStillApply`, `test_perPaymentCapStillApplies`, `test_payPassesThrough_butNotWithATradeCertificate`; Run 4 vault bytecode verified identical |
+| I25 | Theorem 12.3 is falsifiable on-chain by anyone, for money | `ExecutionBounty` runs the claimant's route on its own funds and compares with the deployed bound | positive control pays against a bound understated by 0.1%; donated holdings cannot be used; 2,000-run fuzz never pays; Sepolia XA1–XA3 |
 
-Test totals: **104 Solidity tests** (unit, fuzz, stateful invariants — ≈350 000 adversarial calls per CI run,
-60 random clearing economies, a real Groth16 proof attacked 2,000 ways, both bounties), **50 TypeScript tests** (TS ≡
-Solidity parity on a live node, portfolio solver vs. a 20 000-sample oracle, netting solver vs. an exhaustive oracle,
-zero-knowledge prover soundness checks, 32-case red-team).
+Test totals: **132 Solidity tests** (unit, fuzz, stateful invariants — ≈350 000 adversarial calls per CI run,
+60 random clearing economies, a real Groth16 proof attacked 2,000 ways, three bounties, best execution with
+two 2,000-run soundness fuzzers), **56 TypeScript tests** (TS ≡ Solidity parity on a live node, portfolio solver vs.
+a 20 000-sample oracle, netting solver vs. an exhaustive oracle, zero-knowledge prover soundness checks, routing
+weak/strong duality on 700 random markets, 32-case red-team).
+
+### Proven properties vs. trust assumptions
+
+| Proven (by code the chain runs, or by mathematics the tests exercise) | Assumed (a party or a fact we rely on) |
+|---|---|
+| I1–I25 above, within their stated conditions | the owner key is not compromised (K1); Ethereum consensus and the EVM behave as specified |
+| Theorems 4.4, 9.2 (with proofs in ALGORITHMS) and 12.3 (proof uses path deficiency from the literature, tested) | the Groth16 setup was not subverted (K18); BN254 pairing and keccak256 are secure |
+| Accepted conversions are within τ of the optimum on the state they executed on | the owner's venues are honest constant-product pools with the declared fee (K22) |
+| The bound is never understated by integer rounding | the co-signer's quote reflects a fair market when it signs (K23) |
+| | the data vendor's attestation means what it says (§10); token contracts are standard ERC-20 (K9) |
 
 ## 4. Threat model
 
@@ -106,6 +140,10 @@ owner's authority; confidentiality of keys.
 | Lazy / dishonest AI provider | submits unoptimised or near-miss work | rejected by mathematics; client refunded (X17–X19) |
 | Proof thief / data forger | copies a valid zk proof from calldata; proves on self-attested data; overstates quality | proof bound to its author; vendor attestation required (ZA1–ZA3) |
 | Theorem challenger | any input at all, with a 1,000 tUSD incentive per theorem | every refutation attempt reverts with the gap it could not close (BA1–BA3, BM1–BM2) |
+| Compromised trading agent | holds the operator key; routes any way; picks any prices | cannot leak more than τ = 1 ppm per trade through routing (EA1–EA3); cannot redirect output (EA6); cannot strand value (EA4) |
+| Front-runner / sandwich attacker | moves venue prices before a signed trade | refused by the co-signed floor when the move exceeds 1% (EA8); smaller moves are a residual risk (K23) |
+| Liquidity provider colluding with the agent | owns liquidity in one venue and wants volume routed through it | routing to it beyond the optimum fails the proof (EA1, EA5) |
+| Execution-theorem challenger | any route and prices, with 1,000 tUSD on offer | every claim reverts with `TheoremHolds(output, bound)` (XA1–XA3) |
 | Stranger | calls permissionless functions | can only settle due liabilities to their creditors (P3) |
 | Owner-key thief | full owner powers | **out of scope** — see K1 |
 
@@ -139,6 +177,57 @@ payees ≤ 32; Elevation of privilege → single-function agent key, owner-only 
 | K19 | **Circuit completeness**: an under-constrained circuit would accept bad witnesses. | Medium | Every arithmetic constraint is mirrored in `checkWitness`; explicit range checks keep all values ≪ p; tests show no witness exists for 1/N, a 1 bp nudge or other data. Roadmap: formal circuit audit (e.g. Picus / Circomspect). |
 | K20 | **Provider binding is per spec**: a client that accepts a quote whose spec names a different provider could pay for a proof it cannot use. | Low | Clients check `spec.provider == quote.provider` (enforced by QED's client agent); the escrow already pins delivery to the quoted provider. |
 | K21 | Bounty pools are finite and in a test token; they demonstrate falsifiability, not insurance. | Info | Pools and claims are public; `npm run verify` checks daily that no `Refuted` event exists. |
+| K22 | **Venue trust**: the bound assumes each owner-named venue is an honest constant-product pool with the declared fee. A malicious pool could report reserves that do not reflect its swap behaviour. | Medium | Only the vault owner names venues; the module cross-checks the fee where the pool reports it; changing the set voids outstanding orders. Production: pin venues by code hash. |
+| K23 | **Manipulation below the floor**: an attacker who moves every venue by less than the co-signer's 1% allowance before a trade is caught by neither check; the proof is relative to the moved state. | Medium | Private order flow, tighter floors for larger trades, a TWAP reference in the co-signer's T2 screen. Disclosed in ALGORITHMS §12.7. |
+| K24 | **Granularity**: integer rounding costs up to one raw unit of output per hop, so τ = 1 ppm is too tight for outputs of a few raw units. | Low | The co-signer sets τ per order; B2 measures the floor (max 7.4 ppm on tiny outputs). |
+| K25 | **Gas is not in the objective**: an output-optimal route can use more hops than a cheaper near-optimal one. | Low | Gas is paid by the operator's ETH, not the vault; at Sepolia prices a four-hop trade costs ~0.00001 ETH. |
+| K26 | **Concentrated-liquidity and stable-swap venues** are not supported by the bound. | Info | Their per-venue value h_i has a (piecewise) closed form; not implemented. |
+| K27 | **LLM provider credentials**: the language layer calls an external API with a key the operator supplies. | Low | Held only by the brain process, never logged or committed; the offline parser is the fallback; no money field depends on it. |
+
+## 5a. Key lifecycle, oracles, MEV, availability and administration
+
+**Key lifecycle.** Each role's key is generated per run (`viem` `generatePrivateKey`), stored only in a `.keys.env*` file
+excluded from git with mode 0600, and loaded into one process. The language model never sees any key. Rotation is
+on-chain and immediate: `setAgent`, `setCosigner`, `setGuardian` (vault), `setOperator` (execution module); a key
+compromise is contained by `pause` (guardian, one transaction) and `bumpEpoch` (owner: every mandate and certificate
+becomes void). Production would hold the owner key in an ERC-1271 multisig or MPC wallet and the agent and co-signer
+keys in HSM or cloud KMS signers; none of that is implemented here.
+
+**Oracles and data integrity.** QED uses no price oracle. Conversions are proven against the venues' own reserves,
+read in the same transaction, so there is no stale price to exploit inside the trade. Portfolio data is either public
+in the spec (§4) or attested by the vendor's signature over a commitment (§10). The co-signer reads chain state
+itself and never trusts the agent's figures.
+
+**MEV and front-running.** A signed trade can be front-run (EA8 on Sepolia). The proof cannot prevent this, because it is
+about the state the trade executes on; the co-signed floor bounds it. Escrow deliveries, clearing nettings and bounty
+claims are not front-runnable for profit: they pay only their sender (provider binding, or the claimant), or move
+no value.
+
+**Availability.** Every failure mode fails closed: no co-signer means no payments (K8), a moved market means no
+trade (A10), and a stale clearing snapshot means no netting (K15). Creditors are never blocked: `settle` works while
+paused. No contract has an unbounded loop over user-controlled data (payees ≤ 32, venues ≤ 16, hops ≤ 32, open
+obligations ≤ 128).
+
+**Administration.** No contract is upgradeable. The only administrators are each vault's owner (configuration, never
+ring-fenced funds) and the deployer's `mint` on test tokens. The clearing house, verifiers, escrow, pools and
+bounties have no admin at all.
+
+### Mitigation classes
+
+| Class | What it covers here |
+|---|---|
+| **Eliminated by code** | spending outside the mandate, breaking a ring-fence, replay, tampering with signed terms, a lazy proof being paid, a non-maximal netting, a sub-optimal conversion, value stranded in the module |
+| **Eliminated by cryptography** | forged signatures, forged zero-knowledge proofs (given a sound setup), stolen proofs (provider binding) |
+| **Bounded by mechanism** | loss under total hot-key compromise (`blastRadius`), front-running (co-signed floor), integer rounding (τ) |
+| **Shifted to incentives** | anyone finding a flaw in Theorems 4.4, 9.2 or 12.3 can take the corresponding bounty |
+| **Delegated to trusted parties** | the owner key; the co-signer's honesty for its quote and screens; the data vendor; the trusted setup; the venue set |
+| **Cannot be eliminated here** | owner-key compromise; market manipulation below the floor; consensus failure; a regulator's view of an autonomous agent |
+
+### Production-readiness limitations
+
+Testnet only, valueless tokens, no external audit, no formal verification of the contracts or the circuit, a single-
+machine trusted setup, a co-signer that is one process rather than a quorum, demo-size liquidity, and venues that are
+our own constant-product pools rather than production DEXs. Each is listed above with its roadmap.
 
 ## 6. Incident response
 
@@ -156,3 +245,5 @@ payees ≤ 32; Elevation of privilege → single-function agent key, owner-only 
 * **Audit trail**: canonical decision records, hash-anchored on-chain; LLM transcripts hashed per turn.
 * **Explainability**: every decision has a human-readable rationale; the agent answers "why" from its decision log.
 * **Kill switch** with creditor continuity.
+* **Best execution as a precondition** (cf. MiFID II art. 27, FINRA rule 5310): every conversion carries a proof that it
+  was within 1 ppm of the best available route, checked on-chain at the moment of execution.

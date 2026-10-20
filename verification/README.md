@@ -8,7 +8,7 @@
 
 ## Verified on Sourcify
 
-All 22 deployed contracts are verified on [Sourcify](https://sourcify.dev) with a full creation **and** runtime bytecode match (`sourcify.json`), so block explorers that read Sourcify (e.g. [Blockscout](https://eth-sepolia.blockscout.com)) show their source.
+All 23 deployed contracts are verified on [Sourcify](https://sourcify.dev) with a full creation **and** runtime bytecode match (`sourcify.json`), so block explorers that read Sourcify (e.g. [Blockscout](https://eth-sepolia.blockscout.com)) show their source.
 
 | Contract | Address | Sourcify |
 |---|---|---|
@@ -34,3 +34,4 @@ All 22 deployed contracts are verified on [Sourcify](https://sourcify.dev) with 
 | CPMMPool venue 2 (tUSD/tETH 0.30%) | [`0x442229dacb4dc05689f95138017d9ea2020d829b`](https://eth-sepolia.blockscout.com/address/0x442229dacb4dc05689f95138017d9ea2020d829b?tab=contract) | creation match · runtime match |
 | CPMMPool venue 3 (tETH/tEUR 0.30%) | [`0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa`](https://eth-sepolia.blockscout.com/address/0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa?tab=contract) | creation match · runtime match |
 | CPMMPool venue 4 (tUSD/tEUR 1.00%) | [`0x81557a91d28ce0b17f475466a2b7e3edb8541c64`](https://eth-sepolia.blockscout.com/address/0x81557a91d28ce0b17f475466a2b7e3edb8541c64?tab=contract) | creation match · runtime match |
+| ExecutionBounty (Run 4b) | [`0x3148f3710f4e4f700dbf359f63e9e116e6e319c4`](https://eth-sepolia.blockscout.com/address/0x3148f3710f4e4f700dbf359f63e9e116e6e319c4?tab=contract) | creation match · runtime match |

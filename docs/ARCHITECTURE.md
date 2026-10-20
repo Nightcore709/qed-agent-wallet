@@ -11,11 +11,13 @@ flowchart LR
     ECON["Economic engine<br/>(prices, reserve buffer)"]
     SOLVER["Certifying solver<br/>(KKT + Cholesky witness)"]
     AGENT["QED agent process<br/>🔑 AGENT key only"]
-    COSIGN["Co-signer process<br/>🔑 CO-SIGNER key only<br/>12 policy checks"]
+    COSIGN["Co-signer process<br/>🔑 CO-SIGNER key only<br/>12 policy checks · own route quote"]
+    ROUTER["Best-execution router<br/>dual prices ν · route · bound replica"]
     VENDOR["Helix Data vendor<br/>🔑 VENDOR key only"]
     LLM --> GUARD --> AGENT
     ECON --> AGENT
     SOLVER --> AGENT
+    ROUTER --> AGENT
     AGENT -- "request certificate" --> COSIGN
     AGENT -- "invoice / data" --> VENDOR
   end
@@ -29,7 +31,12 @@ flowchart LR
     TOKEN["TestUSD (tUSD)"]
     CLEAR["QEDClearing<br/>proof-gated multilateral netting"]
     PRIV["PrivateMinVarianceVerifier<br/>vendor attestation · Groth16"]
-    BOUNTY["OptimalityBounty · MaximalityBounty<br/>pay anyone who refutes the theorems"]
+    BOUNTY["Optimality · Maximality · Execution bounties<br/>pay anyone who refutes the theorems"]
+    EXEC["QEDExecution<br/>the vault's agent · on-chain best-execution bound"]
+    POOLS["Owner-named venues<br/>(Uniswap-V2-interface pools)"]
+    EXEC -- "executePayment" --> VAULT
+    EXEC -- "swap" --> POOLS
+    BOUNTY -.re-runs.-> EXEC
     ESCROW --> VERIFIER
     ESCROW --> PRIV
     BOUNTY -.re-runs.-> VERIFIER
@@ -44,6 +51,7 @@ flowchart LR
   GUARDIAN["Guardian"] -- "pause()" --> VAULT
   VAULT -- "settle() → creditor only" --> CREDITOR["CloudCo (creditor)"]
   AGENT -- "net(ids, x, π, y)" --> CLEAR
+  AGENT -- "trade(order, route, ν)" --> EXEC
 ```
 
 The design rule is a trust gradient: **everything that can be fooled is off-chain and holds at most one key;
@@ -62,7 +70,10 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `QEDClearing` | 5.3 KB | Proof-gated multilateral netting for agent economies. Members `join` (on-chain consent to the terms) and record debts as debtors; `net` is permissionless and executes only if net positions are unchanged, nothing is created, the snapshot is complete and current, and an exact LP-duality certificate proves the netting maximal (ALGORITHMS §9). |
 | `PrivateMinVarianceVerifier` + `Groth16Verifier` | 2.1 KB + 1.6 KB | `IProofVerifier` for the same problem **in zero knowledge**: checks the data vendor's attestation of a Poseidon commitment, binds the proof to its provider, then verifies a Groth16 proof of the KKT certificate (ALGORITHMS §10). Usable by the deployed `ProofEscrow` unchanged. |
 | `OptimalityBounty`, `MaximalityBounty` | 2.0 KB, 2.6 KB | Standing offers that pay their whole balance to anyone who refutes, on-chain, Theorem 4.4 (via the deployed verifier) or the netting maximality theorem (ALGORITHMS §11). No owner, no withdrawal. |
-| `TestUSD` | 2.1 KB | Valueless 6-decimal test token with a public 1 000 tUSD/day faucet for reviewers. |
+| `QEDExecution` | 9.6 KB | Lets a vault's agent convert money with **best execution proved on-chain**. It is the vault's `agent`: funds arrive only through `executePayment` in the same transaction; the co-signed order fixes recipient, floor, tolerance and venue set; the contract computes the weak-duality bound over every owner venue from live reserves, runs the agent's route and refuses any output more than τ below the bound (ALGORITHMS §12). Holds nothing between transactions. |
+| `CPMMPool` | 2.1 KB | Trading venue with the Uniswap V2 pair interface and invariant, fee as a parameter; liquidity by transfer + `sync`. |
+| `ExecutionBounty` | 3.7 KB | Pays its pool to anyone whose route, run on the bounty's own funds, beats `QEDExecution.quoteBound` (Theorem 12.3). |
+| `TestUSD`, `TestToken` | 2.1 KB, 1.8 KB | Valueless test tokens: tUSD (6 dp, public 1 000/day faucet), tEUR (6 dp) and tETH (18 dp). |
 
 ### Off-chain (`agent/`, TypeScript, viem)
 
@@ -78,6 +89,10 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `circuits/private_minvar.circom` | build time | the zero-knowledge statement (12,569 constraints); `circuits/setup.sh` runs the two-phase trusted setup |
 | `engine/netting.ts` | inside agent | certifying netting solver (min-mean cycle cancelling + Bellman–Ford dual), bit-exact checker, naive greedy rival |
 | `scripts/clearing.ts` | orchestrator (5 member agents, QED prover, Mallory) | runs the clearing economy: gridlock, attacks, proven netting, settlement |
+| `engine/execution.ts` | inside agent and co-signer | best-execution solver: closed-form venue values, coordinate descent + Newton on B(ν), route recovery (incl. arbitrage legs), exact integer simulator, bit-exact replica of the on-chain bound, baseline policies |
+| `roles/trader.ts` | inside agent · OPERATOR key | reads the owner's venues, plans and pre-flights the certified route, ranks alternatives, applies the submit rule |
+| `cosigner.ts → evaluateTrade` | co-signer process | 11 checks for a conversion, including its own optimal quote (written into the order as the floor) and a quoted-rate manipulation screen |
+| `scripts/execute.ts`, `execution-bounty.ts` | orchestrators | Run 4 (conversions, attacks, front-run) and Run 4b (execution bounty) |
 | `scripts/private.ts` | orchestrator (Helix, Northwind, QED, Atlas, Mallory) | runs the private economy and the bounty challenges on the main run's escrow and verifier |
 | `scripts/live.ts` | orchestrator (owner, client, guardian, Mallory) | deploys and runs the whole economy, records evidence |
 | `scripts/verify.ts` | anyone · no keys | independent re-derivation of every on-chain claim |
@@ -175,13 +190,42 @@ sequenceDiagram
   A-->>C: w and its salt off-chain, re-hashed by the client against the commitment
 ```
 
-### 3.5 Defence in depth against a manipulated agent
+### 3.5 A conversion with proven best execution (QEDExecution)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant O as Owner
+  participant L as Language model + guard
+  participant A as QED agent (operator key)
+  participant C as Co-signer
+  participant X as QEDExecution
+  participant V as QEDVault
+  participant P as Venues
+  O->>L: "Move 20 tUSD into the euro reserve"
+  L->>A: proposal: pay Euro reserve 20 tUSD (a tEUR vault, so convert)
+  A->>X: read venues and reserves; solve min B(ν); pre-flight quoteBound
+  O->>C: signed confirmation of the exact conversion
+  C->>X: read venues itself, solve itself, set floor = own quote less 1%
+  C-->>A: certificate with ref = hash(order)
+  A->>X: trade(mandate, certificate, order, route, prices ν)
+  X->>X: bound B from live reserves of all venues
+  X->>V: executePayment: mandate, co-signature, caps, solvency
+  V-->>X: exactly 20 tUSD
+  X->>P: the agent's hops (split and two-hop)
+  P-->>X: tEUR measured as a balance change
+  X->>X: require out ≥ floor and out ≥ (1 − τ)·B, no leftovers
+  X-->>O: tEUR to the euro reserve; BestExecution event
+```
+
+### 3.6 Defence in depth against a manipulated agent
 
 | Layer | Who | Stops |
 |---|---|---|
 | 1. Guard | deterministic code in the agent | injection, scams, secret requests, escalation — before any proposal |
 | 2. Co-signer | independent process & key | anything not justified by a signed invoice + funded job, or not owner-signed |
 | 3. Vault | Ethereum | everything outside the owner's mandate, caps, solvency, replay, pause — even if layers 1 and 2 are both compromised |
+| 4. Proof of best execution | Ethereum | a conversion more than τ = 1 ppm below the best route, a changed order, a stranded token — even with the agent key stolen |
 
 ## 4. Data & evidence model
 
@@ -230,6 +274,9 @@ can also run the economy directly against Sepolia: `RPC_URL=… CHAIN_ID=1115511
 | `QEDClearing.net` — 11 obligations, 5 members, certificate checked (N6) | 550 826 |
 | `QEDClearing.issue` (first / later) | 795 367 / ≈ 501 600 |
 | Deploy Groth16Verifier / PrivateMinVarianceVerifier | see `docs/EVIDENCE.md` (Run 3) |
+| Deploy QEDExecution / CPMMPool / ExecutionBounty | 15 330 304 / ≈ 3 632 106 / 5 997 780 |
+| `QEDExecution.trade` — vault checks, bound over 5 venues, 4 swaps (E1 / E2) | 1 122 781 / 667 936 |
+| `QEDExecution.setVenues` — 5 venues | 1 938 167 |
 | `ProofEscrow.deliver` with a zero-knowledge proof (attestation + Groth16) | see `docs/EVIDENCE.md` (Run 3, Z3) |
 
 Sepolia's current schedule prices state creation far above the classic EVM (a plain ETH transfer to a fresh
