@@ -7,6 +7,32 @@ is an application or an integration rather than a new idea, it says so.
 Scale used below: **new** = we found no prior system doing this; **specialisation** = a known technique applied to a
 setting where we found no prior deployment; **integration** = known parts combined; **known** = standard practice we use.
 
+## 0. Best execution proved at the instant of the trade (`QEDExecution`) — the upgrade's defining claim
+
+The claim: *a smart contract refuses an agent's conversion unless the output, measured as a balance change, is within
+τ (1 ppm on Sepolia) of a rigorous upper bound on what **any** route through the owner's venues could have returned,
+computed on-chain from live reserves in the same transaction, from a dual price vector the agent supplies.*
+
+| Closest prior art | What it does | Difference from QED |
+|---|---|---|
+| Angeris, Agrawal, Evans, Chitra, Boyd, [*Optimal Routing for Constant Function Market Makers*](https://arxiv.org/abs/2204.05238), EC 2022; Diamandis, Resnick, Chitra, Angeris, [*An Efficient Algorithm for Optimal Routing Through CFMMs*](https://www.researchgate.net/publication/376131386_An_Efficient_Algorithm_for_Optimal_Routing_Through_Constant_Function_Market_Makers) (2023) | Routing as a convex program; dual decomposition; the dual gives a bound used to *solve* | The mathematics QED's bound rests on (we cite it, §12.5). These papers compute routes off-chain; they do not make the dual bound an on-chain acceptance condition |
+| Angeris & Chitra, *Improved Price Oracles: CFMMs* (2020) | Path deficiency of fee-charging CFMMs | The one step of Theorem 12.3 we take from the literature (tested, §12.3) |
+| Zhavoronkov, [*Multi-Path Routing in DEX Networks: Convex Allocation and an Improving-Path Certificate*](https://pith.science/paper/2607.22540) (arXiv 2607.22540, 2026) | Off-chain router; a KKT multiplier certifies that no omitted path improves the candidate allocation | Certificate checked off-chain by the router; "execution is protected by an on-chain slippage tolerance" — exactly the gap QED closes |
+| Jiang, Li, Wen, [*Transfer algorithm for on-chain one-hop routing*](https://fc26.ifca.ai/preproceedings/5.pdf), FC 2026 preproceedings | *Computes* a one-hop split across several AMMs fully on-chain, to a price-gap tolerance | Computes, approximately, for parallel pools of one pair; no bound, no certificate, no multi-hop. QED *verifies* in O(venues), for any route shape over any token graph |
+| Zhou, Qin, Gervais, [*A²MM*](https://arxiv.org/abs/2106.07371) (2021) | Closed-form optimal split between two constant-product pools, executed atomically on-chain | Two pools in closed form; a heuristic beyond two; no proof for general graphs |
+| CoW Protocol [EBBO rule](https://docs.cow.fi/cow-protocol/reference/core/auctions/competition-rules) | Solvers must give prices at least as good as baseline AMMs; "not enforced by the smart contract", monitored afterwards, solvers slashed by governance | After-the-fact, social, against baseline pools. QED: in-transaction, by code, against the *optimum* over all owner venues |
+| Intent protocols and aggregators (UniswapX, 1inch Fusion, ERC-7683 cross-chain intents, Paraswap, 0x) | Fillers or routers compete; the contract enforces a minimum output (Dutch-auction decay or slippage limit) | A floor bounds loss to the tolerance; QED bounds it to τ of the optimum. Floors and proofs compose: QED keeps a co-signed floor for market risk |
+| Tangle Solve problem [*Certified approximate optimal DeFi execution*](https://github.com/tangle-solve/problem-4b97096d-08eb-4c7f-9ae0-7d2da0275ab2) (2026, open problem statement, no code) | Asks for an ε-certificate (e.g. a dual bound) of near-optimal DeFi execution, "independently checkable without trusting the solver" | Frames the open problem; we found no implementation there. QED is one for CFMM routing, checked by the chain at execution time |
+| Yaish et al., *Suboptimality in DeFi* (IACR ePrint 2023/892); MiFID II art. 27, FINRA 5310 | Measure sub-optimal execution after the fact; legal duty of best execution evidenced by periodic reports | Motivation: QED turns the duty into a precondition |
+
+**Assessment: new, as far as our searches reach.** Every ingredient is known: CFMM routing duality, path deficiency,
+fixed-point rounding. What we did not find, in papers, protocol documentation, or code, is a contract that accepts
+a trade *only if* its measured output is within a stated tolerance of an on-chain-computed duality bound over all
+permitted venues, so that an agent, solver or filler with full routing discretion cannot leak more than τ. We also
+found no prior system that combines this with an AI agent's spending authority (the bound is checked inside the
+same transaction that draws funds from a mandate-limited vault) or that stakes money on the bound
+(`ExecutionBounty`, 1,000 tUSD, unclaimed). A reviewer who knows of one should hold us to this paragraph.
+
 ## 1. Payment that settles only on an on-chain-checked optimality certificate (`ProofEscrow` + `MinVarianceVerifier`)
 
 | Closest prior art | What it does | Difference from QED |
@@ -68,11 +94,12 @@ positive-control tests proving the payout path works, is the part we did not fin
 ## 6. What an expert should take away
 
 QED's defensible contribution is not any single primitive. It is a consistent design rule — **every movement of
-money is conditioned on a statement the chain itself can check** — carried through four places where agent
+money is conditioned on a statement the chain itself can check** — carried through five places where agent
 finance normally relies on trust: who may pay (signatures), what may never be spent (an invariant), whether paid
-work is any good (an optimality certificate, public or zero-knowledge), and whether a clearing operator was honest
-(a duality certificate). Its mathematics is classical and stated with proofs; its novelty lies in where those proofs
+work is any good (an optimality certificate, public or zero-knowledge), whether a clearing operator was honest
+(a duality certificate), and whether a conversion got the best price any route could (a duality bound checked at
+execution). Its mathematics is classical and stated with proofs; its novelty lies in where those proofs
 are enforced, and in being falsifiable on-chain for money.
 
-Searches were run on 20 Oct 2026 across arXiv, IACR ePrint, USENIX and project sites. The absence of a prior
+Searches were run on 20 Oct 2026 across arXiv, IACR ePrint, USENIX, Financial Cryptography 2026 preproceedings, protocol documentation (CoW, UniswapX, 1inch, ERC-7683) and GitHub. The absence of a prior
 system in our search is not proof that none exists; if a reviewer knows of one, the comparison above is where it belongs.

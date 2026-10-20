@@ -27,7 +27,7 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import { ExecutionBountyAbi, MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { CPMMPoolAbi, ExecutionBountyAbi, MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
 import { dualBound, simulate, solve, type Hop, type VenueState } from "../src/engine/execution.js";
 import { hashOrder, readVenues } from "../src/roles/trader.js";
 import { encodeAbiParameters } from "viem";
@@ -56,6 +56,8 @@ const rows: Row[] = [];
 const ok = (outcome: string, check: string, cond: boolean, detail = "") => {
   rows.push({ outcome, check, ok: cond, detail });
   console.log(`${cond ? "  ✓" : "  ✗"} [${outcome}] ${check}${detail ? `  — ${detail}` : ""}`);
+  // in CI, a failed check is also a workflow annotation, readable from the API without downloading logs
+  if (!cond && process.env.GITHUB_ACTIONS) console.log(`::error title=verify ${outcome}::${check}${detail ? ` (${detail})` : ""}`.replace(/\r?\n/g, " "));
 };
 
 const step = (id: string) => manifest.steps.find((s: any) => s.id === id);
@@ -331,8 +333,16 @@ async function verifyExecution() {
     const rc = await pub.getTransactionReceipt({ hash: st.tx.hash });
     const { args } = decodeFunctionData({ abi: QEDExecutionAbi as Abi, data: tx.input }) as any;
     const [, , cert, , order, route, prices] = args;
+    // Pre-trade reserves: the state at the end of the previous block, then, for every pool, the last Sync emitted
+    // earlier in the same block (another trade, Mallory, anyone) — PE1 and PE2 share a block.
     const before = rc.blockNumber - 1n;
-    const vs: VenueState[] = await historical((client) => readVenues(client, k.execution, before));
+    const vs0: VenueState[] = await historical((client) => readVenues(client, k.execution, before));
+    const syncs = (await pub.getContractEvents({ address: k.pools, abi: CPMMPoolAbi, eventName: "Sync", fromBlock: rc.blockNumber, toBlock: rc.blockNumber })) as any[];
+    const vs: VenueState[] = vs0.map((v) => {
+      const last = syncs.filter((x) => getAddress(x.address) === getAddress(v.pool) && x.transactionIndex < rc.transactionIndex).sort((a, b) => a.logIndex - b.logIndex).at(-1);
+      return last ? { ...v, r0: BigInt(last.args.reserve0), r1: BigInt(last.args.reserve1) } : v;
+    });
+    const sameBlock = syncs.filter((x) => x.transactionIndex < rc.transactionIndex).length;
     const pm = new Map<string, bigint>(prices.map((p: any) => [p.token.toLowerCase(), BigInt(p.value)]));
     const B = dualBound(vs, BigInt(cert.amount), k.usd, order.tokenOut, pm);
     const ev = (await pub.getContractEvents({ address: k.execution, abi: QEDExecutionAbi, eventName: "BestExecution", fromBlock: rc.blockNumber, toBlock: rc.blockNumber })) as any[];
@@ -340,7 +350,7 @@ async function verifyExecution() {
     const hops: Hop[] = route.map((h: any) => ({ venue: Number(h.venue), zeroForOne: h.zeroForOne, amountIn: BigInt(h.amountIn) }));
     const sim = simulate(vs, hops, k.usd, order.tokenOut, BigInt(cert.amount));
     const own = solve(vs, k.usd, order.tokenOut, BigInt(cert.amount));
-    ok("O1", `${id}: the bound recomputed here from the pre-trade reserves equals the bound the contract enforced`, !!e && e.bound === B, `B = ${Number(B) / 1e6} tEUR (block ${before})`);
+    ok("O1", `${id}: the bound recomputed here from the pre-trade reserves equals the bound the contract enforced`, !!e && e.bound === B, `B = ${Number(B) / 1e6} tEUR (state after block ${before}${sameBlock ? ` and ${sameBlock} earlier pool update(s) in block ${rc.blockNumber}` : ""})`);
     ok("O1", `${id}: replaying the calldata's route on those reserves gives exactly the output the chain delivered`, !!e && sim.ok && sim.amountOut === e.amountOut, `${Number(sim.amountOut) / 1e6} tEUR`);
     ok("O1", `${id}: realised output within the order's tolerance of the bound, and of an independent optimum`, !!e && e.amountOut * 1_000_000n >= B * (1_000_000n - BigInt(order.tolerancePpm)) && e.amountOut * 1_000_000n >= own.sim.amountOut * 999_999n, `gap ${(Number(B - e.amountOut) / Number(B) * 1e6).toFixed(3)} ppm to the bound; independent route ${Number(own.sim.amountOut) / 1e6}`);
     ok("O1", `${id}: the co-signer's certificate commits to this exact order (recipient, floor, τ, venue set)`, cert.ref === hashOrder(order) && order.venueSetHash === vsh && getAddress(order.recipient) === getAddress(k.reserve), `order ${cert.ref.slice(0, 12)}… · floor ${Number(order.minOut) / 1e6}`);
@@ -381,5 +391,6 @@ function hexToBytes(h: Hex): Uint8Array {
 
 main().catch((e) => {
   console.error(e);
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=verify crashed::${String(e?.shortMessage ?? e?.message ?? e).replace(/\r?\n/g, " ").slice(0, 900)}`);
   process.exit(1);
 });
