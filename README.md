@@ -186,11 +186,11 @@ The premium browser interface and bounded real-Anvil API are in [product/index.h
 [agent/scripts/demo-server.mjs](agent/scripts/demo-server.mjs). This runs the **existing**
 financial controller, co-signer and Solidity contracts, recording fresh local receipts.
 
-\`\`\`bash
+```bash
 npm run demo                 # open http://127.0.0.1:4173
 npm run test:demo            # validate safe instruction allowlist
 npm run test:demo:e2e        # exercise browser API → actual Anvil contracts
-\`\`\`
+```
 
 This is intentionally localhost-only and uses valueless tokens; it is not yet a hosted production agent
 and does not replace the historical Sepolia proof ledger. [Exact instructions and limitations](docs/INTERACTIVE_DEMO.md).
