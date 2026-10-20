@@ -55,9 +55,24 @@ const priv = privManifest
   ? { contracts: privManifest.contracts, final: privManifest.final, sepolia: privManifest.sepolia, actors: privManifest.actors, steps: privManifest.steps.map((s: any) => ({ ...s, events: undefined })) }
   : undefined;
 
+const exManifest = read(`${EV}/execution/manifest.json`);
+const exec = exManifest
+  ? {
+      contracts: exManifest.contracts,
+      final: exManifest.final,
+      sepolia: exManifest.sepolia,
+      actors: exManifest.actors,
+      venues: exManifest.venues,
+      orders: exManifest.orders,
+      plans: { A3: exManifest.plans.A3, A6: exManifest.plans.A6 },
+      steps: exManifest.steps.map((s: any) => ({ ...s, events: undefined })),
+    }
+  : undefined;
+
 const D = {
   clearing,
   priv,
+  exec,
   manifest: slimManifest,
   portfolio,
   portfolioMu,
