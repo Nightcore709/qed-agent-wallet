@@ -3521,15 +3521,879 @@
         ]
       },
       "at": "2026-10-20T04:01:04.824Z"
+    },
+    {
+      "phase": "market",
+      "title": "Mallory unwinds: returns 25.196509 tEUR to venue 0",
+      "narrative": "Her front-run failed (EA8); holding tEUR bought at a bad price, she sells it back.",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "id": "MU1",
+      "expect": "success",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x1cdbba5d6eb93aff2adb4b3acaba5987ae208383a5b58976900c4e5119f0dfbc",
+        "status": "success",
+        "blockNumber": "11953421",
+        "gasUsed": "42560",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x98d1a388120e5a535341532047b604655fe1362f",
+        "replica": {
+          "blockNumber": "61",
+          "gasUsed": "34160"
+        },
+        "timestamp": 1792476672
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "to": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "value": "25196509"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        }
+      ],
+      "at": "2026-10-20T06:10:46.896Z"
+    },
+    {
+      "phase": "market",
+      "title": "…and takes 29.826566 tUSD back out of venue 0",
+      "narrative": "Round trip complete; the fees stay with the venue.",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "id": "MU2",
+      "expect": "success",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x06a46723e108445384d2f9a123ce6e14a532cbea599ddcbd319910677c135329",
+        "status": "success",
+        "blockNumber": "11953421",
+        "gasUsed": "73509",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58",
+        "replica": {
+          "blockNumber": "62",
+          "gasUsed": "57109"
+        },
+        "timestamp": 1792476672
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "to": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "value": "29826566"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "821414930",
+            "reserve1": "717019284"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "to": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "amount0In": "0",
+            "amount1In": "25196509",
+            "amount0Out": "29826566",
+            "amount1Out": "0"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        }
+      ],
+      "at": "2026-10-20T06:10:46.918Z"
+    },
+    {
+      "phase": "market",
+      "title": "Mallory unwinds: returns 8.379134 tEUR to venue 1",
+      "narrative": "Her front-run failed (EA8); holding tEUR bought at a bad price, she sells it back.",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "id": "MU3",
+      "expect": "success",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x6165abf0a09d28e27fb81592ef4ee7f82531244dde53f64ed401ddaa8d237ebe",
+        "status": "success",
+        "blockNumber": "11953421",
+        "gasUsed": "34039",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x98d1a388120e5a535341532047b604655fe1362f",
+        "replica": {
+          "blockNumber": "63",
+          "gasUsed": "29348"
+        },
+        "timestamp": 1792476672
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "to": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "value": "8379134"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        }
+      ],
+      "at": "2026-10-20T06:10:46.946Z"
+    },
+    {
+      "phase": "market",
+      "title": "…and takes 9.990375 tUSD back out of venue 1",
+      "narrative": "Round trip complete; the fees stay with the venue.",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "id": "MU4",
+      "expect": "success",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x3bf2e870b8d7dc91d404d9220f156bb27ec26625fc51e9d07e559ca28d1e9000",
+        "status": "success",
+        "blockNumber": "11953421",
+        "gasUsed": "73497",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x1fd2928ce46c29623ed72a1134a761c2a3536031",
+        "replica": {
+          "blockNumber": "64",
+          "gasUsed": "57097"
+        },
+        "timestamp": 1792476672
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "to": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "value": "9990375"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "257026857",
+            "reserve1": "223845073"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "to": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "amount0In": "0",
+            "amount1In": "8379134",
+            "amount0Out": "9990375",
+            "amount1Out": "0"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        }
+      ],
+      "at": "2026-10-20T06:10:46.969Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Owner signs a standing policy: keep ≥ 45.00 tEUR free in the euro reserve; tranches of 2.00–25.00 tUSD; ≤ 1.5% execution cost",
+      "narrative": "Signed once (EIP-191). From here the agent decides when and how much; the owner does not approve individual trades. The vault's mandate still caps every payment.",
+      "actor": "Owner",
+      "actorAddress": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "signed policy",
+          "path": "evidence/ethereum-sepolia/execution/records/P0-policy.json",
+          "hash": "0xaf019aa32be774fc5b408c796c61fa295c17a7cb39c97224ec51e7600dee68cd"
+        }
+      ],
+      "id": "P0",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:46.978Z"
+    },
+    {
+      "phase": "policy",
+      "title": "An over-eager agent asks to convert 25.00 tUSD at once; the co-signer re-derives 19.535234 and refuses",
+      "narrative": "P2 Requested tranche no larger than the co-signer's own decision: requested 25000000 ≤ allowed 19535234; P3 Execution cost within the policy's impact limit: 180.2 bps ≤ 150 bps. Discretion under a policy is bounded twice: by the co-signer's recomputation and by the vault's mandate.",
+      "actor": "Co-signer",
+      "actorAddress": "0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96",
+      "outcomes": [
+        "O1",
+        "O3"
+      ],
+      "artifacts": [
+        {
+          "label": "co-signer decision record",
+          "path": "evidence/ethereum-sepolia/execution/records/0x635fc78914a52101436e4e08b2a8c156a8b55f9b1e8054a6050ad7d33dbb8bbf.json",
+          "hash": "0x635fc78914a52101436e4e08b2a8c156a8b55f9b1e8054a6050ad7d33dbb8bbf"
+        }
+      ],
+      "id": "PA1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:47.159Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Agent observes 20.699566 tEUR free (short 24.300434) and decides to convert 19.535234 tUSD now — limited by impact",
+      "narrative": "Candidates (tUSD): need more than any allowed tranche, impact limit 19.535234, policy cap 25.00, mandate cap 25.00, free funds 55.00. Expected 16.816098 tEUR at 150.0 bps execution cost.",
+      "actor": "QED agent",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "decision",
+          "path": "evidence/ethereum-sepolia/execution/records/T1-decision.json",
+          "hash": "0x66bbe7b5174d9351631ed0038facd037666f19928eb13f31b0b10b5bc10f7442"
+        }
+      ],
+      "id": "T1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:47.232Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Co-signer re-derives the same decision from the chain and signs the order (floor 16.647937 tEUR, τ = 1 ppm)",
+      "narrative": "14 checks, including P1–P3: shortfall, tranche no larger than its own decision, execution cost within the limit.",
+      "actor": "Co-signer",
+      "actorAddress": "0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "co-signer decision record",
+          "path": "evidence/ethereum-sepolia/execution/records/0x264fdf65d1087d4f883513c84076193ebaa0e457a7b264448836a74d8a456b00.json",
+          "hash": "0x264fdf65d1087d4f883513c84076193ebaa0e457a7b264448836a74d8a456b00"
+        }
+      ],
+      "id": "C1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:47.337Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Agent converts 19.535234 tUSD → 16.816098 tEUR; bound 16.816101; reserve free 20.699566 → 37.515664",
+      "narrative": "Agent-initiated under the standing policy, executed with best execution proved on-chain (0.18 ppm from the bound). The agent then re-reads the reserve to confirm the state change.",
+      "actor": "QED agent (operator key)",
+      "outcomes": [
+        "O1",
+        "O2"
+      ],
+      "id": "PE1",
+      "expect": "success",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0xaaa0bacddd313493ff89f08f25f86b5f5eb294423b517bdf16c5489626a0c9ff",
+        "status": "success",
+        "blockNumber": "11953422",
+        "gasUsed": "667936",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
+        "replica": {
+          "blockNumber": "65",
+          "gasUsed": "444016"
+        },
+        "timestamp": 1792476684
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x04D1eF625AD58e3641032267A8f4fB7bC191D117",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "19535234"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "PaymentExecuted",
+          "args": {
+            "intentId": "0x97cdef713072c3be536e1684eb79178e301c49128d503d87256b988e4993915a",
+            "mandateHash": "0x92f3879f2a6b7b06416044c3feb50e29d4b20f3fc5ef7c70abebd8ec76b9dd8c",
+            "recipient": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount": "19535234",
+            "liabilityId": "0",
+            "evidenceHash": "0x264fdf65d1087d4f883513c84076193ebaa0e457a7b264448836a74d8a456b00",
+            "ref": "0xefb47b17dd8e8cd8c63d1f46d7d8068758b63155c389c5c30da58a05158334cd"
+          },
+          "address": "0x04d1ef625ad58e3641032267a8f4fb7bc191d117"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "value": "9116024"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "7846752"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "830530954",
+            "reserve1": "709172532"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "9116024",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "7846752"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "value": "2871808"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "2472202"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "259898665",
+            "reserve1": "221372871"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "2871808",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "2472202"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+            "value": "4139940"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "1326338728862457"
+          },
+          "address": "0xf61c0459cb436ae760b3af0e58700e9df046580f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "613187305",
+            "reserve1": "195711485997175448"
+          },
+          "address": "0x442229dacb4dc05689f95138017d9ea2020d829b"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "4139940",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "1326338728862457"
+          },
+          "address": "0x442229dacb4dc05689f95138017d9ea2020d829b"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+            "value": "1326338728862457"
+          },
+          "address": "0xf61c0459cb436ae760b3af0e58700e9df046580f"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "3563890"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "816513090",
+            "reserve1": "304288514002824552"
+          },
+          "address": "0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "0",
+            "amount1In": "1326338728862457",
+            "amount0Out": "3563890",
+            "amount1Out": "0"
+          },
+          "address": "0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+            "value": "3407462"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "2933254"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "306101369",
+            "reserve1": "263200843"
+          },
+          "address": "0x81557a91d28ce0b17f475466a2b7e3edb8541c64"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "3407462",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "2933254"
+          },
+          "address": "0x81557a91d28ce0b17f475466a2b7e3edb8541c64"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+            "value": "16816098"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "BestExecution",
+          "args": {
+            "intentId": "0x97cdef713072c3be536e1684eb79178e301c49128d503d87256b988e4993915a",
+            "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+            "recipient": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+            "amountIn": "19535234",
+            "spent": "19535234",
+            "amountOut": "16816098",
+            "bound": "16816101",
+            "hops": "5"
+          },
+          "address": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481"
+        }
+      ],
+      "at": "2026-10-20T06:10:47.421Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Agent observes 37.515664 tEUR free (short 7.484336) and decides to convert 8.835281 tUSD now — limited by need",
+      "narrative": "Candidates (tUSD): need 8.835281, impact limit 19.704745, policy cap 25.00, mandate cap 25.00, free funds 35.464766. Expected 7.484336 tEUR at 90.0 bps execution cost.",
+      "actor": "QED agent",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "decision",
+          "path": "evidence/ethereum-sepolia/execution/records/T2-decision.json",
+          "hash": "0xeedd39960a645c44ddab3b71dd33f2977d9786339ac9117c5da7f250651f50d4"
+        }
+      ],
+      "id": "T2",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:47.556Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Co-signer re-derives the same decision from the chain and signs the order (floor 7.409492 tEUR, τ = 1 ppm)",
+      "narrative": "14 checks, including P1–P3: shortfall, tranche no larger than its own decision, execution cost within the limit.",
+      "actor": "Co-signer",
+      "actorAddress": "0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "co-signer decision record",
+          "path": "evidence/ethereum-sepolia/execution/records/0x6df295bfcd48f37a9e723e7e9884d5a92fbf3e8f8bd8f5790d626e7d1138c2bd.json",
+          "hash": "0x6df295bfcd48f37a9e723e7e9884d5a92fbf3e8f8bd8f5790d626e7d1138c2bd"
+        }
+      ],
+      "id": "C2",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:47.742Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Agent converts 8.835281 tUSD → 7.484336 tEUR; bound 7.484339; reserve free 37.515664 → 45.00",
+      "narrative": "Agent-initiated under the standing policy, executed with best execution proved on-chain (0.40 ppm from the bound). The agent then re-reads the reserve to confirm the state change.",
+      "actor": "QED agent (operator key)",
+      "outcomes": [
+        "O1",
+        "O2"
+      ],
+      "id": "PE2",
+      "expect": "success",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0xa9e90f580bb9f0457bfd8a966ec2c0322d877d6ea66e4f4aaabccd147d1aae35",
+        "status": "success",
+        "blockNumber": "11953422",
+        "gasUsed": "667948",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
+        "replica": {
+          "blockNumber": "66",
+          "gasUsed": "444028"
+        },
+        "timestamp": 1792476684
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x04D1eF625AD58e3641032267A8f4fB7bC191D117",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "8835281"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "PaymentExecuted",
+          "args": {
+            "intentId": "0x7b605941bbaf118eb5de4d12b909862d554364611f02b57efa1e0ef5842633a3",
+            "mandateHash": "0x92f3879f2a6b7b06416044c3feb50e29d4b20f3fc5ef7c70abebd8ec76b9dd8c",
+            "recipient": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount": "8835281",
+            "liabilityId": "0",
+            "evidenceHash": "0x6df295bfcd48f37a9e723e7e9884d5a92fbf3e8f8bd8f5790d626e7d1138c2bd",
+            "ref": "0x31cc5618c9d8ff87895b8d182cef2d59eb9ba47f059216abf90a9162dec477c5"
+          },
+          "address": "0x04d1ef625ad58e3641032267a8f4fb7bc191d117"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "value": "4145940"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "3512029"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "834676894",
+            "reserve1": "705660503"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "4145940",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "3512029"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "value": "1297728"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "1099321"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "261196393",
+            "reserve1": "220273550"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "1297728",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "1099321"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+            "value": "1864956"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "591659706795339"
+          },
+          "address": "0xf61c0459cb436ae760b3af0e58700e9df046580f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "615052261",
+            "reserve1": "195119826290380109"
+          },
+          "address": "0x442229dacb4dc05689f95138017d9ea2020d829b"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "1864956",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "591659706795339"
+          },
+          "address": "0x442229dacb4dc05689f95138017d9ea2020d829b"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+            "value": "591659706795339"
+          },
+          "address": "0xf61c0459cb436ae760b3af0e58700e9df046580f"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "1579805"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "814933285",
+            "reserve1": "304880173709619891"
+          },
+          "address": "0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "0",
+            "amount1In": "591659706795339",
+            "amount0Out": "1579805",
+            "amount1Out": "0"
+          },
+          "address": "0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+            "value": "1526657"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "1293181"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "307628026",
+            "reserve1": "261907662"
+          },
+          "address": "0x81557a91d28ce0b17f475466a2b7e3edb8541c64"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "1526657",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "1293181"
+          },
+          "address": "0x81557a91d28ce0b17f475466a2b7e3edb8541c64"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+            "value": "7484336"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "BestExecution",
+          "args": {
+            "intentId": "0x7b605941bbaf118eb5de4d12b909862d554364611f02b57efa1e0ef5842633a3",
+            "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+            "recipient": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+            "amountIn": "8835281",
+            "spent": "8835281",
+            "amountOut": "7484336",
+            "bound": "7484339",
+            "hops": "5"
+          },
+          "address": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481"
+        }
+      ],
+      "at": "2026-10-20T06:10:47.822Z"
+    },
+    {
+      "phase": "policy",
+      "title": "Agent observes 45.00 tEUR free: target met, nothing to do",
+      "narrative": "Candidates (tUSD): need more than any allowed tranche, impact limit 0.00, policy cap 25.00, mandate cap 25.00, free funds 26.629485. ",
+      "actor": "QED agent",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "decision",
+          "path": "evidence/ethereum-sepolia/execution/records/T3-decision.json",
+          "hash": "0x815cd992bbb0c7f9586a3c4ee968c669b744d581c54788267ce178ffce0268b5"
+        }
+      ],
+      "id": "T3",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T06:10:47.832Z"
     }
   ],
   "sepolia": {
     "firstBlock": 11952692,
-    "lastBlock": 11952782,
-    "transactions": 59,
+    "lastBlock": 11953422,
+    "transactions": 65,
     "reverted": 11,
     "receipts": "receipts.json",
-    "relayComparison": "59/59 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Run 4b replayed Run 4's signed bytes on the replica first"
+    "relayComparison": "65/65 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b and 4c first replayed the earlier runs' signed bytes on the replica"
   },
   "executionNote": "Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs).",
   "bounty": {
@@ -3538,5 +4402,69 @@
     "refuted": 0,
     "priceOne": "1000000000000000000000000000000000000",
     "deployBlock": "11952779"
+  },
+  "policyRun": {
+    "policy": {
+      "vault": "0x04d1ef625ad58e3641032267a8f4fb7bc191d117",
+      "reserve": "0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53",
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "targetFree": "45000000",
+      "maxTranche": "25000000",
+      "minTranche": "2000000",
+      "maxImpactBps": 150,
+      "validUntil": "1795068704",
+      "nonce": "policy-1-11155111"
+    },
+    "ticks": [
+      {
+        "tick": 1,
+        "reserveFree": "20699566",
+        "shortfall": "24300434",
+        "action": "convert",
+        "amountIn": "19535234",
+        "limitedBy": "impact",
+        "impactBps": 149.9996167683948,
+        "candidates": {
+          "need": null,
+          "impact": "19535234",
+          "policyCap": "25000000",
+          "mandateCap": "25000000",
+          "freeFunds": "55000000"
+        }
+      },
+      {
+        "tick": 2,
+        "reserveFree": "37515664",
+        "shortfall": "7484336",
+        "action": "convert",
+        "amountIn": "8835281",
+        "limitedBy": "need",
+        "impactBps": 90.04989603626612,
+        "candidates": {
+          "need": "8835281",
+          "impact": "19704745",
+          "policyCap": "25000000",
+          "mandateCap": "25000000",
+          "freeFunds": "35464766"
+        }
+      },
+      {
+        "tick": 3,
+        "reserveFree": "45000000",
+        "shortfall": "0",
+        "action": "none",
+        "amountIn": "0",
+        "limitedBy": null,
+        "impactBps": 0,
+        "candidates": {
+          "need": null,
+          "impact": "0",
+          "policyCap": "25000000",
+          "mandateCap": "25000000",
+          "freeFunds": "26629485"
+        }
+      }
+    ]
   }
 }

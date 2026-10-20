@@ -1,0 +1,21 @@
+{
+  "tick": 3,
+  "reserveFree": "45000000",
+  "available": "26629485",
+  "decision": {
+    "shortfall": "0",
+    "mid": 0.8463417198099906,
+    "candidates": {
+      "need": null,
+      "impact": "0",
+      "policyCap": "25000000",
+      "mandateCap": "25000000",
+      "freeFunds": "26629485"
+    },
+    "action": "none",
+    "amountIn": "0",
+    "expectedOut": "0",
+    "impactBps": 0,
+    "reason": "reserve is at or above its target: nothing to do"
+  }
+}

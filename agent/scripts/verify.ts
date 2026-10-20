@@ -324,8 +324,9 @@ async function verifyExecution() {
     }
     throw last;
   };
-  for (const id of ["E1", "E2"]) {
+  for (const id of ["E1", "E2", "PE1", "PE2"]) {
     const st = em.steps.find((x: any) => x.id === id);
+    if (!st) continue;
     const tx = await pub.getTransaction({ hash: st.tx.hash });
     const rc = await pub.getTransactionReceipt({ hash: st.tx.hash });
     const { args } = decodeFunctionData({ abi: QEDExecutionAbi as Abi, data: tx.input }) as any;
@@ -343,6 +344,14 @@ async function verifyExecution() {
     ok("O1", `${id}: replaying the calldata's route on those reserves gives exactly the output the chain delivered`, !!e && sim.ok && sim.amountOut === e.amountOut, `${Number(sim.amountOut) / 1e6} tEUR`);
     ok("O1", `${id}: realised output within the order's tolerance of the bound, and of an independent optimum`, !!e && e.amountOut * 1_000_000n >= B * (1_000_000n - BigInt(order.tolerancePpm)) && e.amountOut * 1_000_000n >= own.sim.amountOut * 999_999n, `gap ${(Number(B - e.amountOut) / Number(B) * 1e6).toFixed(3)} ppm to the bound; independent route ${Number(own.sim.amountOut) / 1e6}`);
     ok("O1", `${id}: the co-signer's certificate commits to this exact order (recipient, floor, τ, venue set)`, cert.ref === hashOrder(order) && order.venueSetHash === vsh && getAddress(order.recipient) === getAddress(k.reserve), `order ${cert.ref.slice(0, 12)}… · floor ${Number(order.minOut) / 1e6}`);
+  }
+  if (em.policyRun) {
+    console.log("\n— QED Execute: the agent decided under a standing policy —");
+    const pe2 = em.steps.find((x: any) => x.id === "PE2");
+    const target = BigInt(em.policyRun.policy.targetFree);
+    const freeAt = (await historical((client) => client.readContract({ address: k.reserve, abi: QEDVaultAbi, functionName: "freeBalance", blockNumber: BigInt(pe2.tx.blockNumber) }))) as bigint;
+    const sent = (await pub.getTransaction({ hash: pe2.tx.hash })).from;
+    ok("O1", "the policy trades were sent by the operator key, and after the second the euro reserve's free balance met the owner's target", getAddress(sent) === getAddress(em.actors.operator) && freeAt >= target, `free ${Number(freeAt) / 1e6} tEUR ≥ target ${Number(target) / 1e6} at block ${pe2.tx.blockNumber}`);
   }
   console.log("\n— QED Execute: nothing leaked —");
   const bal = (t: Address, a: Address) => pub.readContract({ address: t, abi: TestUSDAbi, functionName: "balanceOf", args: [a] }) as Promise<bigint>;
