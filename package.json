@@ -2,7 +2,7 @@
   "name": "qed-agent-wallet",
   "version": "1.0.0",
   "private": true,
-  "description": "QED \u2014 proof-carrying autonomy for AI agent wallets. FinTechathon 2026 Topic F.",
+  "description": "QED — proof-carrying autonomy for AI agent wallets. FinTechathon 2026 Topic F.",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -29,7 +29,9 @@
     "local:private": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/private.ts EVIDENCE_DIR=evidence/local-private tsx agent/scripts/local.ts",
     "zk:setup": "bash circuits/setup.sh",
     "local:execute": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/execute.ts EVIDENCE_DIR=evidence/local-execution tsx agent/scripts/local.ts",
-    "fixtures:execution": "tsx agent/scripts/fixtures-execution.ts"
+    "fixtures:execution": "tsx agent/scripts/fixtures-execution.ts",
+    "demo": "node agent/scripts/demo-server.mjs",
+    "test:demo": "node --test agent/test/demo.test.mjs"
   },
   "dependencies": {
     "circomlibjs": "^0.1.7",
