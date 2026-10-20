@@ -1,6 +1,6 @@
 # Typeset PDFs
 
-Print-ready copies of the Markdown documentation in `docs/`, typeset from commit `fee102d`.
+Print-ready copies of the Markdown documentation in `docs/`, typeset from commit `e409f0a`.
 
 | File | Contents |
 |---|---|
