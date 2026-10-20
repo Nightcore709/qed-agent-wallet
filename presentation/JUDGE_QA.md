@@ -48,9 +48,10 @@ both hot keys stolen, the vault limits loss to `blastRadius` and only to owner-a
 binds every trade. We published a honeypot vault's keys; its ring-fence is intact. → slide 8, backup B6.
 
 **9. What if the co-signer is compromised too?**
-Then the policy's off-chain judgement (is a tranche due?) is gone, but the chain still enforces the mandate's caps and
-payees, solvency, and best execution. Worst case: conversions up to the caps at best execution, without a shortfall
-(risk K28). Revocation: `bumpEpoch` or `setOperator`.
+Since Run 4d the policy itself is a contract and QEDExecution's only operator, so even with both keys the attacker
+cannot convert when the reserve needs nothing, outside the owner's bounds, above κ against the mid price, or more than
+the shortfall provably required: QA1–QA4 on Sepolia were signed with both real keys and all reverted. What is left is
+the mandate's payees and caps and best execution. Revocation: `QEDTreasuryPolicy.revoke`, `bumpEpoch` or `setOperator`.
 
 **10. Front-running and MEV?**
 The proof is about the state the trade executes on, so a sandwich moves the bound with the market. The co-signed
@@ -67,7 +68,7 @@ a standing policy; the co-signer re-derives everything from the chain. The polic
 Red-team: 25/25 injection attacks blocked with 0 false refusals in the guarded pipeline.
 
 **13. Is it audited?**
-No. 132 Solidity tests (unit, fuzz, ≈350 k-call invariants), 60 TypeScript tests, 44 on-chain attacks, three funded
+No. 145 Solidity tests (unit, fuzz, ≈350 k-call invariants), 60 TypeScript tests, 48 on-chain attacks, three funded
 bounties, and an independent verifier anyone can run. Not a substitute for an audit; stated on every page.
 
 ## Autonomy
@@ -76,6 +77,12 @@ bounties, and an independent verifier anyone can run. Not a substitute for an au
 Under a standing policy: whether to convert, how much, and how to route. Tranche = min(need, impact, policy cap,
 mandate cap, free funds); wait below the minimum. On Sepolia it chose 19.535234 (impact-limited) then 8.835281
 (need-limited), then stopped. → slide 7; ALGORITHMS §12.8.
+
+**14b. How can a contract tell that the agent converted too much without solving the routing problem?**
+Concavity. The best output OPT(x) is concave with OPT(0) = 0, so for a smaller tranche a', OPT(a') ≥ out·a'/a. If
+that lower bound already covers the shortfall, the agent provably over-converted; the contract checks it in one
+integer inequality (ALGORITHMS §12.9, Proposition 12.9). On Sepolia, QA2 (14.93 tUSD when 11.94 sufficed) reverted
+with `OverConversion`.
 
 **15. Isn't that a hard-coded script?**
 The rule is deterministic on purpose, so a second process can re-derive it; the inputs are live chain state, and
@@ -91,13 +98,13 @@ each to code and to a Sepolia step.
 
 **17. Why were transactions relayed through a browser?**
 Our build sandbox had no RPC egress. Every transaction was signed in the sandbox against a replica of Sepolia, and the
-identical bytes were broadcast; all 188 public receipts matched the replica's status and logs. The hashes are of the
+identical bytes were broadcast; all 196 public receipts matched the replica's status and logs. The hashes are of the
 exact bytes, so nothing could be changed in transit. Two early failed attempts are disclosed. → EVIDENCE.md, K12.
 
 **18. How do I check a claim without trusting you?**
-`npm run verify` (no keys): bytecode of 23 contracts, every receipt, every revert replayed on archive state, every
+`npm run verify` (no keys): bytecode of 24 contracts, every receipt, every revert replayed on archive state, every
 accepted trade's bound recomputed from the pre-trade reserves and its route replayed, the policy target, bounty pools.
-It runs in CI on every push and daily. Sourcify shows the source of all 23 contracts.
+It runs in CI on every push and daily. Sourcify shows the source of all 24 contracts.
 
 **19. Gas cost?**
 E1 used 1,122,781 gas (cold storage, four hops, five venues bounded); E2 and the policy trades about 668 k. At
@@ -123,7 +130,7 @@ markets. Production aggregators would sit closer to the optimum. The claim is th
 agent uses, it cannot leak more than τ. For small trades in deep markets a good router is already within ~3 bps.
 
 **24. What would you build next?**
-Concentrated-liquidity venues; the standing policy as an on-chain module (closing K28); a cumulative impact budget
+Concentrated-liquidity venues; liveness guarantees for the policy (K28); a cumulative impact budget
 with a TWAP reference (K29); a co-signer quorum; an external audit.
 
 ## Backup slides

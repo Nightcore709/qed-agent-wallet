@@ -558,7 +558,7 @@ contract and solver are checked against each other bit for bit.
 ### 12.8 Deciding when and how much: the standing treasury policy (`agent/src/roles/treasury.ts`)
 
 Sections 12.1–12.7 prove *how well* a conversion executed. Run 4c lets the agent also decide *whether* and *how
-much*, under an objective the owner signs once (EIP-191, text in PROTOCOL_SPECIFICATION §3.3):
+much*, under an objective the owner signs once (EIP-191, text in PROTOCOL_SPECIFICATION §3.3) and, from Run 4d, also states on-chain (§12.9):
 
 ```
 π = (reserve, tokenIn s, tokenOut t, target T, tranche bounds [X_min, X_max], impact limit κ, validUntil, nonce)
@@ -610,7 +610,49 @@ chain exactly as in §12.4.
 **Limits.** (a) κ bounds each tranche against the mid price *at that tick*; tranche 2 is measured against the
 price tranche 1 moved. Cumulative drift over many tranches is bounded only by `X_max`, the daily cap and the
 number of ticks; a production policy would add a cumulative impact budget, a TWAP reference and a minimum interval
-between tranches so that arbitrage can restore the price (risk K29). (b) The policy is enforced by the co-signer
-and the mandate, not by the chain: the chain enforces the mandate's caps and best execution, while "a tranche is
-due" is an off-chain judgement the co-signer re-derives (risk K28). Revocation is immediate through the mandate
-(`bumpEpoch`) or the operator key (`setOperator`).
+between tranches so that arbitrage can restore the price (risk K29). (b) In Run 4c the policy was enforced by the
+co-signer and the mandate only. §12.9 moves its safety clauses on-chain.
+
+### 12.9 The policy as a contract (`QEDTreasuryPolicy`)
+
+The co-signer's recomputation is a second opinion, not a guarantee: with both hot keys stolen, nothing in §12.8 stops
+a "tranche" the reserve does not need. `QEDTreasuryPolicy` is made `QEDExecution`'s only operator, so the agent's key
+can trade only through `convert`, which wraps `trade` (§12.4) with four clauses, all checked in the same transaction:
+
+```
+C1  shortfall      free_before < T                                   (NoShortfall)
+C2  bounds         X_min ≤ a ≤ X_max                                  (TrancheOutOfBounds)
+C3  cost           out · 10⁴ ≥ ⌊a·ΣR_out/ΣR_in⌋ · (10⁴ − κ)          (ExecutionCostTooHigh)
+C4  need           free_before·a + out·a' < T·a,  a' = a − ⌊a·σ/10⁴⌋  (OverConversion)
+```
+
+`ΣR_in, ΣR_out` are the reserves of the owner's venues that trade the pair directly, read before the trade, so C3 is
+the off-chain impact limit of §12.8 evaluated by the chain. σ (`needSlackBps`) is the owner's tolerance for
+over-conversion.
+
+**Proposition 12.9 (no provable over-conversion).** If a trade of `a` passes C4 then no tranche smaller than `a'`
+is guaranteed by the trade's own evidence to cover the shortfall; conversely, if `free_before + out·a'/a ≥ T`, then
+the tranche `a'` routed optimally would have covered it, and C4 refuses the trade.
+
+*Proof.* OPT is concave on `[0, a]` with OPT(0) = 0 (§12.8 (ii)), so OPT(a') ≥ (a'/a)·OPT(a). The realised output
+satisfies out ≤ OPT(a) and, by §12.4, out ≥ (1 − τ)·OPT(a). Hence OPT(a') ≥ (a'/a)·out, and if
+`free_before + out·a'/a ≥ T` the smaller tranche would have reached the target. C4 is that inequality multiplied
+by `a > 0`, in exact integers. ∎
+
+Concavity is a property of the continuous routing problem; pool arithmetic rounds each hop by at most one raw unit,
+which the slack σ dominates by orders of magnitude (σ = 10 bps of an 11.9 tUSD tranche is ≈ 12,000 raw units of
+input). C4 is one-sided by design: it refuses only *provable* over-conversion and never second-guesses a tranche
+limited by market impact. What C1–C4 do not enforce is liveness: an agent that converts less than it could, or
+waits, is not caught. That is a cost to the owner, not a loss.
+
+**Composition.** Run 4d keeps every earlier layer: the co-signer still re-derives the tranche (P1–P3) and re-quotes
+(T1–T3), the vault still enforces the mandate, caps and solvency, `QEDExecution` still enforces best execution. The
+new contract adds the clauses a stolen co-signer key would otherwise bypass.
+
+**The live run (Run 4d, Sepolia blocks 11,954,079–11,954,086).** Target 55 tEUR, `X ∈ [2, 25]` tUSD, κ = 150 bps,
+σ = 10 bps. The agent observed 45.00 free (short 10.00); need 11.943294 tUSD, impact limit 19.800521 tUSD, so it
+converted 11.943294 (need-limited) → 10.000000 tEUR at 107.0 bps against mid, 0.30 ppm from the best-execution bound (`QE1`). With both hot keys, the attacker
+was refused the direct route (`QA1` NotOperator), 14.93 tUSD (`QA2` OverConversion), 25 tUSD (`QA3`
+ExecutionCostTooHigh) and a tranche after the target was met (`QA4` NoShortfall). Tests:
+`contracts/test/QEDTreasuryPolicy.t.sol` (13, including a 2,000-run fuzz that every accepted tranche satisfies
+C1–C4 and every refused one breaks a clause).

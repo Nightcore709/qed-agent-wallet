@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   contracts:
-    name: Solidity — build, 132 tests, fuzz + invariants
+    name: Solidity — build, 145 tests, fuzz + invariants
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

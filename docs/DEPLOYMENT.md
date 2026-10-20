@@ -2,7 +2,7 @@
 
 ## Live deployment (Ethereum Sepolia, chain id 11155111)
 
-23 contracts, all verified on Sourcify with a creation and runtime bytecode match; the full table with explorer links is in [`verification/README.md`](../verification/README.md), every transaction in [`EVIDENCE.md`](EVIDENCE.md).
+24 contracts, all verified on Sourcify with a creation and runtime bytecode match; the full table with explorer links is in [`verification/README.md`](../verification/README.md), every transaction in [`EVIDENCE.md`](EVIDENCE.md).
 
 | Run | Contracts | First block |
 |---|---|---|
@@ -11,6 +11,7 @@
 | 3 · zero-knowledge job, bounties | Groth16Verifier `0xc043…4e7b` · PrivateMinVarianceVerifier `0x1270…b453` · OptimalityBounty `0xfc21…b677` · MaximalityBounty `0xd767…7d69` | 11,951,192 |
 | 4 · best execution | QEDExecution `0x8e2e…9481` · QEDVault tUSD treasury `0x04d1…d117` · QEDVault euro reserve `0x6fb7…9c53` · tEUR `0x98d1…362f` · tETH `0xf61c…580f` · CPMMPool ×5 (`0xf88d…8a58`, `0x1fd2…6031`, `0x4422…829b`, `0x7067…dbfa`, `0x8155…1c64`) | 11,952,692 |
 | 4b · execution bounty | ExecutionBounty `0x3148…19c4` (1,000 tUSD) | 11,952,779 |
+| 4d · the policy as a contract | QEDTreasuryPolicy `0xf7f2…69e7` (QEDExecution's operator since block 11,954,081) | 11,954,079 |
 
 Machine-readable: `deployments/11155111.json` (Run 1) and the `contracts` block of each run's `evidence/ethereum-sepolia/**/manifest.json`.
 
@@ -70,6 +71,7 @@ Sepolia currently prices state creation far above the classic schedule (a plain 
 | Change the venues the agent may trade on | `QEDExecution.setVenues(pools, fees)`: each declared fee is cross-checked against the pool's own `feeBps()`; the new venue-set hash invalidates every outstanding signed order | vault owner |
 | Rotate the trading hot key | `QEDExecution.setOperator(addr)` | vault owner |
 | Withdraw the agent's trading authority entirely | `QEDVault.setAgent(other)` — QEDExecution then cannot move funds at all | vault owner |
-| Stop a standing treasury policy | let it expire (`validUntil`), have the co-signer drop its nonce, rotate the operator, or `pause()` the vault | owner / co-signer operator |
+| Change or stop the standing treasury policy | `QEDTreasuryPolicy.setPolicy(p)` or `revoke()` (immediate); also expiry, a new operator, or `pause()` of the vault | vault owner |
+| Rotate the agent key under the policy | `QEDTreasuryPolicy.setAgent(addr)` | vault owner |
 
 Monitor: `QEDExecution.quoteBound(amountIn, tokenIn, tokenOut, prices)` is a free view that returns the bound any route would be measured against, so a monitor can price every pending order before it lands; `BestExecution` events record input, spent, output and bound for every accepted trade. `QEDLens.snapshot(vault)` returns balance, ring-fenced, free, 24 h blast radius, open liabilities, epoch and paused state in one call; the dashboard polls it live.

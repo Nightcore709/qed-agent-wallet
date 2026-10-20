@@ -31,7 +31,7 @@ product, engineering and evaluation limits so a reviewer can see the whole bound
 
 | Limit | Consequence | Where |
 |---|---|---|
-| The standing policy is enforced off-chain | The co-signer re-derives every tranche; the chain enforces the mandate's caps and best execution, not the policy's target or impact limit. Both hot keys colluding could convert up to the mandate's caps, at best execution, without a shortfall | K28 |
+| Policy liveness is off-chain | Since Run 4d `QEDTreasuryPolicy` enforces the policy's safety clauses on-chain (shortfall, bounds, cost, no provable over-conversion beyond the owner's slack σ). It cannot force an agent to act: a slow or idle agent costs the owner time, not money | K28 |
 | Impact is per tranche against the current mid | Successive tranches can move the price further in total; no cumulative budget or TWAP reference yet | K29, ALGORITHMS §12.8 |
 | One objective type | The live policy keeps a reserve topped up. Other objectives (rebalancing to weights, paying a schedule of invoices in foreign currency) would reuse the same loop but are not implemented | — |
 | The language model is a parser, not a planner | It reads owner instructions; deterministic code decides amounts and routes. This is a deliberate safety choice, not a capability claim | ALGORITHMS §8 |
@@ -57,7 +57,7 @@ product, engineering and evaluation limits so a reviewer can see the whole bound
 ## 6. How the evidence was produced
 
 The build sandbox had no outbound RPC. Every transaction was signed in the sandbox against a replica of Sepolia and
-the identical bytes were broadcast through a browser relay; all 188 public receipts matched the replica (status and
+the identical bytes were broadcast through a browser relay; all 196 public receipts matched the replica (status and
 logs). Two early attempts under other keys were abandoned and are disclosed (K12, EVIDENCE.md). The keys of the very
 first run were lost in a container reset, so that run cannot sign again; its evidence is unaffected.
 

@@ -78,24 +78,25 @@ no funds are at risk.
 | No benchmarks | Deterministic benchmark suite, checked in CI | `benchmarks/run.ts`, `docs/BENCHMARKS.md` | B1–B5 with unfavourable results | `benchmarks/results.json` |
 | Single currency | A multi-currency treasury made of QED vaults | euro reserve = second `QEDVault`, ring-fenced euro liability | — | R1 |
 | The agent decided *how*, never *whether* or *how much* | A standing owner-signed treasury policy; the agent sizes tranches as min(need, impact, policy cap, mandate cap, free funds), waits when the market is too thin, stops at target | `roles/treasury.ts` (`decideTranche`, Proposition 12.8); co-signer P1–P3; `policy-phases.ts` shared by Sepolia and local runs | no human approval per trade; an over-sized request is refused before any transaction exists | Run 4c: PA1 refused, PE1 (impact-limited), PE2 (need-limited), T3 (stop); `local:execute` reproduces it to the raw unit |
+| The policy was enforced by the co-signer only; both hot keys stolen could convert without a need | The owner's policy as a contract: `QEDTreasuryPolicy` is QEDExecution's only operator and refuses no-shortfall, out-of-bounds, over-cost and provably over-sized tranches (Proposition 12.9, by concavity) | `contracts/src/QEDTreasuryPolicy.sol`, 13 tests; Run 4d script with an original-timestamp replica | the agent's discretion over *whether* and *how much* is now bounded by the chain, not only by a second process | Run 4d: QA1–QA4 refused with both real hot keys, QE1 accepted; Sourcify match; `npm run verify` re-checks every clause |
 | No view of a transaction's life | Lifecycle lanes and a nine-state legend (proposed → simulated → evaluated → rejected/authorized → submitted → pending → confirmed/reverted), each tied to a Sepolia step | `app/index.html` | a judge can follow one order from words to receipt | dashboard *Execution* |
 | The independent verifier failed on trades sharing a block | Pre-trade reserves rebuilt from the previous block plus earlier `Sync` events in the same block; failures become CI annotations | `agent/scripts/verify.ts` | `npm run verify` green again on all four runs | CI run after commit `9e466ee` |
 | The pitch led with QED's older features | Deck rebuilt around the upgrade: 15 slides in 9:30 plus 8 backup slides, PDF, timed script, demo and video scripts, 24 judge questions | Slides artifact; `presentation/` | one capability, one picture, every claim a transaction | `presentation/SCRIPT.md` |
 | Docs incomplete for the directive | Prior art, protocol spec, expanded security, attributions, self-review | `docs/*`, `ATTRIBUTIONS.md` | — | this repository |
 
 Not done, honestly: the portfolio from job #1 still feeds nothing; runs remain separate deployments; the standing
-policy is enforced by the co-signer and the mandate rather than by a contract (K28); impact is bounded per tranche,
+policy's liveness is not enforced (K28); impact is bounded per tranche,
 not cumulatively (K29); concentrated-liquidity venues; external audit; a rehearsal of the talk by the team.
 
 ## 4. Scores after the upgrade
 
 | Dimension | Before | After | Why it moved (or not) |
 |---|--:|--:|---|
-| Conceptual originality | 6.0 | 7.5 | a capability we found nowhere else (PRIOR_ART §0), with a falsifiable theorem and money on it |
-| Mathematical sophistication | 7.5 | 8.0 | routing duality, closed-form venue values, a rounding-safe integer bound, a convex solver, the tranche rule (Prop. 12.8) |
-| Autonomous financial capability | 4.5 | 7.0 | the agent now decides whether, how much and how to convert under one signed policy, waits or stops on its own, and a second process re-derives every decision; the policy itself is enforced off-chain (K28) |
-| On-chain functionality | 8.0 | 8.5 | 65 more transactions, 11 more contracts, 11 more refused attacks, all receipts matched |
-| Security architecture | 8.0 | 8.5 | a fourth layer: agent discretion in trading bounded at τ = 1 ppm; policy over-reach refused before signing |
+| Conceptual originality | 6.0 | 8.0 | a capability we found nowhere else (PRIOR_ART §0), with a falsifiable theorem and money on it, and an on-chain over-conversion test that needs no solver (Proposition 12.9) |
+| Mathematical sophistication | 7.5 | 8.5 | routing duality, closed-form venue values, a rounding-safe integer bound, a convex solver, the tranche rule (Prop. 12.8) and the concavity certificate against over-conversion (Prop. 12.9) |
+| Autonomous financial capability | 4.5 | 7.5 | the agent decides whether, how much and how to convert under one owner policy, waits or stops on its own; a second process re-derives every decision and a contract enforces the policy's safety clauses even with both hot keys stolen |
+| On-chain functionality | 8.0 | 8.5 | 73 more transactions, 12 more contracts, 15 more refused attacks, all receipts matched |
+| Security architecture | 8.0 | 9.0 | two new on-chain layers: agent discretion in routing bounded at τ = 1 ppm, and in sizing bounded by the policy contract (no shortfall, bounds, cost, over-conversion) even with both hot keys stolen |
 | Smart-contract correctness | 7.5 | 8.0 | soundness fuzzers, bit-exact cross-language parity, positive controls; still unaudited |
 | Software engineering | 7.0 | 7.5 | engine and role modules, shared policy phases, typed, tested; orchestration scripts still long |
 | System integration | 6.5 | 7.5 | the new module composes with the unchanged vault and co-signer; runs are still separate deployments |
@@ -109,8 +110,9 @@ not cumulatively (K29); concentrated-liquidity venues; external audit; a rehears
 **Is the improvement substantive?** Yes, on three axes a skeptical judge would check: there is a capability we
 could not find elsewhere (an on-chain condition that a trade be within 1 ppm of the best route through permitted
 venues), it is exercised by real transactions including attacks a slippage-only wallet would accept, and the agent
-now exercises discretion that is bounded twice (co-signer recomputation, chain proof). It is not a 10 on any axis:
-the venue model is constant-product only, the policy is not yet a contract, and nothing is audited.
+now exercises discretion that is bounded three times (co-signer recomputation, the policy contract, the chain's
+proof of best execution). It is not a 10 on any axis: the venue model is constant-product only, the policy enforces
+safety but not liveness, and nothing is audited.
 
 ## 5. Adversarial panel: the strongest criticism from each seat
 
@@ -124,7 +126,7 @@ the venue model is constant-product only, the policy is not yet a contract, and 
 | Security engineer | "Cheapest attack: sandwich below the floor." | Yes, ≤ 1% of a trade (K23), the same as every slippage-protected wallet, but the agent can no longer add its own leakage on top. | private order flow; TWAP screen |
 | Software architect | "Four runs, four orchestrators, a browser relay." | Each run is reproducible locally (`npm run local*`) and verified from the public chain; the relay is disclosed. | one long-lived deployment |
 | Product designer | "Too much to explain in ten minutes." | The deck now leads with one capability and one picture (the accept zone). | user testing |
-| FinTechathon judge | "Is anything here new and real?" | Live Sepolia transactions for each claim, 23 Sourcify-verified contracts, a theorem with money on it, and a prior-art page that says what is not ours. | — |
+| FinTechathon judge | "Is anything here new and real?" | Live Sepolia transactions for each claim, 24 Sourcify-verified contracts, a theorem with money on it, and a prior-art page that says what is not ours. | — |
 
 ## 6. Research question this supports
 
@@ -154,12 +156,12 @@ PARTIAL means part of it is not done; NOT VERIFIED means we could not check it o
 | Gate | Verdict | Evidence |
 |---|---|---|
 | Novelty | **PASS** (with stated limits) | `docs/PRIOR_ART.md` §0: no prior system found that makes the optimality of an executed route an on-chain condition of the trade; every ingredient cited |
-| Correctness | **PASS** | Theorem 12.3 with proof, Proposition 12.8; 132 Solidity + 60 TypeScript tests passing; bit-exact TS ≡ Solidity parity; `npm run verify` green in CI |
-| Autonomy | **PASS** (policy enforced off-chain, K28) | Run 4c on Sepolia: policy signed once; PA1 refused; PE1 impact-limited; PE2 need-limited; T3 stop; `local:execute` reproduces it; ARCHITECTURE §3.6 maps the twelve-step loop |
-| Security | **PASS** | I1–I26 with tests; 44 attack transactions on Sepolia, each reverted with its designed error; honeypot keys published; K1–K29 disclosed |
-| Execution | **PASS** | 188 Sepolia transactions in four runs, 188/188 receipts matched the replica; 23 contracts verified on Sourcify |
+| Correctness | **PASS** | Theorem 12.3 with proof, Proposition 12.8; 145 Solidity + 60 TypeScript tests passing; bit-exact TS ≡ Solidity parity; `npm run verify` green in CI |
+| Autonomy | **PASS** | Run 4c: policy signed once; PA1 refused; PE1 impact-limited; PE2 need-limited; T3 stop; `local:execute` reproduces it. Run 4d: the policy as a contract, QA1–QA4 refused with both hot keys stolen, QE1 accepted. ARCHITECTURE §3.6 maps the twelve-step loop. Liveness is not enforced (K28) |
+| Security | **PASS** | I1–I27 with tests; 48 attack transactions on Sepolia, each reverted with its designed error; honeypot keys published; K1–K29 disclosed |
+| Execution | **PASS** | 196 Sepolia transactions in four runs, 196/196 receipts matched the replica; 24 contracts verified on Sourcify |
 | Reproducibility | **PASS** | CI runs all four economies, the benchmarks (diffed) and `verify`; clean-clone log in TESTING.md; REPRODUCIBILITY.md |
-| Innovation | **PASS** | E1 (0.17 ppm), the accept-zone attacks EA1–EA3, PE1/PE2, ExecutionBounty unclaimed |
+| Innovation | **PASS** | E1 (0.17 ppm), the accept-zone attacks EA1–EA3, PE1/PE2, QA2 (over-conversion refused by concavity), ExecutionBounty unclaimed |
 | UX | **PASS** (no user testing) | every dashboard section rendered at 1366 px and 390 px in light and dark: no horizontal overflow, no script errors; nine transaction states shown |
 | Presentation | **PASS** | 15-slide deck + 8 backup slides, every slide rendered and inspected; vector PDF; notes timed at 9:30; demo and video scripts; 24 judge questions. The PowerPoint file is one click in the deck's export menu |
 | Documentation | **PASS** | docs index maps every document the brief names; PDFs rebuilt from the final docs |

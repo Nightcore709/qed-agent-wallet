@@ -29,7 +29,7 @@ Expect `Compiler run successful`. Submodules: OpenZeppelin 5.1 and forge-std.
 ## 2. Tests (≈ 2½ min)
 
 ```bash
-forge test          # expect: 132 tests passed, 0 failed   (≈ 100 s; invariants ≈ 350 k adversarial calls)
+forge test          # expect: 145 tests passed, 0 failed   (≈ 100 s; invariants ≈ 350 k adversarial calls)
 npm run test:ts     # expect: # tests 60  # pass 60        (≈ 35 s; starts its own anvil for TS ≡ Solidity parity)
 npm run typecheck   # expect: no output
 ```
@@ -79,7 +79,7 @@ Only solver wall-clock time varies between machines; it is printed, not stored.
 npm run verify                                   # RPC_URL and ARCHIVE_RPC may be overridden
 ```
 
-It checks, from a public Sepolia RPC: the bytecode of all 23 contracts against this build; every recorded
+It checks, from a public Sepolia RPC: the bytecode of all 24 contracts against this build; every recorded
 receipt's status, sender and events; every reverted attack's custom error by replaying it on archive state;
 signatures recovered from calldata; the KKT certificate and the netting certificate re-checked; the Groth16 proof
 re-verified with snarkjs; for each accepted conversion (E1, E2, PE1, PE2) the bound recomputed from the pre-trade
@@ -94,7 +94,7 @@ node agent/scripts/sourcify-inputs.mjs           # regenerates verification/<Con
 solc --standard-json < verification/QEDExecution.json > out.json   # solc 0.8.26
 ```
 
-All 23 contracts are verified on Sourcify with creation and runtime match ([verification/README.md](../verification/README.md)).
+All 24 contracts are verified on Sourcify with creation and runtime match ([verification/README.md](../verification/README.md)).
 
 ## 7. Regenerate derived files
 
@@ -143,6 +143,10 @@ KEYS_FILE=.keys.env.execution EXTRA_KEYS=.keys.env.clearing SCRIPT=agent/scripts
 # 4. finalize: agent/scripts/finalize-execution*.ts merges public receipts into evidence/ethereum-sepolia/execution/
 ```
 
-All 188 receipts matched (status and every log, excluding the chain's EIP-7708 system log). Because the hashes are
+Run 4d (`agent/scripts/execute-policy-chain.ts`) also sets `ANVIL_GENESIS_TS` to a time before Run 4, so the replica
+replays Runs 4–4c **at their original block timestamps**: their certificates had expired by then, and a wall-clock
+replay would have diverged.
+
+All 196 receipts matched (status and every log, excluding the chain's EIP-7708 system log). Because the hashes are
 of the exact signed bytes, anyone can confirm the relay changed nothing: `keccak256(raw)` of each outbox entry is the
 transaction hash on Etherscan.

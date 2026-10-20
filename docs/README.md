@@ -14,14 +14,14 @@ content lives, so nothing is duplicated.
 | SECURITY_SELF_ASSESSMENT | [`SECURITY.md`](SECURITY.md): permission tiers, properties I1–I26 with their tests, proven vs assumed, known risks K1–K29, key lifecycle, oracles, MEV, availability, administration, incident response, compliance controls |
 | THREAT_MODEL | [`SECURITY.md` §4](SECURITY.md#4-threat-model): assets, fourteen adversaries with the evidence of each outcome, STRIDE |
 | PRIOR_ART_AND_NOVELTY | [`PRIOR_ART.md`](PRIOR_ART.md): what exists (agent wallets, intents, solver auctions, CFMM routing theory, verifiable computation) and what we found no prior system doing |
-| DEPLOYMENT | [`DEPLOYMENT.md`](DEPLOYMENT.md): 23 live contracts, prerequisites, local and public-network runs, operations runbook |
-| TESTING | [`TESTING.md`](TESTING.md): the 132 Solidity and 60 TypeScript tests, end-to-end runs, clean-clone reproduction log |
+| DEPLOYMENT | [`DEPLOYMENT.md`](DEPLOYMENT.md): 24 live contracts, prerequisites, local and public-network runs, operations runbook |
+| TESTING | [`TESTING.md`](TESTING.md): the 145 Solidity and 60 TypeScript tests, end-to-end runs, clean-clone reproduction log |
 | BENCHMARKS | [`BENCHMARKS.md`](BENCHMARKS.md): B1–B5 against the original QED, baselines, prior techniques and ablations, with failures reported |
 | REPRODUCIBILITY | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md): exact commands to build, test, run, verify and re-derive every published number |
 | KNOWN_LIMITATIONS | [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md): what QED does not do, what is assumed, and what is unverified |
 | SUBMISSION_CHECKLIST | [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md): every required and optional item, with its status |
 | ATTRIBUTIONS | [`../ATTRIBUTIONS.md`](../ATTRIBUTIONS.md): libraries, papers and generated code, with licences |
-| Execution evidence | [`EVIDENCE.md`](EVIDENCE.md) (generated from the manifests): all 188 Sepolia transactions, with blocks, gas and the error of every reverted attack |
+| Execution evidence | [`EVIDENCE.md`](EVIDENCE.md) (generated from the manifests): all 196 Sepolia transactions, with blocks, gas and the error of every reverted attack |
 | Audit, decisions, changelog, expert review, quality gates, before/after scores | [`SELF_REVIEW.md`](SELF_REVIEW.md) |
 | Presentation | [`../presentation/SCRIPT.md`](../presentation/SCRIPT.md) (timed talk and demo script), [`../presentation/JUDGE_QA.md`](../presentation/JUDGE_QA.md) |
 | PDFs for the submission email | [`pdf/`](pdf/): technical documentation, security self-assessment, execution evidence |

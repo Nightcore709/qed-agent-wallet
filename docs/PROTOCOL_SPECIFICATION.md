@@ -112,6 +112,30 @@ from the chain: P1 a shortfall exists and a tranche is due; P2 `minTranche ≤ r
 requested tranche's execution cost against mid is within `max impact bps`. The policy is reusable until `valid until`;
 it is revoked immediately by voiding the mandate it runs under (`bumpEpoch`) or by rotating the operator.
 
+### 3.4 `QEDTreasuryPolicy` (Run 4d; no domain of its own)
+
+```
+Policy { uint256 targetFree; uint256 minTranche; uint256 maxTranche; uint16 maxImpactBps; uint16 needSlackBps; uint64 validUntil }
+constructor(QEDExecution execution, QEDVault reserve, address agent)   — tokenIn = execution.asset(), tokenOut = reserve.asset()
+setPolicy(Policy) · revoke() · setAgent(address)                        — only treasury.owner(); setPolicy requires
+                                                                          0 < minTranche ≤ maxTranche, κ ≤ 1,000, σ ≤ 1,000, target > 0
+```
+
+The vault owner makes the contract QEDExecution's operator (`setOperator`). `convert(m, ownerSig, c, cosignerSig,
+order, route, prices)` takes exactly `trade`'s arguments; callable only by `agent`. In order:
+
+1. `block.timestamp ≤ validUntil` else `PolicyLapsed`; `order.tokenOut == tokenOut` and `order.recipient == reserve`
+   else `WrongOrder`; `minTranche ≤ c.amount ≤ maxTranche` else `TrancheOutOfBounds`.
+2. `free_before = reserve.freeBalance() < targetFree` else `NoShortfall(free, target)`.
+3. `midOut = ⌊a·ΣR_out/ΣR_in⌋` over the venues that trade the pair directly, before the trade (`NoDirectVenue` if none).
+4. `(out, bound) = execution.trade(…)`: every check of §3 applies.
+5. `out·10⁴ ≥ midOut·(10⁴ − κ)` else `ExecutionCostTooHigh(out, midOut, κ)`.
+6. `free_before·a + out·(a − ⌊a·σ/10⁴⌋) < targetFree·a` else `OverConversion(free_before, out, target)`.
+7. `reserve.freeBalance() == free_before + out` else `ReserveMismatch`.
+
+Event `PolicyConversion(intentId, nonce, amountIn, amountOut, midOut, freeBefore, freeAfter)`; `PolicySet` on every
+change. Views `policy()`, `shortfall()`, `midOut(a)`.
+
 ## 4. `ProofEscrow` (EIP-712 domain `"ProofEscrow"`, version `"1"`)
 
 ```

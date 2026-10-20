@@ -63,6 +63,20 @@ The fixture (`npm run fixtures:execution`) is the TypeScript engine's output on 
 * `testFuzz_boundIsNeverBeaten` and `testFuzz_nearOptimalRoutesNeverBeatTheBound` (2,000 runs each): random amounts, random routes over all five venues and random price vectors; no executed route ever returns more than the on-chain bound (Theorem 12.3, weak duality with upward rounding).
 * `ExecutionBounty` (6 tests): the optimal route and lowered prices cannot claim; the pool's own holdings and over-spending cannot be used; `testFuzz_bounty_neverPays` (2,000 runs); **positive control:** against an unsound bound source the bounty pays the first real refutation.
 
+### `QEDTreasuryPolicy.t.sol` (13 tests): the owner's policy, enforced on-chain
+
+With QEDTreasuryPolicy as QEDExecution's operator and the fixture's 20 tUSD route (18.086846 tEUR, 111.5 bps against mid):
+* Accepted: a tranche under a target it does not over-shoot; a tranche that exactly covers the need (shortfall just
+  above out·(1 − σ)); the mid-price reference equals ΣR_out/ΣR_in of the direct venues.
+* Refused: no shortfall (`NoShortfall`); over-conversion (`OverConversion`); cost above κ = 100 bps
+  (`ExecutionCostTooHigh`); a tranche above the owner's maximum (`TrancheOutOfBounds`); a lapsed and a revoked policy
+  (`PolicyLapsed`); an order paying anyone but the reserve (`WrongOrder`); the agent's key calling `trade` directly
+  (`NotOperator`) and anyone else calling `convert` (`NotAgent`); non-owners configuring it, and invalid parameters.
+* `test_ringFencingCreatesTheShortfall`: the owner ring-fences reserve money for a creditor; the shortfall that
+  creates makes the same tranche legitimate.
+* `testFuzz_everyAcceptedTrancheSatisfiesThePolicy` (2,000 runs over target, κ and σ): every accepted tranche
+  satisfies C1–C4; every refused one breaks at least one, and nothing moves.
+
 ## TypeScript (`node --test`, `agent/test`)
 
 | File | What it proves |
@@ -93,5 +107,5 @@ The fixture (`npm run fixtures:execution`) is the TypeScript engine's output on 
 | 2026-10-19 16:50 | Fresh Linux container with nothing installed (no Foundry, no keys, no prior state) | `git clone --recursive`, install Foundry 1.7.1 + solc 0.8.26 from their GitHub releases, `npm ci`, `forge build`, `forge test`, `npm run test:ts` | **67 / 67** Solidity tests and **42 / 42** TypeScript tests passed |
 | 2026-10-19 21:46 | Fresh `git clone --recursive` of commit `dee4c07` into an empty directory (Foundry 1.7.1 toolchain present; no keys, no `node_modules`, no build output) | `npm ci`, `forge build`, `forge test`, `npm run test:ts`, `QED_OFFLINE=1 npm run local`, `npm run local:clearing` | **82 / 82** Solidity and **45 / 45** TypeScript tests passed; both economies ran end to end on a local chain (4 min 6 s) |
 | 2026-10-20 02:29 | Fresh `git clone --recursive` of commit `aeaf628` into an empty directory (Foundry 1.7.1 toolchain present; no keys, no `node_modules`, no build output) | `npm ci`, `forge build`, `forge test`, `npm run test:ts`, `QED_OFFLINE=1 npm run local`, `npm run local:clearing`, `npm run local:private` | **104 / 104** Solidity and **50 / 50** TypeScript tests passed; all three economies ran end to end on a local chain, including a real Groth16 proof (4 min 49 s) |
-| 2026-10-20 14:20 IST | Fresh `git clone --recursive` of commit `87cb60c` into an empty directory (Foundry 1.7.1 toolchain present; no keys, no `node_modules`, no build output) | `npm ci`, `forge build`, `forge test`, `npm run test:ts`, `QED_OFFLINE=1 npm run local:execute` | **132 / 132** Solidity and **60 / 60** TypeScript tests passed; the best-execution economy and the standing-policy loop ran end to end with dev keys, the policy met its target (3 min 58 s) |
+| 2026-10-20 13:40 IST | Fresh `git clone --recursive` of commit `87cb60c` into an empty directory (Foundry 1.7.1 toolchain present; no keys, no `node_modules`, no build output) | `npm ci`, `forge build`, `forge test`, `npm run test:ts`, `QED_OFFLINE=1 npm run local:execute` | **132 / 132** Solidity and **60 / 60** TypeScript tests passed; the best-execution economy and the standing-policy loop ran end to end with dev keys, the policy met its target (3 min 58 s) |
 | every push + daily | GitHub Actions `ubuntu-latest` | `.github/workflows/ci.yml`: Solidity suite, TypeScript suite, all four economies on a local chain, benchmark reproducibility, `npm run verify` (all four runs) against public Sepolia | green |

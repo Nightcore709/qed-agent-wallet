@@ -60,7 +60,7 @@ Who can actually move money? On the left, what might be wrong or compromised: th
 
 ### 9. Each outcome is a public transaction you can open. · 5:17
 
-Topic F's four outcomes, each a transaction. One: a separate agent key under an independent certificate: L4 for a payment, E1 for a trade, PE1 for a trade the agent started itself. Two: paid work settled through escrow, on an optimality proof and on a zero-knowledge proof. Three: 44 attacks, 44 reverts, nothing to the attacker. Four: one command re-derives every claim, with no keys, daily in CI.
+Topic F's four outcomes, each a transaction. One: a separate agent key under an independent certificate: L4 for a payment, E1 for a trade, PE1 for a trade the agent started itself. Two: paid work settled through escrow, on an optimality proof and on a zero-knowledge proof. Three: 48 attacks, 48 reverts, nothing to the attacker. Four: one command re-derives every claim, with no keys, daily in CI.
 
 ### 10. What the proof buys, including where it buys little · 5:49
 
@@ -109,5 +109,5 @@ Fallbacks: if the dashboard's live RPC is slow it shows the committed snapshot a
 | 1:50–2:35 | Accept-zone strip; EA1 on Etherscan | “Now a compromised agent with a genuine co-signed order. A route over the direct pools only is 33 basis points short; any one-percent wallet accepts it. QED reverts it: NotBestExecution. So does a half-basis-point skim, a fake price proof, a stranded token, a redirected output and a front-run.” |
 | 2:35–3:25 | Lifecycle lane “The agent decides”; slide 7 | “Then the agent decides for itself. The owner signed one policy: keep 45 euros free in the reserve, at most 150 basis points per tranche. The agent sized each trade itself: first by market impact, then by remaining need, and stopped when the target was met. When it over-reached, the independent co-signer recomputed the rule and refused. Every trade was proved best on-chain.” |
 | 3:25–4:05 | Slide 8, then slide 11 | “The AI is never the sole authority: the language model holds no key, an independent co-signer re-derives every decision, and the vault and execution contracts have the last word. And we put money on the theorem: a thousand test dollars to anyone whose route beats the bound. Nobody has.” |
-| 4:05–4:40 | Terminal: `npm run verify` scrolling; slide 14 | “Don't trust us: one command re-derives every claim from a public Sepolia node, without keys, and another reproduces the agent's trades on a laptop to the last unit. 188 transactions, 23 verified contracts, 44 refused attacks.” |
+| 4:05–4:40 | Terminal: `npm run verify` scrolling; slide 14 | “Don't trust us: one command re-derives every claim from a public Sepolia node, without keys, and another reproduces the agent's trades on a laptop to the last unit. 196 transactions, 24 verified contracts, 48 refused attacks.” |
 | 4:40–4:55 | Slide 15 | “Agents will hold the money. QED makes them prove it.” |

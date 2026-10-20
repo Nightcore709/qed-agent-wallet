@@ -73,6 +73,7 @@ everything that decides whether money moves is on-chain and checks proofs.**
 | `QEDExecution` | 9.6 KB | Lets a vault's agent convert money with **best execution proved on-chain**. It is the vault's `agent`: funds arrive only through `executePayment` in the same transaction; the co-signed order fixes recipient, floor, tolerance and venue set; the contract computes the weak-duality bound over every owner venue from live reserves, runs the agent's route and refuses any output more than τ below the bound (ALGORITHMS §12). Holds nothing between transactions. |
 | `CPMMPool` | 2.1 KB | Trading venue with the Uniswap V2 pair interface and invariant, fee as a parameter; liquidity by transfer + `sync`. |
 | `ExecutionBounty` | 3.7 KB | Pays its pool to anyone whose route, run on the bounty's own funds, beats `QEDExecution.quoteBound` (Theorem 12.3). |
+| `QEDTreasuryPolicy` | 6.8 KB | The owner's standing conversion policy as a contract and QEDExecution's only operator: refuses a tranche with no shortfall, outside bounds, above κ against mid, or provably larger than needed (ALGORITHMS §12.9). |
 | `TestUSD`, `TestToken` | 2.1 KB, 1.8 KB | Valueless test tokens: tUSD (6 dp, public 1 000/day faucet), tEUR (6 dp) and tETH (18 dp). |
 
 ### Off-chain (`agent/`, TypeScript, viem)
@@ -235,7 +236,7 @@ re-derives before anything is signed.
 | 6 | Apply the innovation | `planTrade` → `quoteBound` | the route's dual-price proof is computed and pre-flighted against the on-chain bound | `PE1`: 0.18 ppm from the bound |
 | 7 | Decide | `decideTranche` | convert the minimum of the candidates, wait if below the minimum tranche, or do nothing | `T1` convert (impact) · `T2` convert (need) · `T3` none |
 | 8 | Construct a narrowly authorised transaction | co-signer `evaluateTrade` | an independent process re-derives the decision (P1–P3), re-quotes (T1–T3), writes its own floor and τ into the order and certifies `hash(order)`; refuses an over-sized request | `C1`, `C2`; refusal `PA1` |
-| 9 | Execute through a real wallet | operator key → `QEDExecution.trade` → `QEDVault.executePayment` | the vault checks mandate, certificate, caps and solvency; the module checks best execution | `PE1`, `PE2` |
+| 9 | Execute through a real wallet | operator key → `QEDTreasuryPolicy.convert` (Run 4d) → `QEDExecution.trade` → `QEDVault.executePayment` | the policy contract checks shortfall, bounds, cost and need; the vault checks mandate, certificate, caps and solvency; the module checks best execution | `PE1`, `PE2`; `QE1` through the policy contract |
 | 10 | Verify status and state | `execute-policy.ts`, `npm run verify` | receipt status; `BestExecution` event; reserve re-read: its free balance must rise by exactly the output | `PE1` 20.70 → 37.52, `PE2` → 45.00 |
 | 11 | Record evidence | `Evidence`, `records/` | every decision and co-signer record hashed; the certificate anchors the record's hash on chain | `evidence/ethereum-sepolia/execution/` |
 | 12 | Explain | manifest narratives, dashboard | each step says what was decided and which limit bound it | dashboard "The agent decides" lane |
@@ -275,6 +276,7 @@ sequenceDiagram
 | 2. Co-signer | independent process & key | anything not justified by a signed invoice + funded job, an owner confirmation, or a standing owner policy it re-derives itself |
 | 3. Vault | Ethereum | everything outside the owner's mandate, caps, solvency, replay, pause — even if layers 1 and 2 are both compromised |
 | 4. Proof of best execution | Ethereum | a conversion more than τ = 1 ppm below the best route, a changed order, a stranded token — even with the agent key stolen |
+| 5. The policy as a contract | Ethereum | a conversion the owner's objective does not need, outside its bounds or above its cost limit — even with the agent **and** co-signer keys stolen |
 
 ## 4. Data & evidence model
 
