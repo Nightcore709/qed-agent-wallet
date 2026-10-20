@@ -160,19 +160,19 @@ sequenceDiagram
   participant H as Helix (data vendor)
   participant C as Northwind (client)
   participant A as QED agent
-  participant E as ProofEscrow (job #1's escrow)
+  participant E as ProofEscrow (the escrow of job 1)
   participant P as PrivateMinVarianceVerifier
   participant G as Groth16Verifier
-  H-->>A: covariance Σ (licensed, off-chain) + signed Poseidon commitment
-  A-->>C: EIP-712 quote: verifier = P, spec = (commitment, attestation, provider = QED)
+  H-->>A: covariance Σ (licensed, off-chain) and a signed Poseidon commitment
+  A-->>C: EIP-712 quote with verifier P and a spec naming QED as provider
   C->>E: open(quote) — 12 tUSD escrowed
-  A->>A: optimum + KKT certificate in fixed point → Groth16 proof (1.5 s)
+  A->>A: optimum and KKT certificate in fixed point, then a Groth16 proof (1.5 s)
   A->>E: deliver(spec, proof, weightsCommitment, variance)
   E->>P: verify(spec, solution)
-  P->>P: Helix's attestation? public signals canonical?
-  P->>G: verifyProof(a, b, c, [weightsCommitment, variance, dataCommitment, QED])
-  E-->>A: 12 tUSD into QED's vault — Σ and w never on-chain
-  A-->>C: w + salt off-chain; the client re-hashes them to the commitment
+  P->>P: vendor attestation valid, public signals canonical
+  P->>G: verifyProof(a, b, c, public signals)
+  E-->>A: 12 tUSD into the QED vault, while Σ and w never reach the chain
+  A-->>C: w and its salt off-chain, re-hashed by the client against the commitment
 ```
 
 ### 3.5 Defence in depth against a manipulated agent
