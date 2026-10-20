@@ -1,32 +1,65 @@
 # QED — proof-carrying autonomy for AI-agent wallets
 
-**An autonomous on-chain wallet in which the AI is allowed to be wrong, manipulated or stolen — and the money is still safe, because every payment carries a proof the chain checks.**
+**An autonomous on-chain wallet in which the AI is allowed to be wrong, manipulated or stolen — and the money is still safe, because every movement of money carries a proof the chain checks: who may pay, what may never be spent, whether paid work is optimal, whether a clearing is maximal, and whether a trade got the best price any route could.**
 
 FinTechathon 2026 · International Track · Topic F — Autonomous On-chain Wallet ·
-Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-agent-wallet/) · [Evidence](docs/EVIDENCE.md) · [Security self-assessment](docs/SECURITY.md) · [Algorithms](docs/ALGORITHMS.md) · [Architecture](docs/ARCHITECTURE.md) · PDFs: [technical documentation](docs/pdf/QED-Technical-Documentation.pdf), [security self-assessment](docs/pdf/QED-Security-Self-Assessment.pdf), [execution evidence](docs/pdf/QED-Execution-Evidence.pdf)
+Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-agent-wallet/) · [Docs index](docs/README.md) · [Evidence](docs/EVIDENCE.md) · [Security self-assessment](docs/SECURITY.md) · [Algorithms](docs/ALGORITHMS.md) · [Benchmarks](docs/BENCHMARKS.md) · [Prior art](docs/PRIOR_ART.md) · PDFs: [technical documentation](docs/pdf/QED-Technical-Documentation.pdf), [security self-assessment](docs/pdf/QED-Security-Self-Assessment.pdf), [execution evidence](docs/pdf/QED-Execution-Evidence.pdf)
 
-[![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml) · Source of all 12 deployed contracts verified on [Sourcify](verification/README.md) (creation + runtime match)
+[![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml) · Source of all 23 deployed contracts verified on [Sourcify](verification/README.md) (creation + runtime match)
 
 ---
 
-## The idea in seven sentences
+## New: best execution, proved at the instant of the trade
+
+An autonomous treasury must convert money as well as pay it: settle a euro invoice from dollars, sweep revenue into a
+reserve. That is where an agent's discretion is largest and least visible. Wallets and intent standards bound it
+with a minimum output, so a compromised or careless agent can leak up to the whole slippage tolerance on every trade.
+
+In QED the agent may route a conversion however it likes, but it must attach **one price per token**. From those
+prices and the live reserves of *every* venue the owner allows, `QEDExecution` computes, on-chain and in the same
+transaction, a rigorous upper bound on what **any** route could have returned (weak Lagrangian duality for
+constant-product markets, every rounding step upward). It then runs the agent's route, measures what actually
+arrived, and refuses the trade if that is more than **1 ppm** below the bound. Every price vector yields a valid
+bound, so a dishonest agent cannot forge a proof; it can only fail to produce one.
+([§12](docs/ALGORITHMS.md#12-best-execution-proved-at-the-instant-of-the-trade-qedexecution),
+[prior art](docs/PRIOR_ART.md): we found no system that checks the optimality of an executed route on-chain.)
+
+| On Ethereum Sepolia (Run 4) | Result |
+|---|---|
+| [`E1` the agent converts 20 tUSD for the euro reserve over 4 venues and a two-hop path](https://sepolia.etherscan.io/tx/0x56f798cd321e0d85ba6a7b1425dd7b12f04db386a81bf0e67c94374f12f19690) | **18.086846 tEUR delivered; on-chain bound 18.086849: 0.17 ppm from the best possible route** |
+| [`EA1` a compromised agent routes over the direct pools only: −33 bps, *above* the 1% floor](https://sepolia.etherscan.io/tx/0xccd07d1790d002a173435e216c80f0c305e3a10dd0c720548b38d50cd9b54937) | reverted `NotBestExecution` — a slippage-only wallet would have paid it |
+| [`EA2` …skims 0.47 bps](https://sepolia.etherscan.io/tx/0xe9d68952a2c45513966c5b721a50dfb5f48c2aeab858b46a3a007364229f7b90) · [`EA3` …"forges" the prices](https://sepolia.etherscan.io/tx/0x0b4591467b610537b40a2cf6c3df504c0c46e11e16346ce1b148272409ef8472) | reverted `NotBestExecution` · `NotBestExecution` |
+| [`EA4` strand the bridge token](https://sepolia.etherscan.io/tx/0x3a957099556e5e3e20ed29d602dda1c08d7305139a74d6d20d40754f596f4e58) · [`EA5` one pool, −118 bps](https://sepolia.etherscan.io/tx/0x565d52b6c9b507e4489bf2504dd64d634b4bf8cbb8c91b623c71127cf94415e1) · [`EA6` redirect to Mallory](https://sepolia.etherscan.io/tx/0x7e317abb6f9a431600627e1240f3f8743f8258a27591d69ef7c534ef1d5a7066) · [`EA7` no agent key](https://sepolia.etherscan.io/tx/0xf6423a13e09730be435232272f1bd46c58df539fde4bd725e4dbb9bf2c121545) | `Leftover` · `InsufficientOutput` · `OrderMismatch` · `NotOperator` |
+| [`E2` the same co-signed order, honest route](https://sepolia.etherscan.io/tx/0xbd051424e52211d3d5997ffbcbf70e537931bf03b618dcc6d0e9e4d830d60e6f) | **accepted: 17.612720 of ≤ 17.612723 tEUR** |
+| [`EA8` Mallory front-runs a signed order](https://sepolia.etherscan.io/tx/0xaa364d6493cd972e174a6f58302c6261b19478e893372d8eeed4eb75b36f16d1) | reverted `InsufficientOutput` by the co-signed floor; the agent then declines to trade into the moved market |
+| [`XA1`](https://sepolia.etherscan.io/tx/0x05813963ca47b352664df1f66813e7f2c45aeb7636f45ed841b3287537246b4e)–[`XA3` claims on the 1,000 tUSD `ExecutionBounty`](https://sepolia.etherscan.io/tx/0xdc6140ae9fd9d562a9a929d9bc154ad91a690c3d38fe1a1f44b5c3cdd78ab3e2) | `TheoremHolds(output, bound)`: nobody has beaten the bound |
+
+Across 1,000 random markets, routing policies without a proof fall a median **34–117 bps** short of the optimum,
+and among routes that still clear a 1% floor, a hostile agent keeps a median 14–32 bps per trade. With the proof,
+it keeps at most 1 ppm. For small trades in deep markets a good router is already within about 3 bps, so there the
+benefit is the *guarantee*, not the average ([benchmarks](docs/BENCHMARKS.md)). The language layer reads the owner's
+instruction (live model); the co-signer re-quotes independently and writes its own floor into the order; the vault
+is unchanged and still enforces mandate, caps and solvency.
+
+## The idea in eight sentences
 
 1. **The AI holds one key that can call one function.** `QEDVault.executePayment` succeeds only with an owner-signed EIP-712 *mandate* **and** a certificate from an *independent co-signer* (a separate process, a separate key, 12 policy checks) **and** inside an on-chain *solvency invariant* that ring-fences money owed to creditors.
-2. **The worst case is computed, not hoped for.** `QEDLens.blastRadius(vault, horizon)` returns, at any block, the most the vault can lose if *both* hot keys are stolen — and the loss to any address the owner never approved is provably **zero**.
-3. **AI work is paid for proofs, not promises.** In `ProofEscrow` a client pays only when the delivered answer passes an **on-chain optimality check** (exact-integer KKT conditions + a positive-semidefiniteness witness). A lazy or dishonest AI provider is rejected by mathematics and the client is refunded.
-4. **We published the keys.** The honeypot vault's agent *and* co-signer private keys are in this repository. Its 90 tUSD ring-fence is protected by the contract, not by secrecy. [Try to steal it.](#steal-this-the-honeypot)
-5. **Whole agent economies clear by proof.** In `QEDClearing`, five AI businesses that owe each other 200 tUSD but hold only 28 tUSD escape gridlock: the QED agent proves, with an exact linear-programming duality certificate checked on-chain, that its netting is the **largest possible** and leaves every member's net position unchanged. A lazy netting is rejected with `NotProvablyMaximal(162, 169)`. [Details below.](#certified-clearing-a-whole-agent-economy-settles-by-proof)
-6. **Optimality, proven in zero knowledge.** Proving an AI decision correct has meant showing its inputs; confidentiality has meant not showing them. In QED Private the agent proves, in a Groth16 zk-SNARK verified on-chain, that its portfolio is optimal for a data model the vendor attested by commitment. The escrow that settled job #1 pays on that proof, and the chain never sees the model or the portfolio. A copied proof is useless: it is bound to its author. [Details below.](#qed-private-paid-for-a-proof-about-data-nobody-saw)
-7. **Theorems with money on them.** Two contracts each hold 1,000 tUSD and pay it, automatically, to anyone who refutes on-chain the optimality theorem behind job #1 or the maximality theorem behind the clearing house. No judge: the contract checks the counterexample. Every attempt so far reverted with the gap it could not close. [Details below.](#theorems-with-money-on-them)
+2. **Trades carry a proof of best execution.** `QEDExecution` refuses any conversion whose measured output is more than 1 ppm below the bound it computes, from live reserves, for every route through the owner's venues. [Above.](#new-best-execution-proved-at-the-instant-of-the-trade)
+3. **The worst case is computed, not hoped for.** `QEDLens.blastRadius(vault, horizon)` returns, at any block, the most the vault can lose if *both* hot keys are stolen — and the loss to any address the owner never approved is provably **zero**.
+4. **AI work is paid for proofs, not promises.** In `ProofEscrow` a client pays only when the delivered answer passes an **on-chain optimality check** (exact-integer KKT conditions + a positive-semidefiniteness witness). A lazy or dishonest AI provider is rejected by mathematics and the client is refunded.
+5. **We published the keys.** The honeypot vault's agent *and* co-signer private keys are in this repository. Its 90 tUSD ring-fence is protected by the contract, not by secrecy. [Try to steal it.](#steal-this-the-honeypot)
+6. **Whole agent economies clear by proof.** In `QEDClearing`, five AI businesses that owe each other 200 tUSD but hold only 28 tUSD escape gridlock: the QED agent proves, with an exact linear-programming duality certificate checked on-chain, that its netting is the **largest possible** and leaves every member's net position unchanged. A lazy netting is rejected with `NotProvablyMaximal(162, 169)`. [Details below.](#certified-clearing-a-whole-agent-economy-settles-by-proof)
+7. **Optimality, proven in zero knowledge.** Proving an AI decision correct has meant showing its inputs; confidentiality has meant not showing them. In QED Private the agent proves, in a Groth16 zk-SNARK verified on-chain, that its portfolio is optimal for a data model the vendor attested by commitment. The escrow that settled job #1 pays on that proof, and the chain never sees the model or the portfolio. A copied proof is useless: it is bound to its author. [Details below.](#qed-private-paid-for-a-proof-about-data-nobody-saw)
+8. **Theorems with money on them.** Three contracts each hold 1,000 tUSD and pay it, automatically, to anyone who refutes on-chain the optimality theorem behind job #1, the maximality theorem behind the clearing house, or the best-execution bound. No judge: the contract checks the counterexample. Every attempt so far reverted with the gap it could not close. [Details below.](#theorems-with-money-on-them)
 
 ## The four outcomes — each one a public transaction
 
 | # | Outcome asked for | Proof on Ethereum Sepolia |
 |---|---|---|
-| **O1** | A **separate AI-agent key** executes a payment under an **independent policy certificate** | [`L4 0x56a2334e…`](https://sepolia.etherscan.io/tx/0x56a2334eaf8ef1a22323b456f608851a571295a9adac3fb1a8c379c5e58b83b6) — sent **by the agent key** `0x2A10…d0Bb`; mandate signature recovers to the **owner** `0xb7Ed…97f7`; certificate signature recovers to the **co-signer** `0xf1F8…2402`; on-chain `evidenceHash` = keccak256 of the [published decision record](evidence/ethereum-sepolia/records/cosigner/). Also [`C1 0x7000d3cc…`](https://sepolia.etherscan.io/tx/0x7000d3cc8dba8ebed99a2a9d43805b09b70a0ccbf0d33f484ad3fd044b675ee3): a chat request → clarified → corrected → owner-signed confirmation → certified payment. |
+| **O1** | A **separate AI-agent key** executes a payment under an **independent policy certificate** | [`L4 0x56a2334e…`](https://sepolia.etherscan.io/tx/0x56a2334eaf8ef1a22323b456f608851a571295a9adac3fb1a8c379c5e58b83b6) — sent **by the agent key** `0x2A10…d0Bb`; mandate signature recovers to the **owner** `0xb7Ed…97f7`; certificate signature recovers to the **co-signer** `0xf1F8…2402`; on-chain `evidenceHash` = keccak256 of the [published decision record](evidence/ethereum-sepolia/records/cosigner/). Also [`C1 0x7000d3cc…`](https://sepolia.etherscan.io/tx/0x7000d3cc8dba8ebed99a2a9d43805b09b70a0ccbf0d33f484ad3fd044b675ee3): a chat request → clarified → corrected → owner-signed confirmation → certified payment. And [`E1`](https://sepolia.etherscan.io/tx/0x56f798cd321e0d85ba6a7b1425dd7b12f04db386a81bf0e67c94374f12f19690): the agent's operator key trades through `QEDExecution` under a co-signer certificate that commits to the order, with best execution proved on-chain. |
 | **O2** | A **paid-work lifecycle** that ends in a **real escrow settlement** | Twice. **Private:** [`Z3` the same escrow pays 12 tUSD into QED's vault on a zero-knowledge proof of optimality](https://sepolia.etherscan.io/tx/0xbb619bf09eebacd240514eab5ec4a03c189612954101b07c59a11fa56f612ec7) for data the chain never sees. **Public:** RFQ → agent-signed quote → [`L2` client funds escrow, 15 tUSD](https://sepolia.etherscan.io/tx/0xa0546be0dc61e68e2f9b5ed2c1455dcb33bce6911ca762adae486f2a5f0646b9) → [`L4` agent buys the risk model it needs](https://sepolia.etherscan.io/tx/0x56a2334eaf8ef1a22323b456f608851a571295a9adac3fb1a8c379c5e58b83b6) → solves → [`L6` delivers portfolio + KKT certificate, verified **on-chain**, 15 tUSD settles into the agent's vault](https://sepolia.etherscan.io/tx/0x4166253f06143b2a07b3c77fb4d4603a33e84f3b6706363f0d727f485f9335f9). Competing provider's lazy answer [`X17` rejected: `DualityGapTooLarge`](https://sepolia.etherscan.io/tx/0x5a6f26aca564583a77b0a0be3c65d830a5ef0e616591c1e5c4e755e1f6ec6481), near-miss [`X18` rejected: `StationarityViolated`](https://sepolia.etherscan.io/tx/0xc269055a7f1e1238e23814e5bc1c034d9bfa28dcd55f116766d7887be987f0fe), client [`X19` refunded](https://sepolia.etherscan.io/tx/0x014cb96984b48ea63495b4dec56471dd3a186757b3e07799b39f13876a144b83). |
-| **O3** | An **adversarial agent cannot violate a protected liability or tamper with signed terms** | **19 attack transactions, all reverted on-chain with exactly the designed error** — tampered quote price/payee (`BadProviderSignature` ×2), forged/altered/redirected certificates (`BadCosignerSignature` ×3), both hot keys stolen paying the attacker (`PayeeNotInMandate`), self-signed mandate (`BadOwnerSignature`), replay (`IntentAlreadyUsed`), drain beyond free balance (`SolvencyViolation`), beyond the 24 h window (`ExceedsDailyCap`), admin calls (`NotOwner`, `NotCreditor`), published-key honeypot (×3), payment while paused (`VaultPaused`). Ring-fenced 70 tUSD reached **only** its creditor — [settled by the attacker's own address while the vault was paused](https://sepolia.etherscan.io/tx/0x9f4a753c58da0f5831d705973f9b0b5c484fa9baa68e47b8a7dc994a46a4135d). Full table: [docs/EVIDENCE.md](docs/EVIDENCE.md#attack-transactions-19--each-reverted-with-exactly-the-designed-error). Plus **6 attacks on the clearing house** and **8 on the private job and the bounties** (a copied zk proof, an understated variance, self-attested data, five refutation attempts), all reverted. **33 attacks, 33 reverts, 0 tUSD to the attacker.** |
-| **O4** | An **external reviewer can reproduce everything** from GitHub source, tests and receipts | `npm run verify` re-derives every claim from a public RPC with **no keys**: on-chain bytecode == this repo's compiled bytecode; every receipt's status and sender; every revert's custom error (replayed on archive state); signatures recovered from calldata; the KKT certificate re-checked off-chain; the netting certificate re-checked; the Groth16 proof re-verified with snarkjs and the vendor's attestation recovered; both bounty pools intact; Mallory received 0 tUSD. It runs in [CI](.github/workflows/ci.yml) on every push and daily. 104 Solidity tests (unit, fuzz, stateful invariants ≈ 350 k adversarial calls/run, 60 random clearing economies, a real zk proof attacked 2,000 ways) + 50 TypeScript tests. A fresh machine reproduced all of it from a clean clone ([log](docs/TESTING.md#clean-clone-reproduction-log)). |
+| **O3** | An **adversarial agent cannot violate a protected liability or tamper with signed terms** | **19 attack transactions, all reverted on-chain with exactly the designed error** — tampered quote price/payee (`BadProviderSignature` ×2), forged/altered/redirected certificates (`BadCosignerSignature` ×3), both hot keys stolen paying the attacker (`PayeeNotInMandate`), self-signed mandate (`BadOwnerSignature`), replay (`IntentAlreadyUsed`), drain beyond free balance (`SolvencyViolation`), beyond the 24 h window (`ExceedsDailyCap`), admin calls (`NotOwner`, `NotCreditor`), published-key honeypot (×3), payment while paused (`VaultPaused`). Ring-fenced 70 tUSD reached **only** its creditor — [settled by the attacker's own address while the vault was paused](https://sepolia.etherscan.io/tx/0x9f4a753c58da0f5831d705973f9b0b5c484fa9baa68e47b8a7dc994a46a4135d). Full table: [docs/EVIDENCE.md](docs/EVIDENCE.md#attack-transactions-19--each-reverted-with-exactly-the-designed-error). Plus **6 attacks on the clearing house** and **8 on the private job and the bounties** (a copied zk proof, an understated variance, self-attested data, five refutation attempts), all reverted. Plus **11 on best execution** (a direct-only route and a 0.47 bp skim that a 1% slippage floor would allow, a "forged" proof, a stranded token, a redirected order, a front-run, three bounty claims). **44 attacks, 44 reverts, 0 tUSD to the attacker.** |
+| **O4** | An **external reviewer can reproduce everything** from GitHub source, tests and receipts | `npm run verify` re-derives every claim from a public RPC with **no keys**: on-chain bytecode == this repo's compiled bytecode; every receipt's status and sender; every revert's custom error (replayed on archive state); signatures recovered from calldata; the KKT certificate re-checked off-chain; the netting certificate re-checked; the Groth16 proof re-verified with snarkjs and the vendor's attestation recovered; the best-execution bound recomputed from pre-trade reserves and the route replayed; all three bounty pools intact; Mallory received 0 tUSD. It runs in [CI](.github/workflows/ci.yml) on every push and daily, with all four economies and the benchmarks. 132 Solidity tests (unit, fuzz, stateful invariants ≈ 350 k adversarial calls/run, 60 random clearing economies, a real zk proof attacked 2,000 ways, routes and prices fuzzed against the bound 6,000 ways) + 56 TypeScript tests. A fresh machine reproduced all of it from a clean clone ([log](docs/TESTING.md#clean-clone-reproduction-log)). |
 
 ## What makes this different
 
@@ -41,6 +74,7 @@ Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-a
 | Verifying an AI's decision means exposing its data | **Zero-knowledge optimality**: the chain verifies the KKT certificate without seeing the data or the answer |
 | "Trust our audit" | **Bounties the contract adjudicates**: refute the theorem on-chain and the contract pays you |
 | Netting needs a trusted clearing house | **Anyone** can clear; the chain checks that the netting is maximal and moves no value (exact LP-duality certificate) |
+| A slippage limit: the agent may leak up to 0.5–1% per trade | **Best execution proved per trade**: within 1 ppm of the best route through the owner's venues, checked on the state the trade executes on |
 
 ## Architecture
 
@@ -56,6 +90,8 @@ Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-a
             │  ProofEscrow — signed quotes · pays iff verifier accepts · refunds after deadline      │
             │  MinVarianceVerifier — exact KKT + PSD certificate check     QEDLens — blast radius    │
             │  QEDClearing — anyone may net agents' debts; executes only on an LP-duality proof      │
+            │  QEDExecution — the vault's agent for trades; pays out only within 1 ppm of the best   │
+            │                 route through the owner's venues (bound computed on-chain)             │
             └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -117,12 +153,14 @@ Requirements: Node 22, [Foundry](https://getfoundry.sh) (forge, anvil).
 git clone --recursive https://github.com/Nightcore709/qed-agent-wallet && cd qed-agent-wallet
 npm ci && forge build
 
-forge test                      # 104 Solidity tests: invariants with both hot keys stolen, 60 clearing economies, a real zk proof attacked, bounties
-npm run test:ts                 # 50 TS tests: TS ≡ Solidity parity on a live node, solvers vs oracles, zk prover, red-team corpus
-npm run verify                  # re-derive every Sepolia claim (all three runs) from a public RPC — no keys
+forge test                      # 132 Solidity tests: invariants with both hot keys stolen, 60 clearing economies, a real zk proof attacked, best-execution soundness fuzzers, bounties
+npm run test:ts                 # 56 TS tests: TS ≡ Solidity parity on a live node, solvers vs oracles, routing duality on 700 random markets, zk prover, red-team corpus
+npm run verify                  # re-derive every Sepolia claim (all four runs) from a public RPC — no keys
+npx tsx benchmarks/run.ts       # B1–B5 benchmarks and ablations, deterministic (docs/BENCHMARKS.md)
 QED_OFFLINE=1 npm run local     # run the whole autonomous economy on a local chain (deterministic brain, dev keys)
 npm run local:clearing          # run the clearing economy on a local chain
 npm run local:private           # zero-knowledge job + theorem bounties on a local chain
+QED_OFFLINE=1 npm run local:execute   # best-execution economy: 5 venues, 2 conversions, 8 attacks, a front-run
 npm run zk:setup                # re-run the Groth16 trusted setup from the circuit (circom 2.2)
 npm run redteam                 # 32-case red-team corpus against the LLM alone and the guarded pipeline (needs ANTHROPIC_API_KEY)
 ```
@@ -132,26 +170,28 @@ Run the economy against a public network yourself: copy `.env.example`, fund the
 
 ## How the evidence was produced (full disclosure)
 
-Our build sandbox had no RPC egress. Every transaction was signed inside the sandbox — one key per process — against a wall-clock-synchronised replica of Sepolia (same chain id, nonces and balances); the **identical signed bytes** were committed to [`relay/`](relay/) and broadcast unchanged by a browser relay, and each public receipt was compared with the replica's (status + every log): **55/55 matched** for the main run, **44/44** for the clearing run and **24/24** for the private run. Two earlier attempts under other keys failed (Sepolia's state-creation gas repricing; one under-provisioned agent transaction) and were abandoned; the canonical run uses fresh keys. Details: [docs/EVIDENCE.md](docs/EVIDENCE.md#how-these-transactions-were-produced--full-disclosure), risk K12 in [docs/SECURITY.md](docs/SECURITY.md).
+Our build sandbox had no RPC egress. Every transaction was signed inside the sandbox — one key per process — against a wall-clock-synchronised replica of Sepolia (same chain id, nonces and balances); the **identical signed bytes** were committed to [`relay/`](relay/) and broadcast unchanged by a browser relay, and each public receipt was compared with the replica's (status + every log): **55/55 matched** for the main run, **44/44** for the clearing run, **24/24** for the private run and **59/59** for the best-execution run (Run 4b first replayed Run 4's signed bytes on the replica, so its state was Sepolia's). Two earlier attempts under other keys failed (Sepolia's state-creation gas repricing; one under-provisioned agent transaction) and were abandoned; the canonical run uses fresh keys. Details: [docs/EVIDENCE.md](docs/EVIDENCE.md#how-these-transactions-were-produced--full-disclosure), risk K12 in [docs/SECURITY.md](docs/SECURITY.md).
 
 ## Repository map
 
 ```
-contracts/src/          QEDVault · QEDLens · ProofEscrow · QEDClearing · TestUSD
+contracts/src/          QEDVault · QEDLens · QEDExecution · ProofEscrow · QEDClearing · TestUSD
+                        venues/    CPMMPool (Uniswap-V2 interface) · TestToken
                         verifiers/ MinVarianceVerifier · PrivateMinVarianceVerifier · zk/Groth16Verifier (generated)
-                        bounties/  OptimalityBounty · MaximalityBounty
+                        bounties/  OptimalityBounty · MaximalityBounty · ExecutionBounty
 circuits/               private_minvar.circom (Groth16) · setup.sh · ceremony transcript · proving and verification keys
 contracts/test/         unit, fuzz and invariant tests (CompromisedAgentHandler holds both hot keys)
-agent/src/roles/        agent · cosigner (12-check policy engine) · vendor · adversary
+agent/src/roles/        agent · trader (best-execution planning) · cosigner (12 payment checks, 11 trade checks) · vendor · adversary
 agent/src/brain/        LLM adapter · deterministic slot filling · deterministic guard (EN + 中文) · offline brain
-agent/src/engine/       certifying min-variance solver · certifying netting solver (min-mean cycle cancelling) · zk prover · economics
-agent/scripts/          live (full economy) · clearing · private · local · verify (independent) · redteam · build-app · evidence-md
-evidence/ethereum-sepolia/  manifest · public receipts · co-signer & agent decision records · honeypot keys · clearing/ · private/
+agent/src/engine/       certifying min-variance solver · certifying netting solver (min-mean cycle cancelling) · best-execution solver (dual prices, route, bound replica) · zk prover · economics
+agent/scripts/          live (full economy) · clearing · private · execute · execution-bounty · local · verify (independent) · redteam · build-app · evidence-md
+benchmarks/             run.ts → results.json (B1–B5)
+evidence/ethereum-sepolia/  manifest · public receipts · co-signer & agent decision records · honeypot keys · clearing/ · private/ · execution/
 relay/                  the exact signed transactions broadcast to Sepolia
 app/ · site/            the QED Proof Ledger dashboard (GitHub Pages)
-docs/                   ARCHITECTURE · ALGORITHMS · SECURITY · EVIDENCE · DEPLOYMENT · TESTING
+docs/                   index (README) · ARCHITECTURE · ALGORITHMS · PROTOCOL_SPECIFICATION · SECURITY · BENCHMARKS · PRIOR_ART · EVIDENCE · DEPLOYMENT · TESTING · SELF_REVIEW · SUBMISSION_CHECKLIST
 ```
 
 ## Status
 
-Testnet prototype with a valueless token; not audited. The Groth16 parameters come from a local ceremony and must be treated as trusted (risk K18). Known risks are listed honestly in [docs/SECURITY.md §5](docs/SECURITY.md#5-known-risk-list-honest). MIT licence, except `contracts/src/verifiers/zk/Groth16Verifier.sol`, which snarkjs generates under GPL-3.0.
+Testnet prototype with a valueless token; not audited. The Groth16 parameters come from a local ceremony and must be treated as trusted (risk K18). Known risks are listed honestly in [docs/SECURITY.md §5](docs/SECURITY.md#5-known-risk-list-honest), and our own audit, adversarial review and quality gates are in [docs/SELF_REVIEW.md](docs/SELF_REVIEW.md). MIT licence, except `contracts/src/verifiers/zk/Groth16Verifier.sol`, which snarkjs generates under GPL-3.0 ([attributions](ATTRIBUTIONS.md)).

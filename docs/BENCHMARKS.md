@@ -90,17 +90,17 @@ qualitative. With the check, neither deliverable is payable (live attack X17 on 
 
 ## B5 · Authorisation layers: which layer refused each recorded attack
 
-Taken from the public evidence manifests: for every attack transaction on Sepolia (42 across the four runs), the
+Taken from the public evidence manifests: for every attack transaction on Sepolia (44 across the four runs), the
 contract whose check produced the revert.
 
 | Layer that refused the attack | Attacks |
 |---|--:|
-| `QEDVault` (mandate, co-signature, caps, solvency, ring-fence, replay) | 16 |
-| `QEDClearing` (consent, conservation, duality certificate) | 6 |
+| `QEDVault` (mandate, co-signature, caps, solvency, ring-fence, replay, pause) | 15 |
+| `QEDClearing` (conservation, completeness, duality certificate) | 6 |
 | `QEDExecution` (best-execution bound, leftovers, operator) | 5 |
 | `QEDExecution` with the co-signed order (floor, order hash) | 3 |
 | `PrivateMinVarianceVerifier` (proof binding, attestation) | 3 |
-| `OptimalityBounty` · `MaximalityBounty` | 3 · 2 |
+| `OptimalityBounty` · `MaximalityBounty` · `ExecutionBounty` | 3 · 2 · 3 |
 | `ProofEscrow` · `MinVarianceVerifier` | 2 · 2 |
 
 This is not a re-run with layers switched off, so removing a layer does not imply that the next one would have

@@ -137,8 +137,8 @@ const attacks: { run: string; id: string; error: string; layer: string }[] = [];
 for (const f of manifests) {
   const m = JSON.parse(readFileSync(f, "utf8"));
   for (const s of m.steps ?? []) {
-    if (s.expect !== "revert" || !s.tx) continue;
-    const layer = s.attack?.layer ?? "QEDVault";
+    if (s.expect !== "revert" || !s.tx || !s.attack) continue; // designed reverts that are not attacks (e.g. clearing G1) are excluded
+    const layer = s.attack.layer;
     attacks.push({ run: m.run ?? "main", id: s.id, error: s.error?.name ?? "?", layer });
     layerOf[layer] = layer;
   }

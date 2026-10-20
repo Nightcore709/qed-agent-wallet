@@ -173,10 +173,10 @@
     }
   },
   "B5": {
-    "attacksOnSepolia": 45,
+    "attacksOnSepolia": 44,
     "byLayer": {
       "ProofEscrow": 2,
-      "QEDVault": 16,
+      "QEDVault": 15,
       "MinVarianceVerifier": 2,
       "QEDClearing": 6,
       "PrivateMinVarianceVerifier": 3,
@@ -300,12 +300,6 @@
         "run": "main",
         "id": "P2",
         "error": "VaultPaused",
-        "layer": "QEDVault"
-      },
-      {
-        "run": "clearing",
-        "id": "G1",
-        "error": "ERC20InsufficientBalance",
         "layer": "QEDVault"
       },
       {
