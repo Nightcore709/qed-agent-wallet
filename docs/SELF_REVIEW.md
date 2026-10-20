@@ -77,30 +77,40 @@ no funds are at risk.
 | Theorems only as text | Money on Theorem 12.3 | `ExecutionBounty` | anyone can falsify the core inequality for 1,000 tUSD | XA1–XA3; positive control |
 | No benchmarks | Deterministic benchmark suite, checked in CI | `benchmarks/run.ts`, `docs/BENCHMARKS.md` | B1–B5 with unfavourable results | `benchmarks/results.json` |
 | Single currency | A multi-currency treasury made of QED vaults | euro reserve = second `QEDVault`, ring-fenced euro liability | — | R1 |
+| The agent decided *how*, never *whether* or *how much* | A standing owner-signed treasury policy; the agent sizes tranches as min(need, impact, policy cap, mandate cap, free funds), waits when the market is too thin, stops at target | `roles/treasury.ts` (`decideTranche`, Proposition 12.8); co-signer P1–P3; `policy-phases.ts` shared by Sepolia and local runs | no human approval per trade; an over-sized request is refused before any transaction exists | Run 4c: PA1 refused, PE1 (impact-limited), PE2 (need-limited), T3 (stop); `local:execute` reproduces it to the raw unit |
+| No view of a transaction's life | Lifecycle lanes and a nine-state legend (proposed → simulated → evaluated → rejected/authorized → submitted → pending → confirmed/reverted), each tied to a Sepolia step | `app/index.html` | a judge can follow one order from words to receipt | dashboard *Execution* |
+| The independent verifier failed on trades sharing a block | Pre-trade reserves rebuilt from the previous block plus earlier `Sync` events in the same block; failures become CI annotations | `agent/scripts/verify.ts` | `npm run verify` green again on all four runs | CI run after commit `9e466ee` |
+| The pitch led with QED's older features | Deck rebuilt around the upgrade: 15 slides in 9:30 plus 8 backup slides, PDF, timed script, demo and video scripts, 24 judge questions | Slides artifact; `presentation/` | one capability, one picture, every claim a transaction | `presentation/SCRIPT.md` |
 | Docs incomplete for the directive | Prior art, protocol spec, expanded security, attributions, self-review | `docs/*`, `ATTRIBUTIONS.md` | — | this repository |
 
-Not done, honestly: the portfolio from job #1 still feeds nothing; runs remain separate deployments; no autonomous
-treasury policy (conversions are owner-initiated, the agent decides *how*, not *whether*); concentrated-liquidity
-venues; external audit.
+Not done, honestly: the portfolio from job #1 still feeds nothing; runs remain separate deployments; the standing
+policy is enforced by the co-signer and the mandate rather than by a contract (K28); impact is bounded per tranche,
+not cumulatively (K29); concentrated-liquidity venues; external audit; a rehearsal of the talk by the team.
 
 ## 4. Scores after the upgrade
 
 | Dimension | Before | After | Why it moved (or not) |
 |---|--:|--:|---|
-| Conceptual originality | 6.0 | 7.5 | a capability we found nowhere else, with a falsifiable theorem behind it |
-| Mathematical sophistication | 7.5 | 8.0 | duality for routing, closed-form venue values, rounding-safe integer bound, convex solver |
-| Autonomous financial capability | 4.5 | 6.0 | trades, plans, compares, declines; still owner-initiated |
-| On-chain functionality | 8.0 | 8.5 | 59 more transactions, 11 more contracts, 11 more refused attacks |
-| Security architecture | 8.0 | 8.5 | a fourth layer: agent discretion in trading becomes ≤ 1 ppm |
-| Smart-contract correctness | 7.5 | 8.0 | soundness fuzzers, bit-exact cross-language parity, positive controls |
-| Software engineering | 7.0 | 7.5 | engine and role modules, typed, tested; orchestrators still long |
-| System integration | 6.5 | 7.5 | new module composes with the unchanged vault and co-signer; runs still separate |
-| User experience | 6.5 | 7.0 | trade lifecycle view, accept-zone chart |
-| Visual design | 7.0 | 7.5 | figures that show the proof, not decoration |
-| Financial / commercial relevance | 5.5 | 7.0 | best execution is a legal duty; multi-currency treasuries |
-| Presentation | 7.0 | see gates | rebuilt around the upgrade |
-| Reproducibility | 8.5 | 8.5 | unchanged standard, extended to Run 4 |
-| Competition readiness | 7.0 | see gates | |
+| Conceptual originality | 6.0 | 7.5 | a capability we found nowhere else (PRIOR_ART §0), with a falsifiable theorem and money on it |
+| Mathematical sophistication | 7.5 | 8.0 | routing duality, closed-form venue values, a rounding-safe integer bound, a convex solver, the tranche rule (Prop. 12.8) |
+| Autonomous financial capability | 4.5 | 7.0 | the agent now decides whether, how much and how to convert under one signed policy, waits or stops on its own, and a second process re-derives every decision; the policy itself is enforced off-chain (K28) |
+| On-chain functionality | 8.0 | 8.5 | 65 more transactions, 11 more contracts, 11 more refused attacks, all receipts matched |
+| Security architecture | 8.0 | 8.5 | a fourth layer: agent discretion in trading bounded at τ = 1 ppm; policy over-reach refused before signing |
+| Smart-contract correctness | 7.5 | 8.0 | soundness fuzzers, bit-exact cross-language parity, positive controls; still unaudited |
+| Software engineering | 7.0 | 7.5 | engine and role modules, shared policy phases, typed, tested; orchestration scripts still long |
+| System integration | 6.5 | 7.5 | the new module composes with the unchanged vault and co-signer; runs are still separate deployments |
+| User experience | 6.5 | 7.5 | trade lifecycle lanes, accept-zone chart, nine transaction states; checked at 1366 px and 390 px, light and dark; no user testing |
+| Visual design | 7.0 | 7.5 | figures that show the proof itself; dashboard and deck share one typographic system |
+| Financial / commercial relevance | 5.5 | 7.0 | best execution is a legal duty; multi-currency treasuries; no traction claimed |
+| Presentation | 7.0 | 8.0 | rebuilt around one capability; every slide rendered and inspected; talk timed at 9:30; not yet rehearsed by the team |
+| Reproducibility | 8.5 | 9.0 | the autonomous loop now runs with dev keys and reproduces Sepolia to the raw unit; REPRODUCIBILITY.md; verify green |
+| Competition readiness | 7.0 | 8.0 | every mandatory artifact exists; the video and the email are the team's steps |
+
+**Is the improvement substantive?** Yes, on three axes a skeptical judge would check: there is a capability we
+could not find elsewhere (an on-chain condition that a trade be within 1 ppm of the best route through permitted
+venues), it is exercised by real transactions including attacks a slippage-only wallet would accept, and the agent
+now exercises discretion that is bounded twice (co-signer recomputation, chain proof). It is not a 10 on any axis:
+the venue model is constant-product only, the policy is not yet a contract, and nothing is audited.
 
 ## 5. Adversarial panel: the strongest criticism from each seat
 
@@ -110,7 +120,7 @@ venues; external audit.
 | Blockchain engineer | "A malicious pool in the venue set breaks everything." | Only the owner names venues; fees are cross-checked; a change voids every order (K22). | pin venues by code hash |
 | Financial economist | "Your benchmark baselines are strawmen; real aggregators are near-optimal." | Agreed for average-case: small trades gain ~3 bps (B1 by size). The claim is adversarial: a *hostile* router is held to 1 ppm. | mainnet comparison with aggregators |
 | Mathematician | "Path deficiency is assumed, not proved." | Correct: cited (Angeris & Chitra 2020) and tested (3,000 cases plus 4,000 on-chain fuzz runs). | a formal proof for V2 with integer rounding |
-| AI researcher | "The 'AI' is an LLM parser plus convex optimisation." | Intended: probabilistic AI only proposes; decisions that move money are deterministic and provable. The agent now plans, compares and declines. | an autonomous treasury policy |
+| AI researcher | "The 'AI' is an LLM parser plus convex optimisation." | Intended: probabilistic AI only proposes; decisions that move money are deterministic and provable. The agent now decides when and how much under a signed policy, plans, compares, waits and declines. | learning the policy's parameters from outcomes, still bounded by the same checks |
 | Security engineer | "Cheapest attack: sandwich below the floor." | Yes, ≤ 1% of a trade (K23), the same as every slippage-protected wallet, but the agent can no longer add its own leakage on top. | private order flow; TWAP screen |
 | Software architect | "Four runs, four orchestrators, a browser relay." | Each run is reproducible locally (`npm run local*`) and verified from the public chain; the relay is disclosed. | one long-lived deployment |
 | Product designer | "Too much to explain in ten minutes." | The deck now leads with one capability and one picture (the accept zone). | user testing |
@@ -138,19 +148,20 @@ model, not from any single formula.
 
 ## 8. Quality gates
 
+Final state, 20 Oct 2026, after the last commit. PASS means the evidence column supports the claim as stated;
+PARTIAL means part of it is not done; NOT VERIFIED means we could not check it ourselves.
+
 | Gate | Verdict | Evidence |
 |---|---|---|
-| Novelty | **PASS** (with stated limits) | `docs/PRIOR_ART.md` §1–5; no prior on-chain atomic best-execution check found |
-| Correctness | **PASS** | Theorem 12.3 with proof; 132 Solidity + 56 TS tests; bit-exact parity; `npm run verify` |
-| Autonomy | **PARTIAL** | the agent plans, compares, decides and declines (A3, A6, A10), but conversions are owner-initiated |
-| Security | **PASS** | I1–I25; 44 attack transactions on Sepolia, every one reverted with its designed error; honeypot |
-| Execution | **PASS** | 182 Sepolia transactions in four runs, receipts matched |
-| Reproducibility | **PASS** | CI runs all four economies, benchmarks and `verify`; Sourcify for 23 contracts |
-| Innovation | **PASS** | E1/E2 and the accept-zone result (EA1, EA2) |
-| UX | **PARTIAL** | new section rendered and checked at 1366 px and 390 px, light and dark; full-page re-review pending |
-| Presentation | **NOT VERIFIED** | deck rebuild in progress |
-| Documentation | **PARTIAL** | this file and the specs are done; README and PDF rebuild in progress |
-| Integration | **PARTIAL** | the module composes with the unchanged vault and co-signer; runs are separate deployments |
-| Submission | **NOT VERIFIED** | depends on the deck, the PDFs and the user's video and email |
-
-This table is updated at the end of the work; the final state is in `docs/SUBMISSION_CHECKLIST.md`.
+| Novelty | **PASS** (with stated limits) | `docs/PRIOR_ART.md` §0: no prior system found that makes the optimality of an executed route an on-chain condition of the trade; every ingredient cited |
+| Correctness | **PASS** | Theorem 12.3 with proof, Proposition 12.8; 132 Solidity + 60 TypeScript tests passing; bit-exact TS ≡ Solidity parity; `npm run verify` green in CI |
+| Autonomy | **PASS** (policy enforced off-chain, K28) | Run 4c on Sepolia: policy signed once; PA1 refused; PE1 impact-limited; PE2 need-limited; T3 stop; `local:execute` reproduces it; ARCHITECTURE §3.6 maps the twelve-step loop |
+| Security | **PASS** | I1–I26 with tests; 44 attack transactions on Sepolia, each reverted with its designed error; honeypot keys published; K1–K29 disclosed |
+| Execution | **PASS** | 188 Sepolia transactions in four runs, 188/188 receipts matched the replica; 23 contracts verified on Sourcify |
+| Reproducibility | **PASS** | CI runs all four economies, the benchmarks (diffed) and `verify`; clean-clone log in TESTING.md; REPRODUCIBILITY.md |
+| Innovation | **PASS** | E1 (0.17 ppm), the accept-zone attacks EA1–EA3, PE1/PE2, ExecutionBounty unclaimed |
+| UX | **PASS** (no user testing) | every dashboard section rendered at 1366 px and 390 px in light and dark: no horizontal overflow, no script errors; nine transaction states shown |
+| Presentation | **PASS** | 15-slide deck + 8 backup slides, every slide rendered and inspected; vector PDF; notes timed at 9:30; demo and video scripts; 24 judge questions. The PowerPoint file is one click in the deck's export menu |
+| Documentation | **PASS** | docs index maps every document the brief names; PDFs rebuilt from the final docs |
+| Integration | **PARTIAL** | the module composes with the unchanged vault and co-signer, and the reserve is a QED vault; the four runs are still separate deployments, and job #1's portfolio feeds nothing |
+| Submission | **PARTIAL** | all files ready (`docs/SUBMISSION_CHECKLIST.md`); recording the video and sending the email are the team's steps |
