@@ -7,6 +7,12 @@ Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-a
 
 [![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml) · Source of all 24 deployed contracts verified on [Sourcify](verification/README.md) (creation + runtime match)
 
+> **Try it: [the live app](https://qed-judges-preview-production.up.railway.app/)** — no wallet, no keys, no install.
+> Ask the agent, convert any amount within the owner's signed mandate, watch the co-signer and the on-chain proof,
+> sign a standing policy, launch real attacks and see them revert. It runs the real QED contracts on a shared,
+> disposable testnet sandbox chain (valueless tokens, resets when idle); the Sepolia evidence is historical.
+> Details: [docs/INTERACTIVE_DEMO.md](docs/INTERACTIVE_DEMO.md).
+
 ---
 
 ## New: best execution, proved at the instant of the trade
@@ -179,6 +185,21 @@ Helix sells a private-markets covariance model it may not publish; Northwind, a 
 | [`BM1` the naive 162 tUSD netting](https://sepolia.etherscan.io/tx/0x47ef93bf3c1a6eea445dc7f0c1b6ccc4c013105c49da0b508130db38f06562bb) · [`BM2` a 170 tUSD netting](https://sepolia.etherscan.io/tx/0xd5124345468035c6409bcde3792f11ed994c062ba019d18bcb40744f8685af2a) | `TheoremHolds(169, 162)` · `NetPositionChanged` |
 
 `npm run verify` checks daily that both pools are still full. [docs/ALGORITHMS.md §11](docs/ALGORITHMS.md#11-theorems-with-money-on-them-optimalitybounty-maximalitybounty).
+
+## Interactive agent (development preview)
+
+The premium browser interface and bounded real-Anvil API are in [product/index.html](product/index.html) and
+[agent/scripts/demo-server.mjs](agent/scripts/demo-server.mjs). This runs the **existing**
+financial controller, co-signer and Solidity contracts, recording fresh local receipts.
+
+```bash
+npm run demo                 # open http://127.0.0.1:4173
+npm run test:demo            # validate safe instruction allowlist
+npm run test:demo:e2e        # exercise browser API → actual Anvil contracts
+```
+
+This is intentionally localhost-only and uses valueless tokens; it is not yet a hosted production agent
+and does not replace the historical Sepolia proof ledger. [Exact instructions and limitations](docs/INTERACTIVE_DEMO.md).
 
 ## Reproduce
 

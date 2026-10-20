@@ -31,10 +31,18 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - uses: foundry-rs/foundry-toolchain@v1
+        with: { version: v1.7.1 }
       - run: npm ci
       - run: forge build
       - run: npx tsc -p tsconfig.json
       - run: npm run test:ts
+      - run: npm run test:demo
+      - name: Interactive browser API-to-contract real Anvil acceptance test
+        run: |
+          set -o pipefail
+          echo "::notice::$(anvil --version | head -1)"
+          npm run test:demo:e2e 2>&1 | tee e2e.log || { grep -E "not ok|rror|assert|expected|actual|did not|failed" e2e.log | head -25 | sed "s/^/::error::/"; exit 1; }
+        env: { QED_OFFLINE: "1" }
       - name: Run the whole autonomous economy locally (deterministic offline brain, dev keys)
         run: npm run local
         env: { QED_OFFLINE: "1" }

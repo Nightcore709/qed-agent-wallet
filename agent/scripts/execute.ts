@@ -213,7 +213,8 @@ async function main() {
     fn(QEDExecutionAbi, "trade", [mandate, ownerSig, r.certificate, r.signature, order, hopsForChain(route), pricesForChain(prices)]);
 
   // conversion #1
-  const instr1 = "Move 20 tUSD of this month's revenue into the euro reserve — CloudCo's euro invoices are due next week.";
+  // Browser demo forwards an owner instruction without expanding the original signed mandate.
+  const instr1 = process.env.QED_DEMO_INSTRUCTION ?? "Move 20 tUSD of this month's revenue into the euro reserve — CloudCo's euro invoices are due next week.";
   const amt1 = await instruct("A1", instr1);
   const r1 = await review("A2", amt1, instr1, `exec-1-${chainId}`);
   const tp1 = await planTrade(c.pub, exec.address, usd, EUR, amt1);
@@ -224,9 +225,17 @@ async function main() {
   ev.offchain("A3", { phase: "conversion", title: `Agent plans: ${tp1.plan.route.length} hops through ${new Set(tp1.plan.route.map((h) => h.venue)).size} venues, expected ${fmt("tEUR", tp1.plan.sim.amountOut)} tEUR; on-chain bound ${fmt("tEUR", tp1.onchainBound)}`, narrative: `Proof: three prices (ν_tUSD ≈ ${tp1.plan.nu[usd.toLowerCase()].toFixed(6)}, ν_tETH ≈ ${(tp1.plan.nu[ETH.toLowerCase()] * 1e12).toFixed(2)}e−12 per raw unit, ν_tEUR = 1), found in ${tp1.plan.iterations} sweeps. Pre-flighted with quoteBound. Alternatives it rejected: ${alt(tp1)}.`, actor: "QED agent", actorAddress: K.OPERATOR.address, outcomes: ["O1"], artifacts: [{ label: "plan with alternatives", path: pr1.path, hash: pr1.hash }] });
   const e1 = await c.send(K.OPERATOR, exec.address, tradeData(r1, tp1.plan.route, tp1.plan.prices));
   const be1 = e1.events.find((e) => e.name === "BestExecution")!.args as any;
-  ev.tx("E1", { phase: "conversion", title: `Agent converts 20 tUSD → ${fmt("tEUR", BigInt(be1.amountOut))} tEUR into the euro reserve; the chain checks the proof: bound ${fmt("tEUR", BigInt(be1.bound))}`, narrative: `Realised output within ${(((Number(be1.bound) - Number(be1.amountOut)) / Number(be1.bound)) * 1e6).toFixed(3)} ppm of the best any route could have obtained. Funds moved vault → module → four venues → reserve in one transaction; the module holds nothing afterwards.`, actor: "QED agent (operator key)", outcomes: ["O1", "O2"] }, e1);
+  ev.tx("E1", { phase: "conversion", title: `Agent converts ${fmtUsd(amt1)} tUSD → ${fmt("tEUR", BigInt(be1.amountOut))} tEUR into the euro reserve; the chain checks the proof: bound ${fmt("tEUR", BigInt(be1.bound))}`, narrative: `Realised output within ${(((Number(be1.bound) - Number(be1.amountOut)) / Number(be1.bound)) * 1e6).toFixed(3)} ppm of the best any route could have obtained. Funds moved vault → module → four venues → reserve in one transaction; the module holds nothing afterwards.`, actor: "QED agent (operator key)", outcomes: ["O1", "O2"] }, e1);
   const dueAt = BigInt((await c.pub.getBlock()).timestamp) + 7n * 86_400n;
-  ev.tx("R1", { phase: "conversion", title: "Owner ring-fences 15 tEUR in the euro reserve for CloudCo's invoice, due in 7 days", narrative: "The converted money becomes a protected euro liability: from now on it can only reach CloudCo.", actor: "Owner", outcomes: ["O3"] }, await c.send(K.OWNER, reserve.address, fn(QEDVaultAbi, "ringFence", [K.CLOUDCO.address, raw("tEUR", 15), dueAt, keccak256(toHex("CloudCo invoice CC-2026-11 · EUR 15.00 · GPU hours"))])));
+  // An interactive first trade can be any positive amount within the actual
+  // signed mandate. Never fabricate 15 tEUR of liabilities if the trade earned less.
+  const receivedEur = BigInt(be1.amountOut);
+  const protectedEur = receivedEur > raw("tEUR", 16)
+    ? raw("tEUR", 15)
+    : receivedEur > 1_000_000n ? receivedEur - 1_000_000n : receivedEur / 2n;
+  if (protectedEur > 0n) {
+    ev.tx("R1", { phase: "conversion", title: `Owner ring-fences ${fmt("tEUR", protectedEur)} tEUR for CloudCo's invoice, due in 7 days`, narrative: "Protected liability is based on actual received tokens; it cannot exceed the reserve balance. Only the creditor may receive those funds.", actor: "Owner", outcomes: ["O3"] }, await c.send(K.OWNER, reserve.address, fn(QEDVaultAbi, "ringFence", [K.CLOUDCO.address, protectedEur, dueAt, keccak256(toHex("CloudCo invoice CC-2026-11 · dynamic test funding"))])));
+  }
 
   // ═════════════ 4 · a compromised agent inside a genuine order ═════════════
   console.log("\nPHASE 4 · the agent's key is compromised: every leak a slippage limit would allow");
