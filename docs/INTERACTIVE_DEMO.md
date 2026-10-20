@@ -30,8 +30,7 @@ reverted attacks. Live events are read from its *newly generated* manifest as th
 progresses. The interface distinguishes off-chain refusals, mined reverts and accepted
 local transactions. Local transaction hashes cannot be looked up on Sepolia Etherscan.
 
-**The owner mandate is deliberately constrained**: only a 20 tUSD conversion into the
-approved euro reserve is accepted. This is an operator-controlled demonstration, not a
+****The owner mandate is deliberately constrained**: the preconfigured demo owner signs a mandate allowing an individual positive conversion of **up to 25 tUSD** into the approved euro reserve. Inputs exceeding 25 tUSD or attempting to change payees or authorization are refused before execution. This is an operator-controlled demonstration, not a
 general-purpose financial assistant or a chat app that can authorize arbitrary transfers.
 The user-supplied text is interpreted by QED's real brain; subsequent scenario phases
 are scripted. The execution process and short policy loop end automatically; this is not
@@ -71,6 +70,7 @@ GitHub Pages site are deliberately unchanged.
 
 - `GET /api/health` — server readiness and non-secret model configuration
 - `GET /api/config` — supported demonstration environments
+- `POST /api/chat` — bounded read-only QED language/guard interpretation; never signs or sends transactions
 - `POST /api/run` — start a preapproved local workflow
 - `GET /api/run/:id` — run status, recorded transaction receipts, policy decisions
 - `GET /api/run/:id/events` — SSE progress (replay of buffered events for reconnect)
@@ -78,11 +78,10 @@ GitHub Pages site are deliberately unchanged.
 A supported request is:
 
 ```json
-{"scenario":"execution","instruction":"Move 20 tUSD into the euro reserve.","impact":150}
+{"scenario":"execution","instruction":"Move 10 tUSD into the euro reserve.","impact":150}
 ```
 
-The endpoint is **not** a general execution or remote signing API. Unsupported amount,
-payee and policy changes are rejected before launching a blockchain process.
+The endpoint is **not** a general execution or remote signing API. Amounts exceeding the mandate cap, ambiguous amounts, unsupported payees, and policy changes are rejected before launching a blockchain process. A rejected input is **not** a blockchain revert.
 
 ## Verification and limits
 
