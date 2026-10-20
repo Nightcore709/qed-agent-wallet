@@ -6,11 +6,11 @@
 
 ## Start in one command
 
-Prerequisites: Node 22.x, npm, Foundry 1.7.1 with \`anvil\` and \`forge\` on PATH.
+Prerequisites: Node 22.x, npm, Foundry 1.7.1 with `anvil` and `forge` on PATH.
 
 On a Mac where QED is already cloned:
 
-\`\`\`bash
+```bash
 cd ~/Desktop/qed-agent-wallet
 git fetch origin
 git switch qed-interactive-agent-demo-20261020
@@ -18,7 +18,7 @@ npm ci
 forge build
 npm run test:demo
 npm run demo
-\`\`\`
+```
 
 Open **http://127.0.0.1:4173** in the same computer's browser. Use **Execute permitted scenario**.
 
@@ -39,47 +39,47 @@ a persistent wallet scheduler.
 
 At most one execution may run at a time. Four runs per hour are allowed per connecting
 IP. Only use locally by default. This server is **not hardened for exposure to the
-public internet**; do not set \`QED_PUBLIC_DEMO=1\` or expose its signing process
+public internet**; do not set `QED_PUBLIC_DEMO=1` or expose its signing process
 without adding authentication, isolated tenant chains, stronger abuse prevention,
 a cloud secret manager, and explicit public-demo authorization.
 
 ## Optional real Anthropic API
 
-If \`ANTHROPIC_API_KEY\` is set in the **same terminal that starts** \`npm run demo\`,
+If `ANTHROPIC_API_KEY` is set in the **same terminal that starts** `npm run demo`,
 QED's existing brain attempts real Anthropic interpretation of the supported request.
 If no API key is configured, it uses the transparently labeled offline deterministic
 parser. If the API call fails, the original QED fallback is recorded explicitly
-as \`offline-fallback (...)\`.
+as `offline-fallback (...)`.
 
 Do not paste the key into GitHub, browser JavaScript, issues, chat messages, logs or
-screenshots. Do not put it into \`product/index.html\` or the dashboard. An Anthropic
+screenshots. Do not put it into `product/index.html` or the dashboard. An Anthropic
 API key pays for API calls; a chat subscription does not substitute for it.
 
 ## Historical vs. fresh evidence
 
-- **Fresh local execution:** results are generated under \`evidence/demo-runs/<run-id>/\`,
+- **Fresh local execution:** results are generated under `evidence/demo-runs/<run-id>/`,
   which is excluded from Git. The frontend shows these receipts as Anvil 31337.
-- **Historical public execution:** source \`evidence/ethereum-sepolia/\` and the
+- **Historical public execution:** source `evidence/ethereum-sepolia/` and the
   original GitHub Pages dashboard. The new site presents curated direct Etherscan
   links as public historical evidence, never as freshly submitted transactions.
-- **Independent public checks:** \`npm run verify\`, requiring a suitable public Sepolia RPC.
+- **Independent public checks:** `npm run verify`, requiring a suitable public Sepolia RPC.
 
 Existing source contracts, mathematical algorithms, canonical evidence, and the original
 GitHub Pages site are deliberately unchanged.
 
 ## API (localhost only)
 
-- \`GET /api/health\` — server readiness and non-secret model configuration
-- \`GET /api/config\` — supported demonstration environments
-- \`POST /api/run\` — start a preapproved local workflow
-- \`GET /api/run/:id\` — run status, recorded transaction receipts, policy decisions
-- \`GET /api/run/:id/events\` — SSE progress (replay of buffered events for reconnect)
+- `GET /api/health` — server readiness and non-secret model configuration
+- `GET /api/config` — supported demonstration environments
+- `POST /api/run` — start a preapproved local workflow
+- `GET /api/run/:id` — run status, recorded transaction receipts, policy decisions
+- `GET /api/run/:id/events` — SSE progress (replay of buffered events for reconnect)
 
 A supported request is:
 
-\`\`\`json
+```json
 {"scenario":"execution","instruction":"Move 20 tUSD into the euro reserve.","impact":150}
-\`\`\`
+```
 
 The endpoint is **not** a general execution or remote signing API. Unsupported amount,
 payee and policy changes are rejected before launching a blockchain process.
@@ -88,12 +88,12 @@ payee and policy changes are rejected before launching a blockchain process.
 
 Run:
 
-\`\`\`bash
+```bash
 npm run test:demo
 npm run test:ts
 npm run typecheck
 forge test
-\`\`\`
+```
 
 The new demo tests validate input restrictions but they are **not substitutes for
 a browser-to-smart-contract acceptance run**. See results in actual CI and local
