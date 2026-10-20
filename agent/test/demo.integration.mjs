@@ -13,7 +13,7 @@ async function request(path,options) {
   return {status:r.status,data:await r.json()};
 }
 test("interactive browser API executes approved trade and refuses on-chain attacks", {timeout:260_000}, async ()=>{
-  const child=spawn(process.execPath,["agent/scripts/demo-server.mjs"],{
+  const child=spawn(process.execPath,["--import","tsx","agent/scripts/demo-server.mjs"],{
     env:{...process.env,PORT:"14273",QED_DEMO_ANVIL_PORT:"18645",QED_OFFLINE:"1",ANTHROPIC_API_KEY:""},
     stdio:"ignore"
   });
