@@ -574,6 +574,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
           `QED bought the licensed risk model it needed ${txLink("L4", "6 tUSD")} and solved the minimum-variance portfolio.`,
           `It delivered the portfolio with its KKT certificate. The verifier contract checked it and 15 tUSD settled into the vault ${txLink("L6")}.`,
           `A cheaper rival delivered a lazy 1/N portfolio ${txLink("X17")} and a near-miss ${txLink("X18")}. Both rejected; the client was refunded ${txLink("X19")}.`,
+          ...(D.priv ? [`Later the same escrow paid 12 tUSD for a <b>zero-knowledge</b> proof of optimality about data it never saw <a class="hash txl" href="${txUrl(D.priv.steps.find((x) => x.id === "Z3").tx.hash)}" target="_blank" rel="noopener">(Z3)</a>.`] : []),
         ],
         end: `payment is a theorem: no reviewer, oracle or approval step exists`,
       },
