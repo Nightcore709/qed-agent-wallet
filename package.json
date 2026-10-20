@@ -31,7 +31,8 @@
     "local:execute": "KEYS_FILE=/nonexistent SCRIPT=agent/scripts/execute.ts EVIDENCE_DIR=evidence/local-execution tsx agent/scripts/local.ts",
     "fixtures:execution": "tsx agent/scripts/fixtures-execution.ts",
     "demo": "node agent/scripts/demo-server.mjs",
-    "test:demo": "node --test agent/test/demo.test.mjs"
+    "test:demo": "node --test agent/test/demo.test.mjs",
+    "test:demo:e2e": "node --test agent/test/demo.integration.mjs"
   },
   "dependencies": {
     "circomlibjs": "^0.1.7",
