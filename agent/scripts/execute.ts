@@ -300,12 +300,15 @@ async function main() {
   const d3 = tp3b instanceof Error ? { submit: false, reasons: [`no certifiable route on the moved market (${tp3b.message})`] } : decide(tp3b, r3.order!);
   ev.offchain("A10", { phase: "market", title: d3.submit ? "Agent re-plans and resubmits" : `Agent re-plans on the moved market${tp3b instanceof Error ? "" : ` (${fmt("tEUR", tp3b.plan.sim.amountOut)} tEUR at best)`} and declines to trade`, narrative: d3.submit ? "The new plan clears the floor." : `${d3.reasons.join("; ")}. It would need a fresh owner instruction and co-signer quote; it does not ask for one into a manipulated market.`, actor: "QED agent", actorAddress: K.OPERATOR.address, outcomes: ["O1", "O3"] });
 
+  let policyOutcome = "";
   // ═════════════ 6 · the agent decides (local chain only: on Sepolia this is Run 4c, execute-policy.ts) ═════════════
   if (LOCAL) {
     console.log("\nPHASE 6 · the agent decides under a standing policy");
     const { policy, ticks } = await runPolicyPhases({ c, ev, K, k: { usd, eur: EUR, pools, vault: vault.address, reserve: reserve.address, execution: exec.address }, cosigner, mandate, ownerSig, out: OUT, chainId, unwind: frontRun });
     ev.meta.policyRun = { policy: { ...policy, targetFree: policy.targetFree.toString(), maxTranche: policy.maxTranche.toString(), minTranche: policy.minTranche.toString(), validUntil: policy.validUntil.toString() }, ticks };
-    if (ticks.at(-1)?.action !== "none") throw new Error(`policy loop did not reach its target: ${JSON.stringify(ticks.at(-1))}`);
+    policyOutcome = ticks.at(-1)?.action === "none" ? "; the standing policy met its target" : `; the standing policy ended in "${ticks.at(-1)?.action}"`;
+    // with the default policy the loop must reach its target (CI checks this); custom POLICY_* settings may end in "wait"
+    if (!process.env.POLICY_TARGET && !process.env.POLICY_IMPACT_BPS && ticks.at(-1)?.action !== "none") throw new Error(`policy loop did not reach its target: ${JSON.stringify(ticks.at(-1))}`);
   }
 
   // ═════════════ final state ═════════════
@@ -322,7 +325,7 @@ async function main() {
   };
   ev.meta.finishedAt = new Date().toISOString();
   ev.flush();
-  console.log(`\nDONE. Reserve holds ${fmt("tEUR", await bal(EUR, reserve.address))} tEUR; 8 attacks refused; module holds nothing${LOCAL ? "; the standing policy met its target" : ""}.`);
+  console.log(`\nDONE. Reserve holds ${fmt("tEUR", await bal(EUR, reserve.address))} tEUR; 8 attacks refused; module holds nothing${LOCAL ? policyOutcome : ""}.`);
 
   function attackSim3(tp: TradePlan, now: VenueState[]) {
     return simulate(now, tp.plan.route, usd, EUR, amt3).amountOut;

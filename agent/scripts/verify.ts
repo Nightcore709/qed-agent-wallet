@@ -235,6 +235,7 @@ async function main() {
   const failed = rows.filter((r) => !r.ok);
   writeFileSync(`${EVIDENCE}/verification.json`, JSON.stringify({ at: new Date().toISOString(), rpc: RPC, chainId, passed: rows.length - failed.length, failed: failed.length, rows }, null, 2));
   console.log(`\n${failed.length === 0 ? "ALL" : rows.length - failed.length + "/" + rows.length} CHECKS PASSED${failed.length ? ` — ${failed.length} FAILED` : ""}  (${rows.length} checks, report: ${EVIDENCE}/verification.json)\n`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::notice title=verify::${rows.length - failed.length}/${rows.length} checks passed against ${RPC}`);
   if (failed.length) process.exit(1);
 }
 

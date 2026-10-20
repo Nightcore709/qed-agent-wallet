@@ -93,7 +93,7 @@ export async function runPolicyPhases(x: PolicyContext) {
         ? `Agent observes ${fmt(view.reserveFree)} tEUR free (short ${fmt(d.shortfall)}) and decides to convert ${fmt(d.amountIn)} tUSD now — limited by ${d.limitedBy}`
         : d.action === "none"
           ? `Agent observes ${fmt(view.reserveFree)} tEUR free: target met, nothing to do`
-          : `Agent observes a ${fmt(d.shortfall)} tEUR shortfall but waits: ${d.reason}`;
+          : `Agent observes a ${fmt(d.shortfall)} tEUR shortfall but waits: ${d.reason.replace(/^wait: /, "")}`;
     ev.offchain(`T${t}`, { phase: "policy", title, narrative: d.action === "none" ? "Shortfall 0: the reserve is at its target, so the agent sends nothing and spends no gas." : `Candidates (tUSD): need ${d.candidates.need === null ? "more than any allowed tranche" : fmt(d.candidates.need)}, impact limit ${fmt(d.candidates.impact)}, policy cap ${fmt(d.candidates.policyCap)}, mandate cap ${fmt(d.candidates.mandateCap)}, free funds ${fmt(d.candidates.freeFunds)}. ${d.action === "convert" ? `Expected ${fmt(d.expectedOut)} tEUR at ${d.impactBps.toFixed(1)} bps execution cost.` : ""}`, actor: "QED agent", actorAddress: K.OPERATOR.address, outcomes: ["O1"], artifacts: [{ label: "decision", path: dPath, hash: hashRecord(rec) }] });
     if (d.action !== "convert") break;
 
