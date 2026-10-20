@@ -47,6 +47,7 @@ function parseRequestedAmount(text) {
 export function validateRun(input) {
   if (!input || typeof input !== "object") return "Invalid request.";
   if (!Object.hasOwn(SCENARIOS, input.scenario)) return "Select a supported demonstration.";
+  if(PUBLIC && input.scenario !== "execution") return "The public service only permits the bounded certified-execution demo; other economies are available locally.";
   if (input.scenario === "execution") {
     const s = input.instruction;
     if (typeof s !== "string" || s.length > 240 || s.length < 12) return "Enter a concise financial instruction (12–240 characters).";
