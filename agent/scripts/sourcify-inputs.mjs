@@ -27,6 +27,9 @@ const targets = {
   PrivateMinVarianceVerifier: "contracts/src/verifiers/PrivateMinVarianceVerifier.sol",
   OptimalityBounty: "contracts/src/bounties/OptimalityBounty.sol",
   MaximalityBounty: "contracts/src/bounties/MaximalityBounty.sol",
+  QEDExecution: "contracts/src/QEDExecution.sol",
+  CPMMPool: "contracts/src/venues/CPMMPool.sol",
+  TestToken: "contracts/src/venues/TestToken.sol",
 };
 mkdirSync("verification", { recursive: true });
 for (const [name, file] of Object.entries(targets)) {
