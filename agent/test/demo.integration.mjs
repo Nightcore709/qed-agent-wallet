@@ -54,6 +54,9 @@ test("interactive browser API executes approved trade and refuses on-chain attac
       "fresh real Anvil receipt required");
     assert.equal(run.aiEngine,"offline-deterministic");
     assert.equal(run.network,"Anvil 31337 (local, disposable, valueless)");
+  } catch (e) {
+    console.log(`::error title=scripted e2e failed::${String(e.message).replace(/\n/g," ").slice(0,600)}`);
+    throw e;
   } finally {
     child.kill("SIGTERM");
     await sleep(300);
