@@ -8,7 +8,7 @@
 
 ## Verified on Sourcify
 
-All 12 deployed contracts are verified on [Sourcify](https://sourcify.dev) with a full creation **and** runtime bytecode match (`sourcify.json`), so block explorers that read Sourcify (e.g. [Blockscout](https://eth-sepolia.blockscout.com)) show their source.
+All 22 deployed contracts are verified on [Sourcify](https://sourcify.dev) with a full creation **and** runtime bytecode match (`sourcify.json`), so block explorers that read Sourcify (e.g. [Blockscout](https://eth-sepolia.blockscout.com)) show their source.
 
 | Contract | Address | Sourcify |
 |---|---|---|
@@ -24,3 +24,13 @@ All 12 deployed contracts are verified on [Sourcify](https://sourcify.dev) with 
 | PrivateMinVarianceVerifier | [`0x1270287aaf21f6cc939c255fc1ba294d9268b453`](https://eth-sepolia.blockscout.com/address/0x1270287aaf21f6cc939c255fc1ba294d9268b453?tab=contract) | creation match · runtime match |
 | OptimalityBounty | [`0xfc2129f0432538d034c5307299022b3d369eb677`](https://eth-sepolia.blockscout.com/address/0xfc2129f0432538d034c5307299022b3d369eb677?tab=contract) | creation match · runtime match |
 | MaximalityBounty | [`0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69`](https://eth-sepolia.blockscout.com/address/0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69?tab=contract) | creation match · runtime match |
+| TestToken tEUR (Run 4) | [`0x98d1a388120e5a535341532047b604655fe1362f`](https://eth-sepolia.blockscout.com/address/0x98d1a388120e5a535341532047b604655fe1362f?tab=contract) | creation match · runtime match |
+| TestToken tETH (Run 4) | [`0xf61c0459cb436ae760b3af0e58700e9df046580f`](https://eth-sepolia.blockscout.com/address/0xf61c0459cb436ae760b3af0e58700e9df046580f?tab=contract) | creation match · runtime match |
+| QEDVault (Run 4 tUSD treasury) | [`0x04d1ef625ad58e3641032267a8f4fb7bc191d117`](https://eth-sepolia.blockscout.com/address/0x04d1ef625ad58e3641032267a8f4fb7bc191d117?tab=contract) | creation match · runtime match |
+| QEDVault (Run 4 euro reserve) | [`0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53`](https://eth-sepolia.blockscout.com/address/0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53?tab=contract) | creation match · runtime match |
+| QEDExecution | [`0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481`](https://eth-sepolia.blockscout.com/address/0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481?tab=contract) | creation match · runtime match |
+| CPMMPool venue 0 (tUSD/tEUR 0.30%) | [`0xf88d53902b9ddf1abf20cfc020a03affa9298a58`](https://eth-sepolia.blockscout.com/address/0xf88d53902b9ddf1abf20cfc020a03affa9298a58?tab=contract) | creation match · runtime match |
+| CPMMPool venue 1 (tUSD/tEUR 0.05%) | [`0x1fd2928ce46c29623ed72a1134a761c2a3536031`](https://eth-sepolia.blockscout.com/address/0x1fd2928ce46c29623ed72a1134a761c2a3536031?tab=contract) | creation match · runtime match |
+| CPMMPool venue 2 (tUSD/tETH 0.30%) | [`0x442229dacb4dc05689f95138017d9ea2020d829b`](https://eth-sepolia.blockscout.com/address/0x442229dacb4dc05689f95138017d9ea2020d829b?tab=contract) | creation match · runtime match |
+| CPMMPool venue 3 (tETH/tEUR 0.30%) | [`0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa`](https://eth-sepolia.blockscout.com/address/0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa?tab=contract) | creation match · runtime match |
+| CPMMPool venue 4 (tUSD/tEUR 1.00%) | [`0x81557a91d28ce0b17f475466a2b7e3edb8541c64`](https://eth-sepolia.blockscout.com/address/0x81557a91d28ce0b17f475466a2b7e3edb8541c64?tab=contract) | creation match · runtime match |
