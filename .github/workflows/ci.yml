@@ -35,6 +35,10 @@ jobs:
       - run: forge build
       - run: npx tsc -p tsconfig.json
       - run: npm run test:ts
+      - run: npm run test:demo
+      - name: Interactive browser API-to-contract real Anvil acceptance test
+        run: npm run test:demo:e2e
+        env: { QED_OFFLINE: "1" }
       - name: Run the whole autonomous economy locally (deterministic offline brain, dev keys)
         run: npm run local
         env: { QED_OFFLINE: "1" }
