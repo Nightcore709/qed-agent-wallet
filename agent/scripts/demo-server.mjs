@@ -29,6 +29,8 @@ const quotas = new Map();
 const chatQuotas=new Map();
 const MAX_TOTAL_RUNS=Number(process.env.QED_MAX_DEMO_RUNS??40);
 let totalRunCount=0;
+const MAX_CHAT_CALLS=Number(process.env.QED_MAX_CHAT_CALLS??80);
+let totalChatCount=0;
 let active = null;
 const MAX_BODY = 3000;
 
@@ -218,14 +220,16 @@ export function createDemoServer() {
       return json(res,200,{status:"ok",mode:PUBLIC?"public-bounded-demo":"localhost",network:"Anvil 31337",modelConfigured:!!process.env.ANTHROPIC_API_KEY,active:!!active});
     if(method==="POST" && parts.join("/")==="api/chat"){
       if(!mayChat(req))return json(res,429,{error:"Read-only agent question limit: 12 per hour per connection."});
+      if(totalChatCount>=MAX_CHAT_CALLS)return json(res,429,{error:"Global read-only AI question budget exhausted."});
+      totalChatCount++;
       let input;try{input=await body(req);}catch{return json(res,400,{error:"Invalid request."});}
       if(typeof input?.message!=="string"||input.message.trim().length<2||input.message.length>1000)
         return json(res,422,{error:"Enter a question between 2 and 1,000 characters."});
       // This pathway NEVER starts a signing process or submits a transaction.
       // It only interprets the request and produces an independently guarded proposal.
       const message=input.message.trim();
-      if(/(?:balance|how much|reserve|available|spent|status|holdings)/i.test(message)&&!active)
-        return json(res,200,{engine:"local-state-gate",intent:"status",reply:"No funded local blockchain session is currently running. Run a permitted conversion to generate real balances and receipts. Historic public Sepolia values are separate from this demo.",flags:[],proposedAction:null,requiresOwnerAuthorization:false});
+      if(/(?:balance|how much|reserve|available|spent|status|holdings|blast radius|what can i lose)/i.test(message))
+        return json(res,200,{engine:"local-state-gate",intent:"status",reply:"Read-only chat is intentionally not an authenticated on-chain treasury account. Do not treat it as your balance. Launch the local execution workflow and inspect the actual, recorded reserve snapshots and receipts. Historical Sepolia numbers are separately labeled.",flags:[],proposedAction:null,requiresOwnerAuthorization:false});
       try{
         const brain=makeBrain();
         const {result,transcript}=await brain.interpret(message,readOnlyContext(),"owner");
