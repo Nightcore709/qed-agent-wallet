@@ -173,7 +173,7 @@
     }
   },
   "B5": {
-    "attacksOnSepolia": 44,
+    "attacksOnSepolia": 48,
     "byLayer": {
       "ProofEscrow": 2,
       "QEDVault": 15,
@@ -185,7 +185,8 @@
       "QEDExecution": 5,
       "QEDExecution (co-signed order)": 2,
       "QEDExecution + co-signer": 1,
-      "ExecutionBounty": 3
+      "ExecutionBounty": 3,
+      "QEDTreasuryPolicy": 4
     },
     "attacks": [
       {
@@ -451,6 +452,30 @@
         "id": "XA3",
         "error": "TheoremHolds",
         "layer": "ExecutionBounty"
+      },
+      {
+        "run": "execution",
+        "id": "QA1",
+        "error": "NotOperator",
+        "layer": "QEDTreasuryPolicy"
+      },
+      {
+        "run": "execution",
+        "id": "QA2",
+        "error": "OverConversion",
+        "layer": "QEDTreasuryPolicy"
+      },
+      {
+        "run": "execution",
+        "id": "QA3",
+        "error": "ExecutionCostTooHigh",
+        "layer": "QEDTreasuryPolicy"
+      },
+      {
+        "run": "execution",
+        "id": "QA4",
+        "error": "NoShortfall",
+        "layer": "QEDTreasuryPolicy"
       }
     ],
     "note": "Which layer's check produced the revert of each recorded attack. Not a re-run with layers disabled: removing a layer does not imply the next one would catch the attack."

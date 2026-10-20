@@ -1,8 +1,8 @@
 /**
- * Appends a follow-up run (4b: execution bounty, 4c: treasury policy) to Run 4's public evidence:
+ * Appends a follow-up run (4b: execution bounty, 4c: treasury policy, 4d: the policy as a contract) to Run 4's public evidence:
  *   evidence/shadow-<run>/manifest.json + relay/receipts-11155111-<run>.json
  *   → evidence/ethereum-sepolia/execution/{manifest,receipts}.json (+ the run's decision records)
- *   RUN=execution-bounty | execution-policy  npx tsx agent/scripts/finalize-execution-append.ts
+ *   RUN=execution-bounty | execution-policy | execution-policy-chain  npx tsx agent/scripts/finalize-execution-append.ts
  * Every public receipt must match the replica (status + logs); blocks, gas and timestamps come from Sepolia.
  */
 import { cpSync, existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -41,11 +41,15 @@ if (RUN === "execution-bounty") {
   manifest.bounty = { ...shadow.final, deployBlock: String(byHash.get(shadow.steps[0].tx.hash.toLowerCase()).block) };
 }
 if (RUN === "execution-policy") manifest.policyRun = { policy: shadow.policy, ticks: shadow.ticks };
+if (RUN === "execution-policy-chain") {
+  manifest.contracts.treasuryPolicy = shadow.contracts.treasuryPolicy;
+  manifest.policyChain = { ...shadow.policyChain, deployBlock: String(byHash.get(shadow.steps[0].tx.hash.toLowerCase()).block) };
+}
 const blocks = rec.transactions.map((r: any) => r.block);
 manifest.sepolia.lastBlock = Math.max(manifest.sepolia.lastBlock, ...blocks);
 manifest.sepolia.transactions += rec.transactions.length;
 manifest.sepolia.reverted += rec.transactions.filter((r: any) => r.status === "reverted").length;
-manifest.sepolia.relayComparison = `${manifest.sepolia.transactions}/${manifest.sepolia.transactions} receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b and 4c first replayed the earlier runs' signed bytes on the replica`;
+manifest.sepolia.relayComparison = `${manifest.sepolia.transactions}/${manifest.sepolia.transactions} receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b–4d first replayed the earlier runs' signed bytes on the replica (4d at their original timestamps)`;
 const label = new Map<string, string>(shadow.steps.filter((s: any) => s.tx).map((s: any) => [s.tx.hash.toLowerCase(), `${s.id} · ${s.title}`]));
 const base = receipts.transactions.length;
 receipts.transactions.push(...rec.transactions.map((r: any) => ({ ...r, i: base + r.i, label: label.get(r.hash.toLowerCase()) ?? "setup" })));

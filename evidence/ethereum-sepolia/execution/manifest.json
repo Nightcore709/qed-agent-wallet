@@ -36,7 +36,8 @@
     "execution": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
     "lens": "0x846186F21227793760429696bb4FD7490236F101",
     "deployBlock": "11952692",
-    "executionBounty": "0x3148f3710f4e4f700dbf359f63e9e116e6e319c4"
+    "executionBounty": "0x3148f3710f4e4f700dbf359f63e9e116e6e319c4",
+    "treasuryPolicy": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7"
   },
   "venues": [
     {
@@ -4385,15 +4386,643 @@
       "offchain": true,
       "expect": "success",
       "at": "2026-10-20T06:10:47.832Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Deploy QEDTreasuryPolicy: the owner's standing policy, enforced by the chain",
+      "narrative": "Wraps QEDExecution.trade with four on-chain clauses: a shortfall must exist, the tranche must be within bounds, its execution cost within κ of the direct venues' mid price, and no smaller tranche may provably have covered the shortfall.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O1",
+        "O3"
+      ],
+      "id": "QD1",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0xcea932ac81f98cd63ac44772b2fb2f80f5f1331547bd3cd798f2166ffb7f5d54",
+        "status": "success",
+        "blockNumber": "11954079",
+        "gasUsed": "9691312",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "66",
+          "gasUsed": "1398922"
+        },
+        "timestamp": 1792484616
+      },
+      "events": [
+        {
+          "name": "AgentSet",
+          "args": {
+            "agent": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00"
+          },
+          "address": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7"
+        }
+      ],
+      "at": "2026-10-20T08:22:02.754Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Owner sets the policy on-chain: keep ≥ 55.00 tEUR free; tranches 2.00–25.00 tUSD; ≤ 1.5% execution cost; at most 0.1% over-conversion",
+      "narrative": "The same objective the co-signer reads from the owner's signed text, now also a contract the agent cannot route around.",
+      "actor": "Owner",
+      "outcomes": [
+        "O1"
+      ],
+      "id": "QD2",
+      "expect": "success",
+      "actorAddress": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+      "tx": {
+        "hash": "0x5fb70f5f4a9c0b86e7240ce8cf661e0db316ecb30fd1ce2a5cdb2e6999c3fff5",
+        "status": "success",
+        "blockNumber": "11954080",
+        "gasUsed": "576618",
+        "from": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+        "to": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7",
+        "replica": {
+          "blockNumber": "67",
+          "gasUsed": "142418"
+        },
+        "timestamp": 1792484628
+      },
+      "events": [
+        {
+          "name": "PolicySet",
+          "args": {
+            "nonce": "1",
+            "targetFree": "55000000",
+            "minTranche": "2000000",
+            "maxTranche": "25000000",
+            "maxImpactBps": 150,
+            "needSlackBps": 10,
+            "validUntil": "1795068685"
+          },
+          "address": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7"
+        }
+      ],
+      "at": "2026-10-20T08:22:02.794Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Owner makes the policy contract QEDExecution's operator",
+      "narrative": "From this transaction on, the AI's hot key can trade only through QEDTreasuryPolicy.convert.",
+      "actor": "Owner",
+      "outcomes": [
+        "O1",
+        "O3"
+      ],
+      "id": "QD3",
+      "expect": "success",
+      "actorAddress": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+      "tx": {
+        "hash": "0x9b4a8ef68ccbea527ccc8be860d564a1b46f10c242027e376f8c0b0c0b134f3b",
+        "status": "success",
+        "blockNumber": "11954081",
+        "gasUsed": "35295",
+        "from": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+        "to": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
+        "replica": {
+          "blockNumber": "68",
+          "gasUsed": "33695"
+        },
+        "timestamp": 1792484640
+      },
+      "events": [
+        {
+          "name": "OperatorSet",
+          "args": {
+            "operator": "0xF7f2E53ad9a194Cb5Cf58959e2e345b0acF069e7"
+          },
+          "address": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481"
+        }
+      ],
+      "at": "2026-10-20T08:22:02.812Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Owner signs the same policy as text for the co-signer",
+      "narrative": "Two independent checkers of one objective: the co-signer before it signs, the contract when the trade executes.",
+      "actor": "Owner",
+      "actorAddress": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "signed policy",
+          "path": "evidence/ethereum-sepolia/execution/records/QP0-policy.json",
+          "hash": "0x4f09990be55f157e48d1032a555e07db6843bf520a43c185ade13d8ac82a7ac8"
+        }
+      ],
+      "id": "QP0",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T08:22:02.815Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Agent observes 45.00 tEUR free (short 10.00) and decides to convert 11.943294 tUSD — limited by need",
+      "narrative": "Candidates (tUSD): need 11.943294, impact limit 19.800521, policy cap 25.00, mandate cap 25.00, free funds 26.629485. Expected 10.00 tEUR at 107.0 bps.",
+      "actor": "QED agent",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "decision",
+          "path": "evidence/ethereum-sepolia/execution/records/QT1-decision.json",
+          "hash": "0x44a59f963df6a7e842b1f6480d2763f1b7818b2007c1a9081b3a749e3e1b534b"
+        }
+      ],
+      "id": "QT1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T08:22:02.940Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Co-signer re-derives the same tranche and signs the order (floor 9.90 tEUR, τ = 1 ppm)",
+      "narrative": "14 checks, P1–P3 included.",
+      "actor": "Co-signer",
+      "actorAddress": "0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96",
+      "outcomes": [
+        "O1"
+      ],
+      "artifacts": [
+        {
+          "label": "co-signer decision record",
+          "path": "evidence/ethereum-sepolia/execution/records/0xe9689310ca5e62efd40ab794ac75c0a93b71d85a2c226aa79d7aed27eb7d85e0.json",
+          "hash": "0xe9689310ca5e62efd40ab794ac75c0a93b71d85a2c226aa79d7aed27eb7d85e0"
+        }
+      ],
+      "id": "QC1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T08:22:03.142Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "The agent's key calls QEDExecution.trade directly with the genuine co-signed order",
+      "narrative": "Skip the policy contract → QEDExecution's operator is now the policy: NotOperator",
+      "actor": "Attacker (agent key + co-signer key)",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "policy_violation",
+        "threat": "Skip the policy contract",
+        "defence": "QEDExecution's operator is now the policy: NotOperator",
+        "layer": "QEDTreasuryPolicy"
+      },
+      "expect": "revert",
+      "id": "QA1",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0x39093e1490228c609da03f081ad536dc017cf62ab598f6be72ad75a737844a9f",
+        "status": "reverted",
+        "blockNumber": "11954082",
+        "gasUsed": "154520",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
+        "replica": {
+          "blockNumber": "69",
+          "gasUsed": "63110"
+        },
+        "timestamp": 1792484652
+      },
+      "events": [],
+      "error": {
+        "name": "NotOperator",
+        "args": [
+          "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00"
+        ]
+      },
+      "at": "2026-10-20T08:22:03.174Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Convert 14.929117 tUSD when 11.943294 covers the shortfall (best-executed, co-signed with the stolen key)",
+      "narrative": "Over-convert: move more treasury money than the objective needs → Concavity: 99.9% of this tranche provably covers the shortfall: OverConversion",
+      "actor": "Attacker (agent key + co-signer key)",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "policy_violation",
+        "threat": "Over-convert: move more treasury money than the objective needs",
+        "defence": "Concavity: 99.9% of this tranche provably covers the shortfall: OverConversion",
+        "layer": "QEDTreasuryPolicy"
+      },
+      "expect": "revert",
+      "id": "QA2",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0xb49d0c4f40dbeb6e66bc764ed96f3054e701be7d3e5932c03b3e6d72cd23f9f3",
+        "status": "reverted",
+        "blockNumber": "11954083",
+        "gasUsed": "713606",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7",
+        "replica": {
+          "blockNumber": "70",
+          "gasUsed": "566106"
+        },
+        "timestamp": 1792484664
+      },
+      "events": [],
+      "error": {
+        "name": "OverConversion",
+        "args": [
+          "45000000",
+          "12479276",
+          "55000000"
+        ]
+      },
+      "at": "2026-10-20T08:22:03.213Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Convert the maximum tranche, 25.00 tUSD, into the thin market",
+      "narrative": "Pay more than the owner's execution-cost limit → Output below (1 − 150 bps) × the direct venues' mid price: ExecutionCostTooHigh",
+      "actor": "Attacker (agent key + co-signer key)",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "policy_violation",
+        "threat": "Pay more than the owner's execution-cost limit",
+        "defence": "Output below (1 − 150 bps) × the direct venues' mid price: ExecutionCostTooHigh",
+        "layer": "QEDTreasuryPolicy"
+      },
+      "expect": "revert",
+      "id": "QA3",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0xc5760e247bfe16526f5af00229ff56f333fb8ef5dd44b88a84f0c6c7ae8e2be9",
+        "status": "reverted",
+        "blockNumber": "11954084",
+        "gasUsed": "713144",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7",
+        "replica": {
+          "blockNumber": "71",
+          "gasUsed": "565644"
+        },
+        "timestamp": 1792484676
+      },
+      "events": [],
+      "error": {
+        "name": "ExecutionCostTooHigh",
+        "args": [
+          "20781325",
+          "21158542",
+          150
+        ]
+      },
+      "at": "2026-10-20T08:22:03.258Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Agent converts 11.943294 tUSD → 10.00 tEUR through the policy contract; reserve free 45.00 → 55.00",
+      "narrative": "All four on-chain clauses held: shortfall 10.00; tranche within 2–25; cost 107.0 bps against mid ≤ 150; no smaller tranche covers the need. Best execution: 0.30 ppm from the bound.",
+      "actor": "QED agent (operator key)",
+      "outcomes": [
+        "O1",
+        "O2"
+      ],
+      "id": "QE1",
+      "expect": "success",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0x12739525e1a11bdcc6921f0eef5dffa3ab1bcb63b9fcd5bc544dda24dbb341c8",
+        "status": "success",
+        "blockNumber": "11954085",
+        "gasUsed": "718374",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7",
+        "replica": {
+          "blockNumber": "72",
+          "gasUsed": "493654"
+        },
+        "timestamp": 1792484688
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x04D1eF625AD58e3641032267A8f4fB7bC191D117",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "11943294"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "PaymentExecuted",
+          "args": {
+            "intentId": "0x89e09deaf24379bdcc9d23cb6cfdf3e136535e4b61f6c81304c924b25bce9e82",
+            "mandateHash": "0x92f3879f2a6b7b06416044c3feb50e29d4b20f3fc5ef7c70abebd8ec76b9dd8c",
+            "recipient": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount": "11943294",
+            "liabilityId": "0",
+            "evidenceHash": "0xe9689310ca5e62efd40ab794ac75c0a93b71d85a2c226aa79d7aed27eb7d85e0",
+            "ref": "0x01e0a6613733f3cf60b7dbb1c73d269f868bef6597e047d28edb7009a802c824"
+          },
+          "address": "0x04d1ef625ad58e3641032267a8f4fb7bc191d117"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "value": "5600663"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "4689389"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "840277557",
+            "reserve1": "700971114"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "5600663",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "4689389"
+          },
+          "address": "0xf88d53902b9ddf1abf20cfc020a03affa9298a58"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "value": "1749872"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "1465162"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "262946265",
+            "reserve1": "218808388"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "1749872",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "1465162"
+          },
+          "address": "0x1fd2928ce46c29623ed72a1134a761c2a3536031"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+            "value": "2519418"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "793623885910462"
+          },
+          "address": "0xf61c0459cb436ae760b3af0e58700e9df046580f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "617571679",
+            "reserve1": "194326202404469647"
+          },
+          "address": "0x442229dacb4dc05689f95138017d9ea2020d829b"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "2519418",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "793623885910462"
+          },
+          "address": "0x442229dacb4dc05689f95138017d9ea2020d829b"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+            "value": "793623885910462"
+          },
+          "address": "0xf61c0459cb436ae760b3af0e58700e9df046580f"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "2109488"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "812823797",
+            "reserve1": "305673797595530353"
+          },
+          "address": "0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "0",
+            "amount1In": "793623885910462",
+            "amount0Out": "2109488",
+            "amount1Out": "0"
+          },
+          "address": "0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+            "value": "2073341"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "value": "1735961"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "Sync",
+          "args": {
+            "reserve0": "309701367",
+            "reserve1": "260171701"
+          },
+          "address": "0x81557a91d28ce0b17f475466a2b7e3edb8541c64"
+        },
+        {
+          "name": "Swap",
+          "args": {
+            "sender": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "amount0In": "2073341",
+            "amount1In": "0",
+            "amount0Out": "0",
+            "amount1Out": "1735961"
+          },
+          "address": "0x81557a91d28ce0b17f475466a2b7e3edb8541c64"
+        },
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+            "to": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+            "value": "10000000"
+          },
+          "address": "0x98d1a388120e5a535341532047b604655fe1362f"
+        },
+        {
+          "name": "BestExecution",
+          "args": {
+            "intentId": "0x89e09deaf24379bdcc9d23cb6cfdf3e136535e4b61f6c81304c924b25bce9e82",
+            "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+            "recipient": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+            "amountIn": "11943294",
+            "spent": "11943294",
+            "amountOut": "10000000",
+            "bound": "10000003",
+            "hops": "5"
+          },
+          "address": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481"
+        },
+        {
+          "name": "PolicyConversion",
+          "args": {
+            "intentId": "0x89e09deaf24379bdcc9d23cb6cfdf3e136535e4b61f6c81304c924b25bce9e82",
+            "nonce": "1",
+            "amountIn": "11943294",
+            "amountOut": "10000000",
+            "midOut": "10108107",
+            "freeBefore": "45000000",
+            "freeAfter": "55000000"
+          },
+          "address": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7"
+        }
+      ],
+      "at": "2026-10-20T08:22:03.341Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "Agent observes 55.00 tEUR free: target met, nothing to do",
+      "narrative": "reserve is at or above its target: nothing to do",
+      "actor": "QED agent",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "outcomes": [
+        "O1"
+      ],
+      "id": "QT2",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-20T08:22:03.372Z"
+    },
+    {
+      "phase": "policy-chain",
+      "title": "With the target met, convert another 2.00 tUSD anyway",
+      "narrative": "Keep draining the treasury into the reserve → The reserve already meets its target: NoShortfall",
+      "actor": "Attacker (agent key + co-signer key)",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "policy_violation",
+        "threat": "Keep draining the treasury into the reserve",
+        "defence": "The reserve already meets its target: NoShortfall",
+        "layer": "QEDTreasuryPolicy"
+      },
+      "expect": "revert",
+      "id": "QA4",
+      "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+      "tx": {
+        "hash": "0x2c68af035340391318a581625610fe2535d9de3284256e9be83e4e618ade245e",
+        "status": "reverted",
+        "blockNumber": "11954086",
+        "gasUsed": "154520",
+        "from": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
+        "to": "0xf7f2e53ad9a194cb5cf58959e2e345b0acf069e7",
+        "replica": {
+          "blockNumber": "73",
+          "gasUsed": "63080"
+        },
+        "timestamp": 1792484700
+      },
+      "events": [],
+      "error": {
+        "name": "NoShortfall",
+        "args": [
+          "55000000",
+          "55000000"
+        ]
+      },
+      "at": "2026-10-20T08:22:03.402Z"
     }
   ],
   "sepolia": {
     "firstBlock": 11952692,
-    "lastBlock": 11953422,
-    "transactions": 65,
-    "reverted": 11,
+    "lastBlock": 11954086,
+    "transactions": 73,
+    "reverted": 15,
     "receipts": "receipts.json",
-    "relayComparison": "65/65 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b and 4c first replayed the earlier runs' signed bytes on the replica"
+    "relayComparison": "73/73 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b–4d first replayed the earlier runs' signed bytes on the replica (4d at their original timestamps)"
   },
   "executionNote": "Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs).",
   "bounty": {
@@ -4466,5 +5095,37 @@
         }
       }
     ]
+  },
+  "policyChain": {
+    "policy": {
+      "targetFree": "55000000",
+      "minTranche": "2000000",
+      "maxTranche": "25000000",
+      "maxImpactBps": 150,
+      "needSlackBps": 10,
+      "validUntil": "1795068685"
+    },
+    "decision": {
+      "reserveFree": "45000000",
+      "shortfall": "10000000",
+      "amountIn": "11943294",
+      "limitedBy": "need",
+      "need": "11943294",
+      "impact": "19800521"
+    },
+    "conversion": {
+      "amountOut": "10000000",
+      "midOut": "10108107",
+      "costBps": 106.95078712562145,
+      "freeBefore": "45000000",
+      "freeAfter": "55000000",
+      "bound": "10000003"
+    },
+    "attacks": {
+      "overConversion": "14929117",
+      "maxTranche": "25000000",
+      "afterTarget": "2000000"
+    },
+    "deployBlock": "11954079"
   }
 }

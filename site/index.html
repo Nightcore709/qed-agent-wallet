@@ -894,6 +894,13 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
         return `<h3>The agent decides: one owner-signed policy, agent-initiated trades (Run 4c)</h3>
           <div class="lane" aria-label="Policy run">${st("ok", "Policy signed", `keep ≥ ${eur(pol.targetFree, 2)} tEUR free; ≤ ${pol.maxImpactBps / 100}% cost per tranche`)}${st("no", "Over-reach refused", `a 25 tUSD request: co-signer re-derives less (PA1)`)}${st("ok", "Tranche 1", `${eur(t1.amountIn, 2)} tUSD, limited by market impact → ${out("PE1")} tEUR ${xlink("PE1", "(PE1)")}`)}${st("ok", "Tranche 2", `${eur(t2.amountIn, 2)} tUSD, limited by need → ${out("PE2")} tEUR ${xlink("PE2", "(PE2)")}`)}${st("ok", "Target met", "reserve free = 45.00 tEUR; the agent stops on its own")}</div>`;
       }
+      // ── the policy as a contract (Run 4d) ──
+      function chainLane() {
+        const pc = EX.policyChain, pol = pc.policy, d = pc.decision, cv = pc.conversion;
+        const err = (id) => xstep(id)?.error?.name ?? "";
+        return `<h3>The policy becomes a contract: both hot keys stolen, the chain still says no (Run 4d)</h3>
+          <div class="lane" aria-label="Policy enforced on-chain">${st("ok", "Policy on-chain", `QEDTreasuryPolicy is the only operator; keep ≥ ${eur(pol.targetFree, 2)} tEUR ${xlink("QD3", "(QD3)")}`)}${st("no", "Over-conversion", `${eur(pc.attacks.overConversion, 2)} tUSD when ${eur(d.need, 2)} suffices: ${err("QA2")} ${xlink("QA2", "(QA2)")}`)}${st("no", "Too costly", `25 tUSD into a thin market: ${err("QA3")} ${xlink("QA3", "(QA3)")}`)}${st("ok", "Tranche", `${eur(d.amountIn, 2)} tUSD → ${eur(cv.amountOut, 2)} tEUR, ${Number(cv.costBps).toFixed(0)} bps vs mid ${xlink("QE1", "(QE1)")}`)}${st("no", "Target met", `one more tranche: ${err("QA4")} ${xlink("QA4", "(QA4)")}`)}</div>`;
+      }
       // ── lifecycle ──
       const st = (cls, b, s) => `<div class="st ${cls}"><b>${b}</b><span>${s}</span></div>`;
       const o3 = EX.orders["3"];
@@ -902,6 +909,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
         <h3>A signed order meets a front-runner (order 3)</h3>
         <div class="lane" aria-label="Order 3">${st("ok", "Proposed", "owner: another 20 tUSD")}${st("ok", "Authorized", `floor ${eur(o3.order.minOut, 2)} tEUR`)}${st("no", "Front-run", `Mallory buys tEUR first ${xlink("M1", "(M1–M4)")}`)}${st("no", "Reverted", `InsufficientOutput: ${eur(xstep("EA8").error.args[0], 2)} < ${eur(xstep("EA8").error.args[1], 2)} ${xlink("EA8", "(EA8)")}`)}${st("wait", "Declined", "agent re-plans, refuses to trade into a moved market")}</div>
         ${EX.policyRun ? policyLane() : ""}
+        ${EX.policyChain ? chainLane() : ""}
         <h3>Every state a transaction can be in here, with the step that shows it</h3>
         <div class="states" role="list">${[
           ["ok", "Proposed", "an action is put forward: the owner's words (A1) or the agent's own decision under the policy (T1)"],
@@ -914,7 +922,7 @@ footer { padding-block: 40px 56px; color: var(--muted); font-size: var(--step--1
           ["ok", "Confirmed", `mined, succeeded, BestExecution logged; the reserve re-read ${xlink("PE1", "(PE1)")}`],
           ["no", "Reverted", `mined and refused with its designed error ${xlink("EA1", "(EA1 NotBestExecution)")}`],
         ].map(([c, b, t]) => `<div class="sx ${c}" role="listitem"><b><i></i>${b}</b><span>${t}</span></div>`).join("")}</div>`;
-      $("bxrows").innerHTML = stepRows(EX.steps.filter((x) => ["conversion", "attack", "market", "policy", "bounty"].includes(x.phase)));
+      $("bxrows").innerHTML = stepRows(EX.steps.filter((x) => ["conversion", "attack", "market", "policy", "policy-chain", "bounty"].includes(x.phase)));
     }
     function drawBounties(pools, block) {
       if (!PV) return;

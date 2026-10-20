@@ -8,7 +8,7 @@
 | Network | Ethereum Sepolia (chain id 11155111) |
 | Blocks | 11,948,657 → 11,949,339 |
 | Transactions | 55 (36 succeeded · 19 reverted **by design** — every one an attack or a paused-vault test) |
-| Plus Run 4 (best execution, execution bounty, standing policy) | 65 more transactions — [see below](#run-4--best-execution-proved-at-the-instant-of-the-trade-qedexecution) |
+| Plus Run 4 (best execution, execution bounty, standing policy) | 73 more transactions — [see below](#run-4--best-execution-proved-at-the-instant-of-the-trade-qedexecution) |
 | Plus Run 3 (zero-knowledge job, bounties) | 24 more transactions — [see below](#run-3--zero-knowledge-optimality-and-theorem-bounties-qed-private) |
 | Plus Run 2 (certified clearing) | 44 more transactions on a separate contract — [see below](#run-2--certified-clearing-of-an-agent-economy-qedclearing) |
 | Off-chain signed artefacts | 7 (mandate, quote, certificate, vendor release, conversation, red-team) — hashes anchored on-chain |
@@ -274,8 +274,8 @@ Set-up transactions of this run (faucet draws, approvals): [`0xe8c1aa8a…8086`]
 
 | | |
 |---|---|
-| Blocks | 11,952,692 → 11,953,422 |
-| Transactions | 65 (54 succeeded · 11 reverted **by design**) |
+| Blocks | 11,952,692 → 11,954,086 |
+| Transactions | 73 (58 succeeded · 15 reverted **by design**) |
 | E1 | 20.000000 tUSD → **18.086846 tEUR**; on-chain bound 18.086849 |
 | E2 | 20.000000 tUSD → **17.612720 tEUR**; on-chain bound 17.612723 |
 | Policy tick 1 | reserve free 20.699566 tEUR, shortfall 24.300434: convert 19.535234 tUSD (limited by impact, 150.0 bps) |
@@ -396,13 +396,25 @@ Set-up transactions of this run (faucet draws, approvals): [`0xe8c1aa8a…8086`]
 | C2 | Co-signer re-derives the same decision from the chain and signs the order (floor 7.409492 tEUR, τ = 1 ppm) | Co-signer | off-chain | — | | |
 | PE2 | Agent converts 8.835281 tUSD → 7.484336 tEUR; bound 7.484339; reserve free 37.515664 → 45.00 | QED agent (operator key) | success | [`0xa9e90f58…ae35`](https://sepolia.etherscan.io/tx/0xa9e90f580bb9f0457bfd8a966ec2c0322d877d6ea66e4f4aaabccd147d1aae35) | 11953422 | 667,948 |
 | T3 | Agent observes 45.00 tEUR free: target met, nothing to do | QED agent | off-chain | — | | |
+| QD1 | Deploy QEDTreasuryPolicy: the owner's standing policy, enforced by the chain | Deployer | success | [`0xcea932ac…5d54`](https://sepolia.etherscan.io/tx/0xcea932ac81f98cd63ac44772b2fb2f80f5f1331547bd3cd798f2166ffb7f5d54) | 11954079 | 9,691,312 |
+| QD2 | Owner sets the policy on-chain: keep ≥ 55.00 tEUR free; tranches 2.00–25.00 tUSD; ≤ 1.5% execution cost; at most 0.1% over-conversion | Owner | success | [`0x5fb70f5f…fff5`](https://sepolia.etherscan.io/tx/0x5fb70f5f4a9c0b86e7240ce8cf661e0db316ecb30fd1ce2a5cdb2e6999c3fff5) | 11954080 | 576,618 |
+| QD3 | Owner makes the policy contract QEDExecution's operator | Owner | success | [`0x9b4a8ef6…4f3b`](https://sepolia.etherscan.io/tx/0x9b4a8ef68ccbea527ccc8be860d564a1b46f10c242027e376f8c0b0c0b134f3b) | 11954081 | 35,295 |
+| QP0 | Owner signs the same policy as text for the co-signer | Owner | off-chain | — | | |
+| QT1 | Agent observes 45.00 tEUR free (short 10.00) and decides to convert 11.943294 tUSD — limited by need | QED agent | off-chain | — | | |
+| QC1 | Co-signer re-derives the same tranche and signs the order (floor 9.90 tEUR, τ = 1 ppm) | Co-signer | off-chain | — | | |
+| QA1 | The agent's key calls QEDExecution.trade directly with the genuine co-signed order | Attacker (agent key + co-signer key) | **reverted** · `NotOperator` | [`0x39093e14…4a9f`](https://sepolia.etherscan.io/tx/0x39093e1490228c609da03f081ad536dc017cf62ab598f6be72ad75a737844a9f) | 11954082 | 154,520 |
+| QA2 | Convert 14.929117 tUSD when 11.943294 covers the shortfall (best-executed, co-signed with the stolen key) | Attacker (agent key + co-signer key) | **reverted** · `OverConversion` | [`0xb49d0c4f…f9f3`](https://sepolia.etherscan.io/tx/0xb49d0c4f40dbeb6e66bc764ed96f3054e701be7d3e5932c03b3e6d72cd23f9f3) | 11954083 | 713,606 |
+| QA3 | Convert the maximum tranche, 25.00 tUSD, into the thin market | Attacker (agent key + co-signer key) | **reverted** · `ExecutionCostTooHigh` | [`0xc5760e24…2be9`](https://sepolia.etherscan.io/tx/0xc5760e247bfe16526f5af00229ff56f333fb8ef5dd44b88a84f0c6c7ae8e2be9) | 11954084 | 713,144 |
+| QE1 | Agent converts 11.943294 tUSD → 10.00 tEUR through the policy contract; reserve free 45.00 → 55.00 | QED agent (operator key) | success | [`0x12739525…41c8`](https://sepolia.etherscan.io/tx/0x12739525e1a11bdcc6921f0eef5dffa3ab1bcb63b9fcd5bc544dda24dbb341c8) | 11954085 | 718,374 |
+| QT2 | Agent observes 55.00 tEUR free: target met, nothing to do | QED agent | off-chain | — | | |
+| QA4 | With the target met, convert another 2.00 tUSD anyway | Attacker (agent key + co-signer key) | **reverted** · `NoShortfall` | [`0x2c68af03…245e`](https://sepolia.etherscan.io/tx/0x2c68af035340391318a581625610fe2535d9de3284256e9be83e4e618ade245e) | 11954086 | 154,520 |
 
 ## How these transactions were produced — full disclosure
 
 Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs). The final phase was executed after rebuilding the replica by replaying the exact signed transactions already on Sepolia.
 
 * The relay fetched `relay/outbox-11155111.json`, `relay/outbox-11155111-b2.json`, `relay/outbox-11155111-clearing.json`, `relay/outbox-11155111-private.json` and the three `relay/outbox-11155111-execution*.json` files from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
-* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded); private run: 24/24 receipts matched; best-execution runs: 65/65 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b and 4c first replayed the earlier runs' signed bytes on the replica.
+* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded); private run: 24/24 receipts matched; best-execution runs: 73/73 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b–4d first replayed the earlier runs' signed bytes on the replica (4d at their original timestamps).
 * Block timestamps differ by seconds between replica and Sepolia; no assertion depends on them (windows are 24 h, certificates live 2 h, deadlines are days).
 * Two earlier attempts under different keys failed and were abandoned: the first ran out of gas on deployment under Sepolia's state-creation repricing; in the second, one agent payment was under-provisioned with gas. The vault was slimmed (via-IR; views moved to QEDLens), every transaction now carries an explicit 16.7 M gas limit (only gas used is charged), and the canonical run above was executed under **fresh keys**, so it shares no state with those attempts.
 * Gas used on Sepolia differs from the replica because Sepolia prices state creation and calldata differently; the relay compared status and logs, not gas.

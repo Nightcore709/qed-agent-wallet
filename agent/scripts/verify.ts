@@ -27,7 +27,7 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import { CPMMPoolAbi, ExecutionBountyAbi, MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { CPMMPoolAbi, QEDTreasuryPolicyAbi, ExecutionBountyAbi, MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
 import { dualBound, simulate, solve, type Hop, type VenueState } from "../src/engine/execution.js";
 import { hashOrder, readVenues } from "../src/roles/trader.js";
 import { encodeAbiParameters } from "viem";
@@ -327,12 +327,13 @@ async function verifyExecution() {
     }
     throw last;
   };
-  for (const id of ["E1", "E2", "PE1", "PE2"]) {
+  for (const id of ["E1", "E2", "PE1", "PE2", "QE1"]) {
     const st = em.steps.find((x: any) => x.id === id);
     if (!st) continue;
     const tx = await pub.getTransaction({ hash: st.tx.hash });
     const rc = await pub.getTransactionReceipt({ hash: st.tx.hash });
-    const { args } = decodeFunctionData({ abi: QEDExecutionAbi as Abi, data: tx.input }) as any;
+    // QE1 went through QEDTreasuryPolicy.convert, which takes exactly QEDExecution.trade's arguments
+    const { args } = decodeFunctionData({ abi: (getAddress(tx.to!) === getAddress(k.execution) ? QEDExecutionAbi : QEDTreasuryPolicyAbi) as Abi, data: tx.input }) as any;
     const [, , cert, , order, route, prices] = args;
     // Pre-trade reserves: the state at the end of the previous block, then, for every pool, the last Sync emitted
     // earlier in the same block (another trade, Mallory, anyone) — PE1 and PE2 share a block.
@@ -363,6 +364,24 @@ async function verifyExecution() {
     const freeAt = (await historical((client) => client.readContract({ address: k.reserve, abi: QEDVaultAbi, functionName: "freeBalance", blockNumber: BigInt(pe2.tx.blockNumber) }))) as bigint;
     const sent = (await pub.getTransaction({ hash: pe2.tx.hash })).from;
     ok("O1", "the policy trades were sent by the operator key, and after the second the euro reserve's free balance met the owner's target", getAddress(sent) === getAddress(em.actors.operator) && freeAt >= target, `free ${Number(freeAt) / 1e6} tEUR ≥ target ${Number(target) / 1e6} at block ${pe2.tx.blockNumber}`);
+  }
+  const tp = (em.contracts as any).treasuryPolicy as Address | undefined;
+  if (tp && em.policyChain) {
+    console.log("\n— QED Execute: the owner's policy, enforced by a contract (Run 4d) —");
+    await verifyBytecode({ treasuryPolicy: tp }, { treasuryPolicy: "QEDTreasuryPolicy.sol/QEDTreasuryPolicy" });
+    const op = (await pub.readContract({ address: k.execution, abi: QEDExecutionAbi, functionName: "operator" })) as Address;
+    const [pExec, pReserve, pAgent] = (await Promise.all(["execution", "reserve", "agent"].map((f) => pub.readContract({ address: tp, abi: QEDTreasuryPolicyAbi, functionName: f as any })))) as Address[];
+    ok("O1", "QEDTreasuryPolicy is QEDExecution's operator: the agent's key can trade only through the policy", getAddress(op) === getAddress(tp) && getAddress(pExec) === getAddress(k.execution) && getAddress(pReserve) === getAddress(k.reserve) && getAddress(pAgent) === getAddress(em.actors.operator), `operator ${op}`);
+    const qe1 = em.steps.find((x: any) => x.id === "QE1");
+    const rc = await pub.getTransactionReceipt({ hash: qe1.tx.hash });
+    const evs = (await pub.getContractEvents({ address: tp, abi: QEDTreasuryPolicyAbi, eventName: "PolicyConversion", fromBlock: rc.blockNumber, toBlock: rc.blockNumber })) as any[];
+    const e = evs.find((x) => x.transactionHash.toLowerCase() === qe1.tx.hash.toLowerCase())?.args;
+    const pol = (await historical((client) => client.readContract({ address: tp, abi: QEDTreasuryPolicyAbi, functionName: "policy", blockNumber: rc.blockNumber }))) as any;
+    const [target, , , kappa, slack] = pol as [bigint, bigint, bigint, number, number];
+    const a = e ? BigInt(e.amountIn) : 0n;
+    const out = e ? BigInt(e.amountOut) : 0n;
+    const smaller = a - (a * BigInt(slack)) / 10_000n;
+    ok("O1", "QE1: every clause of the on-chain policy re-checked from the event and the policy in force at that block", !!e && BigInt(e.freeBefore) < target && out * 10_000n >= BigInt(e.midOut) * (10_000n - BigInt(kappa)) && BigInt(e.freeBefore) * a + out * smaller < target * a && BigInt(e.freeAfter) === BigInt(e.freeBefore) + out && BigInt(e.freeAfter) >= target, e ? `free ${Number(e.freeBefore) / 1e6} → ${Number(e.freeAfter) / 1e6} tEUR (target ${Number(target) / 1e6}); cost ${((1 - Number(out) / Number(e.midOut)) * 1e4).toFixed(1)} bps ≤ ${kappa}` : "event missing");
   }
   console.log("\n— QED Execute: nothing leaked —");
   const bal = (t: Address, a: Address) => pub.readContract({ address: t, abi: TestUSDAbi, functionName: "balanceOf", args: [a] }) as Promise<bigint>;
