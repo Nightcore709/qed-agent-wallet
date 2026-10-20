@@ -66,6 +66,29 @@ npm run test:sandbox     # live sandbox acceptance: 10 and 22.5 tUSD executed wi
 npm run test:demo:e2e    # the above plus the scripted execution economy through the browser API
 ```
 
+## Security design of the hosted app
+
+The app adds a public web service in front of the unchanged contracts. Its design keeps every guarantee of the
+original system and adds service-level limits.
+
+| Tier | Who | What it can do in the app | What it can never do |
+|---|---|---|---|
+| Visitor | anyone with the link | ask questions; request a conversion; confirm it as the sandbox owner; sign a new mandate (1–100 tUSD per conversion) or reserve target (2–80 tEUR); launch one of six fixed attacks; run a scripted economy; reset the sandbox | send to an arbitrary address, call an arbitrary contract, sign arbitrary data, read any key |
+| Language model | Claude, or the offline parser | interpret text into a proposal; explain chain state | sign, execute, change a limit; it never sees a key, and a question never executes |
+| Sandbox owner key | server-held development key | sign the exact conversion the visitor confirmed, or a mandate/policy within the bounds above | exceed the vault's on-chain daily cap; pay a payee outside the mandate |
+| Co-signer | separate engine with its own key | re-derive each conversion (11 checks) and sign an order with a floor | be bypassed: the vault needs both signatures |
+| Contracts | QEDVault, QEDExecution | enforce mandate, caps, ring-fenced liabilities and the best-execution inequality | — |
+
+Service controls: a fixed list of operations (no generic signing or transaction endpoint); chain operations run one
+at a time; 30 operations and 60 questions per hour per client, with global caps on operations, model calls (400)
+and scripted runs; inputs are length- and range-checked; the model key is a server-side secret; the container runs
+as an unprivileged user; the shared sandbox resets after 15 minutes idle.
+
+Known risks of the hosted app (in addition to K1–K29 in SECURITY.md): one shared chain for all visitors (one visitor's
+actions are visible to others and can exhaust the daily window until reset); development keys are held by the
+server, so the app is a demonstration of the protocol, not custody; per-client limits rely on the hosting edge's
+client-IP header; no authentication. Valueless test tokens only; never for real funds.
+
 ## Limits (honest)
 
 - Sandbox keys are deterministic development keys held by the server; the "owner" button exists so a visitor can
