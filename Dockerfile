@@ -19,7 +19,10 @@ COPY --chown=node:node . .
 RUN mkdir -p /app/evidence/demo-runs && chown -R node:node /app/evidence/demo-runs /app/node_modules
 ENV QED_PUBLIC_DEMO=1
 ENV QED_MAX_DEMO_RUNS=40
-ENV QED_OFFLINE=1
+# The language model is used only when ANTHROPIC_API_KEY is set as a service secret; otherwise the labelled
+# deterministic parser answers. Calls are capped (QED_MAX_LLM_CALLS, per-connection hourly limits).
+ENV QED_MAX_LLM_CALLS=400
+ENV QED_TRUST_PROXY=1
 ENV PORT=4173
 USER node
 EXPOSE 4173
