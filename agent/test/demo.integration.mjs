@@ -14,7 +14,7 @@ async function request(path,options) {
 }
 test("interactive browser API executes approved trade and refuses on-chain attacks", {timeout:260_000}, async ()=>{
   const child=spawn(process.execPath,["--import","tsx","agent/scripts/demo-server.mjs"],{
-    env:{...process.env,PORT:"14273",QED_DEMO_ANVIL_PORT:"18645",QED_OFFLINE:"1",ANTHROPIC_API_KEY:""},
+    env:{...process.env,PORT:"14273",QED_DEMO_ANVIL_PORT:"18645",QED_SANDBOX:"0",QED_OFFLINE:"1",ANTHROPIC_API_KEY:""},
     stdio:"ignore"
   });
   try {

@@ -276,7 +276,7 @@ export function createDemoServer() {
       return res.end(readFileSync(PAGE));
     }
     if(method==="GET" && parts.join("/")==="api/health")
-      return json(res,200,{status:"ok",mode:PUBLIC?"public-bounded-demo":"localhost",network:"Anvil 31337",modelConfigured:!!process.env.ANTHROPIC_API_KEY&&process.env.QED_OFFLINE!=="1",aiEngine:sandbox.brain.engine,sandbox:sandbox.status,active:!!active});
+      return json(res,200,{status:"ok",mode:PUBLIC?"public-bounded-demo":"localhost",network:"Anvil 31337",modelConfigured:!!process.env.ANTHROPIC_API_KEY&&process.env.QED_OFFLINE!=="1",aiEngine:sandbox.brain.engine,sandbox:sandbox.status,sandboxError:sandbox.error,active:!!active});
     if(method==="POST" && parts.join("/")==="api/chat"){
       if(!mayChat(req))return json(res,429,{error:"Read-only agent question limit: 12 per hour per connection."});
       if(totalChatCount>=MAX_CHAT_CALLS)return json(res,429,{error:"Global read-only AI question budget exhausted."});

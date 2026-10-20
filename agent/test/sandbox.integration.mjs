@@ -30,14 +30,21 @@ async function job(path, body) {
 test("live sandbox: variable conversions, refusals, inferior-route revert, policy stop", { timeout: 300_000 }, async () => {
   const child = spawn(process.execPath, ["--import", "tsx", "agent/scripts/demo-server.mjs"], {
     env: { ...process.env, PORT: "14274", QED_SANDBOX_PORT: "18746", QED_SANDBOX_RECORDS: "evidence/demo-runs/sandbox-test", QED_OFFLINE: "1", ANTHROPIC_API_KEY: "" },
-    stdio: "ignore",
+    stdio: ["ignore", "pipe", "pipe"],
   });
+  let log = "";
+  child.stdout.on("data", (d) => (log = (log + d).slice(-4000)));
+  child.stderr.on("data", (d) => (log = (log + d).slice(-4000)));
   try {
     let ready = false;
     for (let i = 0; i < 400 && !ready; i++) {
       if (child.exitCode !== null) throw new Error("server exited");
       try { ready = (await req("/api/health")).data.sandbox === "ready"; } catch {}
       if (!ready) await sleep(250);
+    }
+    if (!ready) {
+      const st = await req("/api/sandbox/state").catch(() => ({ data: {} }));
+      console.log(`::error title=sandbox did not start::${JSON.stringify(st.data).slice(0, 300)} ${log.replace(/\n/g, " | ").slice(-700)}`);
     }
     assert.ok(ready, "sandbox chain must deploy");
 
@@ -83,6 +90,9 @@ test("live sandbox: variable conversions, refusals, inferior-route revert, polic
     }
     assert.ok(stopped, "the policy stops at its target");
     assert.ok(BigInt((await req("/api/sandbox/state")).data.reserve.free) >= BigInt(target) * 1_000_000n);
+  } catch (e) {
+    console.log(`::error title=sandbox acceptance failed::${String(e.message).replace(/\n/g, " ").slice(0, 400)} | server: ${log.replace(/\n/g, " | ").slice(-600)}`);
+    throw e;
   } finally {
     child.kill("SIGTERM");
   }

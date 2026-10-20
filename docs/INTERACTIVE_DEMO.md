@@ -1,108 +1,75 @@
-# QED Interactive Agent — implementation preview
+# QED app — the interactive treasury on a live sandbox chain
 
-> **Status: development branch / local demonstration.**
-> The original public GitHub Pages proof ledger remains intact. This new frontend is
-> served by the local Node backend and must not be mistaken for a hosted AI-wallet service.
+> Development branch `qed-interactive-agent-demo-20261020`. The original submission is preserved unchanged on `main`
+> and as tag `qed-original-submission-20261020` (commit `fac6910`), including the GitHub Pages proof ledger.
 
-## Start in one command
+## What it is
 
-Prerequisites: Node 22.x, npm, Foundry 1.7.1 with `anvil` and `forge` on PATH.
+`product/index.html`, served by `agent/scripts/demo-server.mjs`, is the QED product interface. When the server
+starts it boots **one persistent local Anvil chain** (`agent/src/sandbox.ts`, chain id 31337, valueless test tokens)
+and deploys the same best-execution economy as Sepolia Run 4: three tokens, five owner-approved constant-product
+venues, the unchanged `QEDVault` (tUSD treasury and tEUR reserve), `QEDLens` and `QEDExecution`. Every action in the
+app is the real QED pipeline, not an animation:
 
-On a Mac where QED is already cloned:
+```
+your words → language layer (Claude if ANTHROPIC_API_KEY is set, else the labelled offline parser) → guard
+→ signed-mandate limits → owner confirmation (sandbox owner key) → independent co-signer (re-quotes, 11 checks,
+signs an order) → certified route + dual prices → QEDExecution.trade on-chain → receipt → reconciliation
+```
+
+The AI never holds a key and cannot change a limit. Questions never execute anything.
+
+| Area | Depth | What you can do |
+|---|---|---|
+| Agent | **LIVE** | Ask anything; "Convert 22.5 tUSD to tEUR" becomes a proposal you confirm; "Would 80 tUSD violate my mandate?" is a check, never a transaction |
+| Treasury | **LIVE** | Balances, ring-fenced liabilities, blast radius; sign a new mandate (1–100 tUSD per conversion) or a standing policy as the sandbox owner; run policy ticks until the target is met |
+| Execution | **LIVE** | The last trade's route, proof prices, on-chain bound, gap in ppm, baseline routers, live venue reserves |
+| Security Lab | **LIVE** | Six attacks sent as real transactions from a genuine co-signed order: inferior route, skim, forged proof, single pool (`NotBestExecution`), redirect (`OrderMismatch`), stolen order (`NotOperator`) |
+| Economies | **SCRIPTED** | Run the complete scripted economies (paid work and escrow, certified clearing, zero-knowledge optimality, full best-execution run) on a fresh local chain with new receipts |
+| Evidence | **HISTORICAL** | The 196 Ethereum Sepolia transactions and 24 Sourcify-verified contracts, never presented as your session's transactions |
+
+The public sandbox is shared and resets to its initial state (100 tUSD, empty reserve, mandate ≤ 25 tUSD) after
+15 minutes without an operation, or on **Reset sandbox**.
+
+## Run it locally
 
 ```bash
-cd ~/Desktop/qed-agent-wallet
-git fetch origin
-git switch qed-interactive-agent-demo-20261020
-npm ci
-forge build
-npm run test:demo
-npm run demo
+git switch qed-interactive-agent-demo-20261020 && npm ci
+npm run demo                       # http://127.0.0.1:4173 ; needs `anvil` (Foundry 1.7.1) on PATH
+# optional: live model
+ANTHROPIC_API_KEY=… npm run demo
 ```
 
-Open **http://127.0.0.1:4173** in the same computer's browser. Use **Execute permitted scenario**.
+## API
 
-This is a **fresh, real, disposable Anvil blockchain run** with deterministic dev identities
-and valueless synthetic tokens. The existing QED execution script deploys actual Solidity
-contracts, consumes the natural-language input through the genuine QED brain and guard,
-obtains the co-signer certificate, executes optimal conversions and replays deliberate
-reverted attacks. Live events are read from its *newly generated* manifest as the run
-progresses. The interface distinguishes off-chain refusals, mined reverts and accepted
-local transactions. Local transaction hashes cannot be looked up on Sepolia Etherscan.
+| Method and path | Effect |
+|---|---|
+| `GET /api/health` | status, AI engine, sandbox status |
+| `GET /api/sandbox/state` | chain, roles, contracts, balances, mandate, policy, last trade, history |
+| `POST /api/agent {message}` | grounded answer, check or proposal; `execution: "none"` always |
+| `POST /api/sandbox/convert {instruction}` | job: full pipeline, returns steps, receipt and reconciliation |
+| `POST /api/sandbox/attack {kind}` | job: one real attack transaction |
+| `POST /api/sandbox/mandate {maxPerPayment}` · `/policy {targetFree}` · `/policy-tick` · `/reset` | owner actions and policy ticks |
+| `GET /api/jobs/:id` | job progress (steps stream as they happen) |
+| `POST /api/run {scenario}` · `GET /api/run/:id` | scripted economies (`execution`, `economy`, `clearing`, `privacy`) |
+| `GET /api/evidence` | historical Sepolia index |
 
-****The owner mandate is deliberately constrained**: the preconfigured demo owner signs a mandate allowing an individual positive conversion of **up to 25 tUSD** into the approved euro reserve. Inputs exceeding 25 tUSD or attempting to change payees or authorization are refused before execution. This is an operator-controlled demonstration, not a
-general-purpose financial assistant or a chat app that can authorize arbitrary transfers.
-The user-supplied text is interpreted by QED's real brain; subsequent scenario phases
-are scripted. The execution process and short policy loop end automatically; this is not
-a persistent wallet scheduler.
+Limits: 30 chain operations and 60 questions per hour per client, global caps on operations, model calls (400) and
+scripted runs; chain operations run one at a time.
 
-At most one execution may run at a time. Four runs per hour are allowed per connecting
-IP. Only use locally by default. This server is **not hardened for exposure to the
-public internet**; do not set `QED_PUBLIC_DEMO=1` or expose its signing process
-without adding authentication, isolated tenant chains, stronger abuse prevention,
-a cloud secret manager, and explicit public-demo authorization.
-
-## Optional real Anthropic API
-
-If `ANTHROPIC_API_KEY` is set in the **same terminal that starts** `npm run demo`,
-QED's existing brain attempts real Anthropic interpretation of the supported request.
-If no API key is configured, it uses the transparently labeled offline deterministic
-parser. If the API call fails, the original QED fallback is recorded explicitly
-as `offline-fallback (...)`.
-
-Do not paste the key into GitHub, browser JavaScript, issues, chat messages, logs or
-screenshots. Do not put it into `product/index.html` or the dashboard. An Anthropic
-API key pays for API calls; a chat subscription does not substitute for it.
-
-## Historical vs. fresh evidence
-
-- **Fresh local execution:** results are generated under `evidence/demo-runs/<run-id>/`,
-  which is excluded from Git. The frontend shows these receipts as Anvil 31337.
-- **Historical public execution:** source `evidence/ethereum-sepolia/` and the
-  original GitHub Pages dashboard. The new site presents curated direct Etherscan
-  links as public historical evidence, never as freshly submitted transactions.
-- **Independent public checks:** `npm run verify`, requiring a suitable public Sepolia RPC.
-
-Existing source contracts, mathematical algorithms, canonical evidence, and the original
-GitHub Pages site are deliberately unchanged.
-
-## API (localhost only)
-
-- `GET /api/health` — server readiness and non-secret model configuration
-- `GET /api/config` — supported demonstration environments
-- `POST /api/chat` — bounded read-only QED language/guard interpretation; never signs or sends transactions
-- `POST /api/run` — start a preapproved local workflow
-- `GET /api/run/:id` — run status, recorded transaction receipts, policy decisions
-- `GET /api/run/:id/events` — SSE progress (replay of buffered events for reconnect)
-
-A supported request is:
-
-```json
-{"scenario":"execution","instruction":"Move 10 tUSD into the euro reserve.","impact":150}
-```
-
-The endpoint is **not** a general execution or remote signing API. Amounts exceeding the mandate cap, ambiguous amounts, unsupported payees, and policy changes are rejected before launching a blockchain process. A rejected input is **not** a blockchain revert.
-
-## Verification and limits
-
-Run:
+## Tests
 
 ```bash
-npm run test:demo
-npm run test:ts
-npm run typecheck
-forge test
+npm run test:demo        # request validation (7 tests)
+npm run test:sandbox     # live sandbox acceptance: 10 and 22.5 tUSD executed within 1 ppm, 80 refused before signing,
+                         # inferior route mined as NotBestExecution, standing policy converts then stops at its target
+npm run test:demo:e2e    # the above plus the scripted execution economy through the browser API
 ```
 
-The new demo tests validate input restrictions but they are **not substitutes for
-a browser-to-smart-contract acceptance run**. See results in actual CI and local
-testing before describing this branch as verified.
+## Limits (honest)
 
-The baseline existing project has 145 Solidity tests and 60 TypeScript tests, plus
-244 Sepolia verification checks in the earlier documented run. The new application has
-not been deployed as a hosted public service, and the UI is not yet connected to a
-persistent off-chain scheduler. Keep all those limitations explicit to judges.
-
-The UI is an **interactive local runnable prototype** with direct execution logs,
-not a production-ready agent wallet, not a financial product for real funds, and
-not externally audited.
+- Sandbox keys are deterministic development keys held by the server; the "owner" button exists so a visitor can
+  play the owner. In production the owner signs in their own wallet.
+- One shared chain for all visitors; no per-user isolation. Valueless tokens only. Not audited.
+- The certificate covers the five owner-approved constant-product venues, not all of DeFi.
+- Transactions here are local sandbox transactions, never Sepolia transactions; the Sepolia evidence is historical.
