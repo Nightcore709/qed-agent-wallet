@@ -84,7 +84,7 @@ receipt's status, sender and events; every reverted attack's custom error by rep
 signatures recovered from calldata; the KKT certificate and the netting certificate re-checked; the Groth16 proof
 re-verified with snarkjs; for each accepted conversion (E1, E2, PE1, PE2) the bound recomputed from the pre-trade
 reserves, the route replayed and an independent optimum solved; the policy target met; all three bounty pools
-intact; Mallory received nothing. Expect `ALL CHECKS PASSED`; the report is written to
+intact; Mallory received nothing. Expect `ALL CHECKS PASSED` (244 checks in CI on 20 Oct 2026, including every clause of the on-chain policy for QE1); the report is written to
 `evidence/ethereum-sepolia/verification.json`. In CI each failed check is also an annotation on the run.
 
 ## 6. Reproduce the deployed bytecode
