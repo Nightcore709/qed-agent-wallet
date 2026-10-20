@@ -195,8 +195,8 @@ npx tsx benchmarks/run.ts       # B1–B5 benchmarks and ablations, deterministi
 QED_OFFLINE=1 npm run local     # run the whole autonomous economy on a local chain (deterministic brain, dev keys)
 npm run local:clearing          # run the clearing economy on a local chain
 npm run local:private           # zero-knowledge job + theorem bounties on a local chain
-QED_OFFLINE=1 npm run local:execute   # best-execution economy: 5 venues, 2 conversions, 8 attacks, a front-run, then the standing policy
-                                      # (dev keys; reproduces Run 4c's Sepolia numbers to the raw unit)
+QED_OFFLINE=1 npm run local:execute   # best-execution economy: 5 venues, 2 conversions, 8 attacks, a front-run, the standing policy,
+                                      # then the policy as a contract with 4 attacks (dev keys; reproduces Runs 4c and 4d to the raw unit)
 npm run zk:setup                # re-run the Groth16 trusted setup from the circuit (circom 2.2)
 npm run redteam                 # 32-case red-team corpus against the LLM alone and the guarded pipeline (needs ANTHROPIC_API_KEY)
 ```

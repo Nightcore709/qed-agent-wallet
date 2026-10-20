@@ -42,7 +42,7 @@ jobs:
         run: npm run local:clearing
       - name: Run the private economy locally (zero-knowledge proof, escrow settlement, theorem bounties)
         run: npm run local:private
-      - name: Run the best-execution economy locally (proven routing, 8 refused attacks, front-run, standing policy to target)
+      - name: Run the best-execution economy locally (proven routing, 12 refused attacks, front-run, standing policy, policy contract)
         run: npm run local:execute
         env: { QED_OFFLINE: "1" }
       - name: Benchmarks are reproducible (fixed seeds)

@@ -28,7 +28,7 @@ import { chain, EXPLORERS, loadEnvFile, NETWORK_NAMES, rpcConfig } from "../src/
 import { Evidence } from "../src/evidence.js";
 import { amountOut as v2Out, simulate, type Hop, type VenueState } from "../src/engine/execution.js";
 import { DECIMALS, EXEC_VENUES, raw, TRADE_TUSD, type Sym } from "../src/engine/executionScenario.js";
-import { runPolicyPhases } from "./policy-phases.js";
+import { runPolicyContractPhases, runPolicyPhases } from "./policy-phases.js";
 import { decide, hashOrder, hopsForChain, planTrade, pricesForChain, readVenues, type Order, type TradePlan } from "../src/roles/trader.js";
 import { PolicyEngine, ownerTradeMessage, type TradeResponse } from "../src/roles/cosigner.js";
 import { signMandate, type Mandate } from "../src/protocol/eip712.js";
@@ -309,6 +309,14 @@ async function main() {
     policyOutcome = ticks.at(-1)?.action === "none" ? "; the standing policy met its target" : `; the standing policy ended in "${ticks.at(-1)?.action}"`;
     // with the default policy the loop must reach its target (CI checks this); custom POLICY_* settings may end in "wait"
     if (!process.env.POLICY_TARGET && !process.env.POLICY_IMPACT_BPS && ticks.at(-1)?.action !== "none") throw new Error(`policy loop did not reach its target: ${JSON.stringify(ticks.at(-1))}`);
+    if (ticks.at(-1)?.action === "none") {
+      // ═══ 7 · the same policy as a contract (Run 4d on Sepolia): attacks signed with the agent AND co-signer keys ═══
+      console.log("\nPHASE 7 · the policy becomes a contract");
+      const r4d = await runPolicyContractPhases({ c, ev, K, k: { usd, eur: EUR, vault: vault.address, reserve: reserve.address, execution: exec.address }, cosigner, mandate, ownerSig, out: OUT, chainId, target: policy.targetFree + 10_000_000n });
+      ev.meta.policyChain = r4d.policyChain;
+      ev.meta.contracts = { ...(ev.meta.contracts ?? {}), treasuryPolicy: r4d.contracts.treasuryPolicy };
+      policyOutcome += "; the policy contract refused four violations and accepted the honest tranche";
+    }
   }
 
   // ═════════════ final state ═════════════
@@ -325,7 +333,7 @@ async function main() {
   };
   ev.meta.finishedAt = new Date().toISOString();
   ev.flush();
-  console.log(`\nDONE. Reserve holds ${fmt("tEUR", await bal(EUR, reserve.address))} tEUR; 8 attacks refused; module holds nothing${LOCAL ? policyOutcome : ""}.`);
+  console.log(`\nDONE. Reserve holds ${fmt("tEUR", await bal(EUR, reserve.address))} tEUR; ${LOCAL ? 12 : 8} attacks refused; module holds nothing${LOCAL ? policyOutcome : ""}.`);
 
   function attackSim3(tp: TradePlan, now: VenueState[]) {
     return simulate(now, tp.plan.route, usd, EUR, amt3).amountOut;

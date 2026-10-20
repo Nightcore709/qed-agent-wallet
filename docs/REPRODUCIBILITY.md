@@ -61,7 +61,10 @@ deterministic dev keys. Its last lines must be:
   • T3    Agent observes 45.00 tEUR free: target met, nothing to do
 ```
 
-These are the same figures, to the raw unit, as transactions `PE1` and `PE2` on Sepolia: the engine is
+The run then deploys `QEDTreasuryPolicy`, makes it the only operator, and replays Run 4d: `QA1`–`QA4` refused
+(NotOperator, OverConversion, ExecutionCostTooHigh, NoShortfall) and `QE1` converting 11.943294 tUSD → 10.00 tEUR.
+
+These are the same figures, to the raw unit, as transactions `PE1`, `PE2` and `QE1` on Sepolia: the engine is
 deterministic and the local market is built exactly as the public one. Set `POLICY_IMPACT_BPS=50` and the agent refuses to trade at all (`T1 … waits: the market is too thin: any tranche ≥ 2000000 would pay more than 50 bps`): a policy it cannot honour produces no transaction, not a forced one.
 
 ## 4. Benchmarks (≈ 1 min, deterministic)
