@@ -32,7 +32,8 @@
     "fixtures:execution": "tsx agent/scripts/fixtures-execution.ts",
     "demo": "node --import tsx agent/scripts/demo-server.mjs",
     "test:demo": "node --import tsx --test agent/test/demo.test.mjs",
-    "test:demo:e2e": "node --import tsx --test agent/test/demo.integration.mjs"
+    "test:demo:e2e": "node --import tsx --test agent/test/demo.integration.mjs agent/test/sandbox.integration.mjs",
+    "test:sandbox": "node --import tsx --test agent/test/sandbox.integration.mjs"
   },
   "dependencies": {
     "circomlibjs": "^0.1.7",

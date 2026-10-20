@@ -10,6 +10,8 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { makeBrain, guard } from "../src/brain/index.js";
+import { Sandbox, ATTACK_KINDS, fmt6, ser } from "../src/sandbox.js";
+import { agentReply } from "./agent-chat.mjs";
 
 const ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 const EVIDENCE = join(ROOT, "evidence", "demo-runs");
@@ -49,7 +51,7 @@ function parseRequestedAmount(text) {
 export function validateRun(input) {
   if (!input || typeof input !== "object") return "Invalid request.";
   if (!Object.hasOwn(SCENARIOS, input.scenario)) return "Select a supported demonstration.";
-  if(PUBLIC && input.scenario !== "execution") return "The public service only permits the bounded certified-execution demo; other economies are available locally.";
+  if(PUBLIC && process.env.QED_PUBLIC_SCENARIOS && !process.env.QED_PUBLIC_SCENARIOS.split(",").includes(input.scenario)) return "This scripted economy is disabled on the public service.";
   if (input.scenario === "execution") {
     const s = input.instruction;
     if (typeof s !== "string" || s.length > 240 || s.length < 12) return "Enter a concise financial instruction (12–240 characters).";
@@ -120,8 +122,66 @@ function report(run) {
     error:run.error||null
   };
 }
+function clientIp(req){
+  // Railway's edge sets X-Real-IP; trusted only when QED_TRUST_PROXY=1 (set in the Docker image).
+  if(process.env.QED_TRUST_PROXY==="1"&&typeof req.headers["x-real-ip"]==="string")return req.headers["x-real-ip"].slice(0,64);
+  return req.socket.remoteAddress||"anonymous";
+}
+const opQuotas=new Map();
+const MAX_OPS_PER_HOUR=Number(process.env.QED_MAX_OPS_PER_HOUR??30);
+const MAX_TOTAL_OPS=Number(process.env.QED_MAX_TOTAL_OPS??1500);
+let totalOps=0;
+function mayOperate(req){
+  const ip=clientIp(req),now=Date.now();
+  const prev=(opQuotas.get(ip)||[]).filter(t=>now-t<3600000);
+  if(prev.length>=MAX_OPS_PER_HOUR||totalOps>=MAX_TOTAL_OPS)return false;
+  prev.push(now);opQuotas.set(ip,prev);totalOps++;return true;
+}
+const agentQuotas=new Map();
+function mayAsk(req){
+  const ip=clientIp(req),now=Date.now();
+  const prev=(agentQuotas.get(ip)||[]).filter(t=>now-t<3600000);
+  if(prev.length>=Number(process.env.QED_MAX_QUESTIONS_PER_HOUR??60))return false;
+  prev.push(now);agentQuotas.set(ip,prev);return true;
+}
+// Sandbox jobs: chain-mutating operations run one at a time; the browser polls /api/jobs/:id.
+const jobs=new Map();
+function newJob(kind,run){
+  const id=randomUUID();
+  const job={id,kind,status:"running",steps:[],result:null,error:null,createdAt:new Date().toISOString()};
+  jobs.set(id,job);
+  if(jobs.size>300){for(const k of jobs.keys()){jobs.delete(k);if(jobs.size<=250)break;}}
+  run(s=>job.steps.push(s)).then(r=>{job.result=r;job.status="done";},e=>{job.error=String(e?.message||e).slice(0,400);job.status="failed";});
+  return job;
+}
+export const sandbox=new Sandbox();
+// The public sandbox is shared: after QED_IDLE_RESET_MIN minutes without a chain operation, it returns to its initial
+// state (100 tUSD, empty reserve, mandate v1) so the next visitor starts fresh. Resets are recorded in the history.
+let lastOpAt=Date.now();
+const IDLE_RESET_MS=Number(process.env.QED_IDLE_RESET_MIN??15)*60000;
+setInterval(()=>{if(sandbox.status==="ready"&&sandbox.history.some(h=>h.kind!=="reset")&&Date.now()-lastOpAt>IDLE_RESET_MS){lastOpAt=Date.now();sandbox.reset().catch(()=>{});}},60000).unref();
+let sandboxStarting=null;
+export function startSandbox(){
+  if(!sandboxStarting)sandboxStarting=sandbox.start().catch(e=>{console.error("sandbox failed:",e.message);});
+  return sandboxStarting;
+}
+let evidenceCache=null;
+function evidenceIndex(){
+  if(evidenceCache)return evidenceCache;
+  const runs=[["evidence/ethereum-sepolia/manifest.json","Run 1 · authorised payments, escrow, attacks, honeypot"],["evidence/ethereum-sepolia/clearing/manifest.json","Run 2 · certified clearing"],["evidence/ethereum-sepolia/private/manifest.json","Run 3 · zero-knowledge optimality"],["evidence/ethereum-sepolia/execution/manifest.json","Run 4 · certified best execution and treasury policy"]];
+  const txs=[];
+  for(const [file,run] of runs){
+    try{const m=JSON.parse(readFileSync(join(ROOT,file),"utf8"));
+      for(const st of m.steps||[])if(st.tx)txs.push({run,id:st.id,phase:st.phase,title:st.title,hash:st.tx.hash,status:st.tx.status,block:st.tx.blockNumber,gas:st.tx.gasUsed,error:st.error?.name||null,expect:st.expect||null});
+    }catch{}
+  }
+  let contracts=[];
+  try{contracts=JSON.parse(readFileSync(join(ROOT,"verification/sourcify.json"),"utf8")).contracts.map(c=>({name:c.name,address:c.address,match:c.match}));}catch{}
+  evidenceCache={network:"Ethereum Sepolia (chain 11155111)",explorer:"https://sepolia.etherscan.io",note:"Historical: mined earlier on the public Ethereum Sepolia testnet by the QED team. Not generated by your session.",transactions:txs,contracts,ledger:"https://nightcore709.github.io/qed-agent-wallet/"};
+  return evidenceCache;
+}
 function mayChat(req){
-  const ip=req.socket.remoteAddress||"anonymous",now=Date.now();
+  const ip=clientIp(req),now=Date.now();
   const prev=(chatQuotas.get(ip)||[]).filter(t=>now-t<3600000);
   if(prev.length>=12)return false;
   prev.push(now);chatQuotas.set(ip,prev);return true;
@@ -132,8 +192,7 @@ function readOnlyContext(){
     spentInWindow:0n,paused:false,payees:[] };
 }
 function mayRun(req) {
-  // Deliberately conservative; never trust X-Forwarded-For from the public internet.
-  const ip=req.socket.remoteAddress||"anonymous";
+  const ip=clientIp(req);
   const now=Date.now(), prev=(quotas.get(ip)||[]).filter(t=>now-t<3600000);
   if(prev.length>=4) return false;
   prev.push(now);quotas.set(ip,prev);return true;
@@ -217,7 +276,7 @@ export function createDemoServer() {
       return res.end(readFileSync(PAGE));
     }
     if(method==="GET" && parts.join("/")==="api/health")
-      return json(res,200,{status:"ok",mode:PUBLIC?"public-bounded-demo":"localhost",network:"Anvil 31337",modelConfigured:!!process.env.ANTHROPIC_API_KEY,active:!!active});
+      return json(res,200,{status:"ok",mode:PUBLIC?"public-bounded-demo":"localhost",network:"Anvil 31337",modelConfigured:!!process.env.ANTHROPIC_API_KEY&&process.env.QED_OFFLINE!=="1",aiEngine:sandbox.brain.engine,sandbox:sandbox.status,active:!!active});
     if(method==="POST" && parts.join("/")==="api/chat"){
       if(!mayChat(req))return json(res,429,{error:"Read-only agent question limit: 12 per hour per connection."});
       if(totalChatCount>=MAX_CHAT_CALLS)return json(res,429,{error:"Global read-only AI question budget exhausted."});
@@ -242,6 +301,52 @@ export function createDemoServer() {
           flags:decision.flags,proposedAction:proposal,requiresOwnerAuthorization:!!decision.needsConfirmation,
           execution:"none",notice:"Read-only QED language-layer evaluation. The signed mandate and on-chain contracts alone authorize execution."});
       }catch{return json(res,503,{error:"The agent interpretation service is unavailable. No transaction was attempted."});}
+    }
+    const route=parts.join("/");
+    if(method==="GET"&&route==="api/sandbox/state"){
+      try{return json(res,200,await sandbox.state());}catch(e){return json(res,503,{status:"failed",error:"Sandbox state unavailable."});}
+    }
+    if(method==="GET"&&route==="api/evidence")return json(res,200,evidenceIndex());
+    if(method==="GET"&&parts[0]==="api"&&parts[1]==="jobs"&&parts[2]){
+      const job=jobs.get(parts[2]);
+      return job?json(res,200,job):json(res,404,{error:"Unknown job."});
+    }
+    if(method==="POST"&&route==="api/agent"){
+      if(!mayAsk(req))return json(res,429,{error:"Question limit reached for this connection (60 per hour)."});
+      let input;try{input=await body(req);}catch{return json(res,400,{error:"Invalid request."});}
+      if(typeof input?.message!=="string"||input.message.trim().length<2||input.message.length>600)return json(res,422,{error:"Ask something between 2 and 600 characters."});
+      try{return json(res,200,ser(await agentReply(sandbox,input.message.trim())));}
+      catch(e){return json(res,503,{error:"The agent could not answer: "+String(e?.message||e).slice(0,200)+". No transaction was attempted."});}
+    }
+    if(method==="POST"&&parts[0]==="api"&&parts[1]==="sandbox"&&parts[2]){
+      const op=parts[2];
+      if(!["convert","attack","policy-tick","mandate","policy","reset"].includes(op))return json(res,404,{error:"Not found."});
+      if(sandbox.status!=="ready")return json(res,503,{error:sandbox.status==="starting"?"The sandbox chain is still starting; try again in a few seconds.":"The sandbox chain is unavailable."});
+      lastOpAt=Date.now();
+      if(!mayOperate(req))return json(res,429,{error:"Operation limit reached (30 per hour per connection, global cap applies)."});
+      let input;try{input=await body(req);}catch{return json(res,400,{error:"Invalid request."});}
+      input=input&&typeof input==="object"?input:{};
+      if(op==="convert"){
+        const s=input.instruction;
+        if(typeof s!=="string"||s.trim().length<4||s.length>240)return json(res,422,{error:"Enter a conversion instruction (4–240 characters)."});
+        return json(res,202,newJob("convert",emit=>sandbox.convert(s.trim(),emit)));
+      }
+      if(op==="attack"){
+        if(!ATTACK_KINDS.includes(input.kind))return json(res,422,{error:"Unknown attack."});
+        return json(res,202,newJob("attack",emit=>sandbox.attack(input.kind,emit)));
+      }
+      if(op==="policy-tick")return json(res,202,newJob("policy-tick",emit=>sandbox.policyTick(emit)));
+      if(op==="mandate"){
+        const n=Number(input.maxPerPayment);
+        if(!(n>=1&&n<=100))return json(res,422,{error:"The sandbox owner may sign a per-conversion limit between 1 and 100 tUSD."});
+        return json(res,202,newJob("mandate",()=>sandbox.setMandate(n)));
+      }
+      if(op==="policy"){
+        const n=Number(input.targetFree);
+        if(!(n>=2&&n<=80))return json(res,422,{error:"Choose a reserve target between 2 and 80 tEUR."});
+        return json(res,202,newJob("policy",()=>sandbox.setPolicy(n)));
+      }
+      if(op==="reset")return json(res,202,newJob("reset",()=>sandbox.reset()));
     }
     if(method==="GET" && parts.join("/")==="api/latest")
       return json(res,200,{run:active?.id||(Array.from(sessions.values()).at(-1)?.id??null)});
@@ -286,10 +391,11 @@ export function createDemoServer() {
 }
 if(process.argv[1] && resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const server=createDemoServer();
+  if(process.env.QED_SANDBOX!=="0")startSandbox();
   server.listen(PORT,HOST,()=>{
     console.log("\nQED Interactive Demo → http://"+(HOST==="0.0.0.0"?"localhost":HOST)+":"+PORT);
     console.log("Blockchain: ephemeral Anvil 31337. No real money. "+(process.env.ANTHROPIC_API_KEY?"Anthropic key configured.":"Offline deterministic model."));
     console.log("Press Ctrl+C to stop.\n");
   });
-  for(const s of ["SIGINT","SIGTERM"])process.on(s,()=>{if(active?.child)active.child.kill(s);server.close(()=>process.exit(0));});
+  for(const s of ["SIGINT","SIGTERM"])process.on(s,()=>{if(active?.child)active.child.kill(s);sandbox.stop();server.close(()=>process.exit(0));setTimeout(()=>process.exit(0),1500).unref();});
 }
