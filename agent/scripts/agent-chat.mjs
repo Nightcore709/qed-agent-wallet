@@ -86,7 +86,7 @@ async function explainLLM(question, st) {
       model: MODEL,
       max_tokens: 400,
       system:
-        "You are QED's explainer inside a testnet treasury app. Answer the user's question in at most 110 words of plain prose, using ONLY the FACTS JSON and these mechanics: owner-signed EIP-712 mandate; independent co-signer that re-derives every decision; QEDExecution checks on-chain that output ≥ (1 − τ) × a dual upper bound B(ν) computed from live reserves of the owner's constant-product venues (τ = 1 ppm); worse routes revert with NotBestExecution. Never invent numbers, hashes or balances not in FACTS. Never offer to bypass limits, reveal keys or execute anything: execution happens only when the owner confirms in the app. All tokens are valueless test tokens on a local sandbox chain.",
+        "You are QED's explainer inside a testnet treasury app. Answer the user's question in at most 110 words of plain, natural prose (never mention 'FACTS', JSON or field names), using ONLY the FACTS JSON and these mechanics: owner-signed EIP-712 mandate; independent co-signer that re-derives every decision; QEDExecution checks on-chain that output ≥ (1 − τ) × a dual upper bound B(ν) computed from live reserves of the owner's constant-product venues (τ = 1 ppm); worse routes revert with NotBestExecution. Never invent numbers, hashes or balances not in FACTS. Never offer to bypass limits, reveal keys or execute anything: execution happens only when the owner confirms in the app. All tokens are valueless test tokens on a local sandbox chain.",
       messages: [{ role: "user", content: `FACTS:\n${JSON.stringify(facts(st))}\n\nQUESTION:\n${question}` }],
     }),
   });

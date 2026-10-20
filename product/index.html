@@ -492,6 +492,8 @@ const STEPS={convert:[["interpret","AI interprets the instruction"],["mandate","
   "policy-tick":[["decide","Agent observes and decides"],["cosigner","Co-signer re-derives the decision"],["plan","Agent routes and builds the proof"],["submit","Transaction submitted"],["receipt","Mined and checked on-chain"],["reconcile","Reserve re-read"]],
   attack:[["cosigner","Genuine co-signed order"],["attack","Malicious transaction built"],["receipt","Mined: the chain's verdict"]]};
 function drawTimeline(kind,steps,running){
+  // a "pending" step followed by later steps has completed (e.g. submitted → mined): show it as done
+  steps=steps.map((s,i)=>s.status==="pending"&&i<steps.length-1?{...s,status:"ok"}:s);
   const plan=STEPS[kind]||[];const got=Object.fromEntries(steps.map(s=>[s.key,s]));
   const stopped=steps.some(s=>s.status==="refused"||s.status==="reverted");
   let firstTodo=true;
@@ -545,10 +547,11 @@ $("#composer").addEventListener("submit",e=>{e.preventDefault();ask();});
 $("#q").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask();}});
 async function ask(){
   const text=$("#q").value.trim();if(text.length<2)return;
-  $("#q").value="";chat.push({who:"me",text});chat.push({who:"ai",text:"…",engine:"thinking"});drawChat();
+  $("#q").value="";chat.push({who:"me",text});const slot={who:"ai",text:"…",engine:"thinking"};chat.push(slot);drawChat();
+  // answers fill their own placeholder, so replies stay next to their question even when they arrive out of order
   try{const r=await api("/api/agent",{method:"POST",body:JSON.stringify({message:text})});
-    chat[chat.length-1]={who:"ai",text:r.reply,engine:r.engine,kind:r.kind,amount:r.amount,allowed:r.allowed,checks:r.checks,instruction:r.instruction};
-  }catch(e){chat[chat.length-1]={who:"ai",text:e.message,engine:"error"};}
+    Object.assign(slot,{text:r.reply,engine:r.engine,kind:r.kind,amount:r.amount,allowed:r.allowed,checks:r.checks,instruction:r.instruction});
+  }catch(e){Object.assign(slot,{text:e.message,engine:"error"});}
   drawChat();
 }
 $("#msgs").addEventListener("click",e=>{
