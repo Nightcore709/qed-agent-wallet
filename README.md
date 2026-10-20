@@ -7,6 +7,12 @@ Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-a
 
 [![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml) · Source of all 24 deployed contracts verified on [Sourcify](verification/README.md) (creation + runtime match)
 
+> **Try it: [the live app](https://qed-judges-preview-production.up.railway.app/)** — no wallet, no keys, no install.
+> Ask the agent, convert any amount within the owner's signed mandate, watch the co-signer and the on-chain proof,
+> sign a standing policy, launch real attacks and see them revert. It runs the real QED contracts on a shared,
+> disposable testnet sandbox chain (valueless tokens, resets when idle); the Sepolia evidence is historical.
+> Details: [docs/INTERACTIVE_DEMO.md](docs/INTERACTIVE_DEMO.md).
+
 ---
 
 ## New: best execution, proved at the instant of the trade

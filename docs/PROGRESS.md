@@ -17,12 +17,11 @@ deck and PDFs, GitHub Pages ledger). Statuses: PASS / PARTIAL / FAIL / BLOCKED /
 | Questions vs transactions | `/api/agent` never executes; proposals need the owner's confirmation | API returns `execution: "none"` for every answer, check and proposal | PASS |
 | Scripted economies | Run paid work/escrow, clearing, zero-knowledge, full execution on a fresh chain | `privacy` scenario through the API: exit 0, 21 steps, 16 s | PASS (local) |
 | UI | Responsive fixes (no horizontal scroll at 390 px in any view), buttons, formula, suggestion row | Playwright screenshots at 1440 and 390 px of all seven views; agent flow driven in a browser | PASS (local render) |
-| Public deployment | Railway `qed-judges-preview-production.up.railway.app` | Serves an older build (health has no `sandbox` field) as of 13:10 UTC; Railway did not pick up the new commits while checked; dashboard not reachable from this session | BLOCKED (redeploy needed) |
+| Public deployment | Railway `qed-judges-preview-production.up.railway.app`, redeployed from the branch | 13:23 UTC, from an external browser: new UI served; `/api/health` sandbox ready; question → check (no execution); 10 and 22.5 tUSD executed (blocks 34–35); 80 refused; inferior route reverted `NotBestExecution`; policy target 40 → tick converted, next tick stopped; scripted clearing economy exit 0 (31 steps, 7 reverts); UI flow "Convert 15 tUSD" confirmed on-chain; sandbox reset afterwards | PASS (offline parser; no model key on Railway) |
 | CI | `test:demo:e2e` now includes the sandbox test | `e06b48b`: Solidity PASS, verify PASS, agent job FAIL in the e2e step (log not readable here); local e2e PASS (2/2); diagnostics added | PARTIAL |
 
 ## Remaining
 
-1. Redeploy Railway from the branch head and confirm `/api/health` shows `"sandbox":"ready"`; then run one conversion
-   from the public URL.
+1. Done: Railway redeployed and verified end to end (see table).
 2. Optional: add `ANTHROPIC_API_KEY` as a Railway service variable for live Claude (capped at 400 calls).
 3. Confirm CI green on the branch head.
