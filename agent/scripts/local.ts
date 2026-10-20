@@ -15,6 +15,7 @@ import { createPublicClient, http, parseEther, type Hex } from "viem";
 import { ensureDevKeys, loadEnvFile } from "../src/config.js";
 
 loadEnvFile(process.env.KEYS_FILE ?? ".keys.env");
+if (process.env.EXTRA_KEYS) loadEnvFile(process.env.EXTRA_KEYS);
 const SCRIPT = process.env.SCRIPT ?? "agent/scripts/live.ts";
 const shadowOf = process.env.SHADOW_OF ? Number(process.env.SHADOW_OF) : undefined;
 const chainId = shadowOf ?? 31337;

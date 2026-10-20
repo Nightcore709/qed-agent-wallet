@@ -350,7 +350,7 @@ function gaussSolve(M: number[][], b: number[]): number[] | null {
  * intermediate token once all of its producers have run), and assigns exact integer amounts: source
  * hops split A exactly; the last consumer of each intermediate token takes all of it (amountIn = 0).
  */
-function orderRoute(venues: VenueState[], trades: { venue: number; zeroForOne: boolean; amountIn: number }[], s: string, t: string, A: bigint): Hop[] {
+function orderRoute(venues: VenueState[], trades: { venue: number; zeroForOne: boolean; amountIn: number; amountOut: number }[], s: string, t: string, A: bigint): Hop[] {
   const tin = (x: { venue: number; zeroForOne: boolean }) => key(x.zeroForOne ? venues[x.venue].token0 : venues[x.venue].token1);
   const tout = (x: { venue: number; zeroForOne: boolean }) => key(x.zeroForOne ? venues[x.venue].token1 : venues[x.venue].token0);
   const pending = [...trades];
@@ -360,10 +360,16 @@ function orderRoute(venues: VenueState[], trades: { venue: number; zeroForOne: b
     if (i < 0) throw new Error("route has a cycle (an arbitrage loop): not supported by the router");
     ordered.push(pending.splice(i, 1)[0]);
   }
-  // integer amounts for the source hops, summing to A exactly
+  // When venues disagree, the optimum can contain an arbitrage loop that hands input tokens back
+  // (a trade whose output is s). Those recycled tokens are spent by repeating the largest source leg as
+  // the very last hop ("everything left"), so the first pass spends only A − recycled on that leg.
   const src = ordered.filter((x) => tin(x) === s);
-  const total = src.reduce((a, x) => a + x.amountIn, 0);
-  const amounts = src.map((x) => BigInt(Math.floor((x.amountIn / total) * Number(A))));
+  const recycled = ordered.filter((x) => tout(x) === s).reduce((a, x) => a + x.amountOut, 0);
+  const lead = src.filter((x) => tout(x) === t).reduce<(typeof src)[number] | null>((m, x) => (!m || x.amountIn > m.amountIn ? x : m), null); // a direct leg, so the repeat needs no further hops
+  const recycle = recycled > 0 && lead !== null && lead.amountIn > recycled;
+  const planned = src.map((x) => (recycle && x === lead ? x.amountIn - recycled : x.amountIn));
+  const total = planned.reduce((a, x) => a + x, 0);
+  const amounts = planned.map((x) => BigInt(Math.floor((x / total) * Number(A))));
   if (src.length) {
     const largest = amounts.reduce((bi, v, i) => (v > amounts[bi] ? i : bi), 0);
     amounts[largest] += A - amounts.reduce((a, b) => a + b, 0n);
@@ -373,11 +379,13 @@ function orderRoute(venues: VenueState[], trades: { venue: number; zeroForOne: b
   const hops: Hop[] = [];
   const lastConsumer = new Map<string, number>();
   ordered.forEach((x, i) => {
-    if (tin(x) !== s) lastConsumer.set(tin(x), i);
+    if (tin(x) !== s && tin(x) !== t) lastConsumer.set(tin(x), i);
   });
   let si = 0;
   ordered.forEach((x, i) => {
     if (tin(x) === s) hops.push({ venue: x.venue, zeroForOne: x.zeroForOne, amountIn: amounts[si++] });
+    // selling the output token (an arbitrage leg when venues disagree): an explicit, planned amount
+    else if (tin(x) === t) hops.push({ venue: x.venue, zeroForOne: x.zeroForOne, amountIn: BigInt(Math.max(1, Math.floor(x.amountIn))) });
     else hops.push({ venue: x.venue, zeroForOne: x.zeroForOne, amountIn: lastConsumer.get(tin(x)) === i ? 0n : -1n });
   });
   // resolve the −1 placeholders (non-last intermediate consumers) by exact simulation
@@ -409,6 +417,7 @@ function orderRoute(venues: VenueState[], trades: { venue: number; zeroForOne: b
       }
     });
   }
+  if (recycle && lead) hops.push({ venue: lead.venue, zeroForOne: lead.zeroForOne, amountIn: 0n });
   return hops;
 }
 

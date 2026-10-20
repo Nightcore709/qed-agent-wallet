@@ -24,9 +24,9 @@ import {
   type PublicClient,
   type TransactionReceipt,
 } from "viem";
-import { MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDVaultAbi, TestUSDAbi } from "./abi/contracts.js";
+import { MaximalityBountyAbi, QEDExecutionAbi, CPMMPoolAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDVaultAbi, TestUSDAbi } from "./abi/contracts.js";
 
-export const ALL_ABIS: Abi[] = [QEDVaultAbi as Abi, ProofEscrowAbi as Abi, MinVarianceVerifierAbi as Abi, QEDClearingAbi as Abi, TestUSDAbi as Abi, PrivateMinVarianceVerifierAbi as Abi, OptimalityBountyAbi as Abi, MaximalityBountyAbi as Abi];
+export const ALL_ABIS: Abi[] = [QEDVaultAbi as Abi, ProofEscrowAbi as Abi, MinVarianceVerifierAbi as Abi, QEDClearingAbi as Abi, TestUSDAbi as Abi, PrivateMinVarianceVerifierAbi as Abi, OptimalityBountyAbi as Abi, MaximalityBountyAbi as Abi, QEDExecutionAbi as Abi, CPMMPoolAbi as Abi];
 
 export const baseSepolia = defineChain({
   id: 84532,

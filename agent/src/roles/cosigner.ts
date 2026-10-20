@@ -16,6 +16,9 @@ import { mandateHash, signCertificate, type Certificate, type Mandate } from "..
 import { canonical, hashRecord, invoiceDigest, type Invoice } from "../protocol/records.js";
 import type { Check } from "../engine/economics.js";
 import { POLICY } from "../engine/economics.js";
+import { solve, type Hop } from "../engine/execution.js";
+import { hashOrder, readVenues, type Order } from "./trader.js";
+import { QEDExecutionAbi } from "../abi/contracts.js";
 
 export type CertRequest =
   | {
@@ -49,6 +52,35 @@ export interface CertResponse {
   checks: Check[];
   reasons: string[];
 }
+
+/** An owner-confirmed conversion: the agent proposes, the owner signs the exact instruction. */
+export interface TradeRequest {
+  mandate: Mandate;
+  ownerSig: Hex;
+  module: Address;
+  tokenIn: Address;
+  tokenOut: Address;
+  recipient: Address;
+  amountIn: bigint;
+  instruction: string;
+  nonce: string;
+  instructionSig: Hex;
+  brainEngine: string;
+}
+
+export interface TradeResponse extends CertResponse {
+  order?: Order;
+  quote?: { amountOut: bigint; bound: bigint; route: Hop[] };
+}
+
+export const TRADE_POLICY = {
+  slippageBps: 100, //       the order's floor: the co-signer's own optimal quote less 1%
+  tolerancePpm: 1, //         best-execution tolerance written into the order
+  maxRateDeviationBps: 300, //  quoted rate within 3% of the depth-weighted direct mid (manipulation screen)
+};
+
+export const ownerTradeMessage = (vault: Address, amountIn: bigint, tokenIn: Address, tokenOut: Address, recipient: Address, nonce: string) =>
+  `QED owner instruction\nvault: ${vault}\nconvert: ${amountIn.toString()} of ${tokenIn}\ninto: ${tokenOut}\nfor: ${recipient}\nnonce: ${nonce}`;
 
 export const ownerInstructionMessage = (vault: Address, payee: Address, amount: bigint, dueInDays: number | undefined, nonce: string) =>
   `QED owner instruction\nvault: ${vault}\npay: ${payee}\namount: ${amount.toString()}\ndueInDays: ${dueInDays ?? 0}\nnonce: ${nonce}`;
@@ -187,6 +219,88 @@ export class PolicyEngine {
     const recordPath = `${this.cfg.recordsDir}/${evidenceHash}.json`;
     writeFileSync(recordPath, JSON.stringify({ core: JSON.parse(canonical(core)), canonical: canonical(core), evidenceHash, certificate: certificate ? JSON.parse(canonical(certificate)) : null, signature: signature ?? null }, null, 2));
     return { approved, certificate, signature, evidenceHash, recordPath, checks, reasons };
+  }
+
+  /**
+   * Reviews a conversion. The co-signer does not trust the agent's plan: it reads the venues itself,
+   * solves the routing problem itself, and writes ITS quote (less the slippage allowance) into the
+   * order as the floor. The route and the proof stay the agent's job; the chain checks them.
+   */
+  async evaluateTrade(req: TradeRequest): Promise<TradeResponse> {
+    const pub = this.chain.pub;
+    const block = await pub.getBlock();
+    const now = Number(block.timestamp);
+    const snap = (await pub.readContract({ address: this.cfg.lens, abi: QEDLensAbi, functionName: "snapshot", args: [this.cfg.vault] })) as any;
+    const mHash = mandateHash(req.mandate);
+    const checks: Check[] = [];
+    const add = (id: string, name: string, pass: boolean, detail: string) => checks.push({ id, name, pass, detail });
+    const { recoverAddress } = await import("viem");
+    const digest = (await pub.readContract({ address: this.cfg.lens, abi: QEDLensAbi, functionName: "mandateDigest", args: [this.cfg.vault, req.mandate as any] } as any)) as Hex;
+    const signer = await recoverAddress({ hash: digest, signature: req.ownerSig }).catch(() => "0x0" as Address);
+    add("C1", "Mandate signed by the vault owner", getAddress(signer) === getAddress(snap.owner), `recovered ${signer}`);
+    add("C2", "Mandate active and current epoch", now >= Number(req.mandate.validFrom) && now <= Number(req.mandate.validUntil) && BigInt(snap.epoch) === req.mandate.epoch, `epoch ${snap.epoch}`);
+    const msg = ownerTradeMessage(this.cfg.vault, req.amountIn, req.tokenIn, req.tokenOut, req.recipient, req.nonce);
+    const s = await recoverMessageAddress({ message: msg, signature: req.instructionSig }).catch(() => "0x0" as Address);
+    add("C3", "Conversion confirmed by the owner's signature", getAddress(s) === getAddress(snap.owner), `instruction signer ${s}`);
+    add("C6", "Instruction nonce not seen before", !this.seenNonces.has(req.nonce), req.nonce);
+    add("C9", "Recipient is listed in the owner's mandate", req.mandate.payees.some((p) => getAddress(p) === getAddress(req.recipient)), req.recipient);
+    add("C9b", "Execution module is the vault's agent and a mandate payee", getAddress(snap.agent) === getAddress(req.module) && req.mandate.payees.some((p) => getAddress(p) === getAddress(req.module)), `agent ${snap.agent}`);
+    const free = BigInt(snap.freeBalance);
+    add("C10", "Reserve buffer above ring-fenced liabilities preserved", free - req.amountIn >= POLICY.reserveBuffer, `free ${fmt(free)} − ${fmt(req.amountIn)} = ${fmt(free - req.amountIn)} ≥ ${fmt(POLICY.reserveBuffer)}`);
+    add("C11", "Sanctions / deny-list screening", !this.cfg.denylist.some((d) => getAddress(d) === getAddress(req.recipient)), "recipient not on deny-list");
+
+    // T1–T3: an independent quote, a manipulation screen, and the venue set the proof must range over
+    const venues = await readVenues(pub, req.module);
+    const venueSetHash = (await pub.readContract({ address: req.module, abi: QEDExecutionAbi, functionName: "venueSetHash" })) as Hex;
+    const own = solve(venues, req.tokenIn, req.tokenOut, req.amountIn);
+    add("T1", "Independent re-quote: own optimal route executes", own.sim.ok && own.sim.amountOut > 0n, `own route ${own.route.length} hops → ${own.sim.amountOut} (bound ${own.bound}, gap ${own.gapPpm.toFixed(3)} ppm)`);
+    // T2: the quoted rate must sit close to the depth-weighted mid price of the direct venues — a screen
+    // against venues pushed off-market before signing (it cannot see a manipulation of every venue at once).
+    const direct = venues.filter((v) => [v.token0, v.token1].map((x) => x.toLowerCase()).sort().join() === [req.tokenIn, req.tokenOut].map((x) => x.toLowerCase()).sort().join());
+    const depth = (v: (typeof venues)[number]) => Number(v.token0.toLowerCase() === req.tokenIn.toLowerCase() ? v.r0 : v.r1);
+    const mid = (v: (typeof venues)[number]) => (v.token0.toLowerCase() === req.tokenIn.toLowerCase() ? Number(v.r1) / Number(v.r0) : Number(v.r0) / Number(v.r1));
+    const wMid = direct.reduce((a, v) => a + mid(v) * depth(v), 0) / Math.max(1, direct.reduce((a, v) => a + depth(v), 0));
+    const rate = Number(own.sim.amountOut) / Number(req.amountIn);
+    const deviation = wMid > 0 ? Math.abs(rate / wMid - 1) * 10_000 : Infinity;
+    add("T2", "Quoted rate close to the venues' depth-weighted mid (manipulation screen)", deviation <= TRADE_POLICY.maxRateDeviationBps, `rate ${rate.toFixed(6)} vs weighted mid ${wMid.toFixed(6)}: ${deviation.toFixed(1)} bps (limit ${TRADE_POLICY.maxRateDeviationBps})`);
+    add("T3", "Order commits to the current venue set", /^0x[0-9a-f]{64}$/i.test(venueSetHash), venueSetHash);
+
+    const order: Order = {
+      tokenOut: getAddress(req.tokenOut),
+      recipient: getAddress(req.recipient),
+      minOut: (own.sim.amountOut * BigInt(10_000 - TRADE_POLICY.slippageBps)) / 10_000n,
+      tolerancePpm: TRADE_POLICY.tolerancePpm,
+      venueSetHash,
+    };
+    const approved = checks.every((c) => c.pass);
+    const intentId = keccak256(toHex(`trade:${req.nonce}`));
+    const ref = hashOrder(order);
+    const core = {
+      schema: "qed.decision-record/v1",
+      cosigner: this.key.address,
+      chainId: this.chain.chainId,
+      vault: this.cfg.vault,
+      block: { number: block.number, timestamp: now },
+      mandateHash: mHash,
+      request: { kind: "trade", instruction: req.instruction, brainEngine: req.brainEngine, nonce: req.nonce, tokenIn: req.tokenIn, tokenOut: req.tokenOut, amountIn: req.amountIn, recipient: req.recipient },
+      quote: { amountOut: own.sim.amountOut, bound: own.bound, gapPpm: own.gapPpm, route: own.route, nu: own.nu },
+      order,
+      payment: { payee: req.module, amount: req.amountIn, dueAt: 0n, intentId, ref },
+      treasury: { balance: snap.balance, protected: snap.protectedBalance, free: snap.freeBalance, spentInWindow: snap.spentInWindow, dailyCap: snap.dailyCap, blastRadius24h: snap.blastRadius24h },
+      checks,
+      verdict: approved ? "APPROVED" : "REFUSED",
+    };
+    const evidenceHash = hashRecord(core);
+    let certificate: Certificate | undefined;
+    let signature: Hex | undefined;
+    if (approved) {
+      certificate = { mandateHash: mHash, recipient: getAddress(req.module), amount: req.amountIn, dueAt: 0n, intentId, evidenceHash, ref, notBefore: BigInt(now - 60), expiresAt: BigInt(now + 4 * 3600), epoch: req.mandate.epoch };
+      signature = await signCertificate(this.key, this.chain.chainId, this.cfg.vault, certificate);
+      this.seenNonces.add(req.nonce);
+    }
+    const recordPath = `${this.cfg.recordsDir}/${evidenceHash}.json`;
+    writeFileSync(recordPath, JSON.stringify({ core: JSON.parse(canonical(core)), canonical: canonical(core), evidenceHash, certificate: certificate ? JSON.parse(canonical(certificate)) : null, signature: signature ?? null }, null, 2));
+    return { approved, certificate, signature, evidenceHash, recordPath, checks, reasons: checks.filter((c) => !c.pass).map((c) => `${c.id} ${c.name}: ${c.detail}`), order, quote: { amountOut: own.sim.amountOut, bound: own.bound, route: own.route } };
   }
 
   /** Verified revenue = escrow settlements INTO the vault; spend = agent payments OUT of it. */
