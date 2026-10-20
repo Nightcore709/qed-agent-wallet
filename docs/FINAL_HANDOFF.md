@@ -9,8 +9,8 @@
 
 | Deliverable | Path | Status |
 |---|---|---|
-| Final pitch, editable | `presentation/QED-Final-Pitch.pptx` (12 main slides + appendix A1–A17, speaker notes, 4 sections; team: Apurv Chauhan, Lakshya Goswami, St. Xavier's College, Mumbai) | DONE · validated, every main slide rendered and inspected |
-| Final pitch, PDF (rendered from the PPTX, so they match) | `presentation/QED-Final-Pitch.pdf` | DONE |
+| Final pitch, editable | `presentation/QED-Pitch-Deck-Final.pptx` (12 main slides + appendix A1–A17, speaker notes, 4 sections; team: Apurv Chauhan, Lakshya Goswami, St. Xavier's College, Mumbai) | DONE · validated, every main slide rendered and inspected |
+| Final pitch, PDF (rendered from the PPTX, so they match) | `presentation/QED-Pitch-Deck-Final.pdf` | DONE |
 | Timed script | `presentation/FINAL_SCRIPT.md` (1,061 words ≈ 9 min at a calm pace) | DONE |
 | Judge Q&A | `presentation/FINAL_JUDGE_QA.md` (12 new product/commercial answers + the full technical Q&A) | DONE |
 | Frontend | `product/index.html` | unchanged in this sprint (polished and verified at 390/1440 px earlier today) |

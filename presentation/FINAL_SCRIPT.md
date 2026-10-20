@@ -1,9 +1,9 @@
 # QED — final pitch script
 
 Presenters: Apurv Chauhan and Lakshya Goswami, St. Xavier's College, Mumbai. Swap the name in the first line if Lakshya opens.
-Deck: `presentation/QED-Final-Pitch.pptx` (this text is in its speaker notes) · PDF: `presentation/QED-Final-Pitch.pdf`.
+Deck: `presentation/QED-Pitch-Deck-Final.pptx` (this text is in its speaker notes) · PDF: `presentation/QED-Pitch-Deck-Final.pdf`.
 
-Twelve main slides, 1061 words: about **9:26** at a calm 120 words per minute including slide changes, leaving room for a 60-second live demo inside 10 minutes. Appendix A1–A17 is for questions.
+Twelve main slides, 1061 words: about **9:26** at a calm 120 words per minute including slide changes, leaving room for a 60-second live demo inside 10 minutes. Appendix A1–A17 is a separate file for questions: `presentation/QED-Technical-Appendix.pptx`.
 
 | # | Slide | Starts | Length | Words |
 |---|---|---|---|---|
