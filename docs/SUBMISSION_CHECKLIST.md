@@ -10,7 +10,7 @@ Status: **READY** = the file exists, is final and was checked; **TEAM STEP** = o
 | # | Item (official wording) | What we submit | Status |
 |---|---|---|---|
 | 01 | Technical documentation: system architecture, core algorithm description, security design | `docs/pdf/QED-Technical-Documentation.pdf` (built from ARCHITECTURE, ALGORITHMS, PROTOCOL_SPECIFICATION and the security design); sources in `docs/` | READY |
-| 02 | Presentation deck, final presentation no longer than 10 minutes | The Slides artifact *QED Pitch Deck* (15 slides + 8 backup slides, speaker notes timed at 9:30); `presentation/QED-Pitch-Deck.pdf`; script `presentation/SCRIPT.md` | READY · **TEAM STEP:** fill `[Team name]` on slides 1 and 15, then export PowerPoint from the deck's menu if a .pptx is wanted |
+| 02 | Presentation deck, final presentation no longer than 10 minutes | The Slides artifact *QED Pitch Deck* (15 slides + 8 backup slides, speaker notes timed at 9:35); `presentation/QED-Pitch-Deck.pdf`; script `presentation/SCRIPT.md` | READY · **TEAM STEP:** fill `[Team name]` on slides 1 and 15, then export PowerPoint from the deck's menu if a .pptx is wanted |
 | 03 | Demo video (optional, no longer than 5 minutes) | Shot-by-shot script with narration: `presentation/SCRIPT.md` §3 (≈ 4:55) | **TEAM STEP:** record and attach or link |
 | 04 | Source code with README, GitHub repository link, deployment instructions and test cases | <https://github.com/Nightcore709/qed-agent-wallet>: `README.md`, `docs/DEPLOYMENT.md`, `docs/REPRODUCIBILITY.md`, `docs/TESTING.md` (145 Solidity + 60 TypeScript tests, all passing, CI green) | READY |
 | 05 | Security self-assessment report: permission-tier implementation and known-risk list | `docs/pdf/QED-Security-Self-Assessment.pdf` (from `docs/SECURITY.md`: permission tiers §2, properties I1–I26, threat model §4, known risks K1–K29, key lifecycle, incident response) | READY |
@@ -48,7 +48,7 @@ email with the transaction hashes is in the submission kit.
 ## 4. Before you press send
 
 - [ ] Team name, members and universities on slides 1 and 15 (and `[team]` in slide 1's speaker notes).
-- [ ] Rehearse the talk once with a timer (target 9:30).
+- [ ] Rehearse the talk once with a timer (target 9:35).
 - [ ] Record the video from `presentation/SCRIPT.md` §3; keep it under 5:00.
 - [ ] Attach the three PDFs from `docs/pdf/` and the deck (PDF, or .pptx exported from the deck).
 - [ ] Paste the email from the submission kit; check the repository link opens while signed out.

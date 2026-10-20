@@ -81,7 +81,7 @@ no funds are at risk.
 | The policy was enforced by the co-signer only; both hot keys stolen could convert without a need | The owner's policy as a contract: `QEDTreasuryPolicy` is QEDExecution's only operator and refuses no-shortfall, out-of-bounds, over-cost and provably over-sized tranches (Proposition 12.9, by concavity) | `contracts/src/QEDTreasuryPolicy.sol`, 13 tests; Run 4d script with an original-timestamp replica | the agent's discretion over *whether* and *how much* is now bounded by the chain, not only by a second process | Run 4d: QA1–QA4 refused with both real hot keys, QE1 accepted; Sourcify match; `npm run verify` re-checks every clause |
 | No view of a transaction's life | Lifecycle lanes and a nine-state legend (proposed → simulated → evaluated → rejected/authorized → submitted → pending → confirmed/reverted), each tied to a Sepolia step | `app/index.html` | a judge can follow one order from words to receipt | dashboard *Execution* |
 | The independent verifier failed on trades sharing a block | Pre-trade reserves rebuilt from the previous block plus earlier `Sync` events in the same block; failures become CI annotations | `agent/scripts/verify.ts` | `npm run verify` green again on all four runs | CI run after commit `9e466ee` |
-| The pitch led with QED's older features | Deck rebuilt around the upgrade: 15 slides in 9:30 plus 8 backup slides, PDF, timed script, demo and video scripts, 24 judge questions | Slides artifact; `presentation/` | one capability, one picture, every claim a transaction | `presentation/SCRIPT.md` |
+| The pitch led with QED's older features | Deck rebuilt around the upgrade: 15 slides in 9:35 plus 8 backup slides, PDF, timed script, demo and video scripts, 24 judge questions | Slides artifact; `presentation/` | one capability, one picture, every claim a transaction | `presentation/SCRIPT.md` |
 | Docs incomplete for the directive | Prior art, protocol spec, expanded security, attributions, self-review | `docs/*`, `ATTRIBUTIONS.md` | — | this repository |
 
 Not done, honestly: the portfolio from job #1 still feeds nothing; runs remain separate deployments; the standing
@@ -103,7 +103,7 @@ not cumulatively (K29); concentrated-liquidity venues; external audit; a rehears
 | User experience | 6.5 | 7.5 | trade lifecycle lanes, accept-zone chart, nine transaction states; checked at 1366 px and 390 px, light and dark; no user testing |
 | Visual design | 7.0 | 7.5 | figures that show the proof itself; dashboard and deck share one typographic system |
 | Financial / commercial relevance | 5.5 | 7.0 | best execution is a legal duty; multi-currency treasuries; no traction claimed |
-| Presentation | 7.0 | 8.0 | rebuilt around one capability; every slide rendered and inspected; talk timed at 9:30; not yet rehearsed by the team |
+| Presentation | 7.0 | 8.0 | rebuilt around one capability; every slide rendered and inspected; talk timed at 9:35; not yet rehearsed by the team |
 | Reproducibility | 8.5 | 9.0 | the autonomous loop now runs with dev keys and reproduces Sepolia to the raw unit; REPRODUCIBILITY.md; verify green |
 | Competition readiness | 7.0 | 8.0 | every mandatory artifact exists; the video and the email are the team's steps |
 
@@ -163,7 +163,7 @@ PARTIAL means part of it is not done; NOT VERIFIED means we could not check it o
 | Reproducibility | **PASS** | CI runs all four economies, the benchmarks (diffed) and `verify`; clean-clone log in TESTING.md; REPRODUCIBILITY.md |
 | Innovation | **PASS** | E1 (0.17 ppm), the accept-zone attacks EA1–EA3, PE1/PE2, QA2 (over-conversion refused by concavity), ExecutionBounty unclaimed |
 | UX | **PASS** (no user testing) | every dashboard section rendered at 1366 px and 390 px in light and dark: no horizontal overflow, no script errors; nine transaction states shown |
-| Presentation | **PASS** | 15-slide deck + 8 backup slides, every slide rendered and inspected; vector PDF; notes timed at 9:30; demo and video scripts; 24 judge questions. The PowerPoint file is one click in the deck's export menu |
+| Presentation | **PASS** | 15-slide deck + 8 backup slides, every slide rendered and inspected; vector PDF; notes timed at 9:35; demo and video scripts; 24 judge questions. The PowerPoint file is one click in the deck's export menu |
 | Documentation | **PASS** | docs index maps every document the brief names; PDFs rebuilt from the final docs |
 | Integration | **PARTIAL** | the module composes with the unchanged vault and co-signer, and the reserve is a QED vault; the four runs are still separate deployments, and job #1's portfolio feeds nothing |
 | Submission | **PARTIAL** | all files ready (`docs/SUBMISSION_CHECKLIST.md`); recording the video and sending the email are the team's steps |
