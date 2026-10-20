@@ -25,7 +25,9 @@ const rpc = `http://127.0.0.1:${port}`;
 async function main() {
   if (!shadowOf && !process.env.KEYS_FILE && ensureDevKeys()) console.log("no .keys.env found → using deterministic DEV keys (local chain only)");
   if (shadowOf && !process.env.DEPLOYER_PK) throw new Error("replica mode needs the real role keys in .keys.env");
-  const anvil = spawn("anvil", ["--port", String(port), "--chain-id", String(chainId), "--hardfork", "osaka", "--base-fee", "21", "--gas-limit", "60000000", "--silent"], { stdio: "ignore" });
+  // ANVIL_GENESIS_TS: start the replica in the past, so earlier runs can be replayed at their original timestamps
+  const genesis = process.env.ANVIL_GENESIS_TS ? ["--timestamp", process.env.ANVIL_GENESIS_TS] : [];
+  const anvil = spawn("anvil", ["--port", String(port), "--chain-id", String(chainId), "--hardfork", "osaka", "--base-fee", "21", "--gas-limit", "60000000", ...genesis, "--silent"], { stdio: "ignore" });
   const pub = createPublicClient({ transport: http(rpc) });
   for (let i = 0; i < 100; i++) {
     try {
@@ -42,8 +44,10 @@ async function main() {
     // mirror the public chain exactly: nonces already used there must be used here too
     await (pub as any).request({ method: "anvil_setNonce", params: [process.env.DEPLOYER_ADDR, `0x${Number(process.env.DEPLOYER_START_NONCE).toString(16)}`] });
   }
-  await (pub as any).request({ method: "evm_setNextBlockTimestamp", params: [`0x${Math.floor(Date.now() / 1000).toString(16)}`] });
-  await (pub as any).request({ method: "evm_mine", params: [] });
+  if (!process.env.ANVIL_GENESIS_TS) {
+    await (pub as any).request({ method: "evm_setNextBlockTimestamp", params: [`0x${Math.floor(Date.now() / 1000).toString(16)}`] });
+    await (pub as any).request({ method: "evm_mine", params: [] });
+  }
   const startBlock = await pub.getBlockNumber();
 
   const env = {

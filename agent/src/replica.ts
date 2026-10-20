@@ -15,7 +15,13 @@ export interface StartState {
   [address: string]: { nonce: number; wei: string };
 }
 
-export async function rebuildFromOutboxes(c: Chain$, main: { token: Address; lens: Address }, start: StartState, outboxes: string[]): Promise<number> {
+/**
+ * `times` (optional) maps a transaction hash to its block timestamp on Sepolia. When given, each replayed transaction
+ * is mined at that time (or one second after the previous block), so certificates and mandates that have since
+ * expired replay exactly as they executed; the replica's anvil must then start before the first of them
+ * (ANVIL_GENESIS_TS in local.ts). Without it, replays run at wall-clock time.
+ */
+export async function rebuildFromOutboxes(c: Chain$, main: { token: Address; lens: Address }, start: StartState, outboxes: string[], times?: Record<string, number>): Promise<number> {
   const rpc = (method: string, params: unknown[]) => (c.pub as any).request({ method, params });
   const runtime = async (bytecode: Hex) => (await c.pub.call({ data: bytecode })).data as Hex;
   await rpc("anvil_setCode", [main.token, await runtime(TestUSDBytecode as Hex)]);
@@ -27,7 +33,11 @@ export async function rebuildFromOutboxes(c: Chain$, main: { token: Address; len
   let n = 0;
   for (const file of outboxes) {
     for (const t of JSON.parse(readFileSync(file, "utf8"))) {
-      await c.syncClock();
+      const ts = times?.[t.hash.toLowerCase()];
+      if (ts !== undefined) {
+        const latest = await c.pub.getBlock();
+        await rpc("evm_setNextBlockTimestamp", [toHex(Math.max(ts, Number(latest.timestamp) + 1))]);
+      } else await c.syncClock();
       const h = (await rpc("eth_sendRawTransaction", [t.raw])) as Hex;
       const r = await c.pub.waitForTransactionReceipt({ hash: h });
       if (h.toLowerCase() !== t.hash.toLowerCase() || r.status !== t.shadowStatus) throw new Error(`replay of ${file} diverged at ${t.i}: ${r.status} vs ${t.shadowStatus}`);

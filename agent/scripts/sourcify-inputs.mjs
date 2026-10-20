@@ -31,6 +31,7 @@ const targets = {
   CPMMPool: "contracts/src/venues/CPMMPool.sol",
   TestToken: "contracts/src/venues/TestToken.sol",
   ExecutionBounty: "contracts/src/bounties/ExecutionBounty.sol",
+  QEDTreasuryPolicy: "contracts/src/QEDTreasuryPolicy.sol",
 };
 mkdirSync("verification", { recursive: true });
 for (const [name, file] of Object.entries(targets)) {
