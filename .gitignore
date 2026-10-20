@@ -32,3 +32,6 @@ evidence/local-execution/
 evidence/shadow-execution/
 evidence/shadow-execution-bounty/
 evidence/shadow-execution-policy/
+
+# interactive demo ephemeral evidence
+evidence/demo-runs/
