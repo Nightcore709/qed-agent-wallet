@@ -108,8 +108,10 @@ function environment(run,input) {
   const env={...process.env};
   // Child must NEVER inherit externally configured real wallet signing keys.
   for(const k of Object.keys(env)) if(k.endsWith("_PK") || k.endsWith("_ADDR") ||
-    ["SHADOW_OF","START_STATE","EXTRA_KEYS","RPC_URL","CHAIN_ID","DEPL0YER_START_WEI","ANVIL_GENESIS_TS"].includes(k))delete env[k];
-  env.KEYS_FILE="/nonexistent";
+    ["SHADOW_OF","START_STATE","EXTRA_KEYS","RPC_URL","CHAIN_ID","DEPLOYER_START_WEI","ANVIL_GENESIS_TS"].includes(k))delete env[k];
+  // The main economy relies on local.ts generating deterministic DEV role keys.
+  if(run.scenario==="economy") delete env.KEYS_FILE;
+  else env.KEYS_FILE="/nonexistent";
   env.SCRIPT=SCENARIOS[run.scenario];
   env.EVIDENCE_DIR=join(EVIDENCE,run.id);
   env.ANVIL_PORT=String(ANVIL_PORT);
