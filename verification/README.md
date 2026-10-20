@@ -5,3 +5,22 @@
 `node agent/scripts/sourcify-inputs.mjs` from the sources in this repository. Recompile with
 `solc --standard-json < verification/QEDVault.json`; the same inputs were submitted to Sourcify.
 `npm run verify` independently compares every deployed contract's bytecode with this repository's build.
+
+## Verified on Sourcify
+
+All 12 deployed contracts are verified on [Sourcify](https://sourcify.dev) with a full creation **and** runtime bytecode match (`sourcify.json`), so block explorers that read Sourcify (e.g. [Blockscout](https://eth-sepolia.blockscout.com)) show their source.
+
+| Contract | Address | Sourcify |
+|---|---|---|
+| TestUSD (main run) | [`0x7adb609421e30b3df3063ff2de9d425564893f35`](https://eth-sepolia.blockscout.com/address/0x7adb609421e30b3df3063ff2de9d425564893f35?tab=contract) | creation match · runtime match |
+| MinVarianceVerifier | [`0x1d3eced4bd1cef7edc315315b9fd6acae283dd05`](https://eth-sepolia.blockscout.com/address/0x1d3eced4bd1cef7edc315315b9fd6acae283dd05?tab=contract) | creation match · runtime match |
+| ProofEscrow | [`0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f`](https://eth-sepolia.blockscout.com/address/0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f?tab=contract) | creation match · runtime match |
+| QEDVault (agent) | [`0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6`](https://eth-sepolia.blockscout.com/address/0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6?tab=contract) | creation match · runtime match |
+| QEDVault (honeypot) | [`0xe5b3e7773115dba454e7e40fa97a5d3e332c7f04`](https://eth-sepolia.blockscout.com/address/0xe5b3e7773115dba454e7e40fa97a5d3e332c7f04?tab=contract) | creation match · runtime match |
+| QEDLens | [`0x846186f21227793760429696bb4fd7490236f101`](https://eth-sepolia.blockscout.com/address/0x846186f21227793760429696bb4fd7490236f101?tab=contract) | creation match · runtime match |
+| TestUSD (clearing run) | [`0x6753a8ea4560f07534bcfbca2dea790afb9552d4`](https://eth-sepolia.blockscout.com/address/0x6753a8ea4560f07534bcfbca2dea790afb9552d4?tab=contract) | creation match · runtime match |
+| QEDClearing | [`0x7b7de15772198d82d07019fc816cffc52e7d6ad2`](https://eth-sepolia.blockscout.com/address/0x7b7de15772198d82d07019fc816cffc52e7d6ad2?tab=contract) | creation match · runtime match |
+| Groth16Verifier | [`0xc04329693c7b464ab636107b31dcf6746e204e7b`](https://eth-sepolia.blockscout.com/address/0xc04329693c7b464ab636107b31dcf6746e204e7b?tab=contract) | creation match · runtime match |
+| PrivateMinVarianceVerifier | [`0x1270287aaf21f6cc939c255fc1ba294d9268b453`](https://eth-sepolia.blockscout.com/address/0x1270287aaf21f6cc939c255fc1ba294d9268b453?tab=contract) | creation match · runtime match |
+| OptimalityBounty | [`0xfc2129f0432538d034c5307299022b3d369eb677`](https://eth-sepolia.blockscout.com/address/0xfc2129f0432538d034c5307299022b3d369eb677?tab=contract) | creation match · runtime match |
+| MaximalityBounty | [`0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69`](https://eth-sepolia.blockscout.com/address/0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69?tab=contract) | creation match · runtime match |

@@ -5,7 +5,7 @@
 FinTechathon 2026 · International Track · Topic F — Autonomous On-chain Wallet ·
 Live on **Ethereum Sepolia** · [Dashboard](https://nightcore709.github.io/qed-agent-wallet/) · [Evidence](docs/EVIDENCE.md) · [Security self-assessment](docs/SECURITY.md) · [Algorithms](docs/ALGORITHMS.md) · [Architecture](docs/ARCHITECTURE.md) · PDFs: [technical documentation](docs/pdf/QED-Technical-Documentation.pdf), [security self-assessment](docs/pdf/QED-Security-Self-Assessment.pdf), [execution evidence](docs/pdf/QED-Execution-Evidence.pdf)
 
-[![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml)
+[![CI](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml/badge.svg)](https://github.com/Nightcore709/qed-agent-wallet/actions/workflows/ci.yml) · Source of all 12 deployed contracts verified on [Sourcify](verification/README.md) (creation + runtime match)
 
 ---
 
