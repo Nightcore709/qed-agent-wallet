@@ -1,0 +1,445 @@
+{
+  "generatedBy": "benchmarks/run.ts",
+  "seeds": "B1 1–1000, B3 10001–10500, B4 20001–20500",
+  "B1": {
+    "markets": 1000,
+    "setup": "1,000 seeded markets: 3–4 tokens, 1–3 direct pools and 1–2 two-hop paths per bridge token, depths 100–10,000 USD per side, fees {1,5,30,100} bps, venue mispricing below each venue's fee, trade size 0.1%–20% of direct depth",
+    "shortfallBps": {
+      "single": {
+        "n": 1000,
+        "mean": 219.6406,
+        "median": 74.5382,
+        "p90": 667.0245,
+        "p99": 1533.6102,
+        "max": 2190.6744,
+        "min": 0
+      },
+      "equal": {
+        "n": 1000,
+        "mean": 388.2279,
+        "median": 117.1709,
+        "p90": 1097.4365,
+        "p99": 3044.0145,
+        "max": 4336.2132,
+        "min": 0
+      },
+      "directOnly": {
+        "n": 1000,
+        "mean": 121.351,
+        "median": 33.7213,
+        "p90": 350.4257,
+        "p99": 1045.0039,
+        "max": 1527.9423,
+        "min": 0
+      }
+    },
+    "baselineAlreadyOptimalShare": {
+      "single": 0.022,
+      "equal": 0.017,
+      "directOnly": 0.062
+    },
+    "passesOnePercentFloorShare": {
+      "single": 0.554,
+      "equal": 0.476,
+      "directOnly": 0.713
+    },
+    "leakageInsideFloorBps": {
+      "single": {
+        "n": 554,
+        "mean": 30.7686,
+        "median": 23.7189,
+        "p90": 74.0108,
+        "p99": 93.7618,
+        "max": 99.4877,
+        "min": 0
+      },
+      "equal": {
+        "n": 476,
+        "mean": 36.6419,
+        "median": 32.1288,
+        "p90": 81.0011,
+        "p99": 97.8295,
+        "max": 99.4877,
+        "min": 0
+      },
+      "directOnly": {
+        "n": 713,
+        "mean": 24.6983,
+        "median": 14.0583,
+        "p90": 69.3709,
+        "p99": 95.7378,
+        "max": 99.941,
+        "min": 0
+      }
+    },
+    "bySize": [
+      {
+        "bucket": "< 0.5%",
+        "n": 297,
+        "directOnlyMedianBps": 3.2447,
+        "directOnlyP90Bps": 40.863,
+        "singleMedianBps": 11.452
+      },
+      {
+        "bucket": "0.5–2%",
+        "n": 277,
+        "directOnlyMedianBps": 22.7445,
+        "directOnlyP90Bps": 96.3672,
+        "singleMedianBps": 53.8874
+      },
+      {
+        "bucket": "2–5%",
+        "n": 168,
+        "directOnlyMedianBps": 59.9996,
+        "directOnlyP90Bps": 230.9152,
+        "singleMedianBps": 170.903
+      },
+      {
+        "bucket": "> 5%",
+        "n": 258,
+        "directOnlyMedianBps": 267.8799,
+        "directOnlyP90Bps": 769.7184,
+        "singleMedianBps": 537.5761
+      }
+    ]
+  },
+  "B2": {
+    "gapPpm": {
+      "n": 1000,
+      "mean": 0.3139,
+      "median": 0.075,
+      "p90": 0.75,
+      "p99": 4.235,
+      "max": 7.357,
+      "min": 0
+    },
+    "shareWithin1ppm": 0.923
+  },
+  "B3": {
+    "economies": 500,
+    "setup": "500 seeded economies: 4–12 members, 1–4 obligations per member on average, amounts 1–200 tUSD",
+    "clearedShareOfGross": {
+      "optimal": {
+        "n": 500,
+        "mean": 0.3848,
+        "median": 0.3923,
+        "p90": 0.6532,
+        "p99": 0.8435,
+        "max": 0.8783,
+        "min": 0
+      },
+      "greedy": {
+        "n": 500,
+        "mean": 0.3323,
+        "median": 0.3401,
+        "p90": 0.5916,
+        "p99": 0.7672,
+        "max": 0.8343,
+        "min": 0
+      },
+      "none": 0
+    },
+    "greedyShortfallPctPoints": {
+      "n": 500,
+      "mean": 5.2543,
+      "median": 4.2014,
+      "p90": 12.6603,
+      "p99": 22.1534,
+      "max": 27.6838,
+      "min": 0
+    },
+    "greedyAlreadyOptimalShare": 0.304
+  },
+  "B4": {
+    "problems": 500,
+    "setup": "500 seeded min-variance problems, 4–8 assets, vols 5–60%, one-factor correlations",
+    "equalWeightExcessVariancePct": {
+      "n": 500,
+      "mean": 409.1678,
+      "median": 258.5501,
+      "p90": 908.0472,
+      "p99": 2458.1551,
+      "max": 3856.2102,
+      "min": 10.2888
+    },
+    "lowestVolAssetExcessVariancePct": {
+      "n": 500,
+      "mean": 191.6682,
+      "median": 143.6038,
+      "p90": 398.7148,
+      "p99": 750.9917,
+      "max": 1011.7345,
+      "min": 0
+    }
+  },
+  "B5": {
+    "attacksOnSepolia": 42,
+    "byLayer": {
+      "ProofEscrow": 2,
+      "QEDVault": 16,
+      "MinVarianceVerifier": 2,
+      "QEDClearing": 6,
+      "PrivateMinVarianceVerifier": 3,
+      "OptimalityBounty": 3,
+      "MaximalityBounty": 2,
+      "QEDExecution": 5,
+      "QEDExecution (co-signed order)": 2,
+      "QEDExecution + co-signer": 1
+    },
+    "attacks": [
+      {
+        "run": "main",
+        "id": "X2",
+        "error": "BadProviderSignature",
+        "layer": "ProofEscrow"
+      },
+      {
+        "run": "main",
+        "id": "X3",
+        "error": "BadProviderSignature",
+        "layer": "ProofEscrow"
+      },
+      {
+        "run": "main",
+        "id": "X5",
+        "error": "BadCosignerSignature",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X6",
+        "error": "PayeeNotInMandate",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X7",
+        "error": "BadOwnerSignature",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X8",
+        "error": "BadCosignerSignature",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X9",
+        "error": "BadCosignerSignature",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X10",
+        "error": "IntentAlreadyUsed",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X11",
+        "error": "SolvencyViolation",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X12",
+        "error": "ExceedsDailyCap",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X13",
+        "error": "NotOwner",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X14",
+        "error": "NotCreditor",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X15",
+        "error": "NotOwner",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "X17",
+        "error": "DualityGapTooLarge",
+        "layer": "MinVarianceVerifier"
+      },
+      {
+        "run": "main",
+        "id": "X18",
+        "error": "StationarityViolated",
+        "layer": "MinVarianceVerifier"
+      },
+      {
+        "run": "main",
+        "id": "H4",
+        "error": "PayeeNotInMandate",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "H5",
+        "error": "ExceedsPerPaymentCap",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "H6",
+        "error": "NotOwner",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "main",
+        "id": "P2",
+        "error": "VaultPaused",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "clearing",
+        "id": "G1",
+        "error": "ERC20InsufficientBalance",
+        "layer": "QEDVault"
+      },
+      {
+        "run": "clearing",
+        "id": "N1",
+        "error": "NotProvablyMaximal",
+        "layer": "QEDClearing"
+      },
+      {
+        "run": "clearing",
+        "id": "N2",
+        "error": "NetPositionChanged",
+        "layer": "QEDClearing"
+      },
+      {
+        "run": "clearing",
+        "id": "N3",
+        "error": "ExceedsObligation",
+        "layer": "QEDClearing"
+      },
+      {
+        "run": "clearing",
+        "id": "N4",
+        "error": "IncompleteSnapshot",
+        "layer": "QEDClearing"
+      },
+      {
+        "run": "clearing",
+        "id": "N5",
+        "error": "DualInfeasible",
+        "layer": "QEDClearing"
+      },
+      {
+        "run": "clearing",
+        "id": "N7",
+        "error": "IncompleteSnapshot",
+        "layer": "QEDClearing"
+      },
+      {
+        "run": "private",
+        "id": "ZA1",
+        "error": "ProofRejected",
+        "layer": "PrivateMinVarianceVerifier"
+      },
+      {
+        "run": "private",
+        "id": "ZA2",
+        "error": "ProofRejected",
+        "layer": "PrivateMinVarianceVerifier"
+      },
+      {
+        "run": "private",
+        "id": "ZA3",
+        "error": "UntrustedDataAttestation",
+        "layer": "PrivateMinVarianceVerifier"
+      },
+      {
+        "run": "private",
+        "id": "BA1",
+        "error": "TheoremHolds",
+        "layer": "OptimalityBounty"
+      },
+      {
+        "run": "private",
+        "id": "BA2",
+        "error": "TheoremHolds",
+        "layer": "OptimalityBounty"
+      },
+      {
+        "run": "private",
+        "id": "BA3",
+        "error": "DualityGapTooLarge",
+        "layer": "OptimalityBounty"
+      },
+      {
+        "run": "private",
+        "id": "BM1",
+        "error": "TheoremHolds",
+        "layer": "MaximalityBounty"
+      },
+      {
+        "run": "private",
+        "id": "BM2",
+        "error": "NetPositionChanged",
+        "layer": "MaximalityBounty"
+      },
+      {
+        "run": "execution",
+        "id": "EA1",
+        "error": "NotBestExecution",
+        "layer": "QEDExecution"
+      },
+      {
+        "run": "execution",
+        "id": "EA2",
+        "error": "NotBestExecution",
+        "layer": "QEDExecution"
+      },
+      {
+        "run": "execution",
+        "id": "EA3",
+        "error": "NotBestExecution",
+        "layer": "QEDExecution"
+      },
+      {
+        "run": "execution",
+        "id": "EA4",
+        "error": "Leftover",
+        "layer": "QEDExecution"
+      },
+      {
+        "run": "execution",
+        "id": "EA5",
+        "error": "InsufficientOutput",
+        "layer": "QEDExecution (co-signed order)"
+      },
+      {
+        "run": "execution",
+        "id": "EA6",
+        "error": "OrderMismatch",
+        "layer": "QEDExecution + co-signer"
+      },
+      {
+        "run": "execution",
+        "id": "EA7",
+        "error": "NotOperator",
+        "layer": "QEDExecution"
+      },
+      {
+        "run": "execution",
+        "id": "EA8",
+        "error": "InsufficientOutput",
+        "layer": "QEDExecution (co-signed order)"
+      }
+    ],
+    "note": "Which layer's check produced the revert of each recorded attack. Not a re-run with layers disabled: removing a layer does not imply the next one would catch the attack."
+  }
+}

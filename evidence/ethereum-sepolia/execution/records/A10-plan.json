@@ -1,0 +1,150 @@
+{
+  "venues": [
+    {
+      "pool": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+      "r0": "851241496",
+      "r1": "691822775",
+      "feeBps": 30
+    },
+    {
+      "pool": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+      "r0": "267017232",
+      "r1": "215465939",
+      "feeBps": 5
+    },
+    {
+      "pool": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+      "r0": "609047365",
+      "r1": "197037824726037905",
+      "feeBps": 30
+    },
+    {
+      "pool": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+      "r0": "820076980",
+      "r1": "302962175273962095",
+      "feeBps": 30
+    },
+    {
+      "pool": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+      "r0": "302693907",
+      "r1": "266134097",
+      "feeBps": 100
+    }
+  ],
+  "route": [
+    {
+      "venue": 2,
+      "zeroForOne": true,
+      "amountIn": "12096392"
+    },
+    {
+      "venue": 3,
+      "zeroForOne": false,
+      "amountIn": "0"
+    },
+    {
+      "venue": 4,
+      "zeroForOne": true,
+      "amountIn": "7903608"
+    },
+    {
+      "venue": 0,
+      "zeroForOne": false,
+      "amountIn": "486813"
+    },
+    {
+      "venue": 1,
+      "zeroForOne": false,
+      "amountIn": "1194483"
+    },
+    {
+      "venue": 4,
+      "zeroForOne": true,
+      "amountIn": "0"
+    }
+  ],
+  "perHop": [
+    {
+      "venue": 2,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0xF61C0459cb436Ae760B3af0e58700e9df046580f",
+      "amountIn": "12096392",
+      "amountOut": "3825902198114715"
+    },
+    {
+      "venue": 3,
+      "tokenIn": "0xF61C0459cb436Ae760B3af0e58700e9df046580f",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "3825902198114715",
+      "amountOut": "10196741"
+    },
+    {
+      "venue": 4,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "7903608",
+      "amountOut": "6706156"
+    },
+    {
+      "venue": 0,
+      "tokenIn": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "tokenOut": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "amountIn": "486813",
+      "amountOut": "596775"
+    },
+    {
+      "venue": 1,
+      "tokenIn": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "tokenOut": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "amountIn": "1194483",
+      "amountOut": "1471376"
+    },
+    {
+      "venue": 4,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "2068151",
+      "amountOut": "1698958"
+    }
+  ],
+  "prices": {
+    "0x98d1a388120e5a535341532047b604655fe1362f": "1000000000000000000000000000000000000",
+    "0x7adb609421e30b3df3063ff2de9d425564893f35": "816311775956802319743438101311127552",
+    "0xf61c0459cb436ae760b3af0e58700e9df046580f": "2632047553150565439781208064"
+  },
+  "nu": {
+    "0x98d1a388120e5a535341532047b604655fe1362f": 1,
+    "0x7adb609421e30b3df3063ff2de9d425564893f35": 0.8163117759568023,
+    "0xf61c0459cb436ae760b3af0e58700e9df046580f": 2.6320475531505654e-9
+  },
+  "expectedOut": "16920559",
+  "bound": "16920990",
+  "gapPpm": 25.471,
+  "solverSweeps": 13,
+  "alternatives": [
+    {
+      "policy": "certified",
+      "description": "QED: 6 hops through 5 venues, proven within 25.471 ppm of the optimum",
+      "amountOut": "16920559",
+      "shortfallBps": 0
+    },
+    {
+      "policy": "direct-optimal",
+      "description": "Optimal split over the direct pools only (a single-pair aggregator)",
+      "amountOut": "16485670",
+      "shortfallBps": 257.01
+    },
+    {
+      "policy": "equal-split",
+      "description": "Equal split across the direct pools",
+      "amountOut": "16285031",
+      "shortfallBps": 375.59
+    },
+    {
+      "policy": "single-venue",
+      "description": "Everything through the best single pool",
+      "amountOut": "16339704",
+      "shortfallBps": 343.28
+    }
+  ]
+}

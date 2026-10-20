@@ -1,0 +1,166 @@
+{
+  "core": {
+    "block": {
+      "number": "48",
+      "timestamp": 1792467841
+    },
+    "chainId": 11155111,
+    "checks": [
+      {
+        "detail": "recovered 0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+        "id": "C1",
+        "name": "Mandate signed by the vault owner",
+        "pass": true
+      },
+      {
+        "detail": "epoch 0",
+        "id": "C2",
+        "name": "Mandate active and current epoch",
+        "pass": true
+      },
+      {
+        "detail": "instruction signer 0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+        "id": "C3",
+        "name": "Conversion confirmed by the owner's signature",
+        "pass": true
+      },
+      {
+        "detail": "exec-3-11155111",
+        "id": "C6",
+        "name": "Instruction nonce not seen before",
+        "pass": true
+      },
+      {
+        "detail": "0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53",
+        "id": "C9",
+        "name": "Recipient is listed in the owner's mandate",
+        "pass": true
+      },
+      {
+        "detail": "agent 0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+        "id": "C9b",
+        "name": "Execution module is the vault's agent and a mandate payee",
+        "pass": true
+      },
+      {
+        "detail": "free 60.00 − 20.00 = 40.00 ≥ 5.00",
+        "id": "C10",
+        "name": "Reserve buffer above ring-fenced liabilities preserved",
+        "pass": true
+      },
+      {
+        "detail": "recipient not on deny-list",
+        "id": "C11",
+        "name": "Sanctions / deny-list screening",
+        "pass": true
+      },
+      {
+        "detail": "own route 5 hops → 17213445 (bound 17213448, gap 0.174 ppm)",
+        "id": "T1",
+        "name": "Independent re-quote: own optimal route executes",
+        "pass": true
+      },
+      {
+        "detail": "rate 0.860672 vs weighted mid 0.874033: 152.9 bps (limit 300)",
+        "id": "T2",
+        "name": "Quoted rate close to the venues' depth-weighted mid (manipulation screen)",
+        "pass": true
+      },
+      {
+        "detail": "0x1fe868c31c9e8626b9e084d0fabd49a638b9cef048c3437866b2212ccb8d39f9",
+        "id": "T3",
+        "name": "Order commits to the current venue set",
+        "pass": true
+      }
+    ],
+    "cosigner": "0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96",
+    "mandateHash": "0x92f3879f2a6b7b06416044c3feb50e29d4b20f3fc5ef7c70abebd8ec76b9dd8c",
+    "order": {
+      "minOut": "17041310",
+      "recipient": "0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "tolerancePpm": 1,
+      "venueSetHash": "0x1fe868c31c9e8626b9e084d0fabd49a638b9cef048c3437866b2212ccb8d39f9"
+    },
+    "payment": {
+      "amount": "20000000",
+      "dueAt": "0",
+      "intentId": "0xf53de9bc9ab408f6b055fd21de4455ccbc12dba9913951fa4f501c3da4adba33",
+      "payee": "0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481",
+      "ref": "0x05d11ab8e500254d7a5d85ef8f4ca1bf6e2e5b6ca3f1ed484fb65ff2a533d5b2"
+    },
+    "quote": {
+      "amountOut": "17213445",
+      "bound": "17213448",
+      "gapPpm": 0.174,
+      "nu": {
+        "0x7adb609421e30b3df3063ff2de9d425564893f35": 0.8509866313318172,
+        "0x98d1a388120e5a535341532047b604655fe1362f": 1,
+        "0xf61c0459cb436ae760b3af0e58700e9df046580f": 2.674896667154493e-9
+      },
+      "route": [
+        {
+          "amountIn": "9377351",
+          "venue": 0,
+          "zeroForOne": true
+        },
+        {
+          "amountIn": "2931300",
+          "venue": 1,
+          "zeroForOne": true
+        },
+        {
+          "amountIn": "4218814",
+          "venue": 2,
+          "zeroForOne": true
+        },
+        {
+          "amountIn": "0",
+          "venue": 3,
+          "zeroForOne": false
+        },
+        {
+          "amountIn": "3472535",
+          "venue": 4,
+          "zeroForOne": true
+        }
+      ]
+    },
+    "request": {
+      "amountIn": "20000000",
+      "brainEngine": "anthropic:claude-sonnet-5-5",
+      "instruction": "And put another 20 tUSD into the euro reserve.",
+      "kind": "trade",
+      "nonce": "exec-3-11155111",
+      "recipient": "0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53",
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F"
+    },
+    "schema": "qed.decision-record/v1",
+    "treasury": {
+      "balance": "60000000",
+      "blastRadius24h": "60000000",
+      "dailyCap": "100000000",
+      "free": "60000000",
+      "protected": "0",
+      "spentInWindow": "40000000"
+    },
+    "vault": "0x04d1ef625ad58e3641032267a8f4fb7bc191d117",
+    "verdict": "APPROVED"
+  },
+  "canonical": "{\"block\":{\"number\":\"48\",\"timestamp\":1792467841},\"chainId\":11155111,\"checks\":[{\"detail\":\"recovered 0x9c61629911658eDf3Fe27415bdD48baaFBc188d4\",\"id\":\"C1\",\"name\":\"Mandate signed by the vault owner\",\"pass\":true},{\"detail\":\"epoch 0\",\"id\":\"C2\",\"name\":\"Mandate active and current epoch\",\"pass\":true},{\"detail\":\"instruction signer 0x9c61629911658eDf3Fe27415bdD48baaFBc188d4\",\"id\":\"C3\",\"name\":\"Conversion confirmed by the owner's signature\",\"pass\":true},{\"detail\":\"exec-3-11155111\",\"id\":\"C6\",\"name\":\"Instruction nonce not seen before\",\"pass\":true},{\"detail\":\"0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53\",\"id\":\"C9\",\"name\":\"Recipient is listed in the owner's mandate\",\"pass\":true},{\"detail\":\"agent 0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481\",\"id\":\"C9b\",\"name\":\"Execution module is the vault's agent and a mandate payee\",\"pass\":true},{\"detail\":\"free 60.00 − 20.00 = 40.00 ≥ 5.00\",\"id\":\"C10\",\"name\":\"Reserve buffer above ring-fenced liabilities preserved\",\"pass\":true},{\"detail\":\"recipient not on deny-list\",\"id\":\"C11\",\"name\":\"Sanctions / deny-list screening\",\"pass\":true},{\"detail\":\"own route 5 hops → 17213445 (bound 17213448, gap 0.174 ppm)\",\"id\":\"T1\",\"name\":\"Independent re-quote: own optimal route executes\",\"pass\":true},{\"detail\":\"rate 0.860672 vs weighted mid 0.874033: 152.9 bps (limit 300)\",\"id\":\"T2\",\"name\":\"Quoted rate close to the venues' depth-weighted mid (manipulation screen)\",\"pass\":true},{\"detail\":\"0x1fe868c31c9e8626b9e084d0fabd49a638b9cef048c3437866b2212ccb8d39f9\",\"id\":\"T3\",\"name\":\"Order commits to the current venue set\",\"pass\":true}],\"cosigner\":\"0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96\",\"mandateHash\":\"0x92f3879f2a6b7b06416044c3feb50e29d4b20f3fc5ef7c70abebd8ec76b9dd8c\",\"order\":{\"minOut\":\"17041310\",\"recipient\":\"0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53\",\"tokenOut\":\"0x98D1A388120e5A535341532047B604655fe1362F\",\"tolerancePpm\":1,\"venueSetHash\":\"0x1fe868c31c9e8626b9e084d0fabd49a638b9cef048c3437866b2212ccb8d39f9\"},\"payment\":{\"amount\":\"20000000\",\"dueAt\":\"0\",\"intentId\":\"0xf53de9bc9ab408f6b055fd21de4455ccbc12dba9913951fa4f501c3da4adba33\",\"payee\":\"0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481\",\"ref\":\"0x05d11ab8e500254d7a5d85ef8f4ca1bf6e2e5b6ca3f1ed484fb65ff2a533d5b2\"},\"quote\":{\"amountOut\":\"17213445\",\"bound\":\"17213448\",\"gapPpm\":0.174,\"nu\":{\"0x7adb609421e30b3df3063ff2de9d425564893f35\":0.8509866313318172,\"0x98d1a388120e5a535341532047b604655fe1362f\":1,\"0xf61c0459cb436ae760b3af0e58700e9df046580f\":2.674896667154493e-9},\"route\":[{\"amountIn\":\"9377351\",\"venue\":0,\"zeroForOne\":true},{\"amountIn\":\"2931300\",\"venue\":1,\"zeroForOne\":true},{\"amountIn\":\"4218814\",\"venue\":2,\"zeroForOne\":true},{\"amountIn\":\"0\",\"venue\":3,\"zeroForOne\":false},{\"amountIn\":\"3472535\",\"venue\":4,\"zeroForOne\":true}]},\"request\":{\"amountIn\":\"20000000\",\"brainEngine\":\"anthropic:claude-sonnet-5-5\",\"instruction\":\"And put another 20 tUSD into the euro reserve.\",\"kind\":\"trade\",\"nonce\":\"exec-3-11155111\",\"recipient\":\"0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53\",\"tokenIn\":\"0x7AdB609421E30b3dF3063FF2De9d425564893F35\",\"tokenOut\":\"0x98D1A388120e5A535341532047B604655fe1362F\"},\"schema\":\"qed.decision-record/v1\",\"treasury\":{\"balance\":\"60000000\",\"blastRadius24h\":\"60000000\",\"dailyCap\":\"100000000\",\"free\":\"60000000\",\"protected\":\"0\",\"spentInWindow\":\"40000000\"},\"vault\":\"0x04d1ef625ad58e3641032267a8f4fb7bc191d117\",\"verdict\":\"APPROVED\"}",
+  "evidenceHash": "0xf6d403d6c52d31181b28c8100460d12abac4ff188100503230ed83b52147677e",
+  "certificate": {
+    "amount": "20000000",
+    "dueAt": "0",
+    "epoch": "0",
+    "evidenceHash": "0xf6d403d6c52d31181b28c8100460d12abac4ff188100503230ed83b52147677e",
+    "expiresAt": "1792482241",
+    "intentId": "0xf53de9bc9ab408f6b055fd21de4455ccbc12dba9913951fa4f501c3da4adba33",
+    "mandateHash": "0x92f3879f2a6b7b06416044c3feb50e29d4b20f3fc5ef7c70abebd8ec76b9dd8c",
+    "notBefore": "1792467781",
+    "recipient": "0x8E2ed1ca426C7961a7EE1eCB6CEf5D1fbF1f9481",
+    "ref": "0x05d11ab8e500254d7a5d85ef8f4ca1bf6e2e5b6ca3f1ed484fb65ff2a533d5b2"
+  },
+  "signature": "0xad4d11c28241348402a9fabfa0b5121f4511e422aec2a34b4bd0a02ff0f41044541332d68463b0204d5a83cf187b42542359bc77ae41baa8a95700ab5f72cde81c"
+}

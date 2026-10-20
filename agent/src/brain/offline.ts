@@ -21,6 +21,9 @@ function classify(text: string, ctx: ChatContext, channel: "owner" | "counterpar
   if (ctx.pending && /(actually|make it|change (it|that|the amount)|instead|i meant|sorry)/i.test(t)) return "correct";
   if (ctx.pending && extractAmount(t) !== undefined && !/\b(pay|send|transfer|wire|schedule)\b/i.test(t)) return "correct";
   if (/(blast radius|worst[- ]case|(hacked|compromised|stolen)|how much (can|could) (you|we|i) lose|max(imum)? loss)/i.test(t)) return "blast_radius";
+  // moving money INTO a payee that is itself a vault (e.g. the euro reserve) is a payment — a conversion when
+  // that vault holds another currency — not a ring-fence inside this vault
+  if (/\b(convert|move|top up|put|sweep|exchange|swap)\b.{0,80}\breserve\b/i.test(t) && !/(ring-?fence|set aside|earmark)/i.test(t)) return "pay";
   if (/(ring-?fence|set aside|earmark|reserve\b|lock (up|away))/i.test(t)) return "ring_fence";
   if (/\b(pay|send|transfer|wire|settle|tip|reimburse|remit|schedule)\b/i.test(t)) return "pay";
   if (/(balance|how much|free|available|protected|status|funds|treasury|owe|liabilit|reserves?)/i.test(t)) return "status";

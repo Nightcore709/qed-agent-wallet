@@ -445,3 +445,112 @@ all 60 generated economies; fuzzers try 2,000 random feasible portfolios and 2,0
 On Sepolia, Mallory tried the equal-weight portfolio (BA1), QED's optimum shifted by 0.1% (BA2), the forged
 certificate the chain refused in job #2 (BA3), the naive 162 tUSD netting (BM1) and a 170 tUSD netting that
 breaks one net position (BM2). All five reverted; `npm run verify` checks daily that both pools are still full.
+
+---
+
+## 12. Best execution, proved at the instant of the trade (`QEDExecution`)
+
+### 12.1 The gap it closes
+
+Sections 1–11 let an AI agent *pay*. An autonomous treasury also has to *convert*: pay a euro invoice from a dollar
+balance, rebalance, sweep revenue into a reserve. Conversion is where an agent's discretion is largest and least
+visible. Today's agent wallets and intent standards bound it with a minimum output (a slippage limit, typically
+0.5–1%): any route that clears the floor is accepted, so a compromised or careless agent can leak up to the whole
+tolerance on every trade, for example by routing through one pool and letting an accomplice back-run the price
+dislocation. Brokers have a legal duty of best execution (MiFID II art. 27, FINRA rule 5310), but evidence of it is
+an after-the-fact report.
+
+QED makes best execution a **precondition checked by the chain, against the exact state the trade executes on**.
+The agent may route however it likes; it must attach a proof that no route through the owner's venues could have
+returned more than `1/(1 − τ)` times what it actually delivered. In the live run τ = 1 ppm.
+
+### 12.2 The routing problem
+
+Tokens 𝒯 with input `s` and output `t`. Venues V (chosen by the vault owner), each a constant-product pool with
+reserves `(R_a, R_b)` and fee `1 − γ`; selling `x` of `a` returns `f(x) = R_b·γx / (R_a + γx)`. A *route* is any
+finite sequence of swaps on venues in V, executed atomically, that starts holding `A` of `s` and never holds a
+negative amount of anything. Let `Δ_i ∈ ℝ^𝒯` be venue i's net trade and `Ψ = Σ_i Δ_i`. Then
+
+```
+OPT(A) = max Ψ_t   subject to   Ψ_s ≥ −A,   Ψ_k ≥ 0 (k ∉ {s,t}),   Δ_i reachable on venue i.
+```
+
+Splits, multi-hop paths, repeated use of a venue and arbitrage loops are all routes.
+
+### 12.3 Theorem (a price vector is a proof)
+
+For every `ν ∈ ℝ₊^𝒯` with `ν_t = 1`,
+
+```
+OPT(A) ≤ B(ν) = ν_s·A + Σ_{i∈V} [ (√(ν_b R_b) − √(ν_a R_a / γ))₊² + (√(ν_a R_a) − √(ν_b R_b / γ))₊² ]
+```
+
+*Proof.* For a feasible route, `Ψ_t ≤ Ψ_t + ν_s(Ψ_s + A) + Σ_{k∉{s,t}} ν_k Ψ_k = ν_s A + Σ_i ν·Δ_i` because every
+added term is non-negative. A fee-charging constant-product pool is *path deficient* (Angeris & Chitra, 2020): any
+sequence of swaps on it reaches no net trade outside the downward closure of the single-swap trades, so
+`ν·Δ_i ≤ h_i(ν) := max over single swaps (either direction, or none) of ν·Δ`. For the swap selling `a`, substitute
+`u = R_a + γx`: `ν_b f − ν_a x = ν_b R_b − ν_b R_a R_b / u − (ν_a/γ)(u − R_a)`, maximised at `u* = √(γ R_a R_b ν_b / ν_a)`
+with value `(√(ν_b R_b) − √(ν_a R_a / γ))²` when `u* > R_a`, and 0 otherwise. At most one direction is positive
+because γ ≤ 1. Summing gives `Ψ_t ≤ B(ν)`. ∎
+
+Path deficiency is the one step taken from the literature rather than proved here; it is tested directly
+(3,000 random split and round-trip swaps, `agent/test/execution.test.ts`) and indirectly by the soundness fuzzers
+below.
+
+### 12.4 What the contract checks (`QEDExecution.trade`)
+
+1. The order is the one the co-signer certified (`c.ref = hashOrder(order)`), its recipient is in the owner's
+   mandate, it names the current venue set, and τ ≤ 1%.
+2. **Bound.** From the live reserves of *every* venue in the owner's set (not only those the route uses) it
+   computes `B̂ ≥ B(ν)`: each term as `(⌈√(ν_b R_b)⌉ − ⌊√(⌊ν_a R_a·10⁴/(10⁴ − f)⌋)⌋)₊²`, the sum divided by the
+   fixed-point scale with rounding up. Every rounding step enlarges the bound, so the theorem survives integer
+   arithmetic. Prices are 36-decimal fixed point; a product that would overflow reverts (fail closed).
+3. **Funding.** `QEDVault.executePayment` pays exactly `A` to the module in the same transaction (mandate,
+   co-signature, caps and solvency all apply unchanged).
+4. **Route.** Up to 32 hops on owner venues; `amountIn = 0` spends all that the trade has received of a token.
+5. **Nothing left behind.** No intermediate token may remain; unspent input returns to the vault.
+6. **Two output checks** on the output *measured as a balance change*: `out ≥ minOut` (market risk, set by the
+   co-signer's own quote less 1%) and `out·10⁶ ≥ B̂·(10⁶ − τ)` (best execution). Then `out` goes to the recipient.
+
+**Corollary.** Every accepted trade delivered at least `(1 − τ)·OPT(A)` of the output token, measured on the
+state the trade executed against, whatever route the agent chose. A "forged" proof does not exist: every `ν`
+yields a valid upper bound, so a dishonest agent can only fail to prove.
+
+### 12.5 Completeness: why an honest agent passes
+
+`B` is convex in `ν` (a sum of a linear term and maxima of linear functions), and the routing problem is convex
+(Angeris, Agrawal, Evans, Chitra, Boyd, *Optimal Routing for Constant Function Market Makers*, EC 2022), so strong
+duality holds: `min_ν B(ν) = OPT` for the continuous problem. By the envelope theorem `∂B/∂ν_k` is the net flow
+of token k at the venues' best responses, so the minimiser is exactly the price vector at which those best
+responses spend `A` and balance every intermediate token — the optimal route can be read off it. What separates
+the integer execution from `B(ν*)` is rounding: at most one raw unit of output per hop, plus the granularity of
+intermediate tokens. Measured over 1,000 random markets (benchmarks, B2): median gap 0.075 ppm, 92.3% within
+1 ppm, maximum 7.4 ppm (outputs of a few tokens, where one raw unit is several ppm). τ must be set above that floor
+for the order's size.
+
+### 12.6 The solver (off-chain, untrusted): `agent/src/engine/execution.ts`
+
+1. Rescale each token by its largest reserve, so floating point is well conditioned across 6- and 18-decimal tokens.
+2. Minimise `B` by exact coordinate descent: for each non-output token, bisection in log-space on `∂B/∂ν_k`
+   (increasing in `ν_k` by convexity); then damped Newton steps on `∇B` with a finite-difference Hessian, each
+   accepted only if it lowers `B`.
+3. Read each venue's best trade at `ν*`, drop numerical dust (< 10⁻⁹ of the output's value), order the hops so
+   each input exists when it runs, split `A` exactly across the source legs, let the last consumer of each
+   intermediate token take all of it, and — when venues disagree enough that the optimum contains an arbitrage
+   loop — spend the recycled input through one direct leg at the end.
+4. Simulate the route with the pools' integer arithmetic and recompute the on-chain bound bit for bit; the agent
+   pre-flights with `quoteBound` and does not send a trade its own proof would fail.
+
+Median 3.3 ms per solve, 99th percentile 38 ms (B2). The Solidity tests use fixtures generated from this code, so
+contract and solver are checked against each other bit for bit.
+
+### 12.7 Limits, stated plainly
+
+* **The proof is about the present state.** Someone who moves every venue before the trade changes what is optimal;
+  the bound follows the moved state. That is market risk, bounded separately by the co-signed `minOut`
+  (front-running attempt EA8 on Sepolia). A manipulation smaller than the floor is not caught by either check.
+* **Venues are trusted to be what the owner says they are**: honest constant-product pools with the declared
+  fee (the module checks the fee where the pool reports it). Concentrated-liquidity and stable-swap venues need
+  their own closed form for `h_i` (piecewise for concentrated liquidity); not implemented.
+* **Gas is not in the objective.** A route with more hops can be output-optimal but cost more gas.
+* **The bound is computed by the chain, not proven in zero knowledge**: prices and route are public.

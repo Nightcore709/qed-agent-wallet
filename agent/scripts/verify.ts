@@ -27,7 +27,10 @@ import {
   type Address,
   type Hex,
 } from "viem";
-import { MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { MaximalityBountyAbi, MinVarianceVerifierAbi, OptimalityBountyAbi, PrivateMinVarianceVerifierAbi, ProofEscrowAbi, QEDClearingAbi, QEDExecutionAbi, QEDLensAbi, QEDVaultAbi, TestUSDAbi } from "../src/abi/contracts.js";
+import { dualBound, simulate, solve, type Hop, type VenueState } from "../src/engine/execution.js";
+import { hashOrder, readVenues } from "../src/roles/trader.js";
+import { encodeAbiParameters } from "viem";
 import { CIRCUIT, attestationDigest, verifyOffchain, shutdownProver } from "../src/engine/privateMinvar.js";
 import { checkNetting, type Obligation } from "../src/engine/netting.js";
 import { decodeRevert } from "../src/chain.js";
@@ -225,6 +228,7 @@ async function main() {
   await verifyOutcome3();
   await verifyClearing();
   await verifyPrivate();
+  await verifyExecution();
   await shutdownProver();
   const failed = rows.filter((r) => !r.ok);
   writeFileSync(`${EVIDENCE}/verification.json`, JSON.stringify({ at: new Date().toISOString(), rpc: RPC, chainId, passed: rows.length - failed.length, failed: failed.length, rows }, null, 2));
@@ -280,6 +284,75 @@ async function verifyPrivate() {
   const malIn = (await pub.getContractEvents({ address: k.token, abi: TestUSDAbi, eventName: "Transfer", args: { to: mal }, fromBlock: BigInt(k.deployBlock) })) as any[];
   const fromUs = malIn.filter((e) => [k.escrow, k.optimalityBounty, k.maximalityBounty].map((x) => x.toLowerCase()).includes(e.args.from.toLowerCase()));
   ok("O3", "Mallory received ZERO tUSD from the escrow or either bounty", fromUs.length === 0, `${malIn.length} faucet transfer(s) only`);
+}
+
+
+/** Run 4: best execution proved on-chain, re-proved here from public state with no keys. */
+async function verifyExecution() {
+  const path = `${EVIDENCE}/execution/manifest.json`;
+  if (!existsSync(path)) return;
+  const em = JSON.parse(readFileSync(path, "utf8"));
+  const k = em.contracts as { usd: Address; eur: Address; eth: Address; pools: Address[]; vault: Address; reserve: Address; execution: Address; lens: Address; deployBlock: string };
+  console.log("\n— QED Execute: bytecode —");
+  const addrs: Record<string, Address> = { eur: k.eur, eth: k.eth, vault: k.vault, reserve: k.reserve, execution: k.execution };
+  const art: Record<string, string> = { eur: "TestToken.sol/TestToken", eth: "TestToken.sol/TestToken", vault: "QEDVault.sol/QEDVault", reserve: "QEDVault.sol/QEDVault", execution: "QEDExecution.sol/QEDExecution" };
+  k.pools.forEach((p, i) => {
+    addrs[`venue${i}`] = p;
+    art[`venue${i}`] = "CPMMPool.sol/CPMMPool";
+  });
+  await verifyBytecode(addrs, art);
+  const agent = (await pub.readContract({ address: k.vault, abi: QEDVaultAbi, functionName: "agent" })) as Address;
+  const wiredVault = (await pub.readContract({ address: k.execution, abi: QEDExecutionAbi, functionName: "vault" })) as Address;
+  const venues = (await pub.readContract({ address: k.execution, abi: QEDExecutionAbi, functionName: "venues" })) as any[];
+  const vsh = (await pub.readContract({ address: k.execution, abi: QEDExecutionAbi, functionName: "venueSetHash" })) as Hex;
+  const enc = keccak256(encodeAbiParameters([{ type: "tuple[]", components: [{ name: "pool", type: "address" }, { name: "token0", type: "address" }, { name: "token1", type: "address" }, { name: "feeBps", type: "uint16" }] }], [venues]));
+  ok("O1", "QEDExecution is the treasury vault's agent and is bound to that vault", getAddress(agent) === getAddress(k.execution) && getAddress(wiredVault) === getAddress(k.vault), `agent ${agent}`);
+  ok("O4", "the venue set is exactly the five deployed pools, and its hash is what every order committed to", venues.length === k.pools.length && venues.every((v, i) => getAddress(v.pool) === getAddress(k.pools[i])) && enc === vsh, vsh.slice(0, 18) + "…");
+  console.log("\n— QED Execute: every recorded transaction —");
+  await verifySteps(em.steps);
+
+  console.log("\n— QED Execute: best execution re-proved independently from public state —");
+  const historical = async <T>(f: (c: any) => Promise<T>): Promise<T> => {
+    let last: unknown;
+    for (const client of [pub, ...ARCHIVE]) {
+      try {
+        return await f(client);
+      } catch (e: any) {
+        last = e;
+        if (!NO_STATE.test(String(e?.details ?? e?.message ?? e))) throw e;
+      }
+    }
+    throw last;
+  };
+  for (const id of ["E1", "E2"]) {
+    const st = em.steps.find((x: any) => x.id === id);
+    const tx = await pub.getTransaction({ hash: st.tx.hash });
+    const rc = await pub.getTransactionReceipt({ hash: st.tx.hash });
+    const { args } = decodeFunctionData({ abi: QEDExecutionAbi as Abi, data: tx.input }) as any;
+    const [, , cert, , order, route, prices] = args;
+    const before = rc.blockNumber - 1n;
+    const vs: VenueState[] = await historical((client) => readVenues(client, k.execution, before));
+    const pm = new Map<string, bigint>(prices.map((p: any) => [p.token.toLowerCase(), BigInt(p.value)]));
+    const B = dualBound(vs, BigInt(cert.amount), k.usd, order.tokenOut, pm);
+    const ev = (await pub.getContractEvents({ address: k.execution, abi: QEDExecutionAbi, eventName: "BestExecution", fromBlock: rc.blockNumber, toBlock: rc.blockNumber })) as any[];
+    const e = ev.find((x) => x.transactionHash.toLowerCase() === st.tx.hash.toLowerCase())?.args;
+    const hops: Hop[] = route.map((h: any) => ({ venue: Number(h.venue), zeroForOne: h.zeroForOne, amountIn: BigInt(h.amountIn) }));
+    const sim = simulate(vs, hops, k.usd, order.tokenOut, BigInt(cert.amount));
+    const own = solve(vs, k.usd, order.tokenOut, BigInt(cert.amount));
+    ok("O1", `${id}: the bound recomputed here from the pre-trade reserves equals the bound the contract enforced`, !!e && e.bound === B, `B = ${Number(B) / 1e6} tEUR (block ${before})`);
+    ok("O1", `${id}: replaying the calldata's route on those reserves gives exactly the output the chain delivered`, !!e && sim.ok && sim.amountOut === e.amountOut, `${Number(sim.amountOut) / 1e6} tEUR`);
+    ok("O1", `${id}: realised output within the order's tolerance of the bound, and of an independent optimum`, !!e && e.amountOut * 1_000_000n >= B * (1_000_000n - BigInt(order.tolerancePpm)) && e.amountOut * 1_000_000n >= own.sim.amountOut * 999_999n, `gap ${(Number(B - e.amountOut) / Number(B) * 1e6).toFixed(3)} ppm to the bound; independent route ${Number(own.sim.amountOut) / 1e6}`);
+    ok("O1", `${id}: the co-signer's certificate commits to this exact order (recipient, floor, τ, venue set)`, cert.ref === hashOrder(order) && order.venueSetHash === vsh && getAddress(order.recipient) === getAddress(k.reserve), `order ${cert.ref.slice(0, 12)}… · floor ${Number(order.minOut) / 1e6}`);
+  }
+  console.log("\n— QED Execute: nothing leaked —");
+  const bal = (t: Address, a: Address) => pub.readContract({ address: t, abi: TestUSDAbi, functionName: "balanceOf", args: [a] }) as Promise<bigint>;
+  const held = await Promise.all([k.usd, k.eur, k.eth].map((t) => bal(t, k.execution)));
+  ok("O3", "the execution module holds nothing (tUSD, tEUR, tETH all zero)", held.every((x) => x === 0n));
+  const mal = em.actors.mallory as Address;
+  const fromModule = (await pub.getContractEvents({ address: k.eur, abi: TestUSDAbi, eventName: "Transfer", args: { from: k.execution }, fromBlock: BigInt(k.deployBlock) })) as any[];
+  ok("O3", "every tEUR the module ever sent went to the euro reserve; none to Mallory", fromModule.length >= 2 && fromModule.every((x) => getAddress(x.args.to) === getAddress(k.reserve)) && !fromModule.some((x) => getAddress(x.args.to) === getAddress(mal)), `${fromModule.length} transfers`);
+  const l = (await pub.readContract({ address: k.reserve, abi: QEDVaultAbi, functionName: "getLiability", args: [1n] })) as any;
+  ok("O3", "the euro reserve ring-fences 15 tEUR for CloudCo", getAddress(l.creditor) === getAddress(em.actors.cloudco) && l.amount === 15_000_000n && Number(l.status) === 1, `liability #1 · due ${new Date(Number(l.dueAt) * 1000).toISOString().slice(0, 10)}`);
 }
 
 function hexToBytes(h: Hex): Uint8Array {
