@@ -68,9 +68,13 @@ async function main() {
     // Export every signed transaction in canonical (block) order, with the replica's receipt.
     const last = await pub.getBlockNumber();
     const outbox: any[] = [];
+    // OUTBOX_SKIP: leading transactions that were only replayed to rebuild state (already on the public chain)
+    const skip = Number(process.env.OUTBOX_SKIP ?? 0);
+    let seen = 0;
     for (let b = startBlock + 1n; b <= last; b++) {
       const block = await pub.getBlock({ blockNumber: b, includeTransactions: true });
       for (const tx of block.transactions as any[]) {
+        if (seen++ < skip) continue;
         const raw = (await (pub as any).request({ method: "eth_getRawTransactionByHash", params: [tx.hash] })) as Hex;
         const r = await pub.getTransactionReceipt({ hash: tx.hash });
         outbox.push({

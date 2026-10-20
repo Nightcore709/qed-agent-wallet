@@ -10,6 +10,15 @@ import {QEDExecution} from "../src/QEDExecution.sol";
 import {CPMMPool} from "../src/venues/CPMMPool.sol";
 import {TestToken} from "../src/venues/TestToken.sol";
 import {ExecutionFixture as F} from "./fixtures/ExecutionFixture.sol";
+import {ExecutionBounty, IBoundSource} from "../src/bounties/ExecutionBounty.sol";
+
+/// @dev Positive control for the bounty: the real module's bound, understated by 0.1%.
+contract UnsoundBound is IBoundSource {
+    QEDExecution internal immutable real;
+    constructor(QEDExecution r) { real = r; }
+    function venues() external view returns (QEDExecution.Venue[] memory) { return real.venues(); }
+    function quoteBound(uint256 a, address t, QEDExecution.Price[] calldata p) external view returns (uint256) { return (real.quoteBound(a, t, p) * 999) / 1000; }
+}
 
 /// @notice Best execution, proved on-chain. The honest route, prices, bound and output come from the
 ///         TypeScript solver (fixtures/ExecutionFixture.sol, generated) and must match bit for bit.
@@ -358,6 +367,97 @@ contract QEDExecutionTest is Test {
     /// The honest bound is tight: equal to the realised optimum within the 1 ppm tolerance.
     function test_honestBoundIsTight() public pure {
         assertLe(F.HONEST_BOUND - F.HONEST_OUT, F.HONEST_BOUND / 1e6);
+    }
+
+    // ─────────────────────────── ExecutionBounty: money on Theorem 12.3 ───────────────────────────
+
+    function _bounty(IBoundSource src) internal returns (ExecutionBounty b) {
+        b = new ExecutionBounty(src, IERC20(address(usd)));
+        usd.mint(address(b), 1_000 * USD);
+    }
+
+    function test_bounty_theOptimalRouteCannotClaim() public {
+        ExecutionBounty b = _bounty(IBoundSource(address(exec)));
+        (QEDExecution.Hop[] memory r, QEDExecution.Price[] memory p) = (_route(F.honest()), _prices(F.honestPrices()));
+        vm.prank(mallory);
+        vm.expectRevert(abi.encodeWithSelector(ExecutionBounty.TheoremHolds.selector, F.HONEST_OUT, F.HONEST_BOUND));
+        b.claim(F.AMOUNT_IN, address(eur), p, r);
+        assertEq(usd.balanceOf(address(b)), 1_000 * USD);
+    }
+
+    function test_bounty_forgedPricesOnlyLoosenTheBound() public {
+        ExecutionBounty b = _bounty(IBoundSource(address(exec)));
+        (QEDExecution.Hop[] memory r, QEDExecution.Price[] memory p) = (_route(F.honest()), _prices(F.forgedPrices()));
+        vm.prank(mallory);
+        vm.expectRevert(abi.encodeWithSelector(ExecutionBounty.TheoremHolds.selector, F.HONEST_OUT, F.FORGED_BOUND));
+        b.claim(F.AMOUNT_IN, address(eur), p, r);
+    }
+
+    /// Positive control: against a bound understated by 0.1%, the same honest route collects the whole pool.
+    function test_bounty_paysAgainstAnUnsoundBound() public {
+        ExecutionBounty b = _bounty(new UnsoundBound(exec));
+        (QEDExecution.Hop[] memory r, QEDExecution.Price[] memory p) = (_route(F.honest()), _prices(F.honestPrices()));
+        vm.prank(mallory);
+        b.claim(F.AMOUNT_IN, address(eur), p, r);
+        assertEq(usd.balanceOf(mallory), 1_000 * USD - F.AMOUNT_IN, "claimant takes the unspent pool");
+        assertEq(eur.balanceOf(mallory), F.HONEST_OUT, "and the output");
+        assertEq(usd.balanceOf(address(b)), 0);
+    }
+
+    /// The pool's other holdings are not the claimant's to route: a donated bridge token cannot be sold into a "refutation".
+    function test_bounty_cannotUseThePoolsOwnHoldings() public {
+        ExecutionBounty b = _bounty(new UnsoundBound(exec)); // even against an unsound bound
+        eth.mint(address(b), 1e18);
+        F.H[] memory h = F.honest();
+        QEDExecution.Hop[] memory r = new QEDExecution.Hop[](h.length + 1);
+        QEDExecution.Hop[] memory base = _route(h);
+        for (uint256 i; i < base.length; ++i) r[i] = base[i];
+        r[h.length] = QEDExecution.Hop(3, pools[3].token0() == address(eth), 1e17); // sell 0.1 donated tETH
+        QEDExecution.Price[] memory p = _prices(F.honestPrices());
+        vm.prank(mallory);
+        vm.expectRevert(ExecutionBounty.InvalidClaim.selector);
+        b.claim(F.AMOUNT_IN, address(eur), p, r);
+    }
+
+    function test_bounty_cannotOverspend() public {
+        ExecutionBounty b = _bounty(IBoundSource(address(exec)));
+        QEDExecution.Hop[] memory r = new QEDExecution.Hop[](1);
+        r[0] = QEDExecution.Hop(0, pools[0].token0() == address(usd), F.AMOUNT_IN + 1);
+        QEDExecution.Price[] memory p = _prices(F.honestPrices());
+        vm.prank(mallory);
+        vm.expectRevert(abi.encodeWithSelector(ExecutionBounty.Overspent.selector, F.AMOUNT_IN + 1, F.AMOUNT_IN));
+        b.claim(F.AMOUNT_IN, address(eur), p, r);
+    }
+
+    /// 2,000 random claims — random size, prices and routes — never collect, and never move the pool.
+    function testFuzz_bounty_neverPays(uint256 seed) public {
+        ExecutionBounty b = _bounty(IBoundSource(address(exec)));
+        uint256 a = 1e6 + (uint256(keccak256(abi.encode(seed, "a"))) % (100 * USD));
+        uint256[3] memory pv = F.honestPrices();
+        pv[0] = _scale(pv[0], uint256(keccak256(abi.encode(seed, 0))));
+        pv[2] = _scale(pv[2], uint256(keccak256(abi.encode(seed, 2))));
+        uint256 hops = 1 + (seed % 6);
+        QEDExecution.Hop[] memory r = new QEDExecution.Hop[](hops);
+        uint256 left = a;
+        for (uint256 i; i < hops; ++i) {
+            uint256 x = uint256(keccak256(abi.encode(seed, "hop", i)));
+            uint8 v = uint8(x % pools.length);
+            bool z = (x >> 8) % 2 == 0;
+            address tin = z ? pools[v].token0() : pools[v].token1();
+            uint256 amt;
+            if (tin == address(usd)) {
+                amt = i == hops - 1 ? left : (left * ((x >> 16) % 1000)) / 1000;
+                if (amt == 0) amt = 1;
+                left = left > amt ? left - amt : 0;
+            }
+            r[i] = QEDExecution.Hop(v, z, amt);
+        }
+        QEDExecution.Price[] memory p = _prices(pv);
+        vm.prank(mallory);
+        try b.claim(a, address(eur), p, r) {
+            fail();
+        } catch {}
+        assertEq(usd.balanceOf(address(b)), 1_000 * USD, "a failed claim moves nothing");
     }
 
     // ─────────────────────────── helpers ───────────────────────────
