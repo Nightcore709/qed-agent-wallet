@@ -70,6 +70,48 @@ Event `BestExecution(intentId, tokenOut, recipient, amountIn, spent, amountOut, 
 `pay(m, ownerSig, c, cosignerSig)` forwards ordinary payments (and refuses certificates addressed to the module).
 `quoteBound(amountIn, tokenOut, prices)` is the bound as a view, used for pre-flight and by `ExecutionBounty`.
 
+### 3.1 The trade request the co-signer evaluates
+
+`TradeRequest { mandate, ownerSig, module, tokenIn, tokenOut, amountIn, recipient, nonce, and exactly one of:`
+`instruction + ownerConfirmationSig` (an owner-initiated conversion, the instruction read by the language layer) or
+`policy + policySig` (an agent-initiated conversion under a standing policy) `}`.
+
+Checks (one decision record, hashed into the certificate's `evidenceHash`): C1 owner signed the mandate; C2 mandate
+active and current epoch; C3 the owner confirmed this conversion **or** a current owner-signed policy covers this
+vault, reserve and token pair; C6 instruction nonce not seen before; C9 recipient in the mandate's payees; C9b the
+module is the vault's agent and a mandate payee; C10 the treasury's free balance stays above its buffer; C11
+deny-list screening; T1 an **independent** optimal quote (the co-signer runs its own solver on the live reserves and
+its route must execute); T2 that quote's rate within 300 bps of the depth-weighted mid of the direct venues (a
+manipulation screen); T3 the order commits to the current venue set. Under a policy also P1–P3 (§3.3). On success it
+signs the certificate with `ref = hashOrder(order)`, `order.minOut = ⌊own quote × 0.99⌋` and
+`order.tolerancePpm = min(100, max(1, ⌈2·gap⌉))`, where gap is its own route's measured distance from the bound.
+
+### 3.2 Pre-flight
+
+The agent calls `quoteBound` on the block it will trade against and simulates its route with the pools' integer
+arithmetic; it sends only if its own output clears `bound·(1 − τ)` and `minOut`. A route that would fail is never
+broadcast; if the market has moved past the co-signed floor it re-plans, and declines if the new plan falls below
+the order's floor (Sepolia `A10`).
+
+### 3.3 Standing treasury policy (EIP-191 personal message)
+
+```
+QED treasury policy
+vault: <checksummed tUSD treasury vault>
+reserve: <checksummed reserve vault>
+keep free in reserve at least: <targetFree, raw units> of <checksummed tokenOut>
+convert from: <checksummed tokenIn>
+tranche: <minTranche> to <maxTranche>
+max impact bps: <integer>
+valid until: <unix seconds>
+nonce: <string>
+```
+
+The co-signer recovers the owner from this exact text (C3) and then re-derives the decision of ALGORITHMS §12.8
+from the chain: P1 a shortfall exists and a tranche is due; P2 `minTranche ≤ requested ≤ its own tranche`; P3 the
+requested tranche's execution cost against mid is within `max impact bps`. The policy is reusable until `valid until`;
+it is revoked immediately by voiding the mandate it runs under (`bumpEpoch`) or by rotating the operator.
+
 ## 4. `ProofEscrow` (EIP-712 domain `"ProofEscrow"`, version `"1"`)
 
 ```

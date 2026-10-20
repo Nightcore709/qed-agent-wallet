@@ -105,18 +105,20 @@ tool that can sign.
 | I23 | The order (recipient, floor, tolerance, venue set) cannot be changed after the co-signer approved it | certificate `ref` = order hash; venue-set hash in the order | `test_tamperedOrder_isRejected`, `test_venueChangeInvalidatesOutstandingOrders`; Sepolia EA6 |
 | I24 | Routing through the module weakens none of the vault's guarantees | funds arrive only via `executePayment` in the same transaction; QEDVault bytecode unchanged | `test_vaultLimitsReplayAndPauseStillApply`, `test_perPaymentCapStillApplies`, `test_payPassesThrough_butNotWithATradeCertificate`; Run 4 vault bytecode verified identical |
 | I25 | Theorem 12.3 is falsifiable on-chain by anyone, for money | `ExecutionBounty` runs the claimant's route on its own funds and compares with the deployed bound | positive control pays against a bound understated by 0.1%; donated holdings cannot be used; 2,000-run fuzz never pays; Sepolia XA1–XA3 |
+| I26 | Under a standing policy the agent cannot convert more, or at a worse execution cost, than the owner's policy allows at that block | the co-signer re-derives the tranche from the chain (P1–P3) before it certifies; the mandate's caps and best execution still apply on-chain | `treasury.test.ts` (limits never exceeded, determinism); Sepolia PA1 (25 requested, 19.535234 allowed: refused), PE1–PE2, T3; `npm run verify` checks the target was met at PE2's block |
 
 Test totals: **132 Solidity tests** (unit, fuzz, stateful invariants — ≈350 000 adversarial calls per CI run,
 60 random clearing economies, a real Groth16 proof attacked 2,000 ways, three bounties, best execution with
-two 2,000-run soundness fuzzers), **56 TypeScript tests** (TS ≡ Solidity parity on a live node, portfolio solver vs.
+two 2,000-run soundness fuzzers), **60 TypeScript tests** (TS ≡ Solidity parity on a live node, portfolio solver vs.
 a 20 000-sample oracle, netting solver vs. an exhaustive oracle, zero-knowledge prover soundness checks, routing
-weak/strong duality on 700 random markets, 32-case red-team).
+weak duality on 12,000 route–price pairs and strong duality on 300 markets, the treasury policy's tranche rule,
+32-case red-team).
 
 ### Proven properties vs. trust assumptions
 
 | Proven (by code the chain runs, or by mathematics the tests exercise) | Assumed (a party or a fact we rely on) |
 |---|---|
-| I1–I25 above, within their stated conditions | the owner key is not compromised (K1); Ethereum consensus and the EVM behave as specified |
+| I1–I26 above, within their stated conditions | the owner key is not compromised (K1); Ethereum consensus and the EVM behave as specified |
 | Theorems 4.4, 9.2 (with proofs in ALGORITHMS) and 12.3 (proof uses path deficiency from the literature, tested) | the Groth16 setup was not subverted (K18); BN254 pairing and keccak256 are secure |
 | Accepted conversions are within τ of the optimum on the state they executed on | the owner's venues are honest constant-product pools with the declared fee (K22) |
 | The bound is never understated by integer rounding | the co-signer's quote reflects a fair market when it signs (K23) |
@@ -143,6 +145,7 @@ owner's authority; confidentiality of keys.
 | Compromised trading agent | holds the operator key; routes any way; picks any prices | cannot leak more than τ = 1 ppm per trade through routing (EA1–EA3); cannot redirect output (EA6); cannot strand value (EA4) |
 | Front-runner / sandwich attacker | moves venue prices before a signed trade | refused by the co-signed floor when the move exceeds 1% (EA8); smaller moves are a residual risk (K23) |
 | Liquidity provider colluding with the agent | owns liquidity in one venue and wants volume routed through it | routing to it beyond the optimum fails the proof (EA1, EA5) |
+| Over-eager or compromised agent under a standing policy | requests larger or costlier tranches than the policy allows, or trades when no shortfall exists | the co-signer recomputes the decision and refuses (PA1); the mandate caps what any certificate can move |
 | Execution-theorem challenger | any route and prices, with 1,000 tUSD on offer | every claim reverts with `TheoremHolds(output, bound)` (XA1–XA3) |
 | Stranger | calls permissionless functions | can only settle due liabilities to their creditors (P3) |
 | Owner-key thief | full owner powers | **out of scope** — see K1 |
@@ -183,6 +186,8 @@ payees ≤ 32; Elevation of privilege → single-function agent key, owner-only 
 | K25 | **Gas is not in the objective**: an output-optimal route can use more hops than a cheaper near-optimal one. | Low | Gas is paid by the operator's ETH, not the vault; at Sepolia prices a four-hop trade costs ~0.00001 ETH. |
 | K26 | **Concentrated-liquidity and stable-swap venues** are not supported by the bound. | Info | Their per-venue value h_i has a (piecewise) closed form; not implemented. |
 | K27 | **LLM provider credentials**: the language layer calls an external API with a key the operator supplies. | Low | Held only by the brain process, never logged or committed; the offline parser is the fallback; no money field depends on it. |
+| K28 | **The standing policy is enforced off-chain**: whether a tranche is due is judged by the co-signer, which re-derives it from the chain; the contracts enforce the mandate's caps and best execution, not the policy's target or impact limit. A compromised co-signer *and* operator could convert up to the mandate's caps at best execution when no shortfall exists. | Medium | Bounded by the mandate (per-payment and window caps, payees) and by best execution; every certificate anchors the decision record's hash; revocation by `bumpEpoch` or `setOperator`. Production: encode target and tranche limits in an on-chain policy module. |
+| K29 | **Per-tranche, not cumulative, impact**: κ is measured against the mid price at each tick, so successive tranches can move the price further in total. | Low | Tranche size, daily cap and the 300 bps T2 screen bound it; Run 4c's second tranche paid 90 bps against the moved mid. Production: cumulative impact budget, TWAP reference, minimum interval between tranches. |
 
 ## 5a. Key lifecycle, oracles, MEV, availability and administration
 

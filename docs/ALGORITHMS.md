@@ -554,3 +554,63 @@ contract and solver are checked against each other bit for bit.
   their own closed form for `h_i` (piecewise for concentrated liquidity); not implemented.
 * **Gas is not in the objective.** A route with more hops can be output-optimal but cost more gas.
 * **The bound is computed by the chain, not proven in zero knowledge**: prices and route are public.
+
+### 12.8 Deciding when and how much: the standing treasury policy (`agent/src/roles/treasury.ts`)
+
+Sections 12.1–12.7 prove *how well* a conversion executed. Run 4c lets the agent also decide *whether* and *how
+much*, under an objective the owner signs once (EIP-191, text in PROTOCOL_SPECIFICATION §3.3):
+
+```
+π = (reserve, tokenIn s, tokenOut t, target T, tranche bounds [X_min, X_max], impact limit κ, validUntil, nonce)
+```
+
+**State observed at block b.** `r` = free (not ring-fenced) balance of `t` in the reserve; `a` = what the treasury
+may spend now, `min(free − buffer, dailyCap − spentInWindow)`; `m` = the mandate's per-payment cap; the reserves of
+every owner venue. Let `F*(X)` be the certified output for input `X` (the solver's route, simulated in the pools'
+integer arithmetic, §12.6) and `μ` the depth-weighted mid price of the venues that trade `s/t` directly. Define
+
+```
+shortfall   S = (T − r)₊
+cost        I(X) = 1 − F*(X) / (μ·X)                                   (execution cost against mid, in bps)
+hard cap    H = min(X_max, m, a)
+need        N = min{ X ≤ H : F*(X) ≥ S }        (undefined when F*(H) < S)
+impact      K = max{ X ∈ [X_min, H] : I(X) ≤ κ } (0 when H < X_min or I(X_min) > κ)
+tranche     X = min(N, K, X_max, m, a);   S = 0 → no action;   X < X_min → wait
+```
+
+**Proposition 12.8.** (i) *Safety:* an executed tranche satisfies `X ≤ X_max`, `X ≤ m`, `X ≤ a` and `I(X) ≤ κ`, and
+it covers the shortfall exactly when `need` binds. (ii) *Monotone search:* for the continuous problem `OPT(X)` is
+concave with `OPT(0) = 0`, so `OPT(X)/X` is non-increasing and `I(X)` non-decreasing; `N` and `K` are therefore
+found by bisection over monotone predicates. (iii) *No forced trades:* if the market is too thin for even `X_min`,
+the rule waits. (iv) *Determinism:* `X` is a pure function of the policy and the state at block `b`.
+
+*Proof sketch.* (i) `X` is a minimum that includes `X_max`, `m`, `a` and `K`, and `K` satisfies `I(K) ≤ κ`; the
+co-signer additionally evaluates `I` at the requested `X` itself (check P3), so the bound does not rely on
+monotonicity. If `X = N` then `F*(X) ≥ S` by definition. (ii) `OPT(X)` is the value of a convex program whose
+feasible set grows linearly with the right-hand side `X` (§12.2), hence concave in `X`; a concave function through
+the origin has a non-increasing average. The integer `F*` inherits this up to rounding; `agent/test/treasury.test.ts`
+checks monotonicity on random sizes, and each bisection only ever returns a point at which its predicate was
+evaluated true, so a rounding wobble can make a candidate conservative but never unsafe. (iii) and (iv) are by
+construction. ∎
+
+**Why the co-signer can check it.** Because the rule is deterministic, the co-signer reads the same block,
+recomputes `X` itself and signs only if the request is no larger (P1: a tranche is due; P2: requested ≤ its own `X`
+and ≥ `X_min`; P3: `I(requested) ≤ κ`). An over-eager agent is refused before any transaction exists (Sepolia
+`PA1`: 25 tUSD requested, 19.535234 allowed, 180 bps > 150 bps). The order the co-signer then certifies is proven on
+chain exactly as in §12.4.
+
+**The live run (Run 4c, Sepolia blocks 11,953,421–11,953,422).** Target 45 tEUR free; `X ∈ [2, 25]` tUSD; κ = 150 bps.
+
+| Tick | Observed free | Shortfall | N · K · caps (tUSD) | Decision | On chain |
+|---|--:|--:|---|---|---|
+| 1 | 20.699566 | 24.300434 | — · 19.535 · 25 / 25 / 55 | convert 19.535234, **limited by impact** (150.0 bps) | `PE1`: 16.816098 tEUR, bound 16.816101 |
+| 2 | 37.515664 | 7.484336 | 8.835 · 19.705 · 25 / 25 / 35.46 | convert 8.835281, **limited by need** (90.0 bps) | `PE2`: 7.484336 tEUR, bound 7.484339 |
+| 3 | 45.000000 | 0 | — | nothing to do | none |
+
+**Limits.** (a) κ bounds each tranche against the mid price *at that tick*; tranche 2 is measured against the
+price tranche 1 moved. Cumulative drift over many tranches is bounded only by `X_max`, the daily cap and the
+number of ticks; a production policy would add a cumulative impact budget, a TWAP reference and a minimum interval
+between tranches so that arbitrage can restore the price (risk K29). (b) The policy is enforced by the co-signer
+and the mandate, not by the chain: the chain enforces the mandate's caps and best execution, while "a tranche is
+due" is an off-chain judgement the co-signer re-derives (risk K28). Revocation is immediate through the mandate
+(`bumpEpoch`) or the operator key (`setOperator`).

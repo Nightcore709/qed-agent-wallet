@@ -41,6 +41,22 @@ benefit is the *guarantee*, not the average ([benchmarks](docs/BENCHMARKS.md)). 
 instruction (live model); the co-signer re-quotes independently and writes its own floor into the order; the vault
 is unchanged and still enforces mandate, caps and solvency.
 
+### The agent decides when and how much (Run 4c)
+
+The owner signs one standing policy (EIP-191): *keep at least 45 tEUR free in the euro reserve; tranches of 2–25 tUSD;
+at most 1.5% execution cost per tranche*. From then on nobody approves individual trades. The agent observes the
+reserve, the treasury and every venue, and picks each tranche as the minimum of five quantities: the smallest input whose
+certified output covers the shortfall, the largest input whose cost stays inside the impact limit, the policy cap, the
+mandate cap and the free funds. The co-signer re-derives the same decision from the chain before it signs; the chain
+then proves best execution of whatever is traded.
+
+| On Ethereum Sepolia (Run 4c) | Result |
+|---|---|
+| `PA1` an over-eager agent asks for 25 tUSD at once | co-signer re-derives 19.535234 and refuses (P2, P3: 180 bps > 150 bps); no transaction |
+| [`PE1` tranche 1, limited by market impact](https://sepolia.etherscan.io/tx/0xaaa0bacddd313493ff89f08f25f86b5f5eb294423b517bdf16c5489626a0c9ff) | 19.535234 tUSD → **16.816098 tEUR** (bound 16.816101, 0.18 ppm); reserve 20.70 → 37.52 |
+| [`PE2` tranche 2, limited by need](https://sepolia.etherscan.io/tx/0xa9e90f580bb9f0457bfd8a966ec2c0322d877d6ea66e4f4aaabccd147d1aae35) | 8.835281 tUSD → **7.484336 tEUR** (bound 7.484339, 0.40 ppm); reserve **45.00**: target met |
+| `T3` the agent observes again | shortfall 0: it sends nothing |
+
 ## The idea in eight sentences
 
 1. **The AI holds one key that can call one function.** `QEDVault.executePayment` succeeds only with an owner-signed EIP-712 *mandate* **and** a certificate from an *independent co-signer* (a separate process, a separate key, 12 policy checks) **and** inside an on-chain *solvency invariant* that ring-fences money owed to creditors.
@@ -59,7 +75,7 @@ is unchanged and still enforces mandate, caps and solvency.
 | **O1** | A **separate AI-agent key** executes a payment under an **independent policy certificate** | [`L4 0x56a2334e…`](https://sepolia.etherscan.io/tx/0x56a2334eaf8ef1a22323b456f608851a571295a9adac3fb1a8c379c5e58b83b6) — sent **by the agent key** `0x2A10…d0Bb`; mandate signature recovers to the **owner** `0xb7Ed…97f7`; certificate signature recovers to the **co-signer** `0xf1F8…2402`; on-chain `evidenceHash` = keccak256 of the [published decision record](evidence/ethereum-sepolia/records/cosigner/). Also [`C1 0x7000d3cc…`](https://sepolia.etherscan.io/tx/0x7000d3cc8dba8ebed99a2a9d43805b09b70a0ccbf0d33f484ad3fd044b675ee3): a chat request → clarified → corrected → owner-signed confirmation → certified payment. And [`E1`](https://sepolia.etherscan.io/tx/0x56f798cd321e0d85ba6a7b1425dd7b12f04db386a81bf0e67c94374f12f19690): the agent's operator key trades through `QEDExecution` under a co-signer certificate that commits to the order, with best execution proved on-chain. |
 | **O2** | A **paid-work lifecycle** that ends in a **real escrow settlement** | Twice. **Private:** [`Z3` the same escrow pays 12 tUSD into QED's vault on a zero-knowledge proof of optimality](https://sepolia.etherscan.io/tx/0xbb619bf09eebacd240514eab5ec4a03c189612954101b07c59a11fa56f612ec7) for data the chain never sees. **Public:** RFQ → agent-signed quote → [`L2` client funds escrow, 15 tUSD](https://sepolia.etherscan.io/tx/0xa0546be0dc61e68e2f9b5ed2c1455dcb33bce6911ca762adae486f2a5f0646b9) → [`L4` agent buys the risk model it needs](https://sepolia.etherscan.io/tx/0x56a2334eaf8ef1a22323b456f608851a571295a9adac3fb1a8c379c5e58b83b6) → solves → [`L6` delivers portfolio + KKT certificate, verified **on-chain**, 15 tUSD settles into the agent's vault](https://sepolia.etherscan.io/tx/0x4166253f06143b2a07b3c77fb4d4603a33e84f3b6706363f0d727f485f9335f9). Competing provider's lazy answer [`X17` rejected: `DualityGapTooLarge`](https://sepolia.etherscan.io/tx/0x5a6f26aca564583a77b0a0be3c65d830a5ef0e616591c1e5c4e755e1f6ec6481), near-miss [`X18` rejected: `StationarityViolated`](https://sepolia.etherscan.io/tx/0xc269055a7f1e1238e23814e5bc1c034d9bfa28dcd55f116766d7887be987f0fe), client [`X19` refunded](https://sepolia.etherscan.io/tx/0x014cb96984b48ea63495b4dec56471dd3a186757b3e07799b39f13876a144b83). |
 | **O3** | An **adversarial agent cannot violate a protected liability or tamper with signed terms** | **19 attack transactions, all reverted on-chain with exactly the designed error** — tampered quote price/payee (`BadProviderSignature` ×2), forged/altered/redirected certificates (`BadCosignerSignature` ×3), both hot keys stolen paying the attacker (`PayeeNotInMandate`), self-signed mandate (`BadOwnerSignature`), replay (`IntentAlreadyUsed`), drain beyond free balance (`SolvencyViolation`), beyond the 24 h window (`ExceedsDailyCap`), admin calls (`NotOwner`, `NotCreditor`), published-key honeypot (×3), payment while paused (`VaultPaused`). Ring-fenced 70 tUSD reached **only** its creditor — [settled by the attacker's own address while the vault was paused](https://sepolia.etherscan.io/tx/0x9f4a753c58da0f5831d705973f9b0b5c484fa9baa68e47b8a7dc994a46a4135d). Full table: [docs/EVIDENCE.md](docs/EVIDENCE.md#attack-transactions-19--each-reverted-with-exactly-the-designed-error). Plus **6 attacks on the clearing house** and **8 on the private job and the bounties** (a copied zk proof, an understated variance, self-attested data, five refutation attempts), all reverted. Plus **11 on best execution** (a direct-only route and a 0.47 bp skim that a 1% slippage floor would allow, a "forged" proof, a stranded token, a redirected order, a front-run, three bounty claims). **44 attacks, 44 reverts, 0 tUSD to the attacker.** |
-| **O4** | An **external reviewer can reproduce everything** from GitHub source, tests and receipts | `npm run verify` re-derives every claim from a public RPC with **no keys**: on-chain bytecode == this repo's compiled bytecode; every receipt's status and sender; every revert's custom error (replayed on archive state); signatures recovered from calldata; the KKT certificate re-checked off-chain; the netting certificate re-checked; the Groth16 proof re-verified with snarkjs and the vendor's attestation recovered; the best-execution bound recomputed from pre-trade reserves and the route replayed; all three bounty pools intact; Mallory received 0 tUSD. It runs in [CI](.github/workflows/ci.yml) on every push and daily, with all four economies and the benchmarks. 132 Solidity tests (unit, fuzz, stateful invariants ≈ 350 k adversarial calls/run, 60 random clearing economies, a real zk proof attacked 2,000 ways, routes and prices fuzzed against the bound 6,000 ways) + 56 TypeScript tests. A fresh machine reproduced all of it from a clean clone ([log](docs/TESTING.md#clean-clone-reproduction-log)). |
+| **O4** | An **external reviewer can reproduce everything** from GitHub source, tests and receipts | `npm run verify` re-derives every claim from a public RPC with **no keys**: on-chain bytecode == this repo's compiled bytecode; every receipt's status and sender; every revert's custom error (replayed on archive state); signatures recovered from calldata; the KKT certificate re-checked off-chain; the netting certificate re-checked; the Groth16 proof re-verified with snarkjs and the vendor's attestation recovered; the best-execution bound recomputed from pre-trade reserves and the route replayed; all three bounty pools intact; Mallory received 0 tUSD. It runs in [CI](.github/workflows/ci.yml) on every push and daily, with all four economies and the benchmarks. 132 Solidity tests (unit, fuzz, stateful invariants ≈ 350 k adversarial calls/run, 60 random clearing economies, a real zk proof attacked 2,000 ways, routes and prices fuzzed against the bound 6,000 ways) + 60 TypeScript tests. A fresh machine reproduced all of it from a clean clone ([log](docs/TESTING.md#clean-clone-reproduction-log)). |
 
 ## What makes this different
 
@@ -154,13 +170,14 @@ git clone --recursive https://github.com/Nightcore709/qed-agent-wallet && cd qed
 npm ci && forge build
 
 forge test                      # 132 Solidity tests: invariants with both hot keys stolen, 60 clearing economies, a real zk proof attacked, best-execution soundness fuzzers, bounties
-npm run test:ts                 # 56 TS tests: TS ≡ Solidity parity on a live node, solvers vs oracles, routing duality on 700 random markets, zk prover, red-team corpus
+npm run test:ts                 # 60 TS tests: TS ≡ Solidity parity on a live node, solvers vs oracles, routing duality (weak: 12,000 route–price pairs; strong: 300 markets), treasury policy, zk prover, red-team corpus
 npm run verify                  # re-derive every Sepolia claim (all four runs) from a public RPC — no keys
 npx tsx benchmarks/run.ts       # B1–B5 benchmarks and ablations, deterministic (docs/BENCHMARKS.md)
 QED_OFFLINE=1 npm run local     # run the whole autonomous economy on a local chain (deterministic brain, dev keys)
 npm run local:clearing          # run the clearing economy on a local chain
 npm run local:private           # zero-knowledge job + theorem bounties on a local chain
-QED_OFFLINE=1 npm run local:execute   # best-execution economy: 5 venues, 2 conversions, 8 attacks, a front-run
+QED_OFFLINE=1 npm run local:execute   # best-execution economy: 5 venues, 2 conversions, 8 attacks, a front-run, then the standing policy
+                                      # (dev keys; reproduces Run 4c's Sepolia numbers to the raw unit)
 npm run zk:setup                # re-run the Groth16 trusted setup from the circuit (circom 2.2)
 npm run redteam                 # 32-case red-team corpus against the LLM alone and the guarded pipeline (needs ANTHROPIC_API_KEY)
 ```
@@ -170,7 +187,7 @@ Run the economy against a public network yourself: copy `.env.example`, fund the
 
 ## How the evidence was produced (full disclosure)
 
-Our build sandbox had no RPC egress. Every transaction was signed inside the sandbox — one key per process — against a wall-clock-synchronised replica of Sepolia (same chain id, nonces and balances); the **identical signed bytes** were committed to [`relay/`](relay/) and broadcast unchanged by a browser relay, and each public receipt was compared with the replica's (status + every log): **55/55 matched** for the main run, **44/44** for the clearing run, **24/24** for the private run and **59/59** for the best-execution run (Run 4b first replayed Run 4's signed bytes on the replica, so its state was Sepolia's). Two earlier attempts under other keys failed (Sepolia's state-creation gas repricing; one under-provisioned agent transaction) and were abandoned; the canonical run uses fresh keys. Details: [docs/EVIDENCE.md](docs/EVIDENCE.md#how-these-transactions-were-produced--full-disclosure), risk K12 in [docs/SECURITY.md](docs/SECURITY.md).
+Our build sandbox had no RPC egress. Every transaction was signed inside the sandbox — one key per process — against a wall-clock-synchronised replica of Sepolia (same chain id, nonces and balances); the **identical signed bytes** were committed to [`relay/`](relay/) and broadcast unchanged by a browser relay, and each public receipt was compared with the replica's (status + every log): **55/55 matched** for the main run, **44/44** for the clearing run, **24/24** for the private run and **65/65** for the best-execution runs: **188 transactions in all** (Runs 4b and 4c first replayed the earlier runs' signed bytes on the replica, so its state was Sepolia's). Two earlier attempts under other keys failed (Sepolia's state-creation gas repricing; one under-provisioned agent transaction) and were abandoned; the canonical run uses fresh keys. Details: [docs/EVIDENCE.md](docs/EVIDENCE.md#how-these-transactions-were-produced--full-disclosure), risk K12 in [docs/SECURITY.md](docs/SECURITY.md).
 
 ## Repository map
 
@@ -181,15 +198,16 @@ contracts/src/          QEDVault · QEDLens · QEDExecution · ProofEscrow · QE
                         bounties/  OptimalityBounty · MaximalityBounty · ExecutionBounty
 circuits/               private_minvar.circom (Groth16) · setup.sh · ceremony transcript · proving and verification keys
 contracts/test/         unit, fuzz and invariant tests (CompromisedAgentHandler holds both hot keys)
-agent/src/roles/        agent · trader (best-execution planning) · cosigner (12 payment checks, 11 trade checks) · vendor · adversary
+agent/src/roles/        agent · trader (best-execution planning) · treasury (standing policy, tranche rule) · cosigner (12 payment checks, 14 trade and policy checks) · vendor · adversary
 agent/src/brain/        LLM adapter · deterministic slot filling · deterministic guard (EN + 中文) · offline brain
 agent/src/engine/       certifying min-variance solver · certifying netting solver (min-mean cycle cancelling) · best-execution solver (dual prices, route, bound replica) · zk prover · economics
-agent/scripts/          live (full economy) · clearing · private · execute · execution-bounty · local · verify (independent) · redteam · build-app · evidence-md
+agent/scripts/          live (full economy) · clearing · private · execute · execution-bounty · execute-policy · local · verify (independent) · redteam · build-app · evidence-md
 benchmarks/             run.ts → results.json (B1–B5)
 evidence/ethereum-sepolia/  manifest · public receipts · co-signer & agent decision records · honeypot keys · clearing/ · private/ · execution/
 relay/                  the exact signed transactions broadcast to Sepolia
 app/ · site/            the QED Proof Ledger dashboard (GitHub Pages)
-docs/                   index (README) · ARCHITECTURE · ALGORITHMS · PROTOCOL_SPECIFICATION · SECURITY · BENCHMARKS · PRIOR_ART · EVIDENCE · DEPLOYMENT · TESTING · SELF_REVIEW · SUBMISSION_CHECKLIST
+docs/                   index (README) · ARCHITECTURE · ALGORITHMS · PROTOCOL_SPECIFICATION · SECURITY · BENCHMARKS · PRIOR_ART · EVIDENCE · DEPLOYMENT · TESTING · REPRODUCIBILITY · KNOWN_LIMITATIONS · SELF_REVIEW · SUBMISSION_CHECKLIST
+presentation/           SCRIPT (10-minute talk + demo) · JUDGE_QA
 ```
 
 ## Status

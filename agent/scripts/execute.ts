@@ -28,6 +28,7 @@ import { chain, EXPLORERS, loadEnvFile, NETWORK_NAMES, rpcConfig } from "../src/
 import { Evidence } from "../src/evidence.js";
 import { amountOut as v2Out, simulate, type Hop, type VenueState } from "../src/engine/execution.js";
 import { DECIMALS, EXEC_VENUES, raw, TRADE_TUSD, type Sym } from "../src/engine/executionScenario.js";
+import { runPolicyPhases } from "./policy-phases.js";
 import { decide, hashOrder, hopsForChain, planTrade, pricesForChain, readVenues, type Order, type TradePlan } from "../src/roles/trader.js";
 import { PolicyEngine, ownerTradeMessage, type TradeResponse } from "../src/roles/cosigner.js";
 import { signMandate, type Mandate } from "../src/protocol/eip712.js";
@@ -280,10 +281,12 @@ async function main() {
   const tp3 = await planTrade(c.pub, exec.address, usd, EUR, amt3);
   const pr3 = recordPlan("A9", tp3);
   ev.offchain("A9", { phase: "market", title: `Agent signs its plan for order 3: ${fmt("tEUR", tp3.plan.sim.amountOut)} tEUR expected, floor ${fmt("tEUR", r3.order!.minOut)}`, narrative: "The signed transaction is now public in the mempool.", actor: "QED agent", actorAddress: K.OPERATOR.address, outcomes: ["O3"], artifacts: [{ label: "plan", path: pr3.path, hash: pr3.hash }] });
+  const frontRun: [number, bigint][] = [];
   for (const [vi, amt] of [[0, U(30)], [1, U(10)]] as const) {
     const v = (await readVenues(c.pub, exec.address))[vi];
     const z = v.token0 === usd;
     const out = v2Out(amt, z ? v.r0 : v.r1, z ? v.r1 : v.r0, v.feeBps);
+    frontRun.push([vi, out]);
     ev.tx(`M${vi * 2 + 1}`, { phase: "market", title: `Mallory front-runs: sends ${fmtUsd(amt)} tUSD to venue ${vi}`, narrative: "Buying tEUR ahead of the agent pushes its price up on the venues the route uses.", actor: "Mallory", outcomes: ["O3"] }, await c.send(K.MALLORY, usd, fn(TestUSDAbi, "transfer", [pools[vi], amt])));
     ev.tx(`M${vi * 2 + 2}`, { phase: "market", title: `…and takes ${fmt("tEUR", out)} tEUR out of venue ${vi}`, narrative: "A plain Uniswap-V2-style swap.", actor: "Mallory", outcomes: ["O3"] }, await c.send(K.MALLORY, pools[vi], fn(CPMMPoolAbi, "swap", [z ? 0n : out, z ? out : 0n, K.MALLORY.address, "0x"])));
   }
@@ -296,6 +299,14 @@ async function main() {
   if (!(tp3b instanceof Error)) recordPlan("A10", tp3b);
   const d3 = tp3b instanceof Error ? { submit: false, reasons: [`no certifiable route on the moved market (${tp3b.message})`] } : decide(tp3b, r3.order!);
   ev.offchain("A10", { phase: "market", title: d3.submit ? "Agent re-plans and resubmits" : `Agent re-plans on the moved market${tp3b instanceof Error ? "" : ` (${fmt("tEUR", tp3b.plan.sim.amountOut)} tEUR at best)`} and declines to trade`, narrative: d3.submit ? "The new plan clears the floor." : `${d3.reasons.join("; ")}. It would need a fresh owner instruction and co-signer quote; it does not ask for one into a manipulated market.`, actor: "QED agent", actorAddress: K.OPERATOR.address, outcomes: ["O1", "O3"] });
+
+  // ═════════════ 6 · the agent decides (local chain only: on Sepolia this is Run 4c, execute-policy.ts) ═════════════
+  if (LOCAL) {
+    console.log("\nPHASE 6 · the agent decides under a standing policy");
+    const { policy, ticks } = await runPolicyPhases({ c, ev, K, k: { usd, eur: EUR, pools, vault: vault.address, reserve: reserve.address, execution: exec.address }, cosigner, mandate, ownerSig, out: OUT, chainId, unwind: frontRun });
+    ev.meta.policyRun = { policy: { ...policy, targetFree: policy.targetFree.toString(), maxTranche: policy.maxTranche.toString(), minTranche: policy.minTranche.toString(), validUntil: policy.validUntil.toString() }, ticks };
+    if (ticks.at(-1)?.action !== "none") throw new Error(`policy loop did not reach its target: ${JSON.stringify(ticks.at(-1))}`);
+  }
 
   // ═════════════ final state ═════════════
   const bal = async (t: Address, a: Address) => (await c.pub.readContract({ address: t, abi: TestUSDAbi, functionName: "balanceOf", args: [a] })) as bigint;
@@ -311,7 +322,7 @@ async function main() {
   };
   ev.meta.finishedAt = new Date().toISOString();
   ev.flush();
-  console.log(`\nDONE. Reserve holds ${fmt("tEUR", await bal(EUR, reserve.address))} tEUR; 8 attacks refused; module holds nothing.`);
+  console.log(`\nDONE. Reserve holds ${fmt("tEUR", await bal(EUR, reserve.address))} tEUR; 8 attacks refused; module holds nothing${LOCAL ? "; the standing policy met its target" : ""}.`);
 
   function attackSim3(tp: TradePlan, now: VenueState[]) {
     return simulate(now, tp.plan.route, usd, EUR, amt3).amountOut;

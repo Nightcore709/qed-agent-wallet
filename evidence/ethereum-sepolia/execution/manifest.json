@@ -4368,7 +4368,7 @@
     {
       "phase": "policy",
       "title": "Agent observes 45.00 tEUR free: target met, nothing to do",
-      "narrative": "Candidates (tUSD): need more than any allowed tranche, impact limit 0.00, policy cap 25.00, mandate cap 25.00, free funds 26.629485. ",
+      "narrative": "Shortfall 0: the reserve is at its target, so the agent sends nothing and spends no gas.",
       "actor": "QED agent",
       "actorAddress": "0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00",
       "outcomes": [

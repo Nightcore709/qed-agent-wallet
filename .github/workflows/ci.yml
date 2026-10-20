@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   contracts:
-    name: Solidity — build, 126 tests, fuzz + invariants
+    name: Solidity — build, 132 tests, fuzz + invariants
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
         env: { FOUNDRY_PROFILE: ci }
 
   agent:
-    name: Agent — type-check, 56 tests, all four economies on a local chain
+    name: Agent — type-check, 60 tests, all four economies on a local chain
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
         run: npm run local:clearing
       - name: Run the private economy locally (zero-knowledge proof, escrow settlement, theorem bounties)
         run: npm run local:private
-      - name: Run the best-execution economy locally (proven routing, 8 refused attacks, front-run)
+      - name: Run the best-execution economy locally (proven routing, 8 refused attacks, front-run, standing policy to target)
         run: npm run local:execute
         env: { QED_OFFLINE: "1" }
       - name: Benchmarks are reproducible (fixed seeds)

@@ -8,6 +8,7 @@
 | Network | Ethereum Sepolia (chain id 11155111) |
 | Blocks | 11,948,657 → 11,949,339 |
 | Transactions | 55 (36 succeeded · 19 reverted **by design** — every one an attack or a paused-vault test) |
+| Plus Run 4 (best execution, execution bounty, standing policy) | 65 more transactions — [see below](#run-4--best-execution-proved-at-the-instant-of-the-trade-qedexecution) |
 | Plus Run 3 (zero-knowledge job, bounties) | 24 more transactions — [see below](#run-3--zero-knowledge-optimality-and-theorem-bounties-qed-private) |
 | Plus Run 2 (certified clearing) | 44 more transactions on a separate contract — [see below](#run-2--certified-clearing-of-an-agent-economy-qedclearing) |
 | Off-chain signed artefacts | 7 (mandate, quote, certificate, vendor release, conversation, red-team) — hashes anchored on-chain |
@@ -267,12 +268,141 @@ Set-up transactions of this run (funding, mints): [`0xda9bfc81…7390`](https://
 
 Set-up transactions of this run (faucet draws, approvals): [`0xe8c1aa8a…8086`](https://sepolia.etherscan.io/tx/0xe8c1aa8a621b54adce0b07685f0a6d873ff1f0abbd7fae73907da77ba0358086), [`0xa6c497bf…ba06`](https://sepolia.etherscan.io/tx/0xa6c497bf7a02d951bb9608946d8f1a1f751f522089dad81413fe92c14082ba06), [`0x0d750770…6e7a`](https://sepolia.etherscan.io/tx/0x0d75077043f93946407c8e83cf16834fe11a555b2a171317082a347e0a876e7a), [`0x52b9a61f…2552`](https://sepolia.etherscan.io/tx/0x52b9a61f848224009cad3042931ed73b0fe00183874ef26e1a7113179a6b2552), [`0x1f93f3a3…93a7`](https://sepolia.etherscan.io/tx/0x1f93f3a37b66e1c308b73d9d0fef7dee2355ca34c99dd43b4d83a66b261293a7), [`0x37f9ba83…feb2`](https://sepolia.etherscan.io/tx/0x37f9ba83d835d40411a6896b2172307d4b732249f9c21e8ebffe8c569b19feb2).
 
+## Run 4 — best execution, proved at the instant of the trade (QEDExecution)
+
+> `evidence/ethereum-sepolia/execution/manifest.json`, `receipts.json`, `records/`. Run 4 deploys five constant-product venues, a second QEDVault as the euro reserve and the QEDExecution module; Run 4b adds ExecutionBounty; Run 4c runs a standing owner-signed treasury policy. `npm run verify` recomputes every accepted trade's bound from the pre-trade reserves, replays the route, solves independently, and checks the bounty pool and the policy's target.
+
+| | |
+|---|---|
+| Blocks | 11,952,692 → 11,953,422 |
+| Transactions | 65 (54 succeeded · 11 reverted **by design**) |
+| E1 | 20.000000 tUSD → **18.086846 tEUR**; on-chain bound 18.086849 |
+| E2 | 20.000000 tUSD → **17.612720 tEUR**; on-chain bound 17.612723 |
+| Policy tick 1 | reserve free 20.699566 tEUR, shortfall 24.300434: convert 19.535234 tUSD (limited by impact, 150.0 bps) |
+| Policy tick 2 | reserve free 37.515664 tEUR, shortfall 7.484336: convert 8.835281 tUSD (limited by need, 90.0 bps) |
+| Policy tick 3 | reserve free 45.000000 tEUR, shortfall 0.000000: nothing to do |
+| ExecutionBounty | 1000.000000 tUSD unclaimed after 3 refutation attempts |
+| QEDExecution token holdings at the end of Run 4 (re-checked after Run 4c by `npm run verify`) | usd 0 · eur 0 · eth 0 (nothing stranded) |
+
+| Contract | Address |
+|---|---|
+| QEDExecution | [`0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481`](https://sepolia.etherscan.io/address/0x8e2ed1ca426c7961a7ee1ecb6cef5d1fbf1f9481) |
+| QEDVault — tUSD treasury | [`0x04d1ef625ad58e3641032267a8f4fb7bc191d117`](https://sepolia.etherscan.io/address/0x04d1ef625ad58e3641032267a8f4fb7bc191d117) |
+| QEDVault — euro reserve | [`0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53`](https://sepolia.etherscan.io/address/0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53) |
+| ExecutionBounty | [`0x3148f3710f4e4f700dbf359f63e9e116e6e319c4`](https://sepolia.etherscan.io/address/0x3148f3710f4e4f700dbf359f63e9e116e6e319c4) |
+| TestToken tEUR · tETH | [`0x98D1A388120e5A535341532047B604655fe1362F`](https://sepolia.etherscan.io/address/0x98D1A388120e5A535341532047B604655fe1362F) · [`0xF61C0459cb436Ae760B3af0e58700e9df046580f`](https://sepolia.etherscan.io/address/0xF61C0459cb436Ae760B3af0e58700e9df046580f) |
+| CPMMPool venue 0 | [`0xf88d53902b9ddf1abf20cfc020a03affa9298a58`](https://sepolia.etherscan.io/address/0xf88d53902b9ddf1abf20cfc020a03affa9298a58) |
+| CPMMPool venue 1 | [`0x1fd2928ce46c29623ed72a1134a761c2a3536031`](https://sepolia.etherscan.io/address/0x1fd2928ce46c29623ed72a1134a761c2a3536031) |
+| CPMMPool venue 2 | [`0x442229dacb4dc05689f95138017d9ea2020d829b`](https://sepolia.etherscan.io/address/0x442229dacb4dc05689f95138017d9ea2020d829b) |
+| CPMMPool venue 3 | [`0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa`](https://sepolia.etherscan.io/address/0x70674a53cd7f1e46d1d10bb17c6007d458ebdbfa) |
+| CPMMPool venue 4 | [`0x81557a91d28ce0b17f475466a2b7e3edb8541c64`](https://sepolia.etherscan.io/address/0x81557a91d28ce0b17f475466a2b7e3edb8541c64) |
+
+| Role | Address |
+|---|---|
+| deployer | [`0x94C938E642BbC657D5F45546E35268a70c936448`](https://sepolia.etherscan.io/address/0x94C938E642BbC657D5F45546E35268a70c936448) |
+| owner | [`0x9c61629911658eDf3Fe27415bdD48baaFBc188d4`](https://sepolia.etherscan.io/address/0x9c61629911658eDf3Fe27415bdD48baaFBc188d4) |
+| operator | [`0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00`](https://sepolia.etherscan.io/address/0x0A6A9db9C72afB3d5fD5f2c35E2376eE4aF6bC00) |
+| cosigner | [`0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96`](https://sepolia.etherscan.io/address/0x6C34ddDB7AAcf80348c0CCC7F24Ce66285e52b96) |
+| guardian | [`0x37e2A6AE45c9d546Fe27ed023eCB6893028b590a`](https://sepolia.etherscan.io/address/0x37e2A6AE45c9d546Fe27ed023eCB6893028b590a) |
+| lp1 | [`0x16E4CdBA0A1704960d90BbCFd4F8849E2B1a9bC2`](https://sepolia.etherscan.io/address/0x16E4CdBA0A1704960d90BbCFd4F8849E2B1a9bC2) |
+| lp2 | [`0x8f45490746F6704224D89D20911bB2aE93063d0a`](https://sepolia.etherscan.io/address/0x8f45490746F6704224D89D20911bB2aE93063d0a) |
+| lp3 | [`0xA5FC8fA91280cF2d15DFf3D8EF9FE797952725dC`](https://sepolia.etherscan.io/address/0xA5FC8fA91280cF2d15DFf3D8EF9FE797952725dC) |
+| mallory | [`0x56D161255Ced6863698eA3c6a886982088fa30a8`](https://sepolia.etherscan.io/address/0x56D161255Ced6863698eA3c6a886982088fa30a8) |
+| cloudco | [`0x0418CfE812572f01535Fb260b6a77dAb5704D737`](https://sepolia.etherscan.io/address/0x0418CfE812572f01535Fb260b6a77dAb5704D737) |
+| lp4 | [`0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4`](https://sepolia.etherscan.io/address/0xbfcD82dEeB70295775F60DF4Eb5fcC19B96206E4) |
+
+| Step | What happened | Actor | Result | Transaction | Block | Gas |
+|---|---|---|---|---|---|---|
+| D1 | Deploy tEUR, a valueless 6-decimal test euro | Deployer | success | [`0x6d5d2d62…8e2a`](https://sepolia.etherscan.io/tx/0x6d5d2d62ac456abd24621fccda98e8f1c2cb46ad8527a8b2570fa34dd73a8e2a) | 11952692 | 3,262,131 |
+| D2 | Deploy tETH, an 18-decimal bridge asset | Deployer | success | [`0x9333bcb3…3d1e`](https://sepolia.etherscan.io/tx/0x9333bcb329a7e52c79f6b9e9c582cef2f5185fae7afb6ec53d25304d1e083d1e) | 11952692 | 3,262,143 |
+| D3 | Deploy venue 0: tUSD/tEUR · 0.30% · deep | Deployer | success | [`0x94d0cad8…210f`](https://sepolia.etherscan.io/tx/0x94d0cad8f88304bd3b09f5649f8dda1ba5e1281f4d2b3a8ece10161e7bc8210f) | 11952692 | 3,632,106 |
+| D4 | Deploy venue 1: tUSD/tEUR · 0.05% · thin | Deployer | success | [`0xc895f898…08fd`](https://sepolia.etherscan.io/tx/0xc895f898b26b75fb25acd0dac14fd980a451e262c187316ef8fa02999e1708fd) | 11952692 | 3,632,106 |
+| D5 | Deploy venue 2: tUSD/tETH · 0.30% | Deployer | success | [`0xd6e045cf…d649`](https://sepolia.etherscan.io/tx/0xd6e045cf3c271eaa16b64cce51d65a211b706221ac8ef93ec6c89b015684d649) | 11952692 | 3,632,106 |
+| D6 | Deploy venue 3: tETH/tEUR · 0.30% | Deployer | success | [`0x75492715…ef9c`](https://sepolia.etherscan.io/tx/0x75492715a788ba5d820742092ecda2b38cca9b020bbeb7772dbea034dc21ef9c) | 11952692 | 3,632,115 |
+| D7 | Deploy venue 4: tUSD/tEUR · 1.00% · off-market | Deployer | success | [`0xe0f6e4ab…471f`](https://sepolia.etherscan.io/tx/0xe0f6e4aba7bf5f417ac4d384870c67b4bc0e26f250d5ebab3c66bcb211b4471f) | 11952692 | 3,632,106 |
+| D8 | Deploy QED's tUSD treasury vault (the unchanged QEDVault) | Deployer | success | [`0x5f487d96…1211`](https://sepolia.etherscan.io/tx/0x5f487d9617fc15dfc5743357d2d52821ab596335dd76199c1ef1cd5e41dd1211) | 11952692 | 14,963,220 |
+| D9 | Deploy the euro reserve: a second QEDVault, denominated in tEUR, with a zero agent cap | Deployer | success | [`0x31c372f4…ee83`](https://sepolia.etherscan.io/tx/0x31c372f4562242e1d476b4010a7feb863acd5c38630d4a9ac1350201617eee83) | 11952692 | 14,855,264 |
+| D10 | Deploy QEDExecution for the treasury vault (operator: the AI's hot key) | Deployer | success | [`0x95e8c3d7…80dd`](https://sepolia.etherscan.io/tx/0x95e8c3d73862963e3921c9e4ec242c3af52ce36c06b37265b760128219e280dd) | 11952692 | 15,330,304 |
+| G1 | Deployer sends 0.003 Sepolia ETH for gas to owner | Deployer | success | [`0x61288f9d…879b`](https://sepolia.etherscan.io/tx/0x61288f9d6562378918bade1a05347a0289b5f573f6523f16abbbd073e10c879b) | 11952692 | 204,600 |
+| G2 | Deployer sends 0.006 Sepolia ETH for gas to operator | Deployer | success | [`0x890726e1…16cf`](https://sepolia.etherscan.io/tx/0x890726e1f65e1797df0d5684bd64917cb7633344c62595047f01af16211916cf) | 11952692 | 204,600 |
+| G3 | Deployer sends 0.002 Sepolia ETH for gas to lp1 | Deployer | success | [`0x9482ebd9…1fd2`](https://sepolia.etherscan.io/tx/0x9482ebd9ef15a8277ca21ed0fb502e9d2790dcc24bea03fe329d5707654c1fd2) | 11952692 | 204,600 |
+| G4 | Deployer sends 0.002 Sepolia ETH for gas to lp2 | Deployer | success | [`0x8a2cc19f…f742`](https://sepolia.etherscan.io/tx/0x8a2cc19f976ddbac738c261081eddf18fea73dd566bbdd29b5665e06fcdaf742) | 11952692 | 204,600 |
+| G5 | Deployer sends 0.002 Sepolia ETH for gas to lp3 | Deployer | success | [`0xee0c11c6…e06d`](https://sepolia.etherscan.io/tx/0xee0c11c69ab1257d52fd8c17319c5e92acf8e05118594b88cce16c268eeee06d) | 11952692 | 204,600 |
+| O1 | Owner makes QEDExecution the treasury vault's agent (key rotation, on-chain) | Owner | success | [`0x153b711e…b783`](https://sepolia.etherscan.io/tx/0x153b711e337232662b131423fdd0b84ff53846c1d76c732edf73ed86ccc4b783) | 11952693 | 31,788 |
+| O2 | Owner names the five venues the agent may trade on | Owner | success | [`0x73b74ce0…2fa4`](https://sepolia.etherscan.io/tx/0x73b74ce0e78744679fa960c8eb30e4e76e16fb83961bc4fac6e4ff6780b62fa4) | 11952693 | 1,938,167 |
+| L1 | LP1 draws 1,000 tUSD from the public faucet | LP1 | success | [`0x80d37572…c8b5`](https://sepolia.etherscan.io/tx/0x80d37572e5b62cd4272ee30963d29427f8f05677f92938d226860f5280cfc8b5) | 11952694 | 250,123 |
+| L2 | LP2 draws 1,000 tUSD from the public faucet | LP2 | success | [`0xb6709fef…2a1e`](https://sepolia.etherscan.io/tx/0xb6709fef969fcdfb971f58480b1ce563473bf045da5f2ef844d6e99d6b9a2a1e) | 11952695 | 250,123 |
+| L3 | LP3 draws 1,000 tUSD from the public faucet | LP3 | success | [`0xbbbdd17f…a397`](https://sepolia.etherscan.io/tx/0xbbbdd17f383f75631a9101486bb1b86fdcfc3fc5b71ed8c7a614b3669526a397) | 11952696 | 250,123 |
+| L4 | LP1 provides 800.00 tUSD to venue 0 | LP1 | success | [`0x127040b3…c893`](https://sepolia.etherscan.io/tx/0x127040b3c301da31d81e38fa7db5e9bd615dacc423dccce5a6a1b07de2d9c893) | 11952697 | 140,534 |
+| L5 | Deployer mints 736.00 tEUR into venue 0 | Deployer | success | [`0x9c40e292…d7be`](https://sepolia.etherscan.io/tx/0x9c40e2923d0c1c0e374769fcbd8a86199378aeed6944826eb28930333941d7be) | 11952698 | 238,168 |
+| L6 | Venue 0 syncs its reserves | Deployer | success | [`0x4006dd81…3ffa`](https://sepolia.etherscan.io/tx/0x4006dd81a2ce280dfec6be3f5ac7bc1a556c2ff9b7dcad91e005cfb728263ffa) | 11952698 | 140,901 |
+| L7 | LP2 provides 250.00 tUSD to venue 1 | LP2 | success | [`0x4288f8c4…03d9`](https://sepolia.etherscan.io/tx/0x4288f8c42f6ff0c73316e7ad5640b113ac7a9a8aa4a3fe15e1ec8698f6ac03d9) | 11952699 | 140,546 |
+| L8 | Deployer mints 230.125 tEUR into venue 1 | Deployer | success | [`0x7ad7b7c2…ea17`](https://sepolia.etherscan.io/tx/0x7ad7b7c2346fd77bda7a38c51f2b236a8c0c9a022f300f038124eefff93eea17) | 11952702 | 140,260 |
+| L9 | Venue 1 syncs its reserves | Deployer | success | [`0x6ba013a7…c546`](https://sepolia.etherscan.io/tx/0x6ba013a761bf27a5c3c2c8dd06b3e2cd2bae712567886551340a668625c1c546) | 11952702 | 140,901 |
+| L10 | LP2 provides 600.00 tUSD to venue 2 | LP2 | success | [`0x430efc9f…3cda`](https://sepolia.etherscan.io/tx/0x430efc9f73e367863e431af72f30e85f201b5b5fe5b7d1528874371f3eaf3cda) | 11952703 | 140,534 |
+| L11 | Deployer mints 0.20 tETH into venue 2 | Deployer | success | [`0x9649968b…3872`](https://sepolia.etherscan.io/tx/0x9649968b62803069b5e802615a8a89de9d4787827560703cf263590c64043872) | 11952704 | 238,204 |
+| L12 | Venue 2 syncs its reserves | Deployer | success | [`0x401d280e…7e71`](https://sepolia.etherscan.io/tx/0x401d280ecce889e773f91eaad23590e5f9ac21314b44135f67dbed07e08c7e71) | 11952704 | 140,901 |
+| L13 | Deployer mints 0.30 tETH into venue 3 | Deployer | success | [`0xed23831f…84d9`](https://sepolia.etherscan.io/tx/0xed23831fb024c3bde468a6565e9176558d8312c64fd53192a5a8b6a656b784d9) | 11952704 | 140,284 |
+| L14 | Deployer mints 828.15 tEUR into venue 3 | Deployer | success | [`0x3438a671…2715`](https://sepolia.etherscan.io/tx/0x3438a671799e522972f9117703f9db066449c4e5c31354a3c3f94dad79a52715) | 11952704 | 140,260 |
+| L15 | Venue 3 syncs its reserves | Deployer | success | [`0xbd65d9a8…4c5d`](https://sepolia.etherscan.io/tx/0xbd65d9a8881ebae0c32941ece52a2d296269dc01fe99d0d3810e19843d814c5d) | 11952704 | 140,879 |
+| L16 | LP3 provides 300.00 tUSD to venue 4 | LP3 | success | [`0x3bda0847…164c`](https://sepolia.etherscan.io/tx/0x3bda0847bec627e59a0352470d3da7dcc582bf9cdcdc88d5176114b85ba0164c) | 11952705 | 140,534 |
+| L17 | Deployer mints 268.50 tEUR into venue 4 | Deployer | success | [`0x84ea56c6…1eb1`](https://sepolia.etherscan.io/tx/0x84ea56c649b966559619318aefde43ea3081ab21fb8cd046ff60be22c1a41eb1) | 11952706 | 140,248 |
+| L18 | Venue 4 syncs its reserves | Deployer | success | [`0x3c8cd82d…81a3`](https://sepolia.etherscan.io/tx/0x3c8cd82d89af8ebf9845ad248f9374b2fff88684a0343ff9b766bcdc09f781a3) | 11952706 | 140,901 |
+| L19 | LP3 funds QED's treasury vault with 100 tUSD | LP3 | success | [`0x88e9ec45…e9de`](https://sepolia.etherscan.io/tx/0x88e9ec452c7fb2c0d3b266204fce6c0b6c8745777f73d6f4e1674da2946de9de) | 11952707 | 140,534 |
+| L20 | LP3 sends Mallory 100 tUSD | LP3 | success | [`0xf65b9e59…5180`](https://sepolia.etherscan.io/tx/0xf65b9e59f538392da9ee4922d146ba70cc28034fbf0cb55209ffdf84ecb75180) | 11952707 | 42,614 |
+| A0 | Owner signs the trading mandate: payees = execution module, euro reserve, CloudCo; ≤ 25 tUSD per conversion, ≤ 100 a day | Owner | off-chain | — | | |
+| A1 | Owner: “Move 20 tUSD of this month's revenue into the euro reserve — CloudCo's euro invoices are due next week.” | Owner → language model → guard | off-chain | — | | |
+| A2 | Owner confirms; the co-signer re-quotes on its own (18.086846 tEUR) and signs an order with floor 17.905977 and τ = 1 ppm | Owner, then co-signer | off-chain | — | | |
+| A3 | Agent plans: 4 hops through 4 venues, expected 18.086846 tEUR; on-chain bound 18.086849 | QED agent | off-chain | — | | |
+| E1 | Agent converts 20 tUSD → 18.086846 tEUR into the euro reserve; the chain checks the proof: bound 18.086849 | QED agent (operator key) | success | [`0x56f798cd…9690`](https://sepolia.etherscan.io/tx/0x56f798cd321e0d85ba6a7b1425dd7b12f04db386a81bf0e67c94374f12f19690) | 11952708 | 1,122,781 |
+| R1 | Owner ring-fences 15 tEUR in the euro reserve for CloudCo's invoice, due in 7 days | Owner | success | [`0xa37131fa…791d`](https://sepolia.etherscan.io/tx/0xa37131fa899542007cab34edbe1285537b491ad554a165ae9724e43da905791d) | 11952709 | 800,257 |
+| A4 | Owner: “Top up the euro reserve with another 20 tUSD.” | Owner → language model → guard | off-chain | — | | |
+| A5 | Owner confirms; the co-signer re-quotes on its own (17.61272 tEUR) and signs an order with floor 17.436592 and τ = 1 ppm | Owner, then co-signer | off-chain | — | | |
+| A6 | Honest plan for order 2: 17.61272 tEUR, bound 17.612723; floor 17.436592 | QED agent | off-chain | — | | |
+| EA1 | Route over the direct pools only, optimally split: 17.5541 tEUR (−33.28 bps, above the 1% floor) | Compromised agent (operator key) | **reverted** · `NotBestExecution` | [`0xccd07d17…4937`](https://sepolia.etherscan.io/tx/0xccd07d1790d002a173435e216c80f0c305e3a10dd0c720548b38d50cd9b54937) | 11952710 | 508,799 |
+| EA2 | Skim: the optimal route with 5% of one leg moved (−0.47 bps) | Compromised agent (operator key) | **reverted** · `NotBestExecution` | [`0xe9d68952…7b90`](https://sepolia.etherscan.io/tx/0xe9d68952a2c45513966c5b721a50dfb5f48c2aeab858b46a3a007364229f7b90) | 11952710 | 650,809 |
+| EA3 | A “forged proof”: prices chosen to make the single-pair route look optimal | Compromised agent (operator key) | **reverted** · `NotBestExecution` | [`0x0b459146…8472`](https://sepolia.etherscan.io/tx/0x0b4591467b610537b40a2cf6c3df504c0c46e11e16346ce1b148272409ef8472) | 11952710 | 508,799 |
+| EA4 | Strand the bridge token: buy tETH and never sell it | Compromised agent (operator key) | **reverted** · `Leftover` | [`0x3a957099…4e58`](https://sepolia.etherscan.io/tx/0x3a957099556e5e3e20ed29d602dda1c08d7305139a74d6d20d40754f596f4e58) | 11952710 | 581,568 |
+| EA5 | Everything through one pool: 17.404968 tEUR (−117.96 bps) | Compromised agent (operator key) | **reverted** · `InsufficientOutput` | [`0x565d52b6…15e1`](https://sepolia.etherscan.io/tx/0x565d52b6c9b507e4489bf2504dd64d634b4bf8cbb8c91b623c71127cf94415e1) | 11952710 | 378,278 |
+| EA6 | Redirect the order's output to Mallory | Compromised agent (operator key) | **reverted** · `OrderMismatch` | [`0x7e317abb…7066`](https://sepolia.etherscan.io/tx/0x7e317abb6f9a431600627e1240f3f8743f8258a27591d69ef7c534ef1d5a7066) | 11952710 | 154,520 |
+| EA7 | Mallory calls the module directly with the genuine order | Mallory | **reverted** · `NotOperator` | [`0xf6423a13…1545`](https://sepolia.etherscan.io/tx/0xf6423a13e09730be435232272f1bd46c58df539fde4bd725e4dbb9bf2c121545) | 11952711 | 154,520 |
+| E2 | Same order, honest route: 17.61272 tEUR, bound 17.612723: accepted | QED agent (operator key) | success | [`0xbd051424…0e6f`](https://sepolia.etherscan.io/tx/0xbd051424e52211d3d5997ffbcbf70e537931bf03b618dcc6d0e9e4d830d60e6f) | 11952712 | 667,936 |
+| A7 | Owner: “And put another 20 tUSD into the euro reserve.” | Owner → language model → guard | off-chain | — | | |
+| A8 | Owner confirms; the co-signer re-quotes on its own (17.213445 tEUR) and signs an order with floor 17.04131 and τ = 1 ppm | Owner, then co-signer | off-chain | — | | |
+| A9 | Agent signs its plan for order 3: 17.213445 tEUR expected, floor 17.04131 | QED agent | off-chain | — | | |
+| M1 | Mallory front-runs: sends 30.00 tUSD to venue 0 | Mallory | success | [`0xcde2feff…c382`](https://sepolia.etherscan.io/tx/0xcde2feffec10f536f08ffd68281add2a3bf39975df62f29eeaedb9e2d81fc382) | 11952713 | 42,626 |
+| M2 | …and takes 25.196509 tEUR out of venue 0 | Mallory | success | [`0xa471900c…9858`](https://sepolia.etherscan.io/tx/0xa471900cfd4a54d385c364c67d7ecc71c698010ea35a1114b0f82ceda0079858) | 11952713 | 171,384 |
+| M3 | Mallory front-runs: sends 10.00 tUSD to venue 1 | Mallory | success | [`0x245ed560…c8ae`](https://sepolia.etherscan.io/tx/0x245ed5607a429f60a1de0985679b7955848ba5af67dfbc01ecea09d2cbd4c8ae) | 11952713 | 42,614 |
+| M4 | …and takes 8.379134 tEUR out of venue 1 | Mallory | success | [`0x1123ac59…9bf7`](https://sepolia.etherscan.io/tx/0x1123ac59d63386022db8ce8ea5c10d1d8cd33cf2f98c2a0488e7bf1fe0ee9bf7) | 11952713 | 73,452 |
+| EA8 | The agent's signed trade lands after the front-run: it would now yield 16.473967 tEUR | QED agent (operator key) | **reverted** · `InsufficientOutput` | [`0xaa364d64…16d1`](https://sepolia.etherscan.io/tx/0xaa364d6493cd972e174a6f58302c6261b19478e893372d8eeed4eb75b36f16d1) | 11952714 | 650,553 |
+| A10 | Agent re-plans on the moved market (16.920559 tEUR at best) and declines to trade | QED agent | off-chain | — | | |
+| XB1 | Deploy ExecutionBounty on the live QEDExecution | Deployer | success | [`0x35827387…01f2`](https://sepolia.etherscan.io/tx/0x35827387ac189ca86e18a3c40aea958d8f7a96dfc8484158bc9241f44c9b01f2) | 11952779 | 5,997,780 |
+| XB2 | Deployer sends Sepolia ETH for gas to a fourth liquidity provider | Deployer | success | [`0xa0b2f08b…1baf`](https://sepolia.etherscan.io/tx/0xa0b2f08b761ec3ed6b83386e86185d635c33fbc05f40d28bfb5a1b733be41baf) | 11952780 | 204,600 |
+| XB3 | LP4 draws 1,000 tUSD from the public faucet | LP4 | success | [`0xc48900c2…d4b2`](https://sepolia.etherscan.io/tx/0xc48900c2f148b15bdf8428013cbadfdb6613b9db1ceef355dd90243ff5b6d4b2) | 11952781 | 250,123 |
+| XB4 | LP4 funds the execution bounty: 1,000 tUSD | LP4 | success | [`0x66d22910…b780`](https://sepolia.etherscan.io/tx/0x66d22910e880a42ffba5cfe006240387f66c2f7d106b1e6e72dd32862981b780) | 11952781 | 128,918 |
+| XA1 | Mallory claims with the optimal route for 20 tUSD (16.920559 tEUR) and its own price proof | Mallory | **reverted** · `TheoremHolds` | [`0x05813963…6b4e`](https://sepolia.etherscan.io/tx/0x05813963ca47b352664df1f66813e7f2c45aeb7636f45ed841b3287537246b4e) | 11952782 | 550,183 |
+| XA2 | …with prices lowered 3% to shrink the bound | Mallory | **reverted** · `TheoremHolds` | [`0x3624e169…a809`](https://sepolia.etherscan.io/tx/0x3624e1698c28a02ce5fa5e0b24bc22250b37625bce6dfeafbef3a1a25829a809) | 11952782 | 380,442 |
+| XA3 | …with the whole 1,000 tUSD pool in one optimal trade (535.11 tEUR) | Mallory | **reverted** · `TheoremHolds` | [`0xdc6140ae…b3e2`](https://sepolia.etherscan.io/tx/0xdc6140ae9fd9d562a9a929d9bc154ad91a690c3d38fe1a1f44b5c3cdd78ab3e2) | 11952782 | 520,345 |
+| MU1 | Mallory unwinds: returns 25.196509 tEUR to venue 0 | Mallory | success | [`0x1cdbba5d…dfbc`](https://sepolia.etherscan.io/tx/0x1cdbba5d6eb93aff2adb4b3acaba5987ae208383a5b58976900c4e5119f0dfbc) | 11953421 | 42,560 |
+| MU2 | …and takes 29.826566 tUSD back out of venue 0 | Mallory | success | [`0x06a46723…5329`](https://sepolia.etherscan.io/tx/0x06a46723e108445384d2f9a123ce6e14a532cbea599ddcbd319910677c135329) | 11953421 | 73,509 |
+| MU3 | Mallory unwinds: returns 8.379134 tEUR to venue 1 | Mallory | success | [`0x6165abf0…7ebe`](https://sepolia.etherscan.io/tx/0x6165abf0a09d28e27fb81592ef4ee7f82531244dde53f64ed401ddaa8d237ebe) | 11953421 | 34,039 |
+| MU4 | …and takes 9.990375 tUSD back out of venue 1 | Mallory | success | [`0x3bf2e870…9000`](https://sepolia.etherscan.io/tx/0x3bf2e870b8d7dc91d404d9220f156bb27ec26625fc51e9d07e559ca28d1e9000) | 11953421 | 73,497 |
+| P0 | Owner signs a standing policy: keep ≥ 45.00 tEUR free in the euro reserve; tranches of 2.00–25.00 tUSD; ≤ 1.5% execution cost | Owner | off-chain | — | | |
+| PA1 | An over-eager agent asks to convert 25.00 tUSD at once; the co-signer re-derives 19.535234 and refuses | Co-signer | off-chain | — | | |
+| T1 | Agent observes 20.699566 tEUR free (short 24.300434) and decides to convert 19.535234 tUSD now — limited by impact | QED agent | off-chain | — | | |
+| C1 | Co-signer re-derives the same decision from the chain and signs the order (floor 16.647937 tEUR, τ = 1 ppm) | Co-signer | off-chain | — | | |
+| PE1 | Agent converts 19.535234 tUSD → 16.816098 tEUR; bound 16.816101; reserve free 20.699566 → 37.515664 | QED agent (operator key) | success | [`0xaaa0bacd…c9ff`](https://sepolia.etherscan.io/tx/0xaaa0bacddd313493ff89f08f25f86b5f5eb294423b517bdf16c5489626a0c9ff) | 11953422 | 667,936 |
+| T2 | Agent observes 37.515664 tEUR free (short 7.484336) and decides to convert 8.835281 tUSD now — limited by need | QED agent | off-chain | — | | |
+| C2 | Co-signer re-derives the same decision from the chain and signs the order (floor 7.409492 tEUR, τ = 1 ppm) | Co-signer | off-chain | — | | |
+| PE2 | Agent converts 8.835281 tUSD → 7.484336 tEUR; bound 7.484339; reserve free 37.515664 → 45.00 | QED agent (operator key) | success | [`0xa9e90f58…ae35`](https://sepolia.etherscan.io/tx/0xa9e90f580bb9f0457bfd8a966ec2c0322d877d6ea66e4f4aaabccd147d1aae35) | 11953422 | 667,948 |
+| T3 | Agent observes 45.00 tEUR free: target met, nothing to do | QED agent | off-chain | — | | |
+
 ## How these transactions were produced — full disclosure
 
 Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs). The final phase was executed after rebuilding the replica by replaying the exact signed transactions already on Sepolia.
 
-* The relay fetched `relay/outbox-11155111.json`, `relay/outbox-11155111-b2.json`, `relay/outbox-11155111-clearing.json` and `relay/outbox-11155111-private.json` from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
-* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded); private run: 24/24 receipts matched.
+* The relay fetched `relay/outbox-11155111.json`, `relay/outbox-11155111-b2.json`, `relay/outbox-11155111-clearing.json`, `relay/outbox-11155111-private.json` and the three `relay/outbox-11155111-execution*.json` files from a **pinned commit** of this repository and broadcast the bytes unchanged; the transaction hashes in this file are therefore the hashes of those exact bytes.
+* Each public receipt was compared with the replica's receipt: 55/55 receipts matched the replica (status + logs; EIP-7708 system logs excluded); clearing run: 44/44 receipts matched the replica (status + logs; EIP-7708 system logs excluded); private run: 24/24 receipts matched; best-execution runs: 65/65 receipts matched the replica (status + logs; EIP-7708 system logs excluded); Runs 4b and 4c first replayed the earlier runs' signed bytes on the replica.
 * Block timestamps differ by seconds between replica and Sepolia; no assertion depends on them (windows are 24 h, certificates live 2 h, deadlines are days).
 * Two earlier attempts under different keys failed and were abandoned: the first ran out of gas on deployment under Sepolia's state-creation repricing; in the second, one agent payment was under-provisioned with gas. The vault was slimmed (via-IR; views moved to QEDLens), every transaction now carries an explicit 16.7 M gas limit (only gas used is charged), and the canonical run above was executed under **fresh keys**, so it shares no state with those attempts.
 * Gas used on Sepolia differs from the replica because Sepolia prices state creation and calldata differently; the relay compared status and logs, not gas.

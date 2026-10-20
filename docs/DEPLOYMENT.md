@@ -2,16 +2,17 @@
 
 ## Live deployment (Ethereum Sepolia, chain id 11155111)
 
-| Contract | Address |
-|---|---|
-| QEDVault (agent) | `0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6` |
-| ProofEscrow | `0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f` |
-| MinVarianceVerifier | `0x1d3eced4bd1cef7edc315315b9fd6acae283dd05` |
-| QEDLens | `0x846186f21227793760429696bb4fd7490236f101` |
-| TestUSD (tUSD, 6 dp, `faucet()` 1 000/day) | `0x7adb609421e30b3df3063ff2de9d425564893f35` |
-| QEDVault (honeypot, keys published) | `0xe5b3e7773115dba454e7e40fa97a5d3e332c7f04` |
+23 contracts, all verified on Sourcify with a creation and runtime bytecode match; the full table with explorer links is in [`verification/README.md`](../verification/README.md), every transaction in [`EVIDENCE.md`](EVIDENCE.md).
 
-Deployment block 11 948 657. Machine-readable: `deployments/11155111.json`. All transactions: `docs/EVIDENCE.md`.
+| Run | Contracts | First block |
+|---|---|---|
+| 1 · payments, escrow, honeypot | QEDVault (agent) `0x441f…8ca6` · ProofEscrow `0x2e33…ba9f` · MinVarianceVerifier `0x1d3e…dd05` · QEDLens `0x8461…f101` · TestUSD `0x7adb…3f35` (6 dp, `faucet()` 1,000/day) · QEDVault (honeypot, keys published) `0xe5b3…7f04` | 11,948,657 |
+| 2 · certified clearing | QEDClearing `0x7b7d…6ad2` · TestUSD (clearing) `0x6753…52d4` | 11,949,578 |
+| 3 · zero-knowledge job, bounties | Groth16Verifier `0xc043…4e7b` · PrivateMinVarianceVerifier `0x1270…b453` · OptimalityBounty `0xfc21…b677` · MaximalityBounty `0xd767…7d69` | 11,951,192 |
+| 4 · best execution | QEDExecution `0x8e2e…9481` · QEDVault tUSD treasury `0x04d1…d117` · QEDVault euro reserve `0x6fb7…9c53` · tEUR `0x98d1…362f` · tETH `0xf61c…580f` · CPMMPool ×5 (`0xf88d…8a58`, `0x1fd2…6031`, `0x4422…829b`, `0x7067…dbfa`, `0x8155…1c64`) | 11,952,692 |
+| 4b · execution bounty | ExecutionBounty `0x3148…19c4` (1,000 tUSD) | 11,952,779 |
+
+Machine-readable: `deployments/11155111.json` (Run 1) and the `contracts` block of each run's `evidence/ethereum-sepolia/**/manifest.json`.
 
 ## Prerequisites
 
@@ -66,5 +67,9 @@ Sepolia currently prices state creation far above the classic schedule (a plain 
 | Change the global 24 h cap | `setDailyCap` | owner |
 | Resume | `unpause()` | owner only |
 | A creditor's bill is due | `settle(id)` | anyone — works while paused |
+| Change the venues the agent may trade on | `QEDExecution.setVenues(pools, fees)`: each declared fee is cross-checked against the pool's own `feeBps()`; the new venue-set hash invalidates every outstanding signed order | vault owner |
+| Rotate the trading hot key | `QEDExecution.setOperator(addr)` | vault owner |
+| Withdraw the agent's trading authority entirely | `QEDVault.setAgent(other)` — QEDExecution then cannot move funds at all | vault owner |
+| Stop a standing treasury policy | let it expire (`validUntil`), have the co-signer drop its nonce, rotate the operator, or `pause()` the vault | owner / co-signer operator |
 
-Monitor: `QEDLens.snapshot(vault)` returns balance, ring-fenced, free, 24 h blast radius, open liabilities, epoch and paused state in one call; the dashboard polls it live.
+Monitor: `QEDExecution.quoteBound(amountIn, tokenIn, tokenOut, prices)` is a free view that returns the bound any route would be measured against, so a monitor can price every pending order before it lands; `BestExecution` events record input, spent, output and bound for every accepted trade. `QEDLens.snapshot(vault)` returns balance, ring-fenced, free, 24 h blast radius, open liabilities, epoch and paused state in one call; the dashboard polls it live.

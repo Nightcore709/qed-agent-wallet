@@ -218,12 +218,61 @@ sequenceDiagram
   X-->>O: tEUR to the euro reserve; BestExecution event
 ```
 
-### 3.6 Defence in depth against a manipulated agent
+### 3.6 The autonomous loop: one objective, twelve steps, two independent deciders (Run 4c)
+
+The owner states an objective once; after that no human approves individual trades. Each step below is code that
+ran on Sepolia, with the evidence it left. Probabilistic reasoning appears nowhere on this path: the language layer
+reads owner instructions (§3.5), but a standing policy is executed by deterministic code that a second process
+re-derives before anything is signed.
+
+| # | Step | Where | What happens | Evidence (Run 4c) |
+|---|---|---|---|---|
+| 1 | Receive an objective | owner → `policyMessage` | "keep ≥ 45 tEUR free in the reserve; tranches 2–25 tUSD; ≤ 150 bps cost", signed once (EIP-191) | `P0` |
+| 2 | Observe | `observeTreasury` | reserve free balance, treasury free balance above its buffer within the daily window, reserves of every owner venue | `T1`–`T3` decision records |
+| 3 | Interpret constraints | `decideTranche` | policy tranche bounds and impact limit, the mandate's per-payment cap, free funds | candidates in each `T` record |
+| 4 | Generate actions | `decideTranche`, `solve` | five candidate sizes (need, impact, three caps); for each size the optimal route over all venues | `T1`: need — (not coverable within the caps), impact 19.535, caps 25 / 25 / 55 |
+| 5 | Evaluate consequences | `certifiedOut`, `impactBps` | certified output and execution cost of each candidate, by integer simulation | `T1`: 150.0 bps at 19.535 tUSD |
+| 6 | Apply the innovation | `planTrade` → `quoteBound` | the route's dual-price proof is computed and pre-flighted against the on-chain bound | `PE1`: 0.18 ppm from the bound |
+| 7 | Decide | `decideTranche` | convert the minimum of the candidates, wait if below the minimum tranche, or do nothing | `T1` convert (impact) · `T2` convert (need) · `T3` none |
+| 8 | Construct a narrowly authorised transaction | co-signer `evaluateTrade` | an independent process re-derives the decision (P1–P3), re-quotes (T1–T3), writes its own floor and τ into the order and certifies `hash(order)`; refuses an over-sized request | `C1`, `C2`; refusal `PA1` |
+| 9 | Execute through a real wallet | operator key → `QEDExecution.trade` → `QEDVault.executePayment` | the vault checks mandate, certificate, caps and solvency; the module checks best execution | `PE1`, `PE2` |
+| 10 | Verify status and state | `execute-policy.ts`, `npm run verify` | receipt status; `BestExecution` event; reserve re-read: its free balance must rise by exactly the output | `PE1` 20.70 → 37.52, `PE2` → 45.00 |
+| 11 | Record evidence | `Evidence`, `records/` | every decision and co-signer record hashed; the certificate anchors the record's hash on chain | `evidence/ethereum-sepolia/execution/` |
+| 12 | Explain | manifest narratives, dashboard | each step says what was decided and which limit bound it | dashboard "The agent decides" lane |
+
+**Refusal is part of the loop.** The agent declines to trade into a moved market (`A10`, Run 4), the co-signer
+refuses an over-sized tranche (`PA1`), the chain refuses sub-optimal routes (`EA1`–`EA3`), and when the target is
+met the agent sends nothing (`T3`).
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant O as Owner (cold key)
+  participant A as QED agent (operator key)
+  participant C as Co-signer (own key)
+  participant X as QEDExecution
+  participant V as QEDVault
+  O->>A: standing policy, signed once
+  loop every tick
+    A->>X: observe reserves, free balances, venues
+    A->>A: decideTranche: min(need, impact, caps) or wait or none
+    A->>C: request: policy + tranche
+    C->>X: observe the same block itself
+    C->>C: re-derive the tranche (P1-P3), re-quote (T1-T3)
+    C-->>A: certificate on hash(order) with its own floor and tau
+    A->>X: trade(route, prices) after pre-flight
+    X->>V: executePayment (mandate, caps, solvency)
+    X->>X: out within tau of the bound, else revert
+    A->>V: re-read the reserve: rose by exactly out
+  end
+```
+
+### 3.7 Defence in depth against a manipulated agent
 
 | Layer | Who | Stops |
 |---|---|---|
 | 1. Guard | deterministic code in the agent | injection, scams, secret requests, escalation — before any proposal |
-| 2. Co-signer | independent process & key | anything not justified by a signed invoice + funded job, or not owner-signed |
+| 2. Co-signer | independent process & key | anything not justified by a signed invoice + funded job, an owner confirmation, or a standing owner policy it re-derives itself |
 | 3. Vault | Ethereum | everything outside the owner's mandate, caps, solvency, replay, pause — even if layers 1 and 2 are both compromised |
 | 4. Proof of best execution | Ethereum | a conversion more than τ = 1 ppm below the best route, a changed order, a stranded token — even with the agent key stolen |
 
