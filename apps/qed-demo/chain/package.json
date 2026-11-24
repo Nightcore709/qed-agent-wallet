@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "tsx": "4.23.15",
-    "viem": "2.57.7"
+    "viem": "2.58.4"
   },
   "devDependencies": {
     "@types/node": "22.10.2",
