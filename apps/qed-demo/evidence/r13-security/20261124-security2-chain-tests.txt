@@ -1,0 +1,32 @@
+# R13 second pass: the wallet service's own tests (apps/qed-demo/chain), 24 Nov 2026, branch claude/r13-security2
+# cd chain && QED_CHAIN_TEST_CONTROL_PORT=11592 QED_CONTAINMENT_ANVIL_PORT=11593 node --import tsx --test --test-concurrency=2 test/*.test.ts
+# (the other tests' ports are fixed in their files; since F-14 every chain they start listens on a browser-refused port)
+
+## Final whole run (after the economy's guarded front; no other chain run was active)
+ℹ tests 159
+ℹ pass 154
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 2
+ℹ duration_ms 280228.408375
+Failed:
+✖ PARITY.md: 86 rows, the Counts section is computed from them, every Verified row names a test and every named test exists
+✖ Security Lab: each of the six attacks is mined as a revert with its error, and no balance changes
+✖ every route is documented in README.md with its method and path
+All three also fail on claude/r11-meridian alone (faacb5d), without this branch's changes:
+- contract.test.ts: README.md has no example of POST /workspaces/:workspaceId/signers/freeze; PARITY.md row F-085 is Verified without naming a test.
+- core.test.ts "Security Lab": rail/service.ts reconcileChain checks every job's mined transaction against the shared chain; attack jobs mine
+  on ephemeral chains that are then destroyed, so three were marked "reorged" ("attack was undone by a chain reorganisation"). Not fixed here.
+
+## Earlier whole run (before the economy's guarded front; it overlapped another worktree's chain run on the same fixed ports)
+ℹ tests 159
+ℹ pass 152
+ℹ fail 5
+ℹ skipped 2
+Of its five failures, two are the contract.test.ts ones above; "paid-work economy" was this branch's (fixed: the guarded front);
+"a reorganisation that replaces the block of a done job" and "killed in the middle of creating a workspace" passed when rerun alone.
+
+## Reruns
+economies.test.ts (after the guarded front): ℹ pass 4 ℹ fail 0 
+service, persistence, workspaces-http, resilience (one at a time, after the other run ended): ℹ pass 17 ℹ fail 0 
+anvil-cors (F-14) and denylist (P7): 5 pass, 0 fail

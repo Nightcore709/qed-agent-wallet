@@ -1,0 +1,12 @@
+✔ the source fingerprint is deterministic and independent of timestamps and of the manifest itself (135.991167ms)
+✔ the runtime allowlist covers frontend, backend, contract artifacts, circuits, evidence, configuration and lockfile (18.187583ms)
+✔ verification refuses a changed, missing or extra file and a different release (347.986584ms)
+✔ the image build re-verifies the manifest and the health endpoint reports the embedded identity (0.376917ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 582.529541

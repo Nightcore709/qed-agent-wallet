@@ -1,0 +1,40 @@
+{
+ "measuredAt": "2026-11-24T10:32:28.128Z",
+ "base": "http://localhost:7301",
+ "watchMs": 3000,
+ "note": "Lab measures on this computer (headless Chrome, 390x844, CPU 4x slower, slow 4G); not field data.",
+ "results": {
+  "/pay": {
+   "lcpMs": 2136,
+   "cls": 0.0208,
+   "shifts": [
+    {
+     "value": 0.0208,
+     "sources": [
+      "form.ac-find"
+     ]
+    }
+   ],
+   "interactionMs": 80,
+   "jsKB": 155,
+   "cssKB": 62,
+   "pass": true
+  },
+  "/holdings": {
+   "lcpMs": 2120,
+   "cls": 0.0208,
+   "shifts": [
+    {
+     "value": 0.0208,
+     "sources": [
+      "form.ac-find"
+     ]
+    }
+   ],
+   "interactionMs": 80,
+   "jsKB": 200,
+   "cssKB": 62,
+   "pass": true
+  }
+ }
+}

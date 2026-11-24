@@ -1,0 +1,102 @@
+{
+  "core": {
+    "block": {
+      "number": "24",
+      "timestamp": 1792418724
+    },
+    "chainId": 11155111,
+    "checks": [
+      {
+        "detail": "recovered 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7",
+        "id": "C1",
+        "name": "Mandate signed by the vault owner",
+        "pass": true
+      },
+      {
+        "detail": "epoch 0, valid until 2026-10-26T14:05:20.000Z",
+        "id": "C2",
+        "name": "Mandate active and current epoch",
+        "pass": true
+      },
+      {
+        "detail": "instruction signer 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7",
+        "id": "C3",
+        "name": "Instruction confirmed by the owner's signature",
+        "pass": true
+      },
+      {
+        "detail": "chat-1792418727105",
+        "id": "C6",
+        "name": "Instruction nonce not seen before",
+        "pass": true
+      },
+      {
+        "detail": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+        "id": "C9",
+        "name": "Payee is listed in the owner's mandate",
+        "pass": true
+      },
+      {
+        "detail": "free 39.00 − 3.00 = 36.00 ≥ 5.00 (ring-fenced 70.00)",
+        "id": "C10",
+        "name": "Reserve buffer above ring-fenced liabilities preserved",
+        "pass": true
+      },
+      {
+        "detail": "payee not on deny-list",
+        "id": "C11",
+        "name": "Sanctions / deny-list screening",
+        "pass": true
+      },
+      {
+        "detail": "spent 6.00 + 3.00 ≤ allowance 17.50 (verified revenue 15.00)",
+        "id": "C12",
+        "name": "Earned autonomy: discretionary spend ≤ 10 + 50% of VERIFIED revenue",
+        "pass": true
+      }
+    ],
+    "cosigner": "0xf1F8941003702C5141977Ee0E9E03A45a9f62402",
+    "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427",
+    "payment": {
+      "amount": "3000000",
+      "dueAt": "0",
+      "intentId": "0x82b732f1ab65be18b04fd523bcd06351f02d30b681ce64feb1cfb628b2545f2c",
+      "payee": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+      "ref": "0x9570285183f919d16b381305d1c15f7136ae94edd4f8b78827ea0acd1c98943d"
+    },
+    "request": {
+      "amount": "3000000",
+      "dueInDays": 0,
+      "instruction": "FX add-on",
+      "kind": "owner-instructed",
+      "nonce": "chat-1792418727105",
+      "payee": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8"
+    },
+    "schema": "qed.decision-record/v1",
+    "treasury": {
+      "balance": "109000000",
+      "blastRadius24h": "39000000",
+      "dailyCap": "25000000",
+      "free": "39000000",
+      "protected": "70000000",
+      "spentInWindow": "6000000"
+    },
+    "vault": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6",
+    "verdict": "APPROVED"
+  },
+  "canonical": "{\"block\":{\"number\":\"24\",\"timestamp\":1792418724},\"chainId\":11155111,\"checks\":[{\"detail\":\"recovered 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7\",\"id\":\"C1\",\"name\":\"Mandate signed by the vault owner\",\"pass\":true},{\"detail\":\"epoch 0, valid until 2026-10-26T14:05:20.000Z\",\"id\":\"C2\",\"name\":\"Mandate active and current epoch\",\"pass\":true},{\"detail\":\"instruction signer 0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7\",\"id\":\"C3\",\"name\":\"Instruction confirmed by the owner's signature\",\"pass\":true},{\"detail\":\"chat-1792418727105\",\"id\":\"C6\",\"name\":\"Instruction nonce not seen before\",\"pass\":true},{\"detail\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\",\"id\":\"C9\",\"name\":\"Payee is listed in the owner's mandate\",\"pass\":true},{\"detail\":\"free 39.00 − 3.00 = 36.00 ≥ 5.00 (ring-fenced 70.00)\",\"id\":\"C10\",\"name\":\"Reserve buffer above ring-fenced liabilities preserved\",\"pass\":true},{\"detail\":\"payee not on deny-list\",\"id\":\"C11\",\"name\":\"Sanctions / deny-list screening\",\"pass\":true},{\"detail\":\"spent 6.00 + 3.00 ≤ allowance 17.50 (verified revenue 15.00)\",\"id\":\"C12\",\"name\":\"Earned autonomy: discretionary spend ≤ 10 + 50% of VERIFIED revenue\",\"pass\":true}],\"cosigner\":\"0xf1F8941003702C5141977Ee0E9E03A45a9f62402\",\"mandateHash\":\"0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427\",\"payment\":{\"amount\":\"3000000\",\"dueAt\":\"0\",\"intentId\":\"0x82b732f1ab65be18b04fd523bcd06351f02d30b681ce64feb1cfb628b2545f2c\",\"payee\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\",\"ref\":\"0x9570285183f919d16b381305d1c15f7136ae94edd4f8b78827ea0acd1c98943d\"},\"request\":{\"amount\":\"3000000\",\"dueInDays\":0,\"instruction\":\"FX add-on\",\"kind\":\"owner-instructed\",\"nonce\":\"chat-1792418727105\",\"payee\":\"0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8\"},\"schema\":\"qed.decision-record/v1\",\"treasury\":{\"balance\":\"109000000\",\"blastRadius24h\":\"39000000\",\"dailyCap\":\"25000000\",\"free\":\"39000000\",\"protected\":\"70000000\",\"spentInWindow\":\"6000000\"},\"vault\":\"0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6\",\"verdict\":\"APPROVED\"}",
+  "evidenceHash": "0x167b71f89e969ab0dc2f0b8d1c13828777a2eeffdc0ead2f8e9a0780bd0a70ff",
+  "certificate": {
+    "amount": "3000000",
+    "dueAt": "0",
+    "epoch": "0",
+    "evidenceHash": "0x167b71f89e969ab0dc2f0b8d1c13828777a2eeffdc0ead2f8e9a0780bd0a70ff",
+    "expiresAt": "1792425924",
+    "intentId": "0x82b732f1ab65be18b04fd523bcd06351f02d30b681ce64feb1cfb628b2545f2c",
+    "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427",
+    "notBefore": "1792418664",
+    "recipient": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+    "ref": "0x9570285183f919d16b381305d1c15f7136ae94edd4f8b78827ea0acd1c98943d"
+  },
+  "signature": "0x169c5706e4e77f40767f428ef269dbf84273b06c19daad5ab4e43c26112fda187a610e4d264fe2d64481f2d9a04223fa5fb8d0fc379c87b59cd2a9e0e25023fc1b"
+}

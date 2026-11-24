@@ -1,0 +1,149 @@
+/* Base (Meridian): the floor every screen stands on, the atmosphere behind it, the type and the small utilities. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* A control that takes focus is scrolled clear of the bars pinned to the window (WCAG 2.2, 2.4.11). */
+  scroll-padding-top: calc(var(--bar-top, 0px) + 16px); scroll-padding-bottom: calc(var(--bar-bottom, 0px) + var(--composer-h, 0px) + 16px);
+  scrollbar-color: var(--ink-4) transparent;
+  background: var(--ground);
+  /* the lights travel between sections instead of switching (tokens.css registers them) */
+  transition: --glow-a var(--d-scene) var(--ease-move), --glow-b var(--d-scene) var(--ease-move), --glow-c var(--d-scene) var(--ease-move);
+}
+body {
+  margin: 0; min-height: 100vh; min-height: 100dvh; background: transparent; color: var(--ink);
+  font: 430 var(--t-body)/1.5 var(--font); letter-spacing: var(--track-body);
+  font-synthesis: none; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;
+  font-feature-settings: "cv11", "ss03";
+  caret-color: var(--brand);
+}
+h1, h2, h3, h4, p, dl, dd, ul, ol, figure, blockquote { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+h1, h2, h3, h4 { overflow-wrap: break-word; min-width: 0; text-wrap: balance; font-weight: 600; color: var(--ink); }
+h1 { font-size: var(--t-h1); line-height: 1.08; letter-spacing: var(--track-h); font-weight: 640; }
+h1:focus { outline: none; }
+h2 { font-size: var(--t-h2); line-height: 1.2; letter-spacing: -.018em; font-weight: 620; }
+h3 { font-size: var(--t-h3); line-height: 1.3; letter-spacing: -.01em; font-weight: 600; }
+h4 { font-size: var(--t-body); line-height: 1.35; font-weight: 600; }
+p, li, dd, figcaption { text-wrap: pretty; }
+a { color: var(--brand); text-decoration-thickness: 1px; text-underline-offset: .22em; text-decoration-color: color-mix(in oklab, currentColor 45%, transparent); }
+a:hover { text-decoration-color: currentColor; }
+button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
+img, video, svg { display: block; max-width: 100%; }
+svg { flex: none; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+::selection { background: color-mix(in oklab, var(--brand) 30%, transparent); color: var(--ink); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: var(--s6) 0; }
+code, kbd, pre, samp { font-family: var(--mono); }
+kbd { font: 550 var(--t-micro)/1 var(--font); color: var(--ink-3); border: 1px solid var(--rule-2); border-radius: 7px; padding: 3px 6px; background: var(--pane); }
+pre { font-size: var(--t-small); line-height: 1.55; background: var(--well); border-radius: var(--r-sm); padding: var(--s3) var(--s4); overflow: auto; max-width: 100%; }
+details > summary { cursor: pointer; }
+details > summary::marker { color: var(--ink-3); }
+table { font-variant-numeric: tabular-nums lining-nums; }
+
+/* figures: every changing number keeps its width */
+.num, .amount, .fig, .money-figure, .pill, .chip, time, .tabular, .figure { font-variant-numeric: tabular-nums lining-nums; }
+.num { text-align: right; white-space: nowrap; }
+.with-paise { white-space: nowrap; }
+/* the paise are quieter than the rupees by colour (the figure's own colour, mixed a quarter of the way to the ground), not by
+   opacity, which let the glass behind show through small digits */
+.paise { font-size: .56em; font-weight: 500; color: color-mix(in oklab, currentColor 74%, var(--ground)); letter-spacing: -.01em; margin-left: .02em; }
+/* in a figure that carries a state (short, owed), the paise keep the state's own colour at full strength: mixed toward the
+   ground, red paise measured 2.8:1 (R12, the short account); their size alone sets them apart */
+:is(.short, .neg, .loss, .void) .paise { color: inherit; }
+
+/* reading levels */
+.muted { color: var(--ink-2); } .faint { color: var(--ink-3); }
+.small { font-size: var(--t-small); line-height: 1.45; } .tiny { font-size: var(--t-micro); line-height: 1.4; }
+.lead { font-size: var(--t-lead); line-height: 1.5; color: var(--ink-2); }
+.nowrap { white-space: nowrap; } .wrap-any { overflow-wrap: anywhere; }
+.code { font-family: var(--mono); font-size: max(var(--t-micro), .86em); letter-spacing: 0; word-break: break-all; }
+.code.issued { display: block; white-space: nowrap; font-size: 1.2em; font-weight: 600; letter-spacing: .05em; margin-top: 4px; }
+.in, .ok, .gain { color: var(--gain); } .wait, .due { color: var(--due); } .void, .loss { color: var(--loss); }
+.by-you { color: var(--ink); font-weight: 600; } .by-qed { color: var(--qed); font-weight: 600; } .by-other { color: var(--ink-2); font-weight: 600; }
+
+/* layout helpers */
+.stack > * + * { margin-top: var(--gap, var(--s3)); }
+.row { display: flex; gap: var(--s2) var(--s3); align-items: center; flex-wrap: wrap; }
+.row.between { justify-content: space-between; } .row.top { align-items: flex-start; } .row.end { justify-content: flex-end; }
+.grow { flex: 1; min-width: 0; }
+.sr, .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.narrow-only { display: none; }
+@media (max-width: 560px) { .desk { display: none; } .narrow-only { display: inline; } }
+
+/* a section reached by a #link stops below any bar pinned to the top of the window */
+:where(section, article, div, fieldset)[id] { scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+
+/* ------------------------------------------------------------------------------------------------ the atmosphere
+ * Three lights and the meridian (a thin arc of light on the horizon) behind every screen, on the compositor only:
+ * the lights are radial gradients that drift by transform, never repainted, and their colours glide between sections.
+ * Reduced motion holds them still; reduced transparency, more contrast and forced colours remove them (the ground
+ * alone is left). Nothing in the atmosphere carries information.
+ */
+.atmos { position: fixed; inset: 0; z-index: var(--z-atmos); pointer-events: none; overflow: hidden; contain: strict; }
+.atmos > i { position: absolute; display: block; border-radius: 50%; will-change: transform; }
+.atmos .la { width: 120vmax; height: 70vmax; left: 50%; bottom: -40vmax; translate: -50% 0; background: radial-gradient(closest-side, var(--glow-a), transparent 72%); animation: atmos-a 26s var(--ease-move) infinite alternate; }
+.atmos .lb { width: 70vmax; height: 60vmax; right: -26vmax; top: 18vh; background: radial-gradient(closest-side, var(--glow-b), transparent 70%); animation: atmos-b 31s var(--ease-move) infinite alternate; }
+.atmos .lc { width: 90vmax; height: 64vmax; left: -34vmax; top: -30vmax; background: radial-gradient(closest-side, var(--glow-c), transparent 70%); animation: atmos-c 37s var(--ease-move) infinite alternate; }
+.atmos svg.meridian { position: absolute; left: 50%; bottom: 0; width: max(1600px, 140vw); height: auto; translate: -50% 38%; overflow: visible; }
+.atmos .grain { position: absolute; inset: -50%; opacity: var(--grain-opacity); background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='180' height='180' filter='url(%23n)'/></svg>"); }
+@keyframes atmos-a { from { transform: translate(-3%, 0) scale(1); } to { transform: translate(4%, -3%) scale(1.08); } }
+@keyframes atmos-b { from { transform: translate(0, 0) scale(1); } to { transform: translate(-6%, -4%) scale(1.12); } }
+@keyframes atmos-c { from { transform: translate(0, 0); } to { transform: translate(5%, 3%); } }
+@keyframes meridian-breathe { from { opacity: .72; } to { opacity: 1; } }
+.atmos svg.meridian .arc { animation: meridian-breathe 9s ease-in-out infinite alternate; }
+
+/* each section's light: the key light, the counter light and the haze (night first, then day) */
+:root[data-section="spend"] { --glow-a: oklch(60% .13 50 / .48); --glow-b: oklch(50% .08 70 / .34); }
+:root[data-section="save"] { --glow-a: oklch(66% .09 84 / .4); --glow-b: oklch(50% .08 52 / .32); }
+:root[data-section="grow"] { --glow-a: oklch(62% .1 95 / .4); --glow-b: oklch(52% .09 60 / .32); }
+:root[data-section="earn"] { --glow-a: oklch(70% .13 84 / .46); --glow-b: oklch(56% .11 46 / .3); }
+:root[data-section="protect"] { --glow-a: oklch(58% .06 74 / .42); --glow-b: oklch(46% .05 60 / .3); }
+:root[data-section="activity"] { --glow-a: oklch(62% .05 80 / .34); --glow-b: oklch(48% .06 56 / .28); }
+:root[data-section="ask"] { --glow-a: oklch(66% .1 78 / .42); --glow-b: oklch(54% .1 50 / .3); }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"])[data-section="spend"] { --glow-a: oklch(84% .1 50 / .58); --glow-b: oklch(88% .07 75 / .45); }
+  :root:not([data-theme="dark"])[data-section="save"] { --glow-a: oklch(89% .06 85 / .6); --glow-b: oklch(86% .07 55 / .42); }
+  :root:not([data-theme="dark"])[data-section="grow"] { --glow-a: oklch(88% .08 95 / .56); --glow-b: oklch(86% .07 60 / .42); }
+  :root:not([data-theme="dark"])[data-section="earn"] { --glow-a: oklch(88% .1 86 / .66); --glow-b: oklch(84% .08 46 / .42); }
+  :root:not([data-theme="dark"])[data-section="protect"] { --glow-a: oklch(88% .045 74 / .6); --glow-b: oklch(86% .04 60 / .42); }
+  :root:not([data-theme="dark"])[data-section="activity"] { --glow-a: oklch(90% .04 80 / .62); --glow-b: oklch(87% .05 56 / .42); }
+  :root:not([data-theme="dark"])[data-section="ask"] { --glow-a: oklch(87% .07 78 / .58); --glow-b: oklch(85% .07 50 / .42); }
+}
+:root[data-theme="light"][data-section="spend"] { --glow-a: oklch(84% .1 50 / .58); --glow-b: oklch(88% .07 75 / .45); }
+:root[data-theme="light"][data-section="save"] { --glow-a: oklch(89% .06 85 / .6); --glow-b: oklch(86% .07 55 / .42); }
+:root[data-theme="light"][data-section="grow"] { --glow-a: oklch(88% .08 95 / .56); --glow-b: oklch(86% .07 60 / .42); }
+:root[data-theme="light"][data-section="earn"] { --glow-a: oklch(88% .1 86 / .66); --glow-b: oklch(84% .08 46 / .42); }
+:root[data-theme="light"][data-section="protect"] { --glow-a: oklch(88% .045 74 / .6); --glow-b: oklch(86% .04 60 / .42); }
+:root[data-theme="light"][data-section="activity"] { --glow-a: oklch(90% .04 80 / .62); --glow-b: oklch(87% .05 56 / .42); }
+:root[data-theme="light"][data-section="ask"] { --glow-a: oklch(87% .07 78 / .58); --glow-b: oklch(85% .07 50 / .42); }
+
+/* ------------------------------------------------------------------------------------------------ arrival
+ * What a screen does when it arrives (src/ui/motion.ts adds [data-arrive] to the page's blocks in reading order):
+ * each block rises 14 px out of a 6 px blur, 60 ms after the one before it. A figure resolves in place, out of
+ * focus into focus; it never counts up from zero, which would show amounts that were never true.
+ */
+@keyframes arrive { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } }
+@keyframes resolve { from { opacity: 0; filter: blur(8px); } }
+@keyframes leave { to { opacity: 0; filter: blur(6px); transform: translateY(-6px); } }
+[data-arrive] { animation: arrive var(--d4) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }
+[data-resolve] { animation: resolve var(--d4) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms + 120ms); }
+.leaving { animation: leave var(--d1) var(--ease-in) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  .atmos > i, .atmos svg.meridian .arc { animation: none !important; }
+}
+/* reduced transparency, more contrast, forced colours, or a device that asked for the plain look (motion.ts): no
+   atmosphere and no frosting; every pane becomes an opaque surface */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .atmos { display: none; }
+  :root { --pane: var(--sheet); --pane-2: var(--sheet-2); --pane-3: var(--sheet); --blur: 0px; --blur-2: 0px; --gloss: transparent; }
+}
+:root[data-fx="plain"] .atmos > i, :root[data-fx="plain"] .atmos .grain { display: none; }
+:root[data-fx="plain"] { --pane: var(--sheet); --pane-2: var(--sheet-2); --pane-3: var(--sheet); --blur: 0px; --blur-2: 0px; }
+@media (forced-colors: active) {
+  :root { --rim: CanvasText; --rule: CanvasText; --rule-2: CanvasText; --edge: CanvasText; --focus: Highlight; }
+}

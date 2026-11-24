@@ -1,0 +1,1530 @@
+# SOLC_VERSION=0.8.38 forge test   (unit, fuzz 1000 runs seed 0x7e5a, invariants 256 x 48)
+# recorded 2026-11-24T21:51:01Z; forge Version: 1.7.1; src/QEDOwnerAccount.sol sha256 35b2aec1afbe97a5dee76ca011803789f6594de9abadfaf7d708a3ef5a556389
+
+Compiling 21 files with Solc 0.8.38
+Compiling 30 files with Solc 0.8.26
+Solc 0.8.26 finished in 4.90s
+Solc 0.8.38 finished in 42.27s
+Compiler run successful!
+
+Ran 1 test for test/Gas.t.sol:GasTest
+[PASS] test_gas_precompile_and_erc1271() (gas: 10526780)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 11.28ms (6.77ms CPU time)
+
+Ran 3 tests for test/VaultContainment.t.sol:VaultContainmentTest
+[PASS] test_a_frozen_passkey_moves_no_money_and_its_mandate_stops_paying() (gas: 15643670)
+[PASS] test_one_passkey_stops_the_agent_at_threshold_two_and_cannot_resume_or_spend() (gas: 15657815)
+[PASS] test_the_release_protective_list_holds_only_calls_that_move_no_money() (gas: 8815359)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 30.75ms (26.22ms CPU time)
+
+Ran 20 tests for test/Containment.t.sol:ContainmentTest
+[PASS] test_a_frozen_assertion_spoils_a_batch_even_beside_enough_others() (gas: 86803)
+[PASS] test_a_frozen_member_can_still_stop_things() (gas: 147118)
+[PASS] test_a_frozen_member_changes_nothing_about_the_account() (gas: 209382)
+[PASS] test_a_frozen_member_keeps_its_veto_over_changes_and_recoveries() (gas: 414269)
+[PASS] test_a_frozen_member_signs_no_erc1271_message() (gas: 79399)
+[PASS] test_a_frozen_member_still_cannot_cancel_its_own_removal() (gas: 374955)
+[PASS] test_a_scheduled_sentinel_is_cancelled_by_one_member_and_refused_when_stale() (gas: 407332)
+[PASS] test_an_account_without_a_sentinel_cannot_be_frozen_by_anyone() (gas: 5316192)
+[PASS] test_construction_lists_the_protective_calls_and_the_sentinel() (gas: 5380153)
+[PASS] test_construction_refuses_a_bad_protective_list_or_sentinel() (gas: 1963300)
+[PASS] test_dropping_the_sentinel_is_immediate_and_a_new_one_waits_the_delay() (gas: 221920)
+[PASS] test_one_passkey_stops_things_whatever_the_threshold() (gas: 5676286)
+[PASS] test_only_the_sentinel_can_freeze_and_never_anything_but_a_member() (gas: 139814)
+[PASS] test_protect_is_bound_to_its_calls_nonce_deadline_and_a_member() (gas: 294990)
+[PASS] test_protect_refuses_every_call_outside_the_list() (gas: 192543)
+[PASS] test_sentinel_abuse_freezes_everyone_moves_nothing_and_a_recovery_ends_it() (gas: 823322)
+[PASS] test_the_sentinel_freezes_a_member_at_once_and_its_approval_stops_counting() (gas: 255028)
+[PASS] test_the_sentinel_has_no_other_power() (gas: 74543)
+[PASS] test_two_of_two_with_one_frozen_moves_nothing() (gas: 5655099)
+[PASS] test_unfreezing_takes_the_unfrozen_admin_quorum_and_applies_at_once() (gas: 280488)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 38.94ms (30.23ms CPU time)
+
+Ran 7 tests for test/TimeLock.t.sol:TimeLockTest
+[PASS] test_a_threshold_quorum_cannot_drain_free_funds_at_once_while_time_locked() (gas: 15350042)
+[PASS] test_any_one_member_cancels_a_time_locked_withdrawal() (gas: 15365379)
+[PASS] test_construction_refuses_a_bad_lockable_list() (gas: 15623205)
+[PASS] test_the_lockable_list_is_the_release_vaults_four_calls_and_disjoint_from_the_other_lists() (gas: 15300607)
+[PASS] test_time_locked_the_four_calls_are_refused_at_once_whatever_the_approvals_and_run_after_the_delay() (gas: 15752657)
+[PASS] test_turning_it_on_is_immediate_and_turning_it_off_waits_the_delay_and_can_be_cancelled() (gas: 15685338)
+[PASS] test_without_the_time_lock_the_four_calls_run_at_once_as_before() (gas: 15620805)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 38.15ms (37.63ms CPU time)
+
+Ran 6 tests for test/VaultIntegration.t.sol:BusinessGuardsTest
+[PASS] test_a_scheduled_guarded_call_is_cancelled_by_any_one_member() (gas: 217179)
+[PASS] test_pause_and_other_protective_calls_stay_immediate_for_one_member() (gas: 275687)
+[PASS] test_the_delayed_path_applies_every_guarded_call() (gas: 480432)
+[PASS] test_the_guard_list_is_recorded_with_its_reasons() (gas: 5678630)
+[PASS] test_threshold_member_cannot_make_any_guarded_call_immediately() (gas: 589140)
+[PASS] test_threshold_member_cannot_schedule_a_guarded_call() (gas: 67786)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 19.90ms (17.27ms CPU time)
+
+Ran 11 tests for test/Guardian.t.sol:GuardianTest
+[PASS] test_a_colluding_guardian_and_code_thief_are_stopped_by_any_unfrozen_member() (gas: 505409)
+[PASS] test_a_frozen_member_cannot_cancel_a_cosigned_recovery_but_an_unfrozen_one_can() (gas: 532270)
+[PASS] test_a_frozen_member_keeps_its_veto_over_a_recovery_without_the_guardian() (gas: 224741)
+[PASS] test_replacing_and_removing_the_guardian_wait_the_delay_and_a_stale_change_is_refused() (gas: 934629)
+[PASS] test_setting_a_guardian_waits_the_delay_and_any_member_can_cancel_it() (gas: 483634)
+[PASS] test_the_guardian_approves_cancels_and_protects_nothing() (gas: 731532)
+[PASS] test_the_guardian_cosigns_exactly_one_recovery() (gas: 675208)
+[PASS] test_the_guardian_is_set_only_through_setGuardian_and_never_at_once() (gas: 707217)
+[PASS] test_the_two_of_two_hostage_case_ends_with_a_guardian() (gas: 1005438)
+[PASS] test_with_a_guardian_a_recovery_code_alone_starts_nothing() (gas: 353677)
+[PASS] test_without_a_guardian_the_cosigned_path_is_refused() (gas: 44777)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 53.97ms (45.28ms CPU time)
+
+Ran 9 tests for test/VaultIntegration.t.sol:VaultIntegrationTest
+[PASS] test_a_nobody_but_the_account_could_accept() (gas: 2073684)
+[PASS] test_a_old_eoa_can_no_longer_call_any_owner_function() (gas: 106477)
+[PASS] test_a_unguarded_owner_calls_stay_immediate() (gas: 298350)
+[PASS] test_b_mandate_signed_through_erc1271_is_accepted_for_a_payment() (gas: 279567)
+[PASS] test_c_mandate_signature_for_another_mandate_is_refused() (gas: 87742)
+[PASS] test_c_mandate_signature_made_for_another_account_is_refused() (gas: 5834698)
+[PASS] test_c_old_eoa_mandate_signature_is_refused() (gas: 49315)
+[PASS] test_even_the_only_member_cannot_make_a_guarded_call_immediately() (gas: 247339)
+[PASS] test_moving_the_vault_to_a_business_account_takes_the_delayed_path() (gas: 6428037)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 16.20ms (11.93ms CPU time)
+
+Ran 8 tests for test/Construction.t.sol:ConstructionTest
+[PASS] testFuzz_threshold_rule_at_construction(uint8,uint8,uint8) (runs: 1000, μ: 1381504, ~: 755906)
+[PASS] test_constructs_and_reports_its_configuration() (gas: 5431158)
+[PASS] test_rejects_bad_delays() (gas: 498641)
+[PASS] test_rejects_bad_origins() (gas: 290527)
+[PASS] test_rejects_bad_thresholds() (gas: 1567417)
+[PASS] test_rejects_more_than_sixteen_signers() (gas: 1811032)
+[PASS] test_rejects_off_curve_and_duplicate_keys_and_role_none() (gas: 422184)
+[PASS] test_rejects_zero_rp_id_hash() (gas: 59239)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 1.47s (1.46s CPU time)
+
+Ran 17 tests for test/Recovery.t.sol:RecoveryTest
+[PASS] testFuzz_finish_never_before_delay(uint256) (runs: 1000, μ: 203684, ~: 203851)
+[PASS] testFuzz_recovery_signature_by_any_other_key_refused(uint256) (runs: 1000, μ: 55777, ~: 55765)
+[PASS] test_any_member_cancels_during_delay_and_the_code_is_burnt() (gas: 279528)
+[PASS] test_expired_recovery_request_refused() (gas: 29007)
+[PASS] test_finish_refused_if_the_new_key_was_added_meanwhile() (gas: 361482)
+[PASS] test_full_recovery_flow() (gas: 325496)
+[PASS] test_high_s_recovery_signature_refused() (gas: 41083)
+[PASS] test_invalid_recovery_signature_refused() (gas: 92155)
+[PASS] test_member_key_cannot_start_recovery() (gas: 30608)
+[PASS] test_new_key_must_be_new_and_on_the_curve() (gas: 50641)
+[PASS] test_one_pending_recovery_per_code() (gas: 201975)
+[PASS] test_recovery_key_cannot_cancel_another_recovery() (gas: 218487)
+[PASS] test_recovery_key_signatures_accepted_nowhere_else() (gas: 62950)
+[PASS] test_recovery_restores_one_member_it_does_not_lower_thresholds() (gas: 5586940)
+[PASS] test_recovery_signature_binds_the_new_key_and_deadline() (gas: 87959)
+[PASS] test_recovery_signature_for_another_account_refused() (gas: 5588004)
+[PASS] test_removing_a_recovery_key_drops_its_pending_recovery() (gas: 365162)
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 1.81s (1.81s CPU time)
+
+Ran 27 tests for test/Execute.t.sol:ExecuteTest
+[PASS] testFuzz_any_nonce_but_current_rejected(uint256) (runs: 1000, μ: 55331, ~: 55331)
+[PASS] testFuzz_other_chain_ids_rejected(uint64) (runs: 1000, μ: 79757, ~: 79757)
+[PASS] testFuzz_past_deadline_rejected(uint64) (runs: 1000, μ: 57822, ~: 57718)
+[PASS] testFuzz_relayer_tampering_with_value_rejected(uint256,uint256) (runs: 1000, μ: 80512, ~: 80512)
+[PASS] test_anyone_may_relay() (gas: 182519)
+[PASS] test_call_to_account_needs_admin_threshold() (gas: 331890)
+[PASS] test_deadline_equal_to_now_accepted() (gas: 180429)
+[PASS] test_duplicate_signer_is_not_counted_twice() (gas: 71767)
+[PASS] test_empty_batch_consumes_nonce() (gas: 119133)
+[PASS] test_execute_approvals_for_another_account_rejected() (gas: 5677234)
+[PASS] test_execute_approvals_from_another_chain_rejected() (gas: 79643)
+[PASS] test_execute_digest_matches_eip712_by_hand() (gas: 20221)
+[PASS] test_expired_deadline_rejected() (gas: 55259)
+[PASS] test_failing_call_reverts_whole_batch_and_keeps_nonce() (gas: 198958)
+[PASS] test_future_nonce_rejected() (gas: 54680)
+[PASS] test_member_id_with_other_key_signature_rejected() (gas: 120333)
+[PASS] test_mixed_batch_with_one_self_call_needs_admin_threshold() (gas: 75181)
+[PASS] test_non_signer_rejected() (gas: 90219)
+[PASS] test_one_approval_is_not_enough_under_threshold_two() (gas: 50301)
+[PASS] test_recovery_signer_cannot_approve_execute() (gas: 90439)
+[PASS] test_reentrancy_into_admin_paths_blocked() (gas: 164989)
+[PASS] test_reentrancy_into_execute_blocked() (gas: 306319)
+[PASS] test_relayer_cannot_change_calls_or_deadline() (gas: 143763)
+[PASS] test_reused_nonce_rejected() (gas: 183922)
+[PASS] test_two_of_three_executes_and_emits() (gas: 188140)
+[PASS] test_unsorted_assertions_rejected() (gas: 88336)
+[PASS] test_value_transfer_from_account() (gas: 206370)
+Suite result: ok. 27 passed; 0 failed; 0 skipped; finished in 3.06s (3.05s CPU time)
+
+Ran 27 tests for test/Admin.t.sol:AdminTest
+[PASS] testFuzz_change_never_applies_early(uint256) (runs: 1000, μ: 288738, ~: 288901)
+[PASS] testFuzz_thresholds_rule(uint256,uint256) (runs: 1000, μ: 150198, ~: 138911)
+[PASS] test_add_invalid_or_duplicate_key_refused() (gas: 357617)
+[PASS] test_add_member_is_immediate_with_admin_threshold() (gas: 273544)
+[PASS] test_admin_functions_only_through_execute() (gas: 23171)
+[PASS] test_cancel_assertion_cannot_be_replayed_on_a_later_change() (gas: 5989525)
+[PASS] test_cancel_by_one_member_under_threshold_two() (gas: 5776898)
+[PASS] test_cancel_needs_assertion_over_that_id() (gas: 5872162)
+[PASS] test_cancel_of_unknown_id_refused() (gas: 34167)
+[PASS] test_delay_bounds() (gas: 237845)
+[PASS] test_invalid_thresholds_refused() (gas: 461959)
+[PASS] test_last_member_removal_refused() (gas: 5252456)
+[PASS] test_lengthening_delays_is_immediate_shortening_is_scheduled() (gas: 283757)
+[PASS] test_lowering_a_threshold_is_scheduled() (gas: 228900)
+[PASS] test_lowering_change_is_stale_after_a_raise() (gas: 349536)
+[PASS] test_member_cannot_cancel_its_own_removal() (gas: 5848938)
+[PASS] test_quorum_is_rechecked_when_applying() (gas: 5750456)
+[PASS] test_raising_thresholds_is_immediate() (gas: 141648)
+[PASS] test_recovery_key_cannot_cancel() (gas: 5848808)
+[PASS] test_removal_below_admin_threshold_refused_at_schedule() (gas: 141438)
+[PASS] test_removal_input_validation() (gas: 356234)
+[PASS] test_removal_is_stale_after_target_was_re_added() (gas: 682351)
+[PASS] test_removal_needs_more_settled_members_it_does_not_name_than_admin_threshold() (gas: 611037)
+[PASS] test_remove_signer_is_scheduled_then_applied_after_delay() (gas: 5696832)
+[PASS] test_schedule_event_carries_the_terms() (gas: 5835550)
+[PASS] test_signer_set_is_bounded() (gas: 2162499)
+[PASS] test_two_compromised_members_removed_together_cannot_cancel() (gas: 5644404)
+Suite result: ok. 27 passed; 0 failed; 0 skipped; finished in 3.14s (3.14s CPU time)
+
+Ran 3 tests for test/WebAuthnDiff.t.sol:WebAuthnDiffTest
+[PASS] testFuzz_the_account_decides_as_openzeppelin_webauthn_verify(bytes32,(uint8,uint8,int8,int8,int8,uint8,bool,bool,bool,bool,bool,bool,bool,uint8,bytes4),uint256) (runs: 1000, μ: 35774, ~: 35856)
+[PASS] testFuzz_valid_assertions_are_accepted_by_both(bytes32,bool) (runs: 1000, μ: 62938, ~: 62988)
+[PASS] test_every_flags_byte_is_decided_alike() (gas: 8609607)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 1.51s (1.47s CPU time)
+
+Ran 14 tests for test/ERC1271.t.sol:ERC1271Test
+[PASS] testFuzz_other_chain_ids_invalid(uint64) (runs: 1000, μ: 65753, ~: 65753)
+[PASS] testFuzz_random_bytes_never_valid_never_revert(bytes) (runs: 1000, μ: 10949, ~: 10961)
+[PASS] testFuzz_valid_for_any_hash(bytes32) (runs: 1000, μ: 92466, ~: 92466)
+[PASS] test_below_threshold_is_invalid_and_check_names_the_reason() (gas: 42279)
+[PASS] test_cross_account_replay_refused() (gas: 5579242)
+[PASS] test_cross_chain_replay_refused() (gas: 119010)
+[PASS] test_duplicate_member_does_not_reach_threshold() (gas: 57192)
+[PASS] test_malformed_signatures_return_invalid_without_reverting() (gas: 32084)
+[PASS] test_recovery_key_cannot_sign_messages() (gas: 75864)
+[PASS] test_replay_safe_hash_matches_eip712_by_hand() (gas: 13776)
+[PASS] test_signature_for_other_hash_is_invalid() (gas: 64323)
+[PASS] test_signature_over_raw_hash_is_invalid() (gas: 62241)
+[PASS] test_threshold_change_applies_to_old_signatures() (gas: 238033)
+[PASS] test_threshold_members_make_a_valid_signature() (gas: 161337)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 3.40s (3.40s CPU time)
+
+Ran 26 tests for test/Verifier.t.sol:VerifierTest
+[PASS] testFuzz_any_bit_flip_in_authenticator_data_rejected(uint256,uint8) (runs: 1000, μ: 33554, ~: 30946)
+[PASS] testFuzz_any_bit_flip_in_client_data_rejected(uint256,uint8) (runs: 1000, μ: 36403, ~: 34755)
+[PASS] testFuzz_flags(uint8) (runs: 1000, μ: 29468, ~: 27475)
+[PASS] testFuzz_high_s_always_rejected(uint256,bytes32) (runs: 1000, μ: 27107, ~: 27096)
+[PASS] testFuzz_only_exact_indices_accepted(uint256,uint256,uint256) (runs: 1000, μ: 27549, ~: 27533)
+[PASS] testFuzz_signature_for_other_challenge_rejected(bytes32,bytes32) (runs: 1000, μ: 30799, ~: 30799)
+[PASS] testFuzz_valid_assertions_verify(uint256,bytes32) (runs: 1000, μ: 34146, ~: 34135)
+[PASS] test_accepts_synced_passkey_flags() (gas: 39200)
+[PASS] test_out_of_range_indices_return_false_without_reverting() (gas: 54363)
+[PASS] test_rejects_backup_state_without_eligibility() (gas: 26821)
+[PASS] test_rejects_high_s_but_accepts_low_s() (gas: 54594)
+[PASS] test_rejects_missing_UP_flag() (gas: 26822)
+[PASS] test_rejects_missing_UV_flag() (gas: 26668)
+[PASS] test_rejects_off_curve_key() (gas: 31912)
+[PASS] test_rejects_origin_index_moved() (gas: 27427)
+[PASS] test_rejects_origin_prefix_extension() (gas: 27763)
+[PASS] test_rejects_short_authenticator_data() (gas: 35118)
+[PASS] test_rejects_signature_by_another_key() (gas: 50487)
+[PASS] test_rejects_tampered_authenticator_data() (gas: 46732)
+[PASS] test_rejects_tampered_client_data() (gas: 46204)
+[PASS] test_rejects_wrong_challenge() (gas: 30791)
+[PASS] test_rejects_wrong_origin() (gas: 27338)
+[PASS] test_rejects_wrong_rpIdHash() (gas: 27187)
+[PASS] test_rejects_wrong_type() (gas: 28002)
+[PASS] test_rejects_zero_r_and_zero_s() (gas: 48114)
+[PASS] test_valid_assertion_verifies() (gas: 38761)
+Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 11.06s (11.08s CPU time)
+
+Ran 16 tests for test/Guards.t.sol:GuardsTest
+[PASS] testFuzz_exactly_the_listed_selectors_are_refused(bytes4,bytes) (runs: 1000, μ: 121772, ~: 121766)
+[PASS] testFuzz_guarded_call_never_immediate_whatever_the_approvals(uint8,uint256) (runs: 1000, μ: 65014, ~: 67567)
+[PASS] test_a_failing_scheduled_batch_stays_pending_and_cancellable() (gas: 213204)
+[PASS] test_a_guarded_call_hidden_in_a_batch_is_refused() (gas: 54119)
+[PASS] test_any_one_member_cancels_a_scheduled_guarded_batch() (gas: 231826)
+[PASS] test_apply_must_present_exactly_the_scheduled_calls() (gas: 230269)
+[PASS] test_delayed_path_runs_the_guarded_call_after_the_delay() (gas: 268384)
+[PASS] test_guard_list_views_and_reasons() (gas: 5325895)
+[PASS] test_invalid_guard_lists_refused() (gas: 1918906)
+[PASS] test_kinds_are_not_interchangeable() (gas: 419093)
+[PASS] test_not_even_every_member_together_can_make_it_immediately() (gas: 81760)
+[PASS] test_other_selectors_on_a_guarded_target_stay_immediate() (gas: 102185)
+[PASS] test_schedule_only_through_execute() (gas: 13824)
+[PASS] test_schedule_refuses_empty_batches_and_calls_to_the_account() (gas: 239940)
+[PASS] test_threshold_member_cannot_make_a_guarded_call() (gas: 46263)
+[PASS] test_threshold_member_cannot_schedule() (gas: 51790)
+Suite result: ok. 16 passed; 0 failed; 0 skipped; finished in 18.00s (1.52s CPU time)
+
+Ran 15 tests for test/ReviewFixes.t.sol:ReviewFixesTest
+[PASS] test_a_guardian_change_voids_every_earlier_pending_one() (gas: 6072960)
+[PASS] test_a_recovery_deadline_is_at_most_one_day_ahead() (gas: 6179120)
+[PASS] test_a_recovery_started_before_the_guardian_took_effect_does_not_finish_while_one_is_set() (gas: 6081065)
+[PASS] test_a_recovery_without_the_guardian_is_not_held_by_freezes_frozen_members_can_cancel_it() (gas: 5816079)
+[PASS] test_a_restart_never_moves_the_wait_earlier() (gas: 6383575)
+[PASS] test_a_two_member_household_removes_an_unfrozen_member_after_a_freeze_or_with_a_settled_third() (gas: 6417338)
+[PASS] test_at_admin_threshold_one_a_recovered_seat_cannot_name_every_other_member() (gas: 6154567)
+[PASS] test_dropping_the_sentinel_voids_pending_sentinel_changes() (gas: 6014960)
+[PASS] test_every_member_frozen_a_colluding_guardian_and_a_stolen_code_the_owner_stops_it_through_qed() (gas: 6007758)
+[PASS] test_the_guardian_withdraws_its_cosignature_and_nothing_else() (gas: 6226810)
+[PASS] test_the_sentinel_stops_a_pending_cosigned_recovery_and_nothing_else() (gas: 6357616)
+[PASS] test_turning_the_time_lock_on_voids_pending_off_changes() (gas: 6240118)
+[PASS] test_with_every_member_frozen_and_no_sentinel_it_waits_and_restarts_in_full_when_a_member_is_unfrozen() (gas: 6129993)
+[PASS] test_with_every_member_frozen_and_the_sentinel_changed_mid_wait_it_stays_pending() (gas: 6131390)
+[PASS] test_with_every_member_frozen_and_the_sentinel_watching_a_cosigned_recovery_finishes_after_its_whole_delay() (gas: 6136902)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 18.04s (51.76ms CPU time)
+
+Ran 17 tests for test/Invariant.t.sol:AccountInvariantTest
+[PASS] invariant_cosigned_recovery_needs_a_whole_unfrozen_window() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_delays_in_bounds() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_frozen_cannot_cancel_cosigned_recovery() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_frozen_member_never_approves() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_frozen_only_on_members() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_guarded_call_never_runs_immediately() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_guardian_consistent() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_guardian_never_approves() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_no_stale_setting_change_applies() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_pending_recoveries_linked() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_protect_and_sentinel_reach_nothing_else() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_quorum() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_recovery_deadline_capped() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_recovery_needs_the_guardian() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_removal_leaves_a_canceller() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_signer_set_consistent() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+[PASS] invariant_time_locked_call_never_runs_immediately() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+------------------------+-------+---------+----------╮
+| Contract       | Selector               | Calls | Reverts | Discards |
++======================================================================+
+| AccountHandler | addMember              | 396   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | addRecovery            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | applyChange            | 406   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancel                 | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cancelRecoveryAsFrozen | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | cosignedRoundTrip      | 358   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen        | 359   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeGuarded         | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | executeLockable        | 337   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | finishRecovery         | 327   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freeze                 | 347   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | freezeAll              | 369   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianCancel         | 346   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | guardianTriesToApprove | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | installGuardian        | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | lockCycle              | 360   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protect                | 356   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective   | 397   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeAllButOne        | 361   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeOne              | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | removeTwo              | 385   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelStop           | 353   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | sentinelSwapThenFinish | 386   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setDelays              | 342   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setGuardian            | 354   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setSentinel            | 370   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setThresholds          | 351   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | setTimeLock            | 343   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startCosignedRecovery  | 349   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecovery          | 333   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | startRecoveryFar       | 366   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | thawThenFinish         | 334   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | unfreeze               | 410   | 0       | 0        |
+|----------------+------------------------+-------+---------+----------|
+| AccountHandler | warp                   | 384   | 0       | 0        |
+╰----------------+------------------------+-------+---------+----------╯
+
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 18.04s (121.72s CPU time)
+
+Ran 17 test suites in 18.05s (79.74s CPU time): 227 tests passed, 0 failed, 0 skipped (227 total tests)
+# exit status: 0

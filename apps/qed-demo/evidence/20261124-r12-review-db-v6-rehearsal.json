@@ -1,0 +1,258 @@
+{
+ "build": {
+  "schemaVersion": "6",
+  "node": "v26.12.0"
+ },
+ "copySha256": "e06438d6886e8f3c3b45d7c14246e70711c5444ec4516cfeffa48a79260772ca",
+ "before": {
+  "schemaVersion": "5",
+  "integrity": "ok",
+  "foreignKeyIssues": 0,
+  "users": 2,
+  "accounts": 44,
+  "entries": 66,
+  "postings": 283,
+  "balances": 44,
+  "holds": 46,
+  "openHolds": 0,
+  "receipts": 59,
+  "receiptsFingerprint": "3ba8faacb8423b947a6a1aec7e22093126092d3d39d0847c8f53207723e37732",
+  "postingsSumByAsset": 0,
+  "amountTextDisagrees": null,
+  "amountsPast64Bits": null
+ },
+ "migrateAndVerify": {
+  "exit": 0,
+  "ms": 395,
+  "ledgers": 2,
+  "consistent": 2,
+  "receipts": 59,
+  "chainsIntact": 2,
+  "lines": [
+   "ledger consistent; receipts 57 intact",
+   "ledger consistent; receipts 2 intact"
+  ]
+ },
+ "after": {
+  "schemaVersion": "6",
+  "integrity": "ok",
+  "foreignKeyIssues": 0,
+  "users": 2,
+  "accounts": 44,
+  "entries": 66,
+  "postings": 283,
+  "balances": 44,
+  "holds": 46,
+  "openHolds": 0,
+  "receipts": 59,
+  "receiptsFingerprint": "3ba8faacb8423b947a6a1aec7e22093126092d3d39d0847c8f53207723e37732",
+  "postingsSumByAsset": 0,
+  "amountTextDisagrees": {
+   "postings": 0,
+   "balances": 0,
+   "holds": 0
+  },
+  "amountsPast64Bits": {
+   "postings": 0,
+   "balances": 0,
+   "holds": 0
+  }
+ },
+ "copy": {
+  "migration": {
+   "from": "5",
+   "to": "6"
+  },
+  "schemaVersion": "5",
+  "restoreVerified": true
+ },
+ "restoredReadOnly": {
+  "ok": true,
+  "integrity": "ok",
+  "foreignKeyIssues": 0,
+  "schemaVersion": "5",
+  "users": 2,
+  "ledgerBreaks": 0,
+  "receipts": 59,
+  "chainsBroken": 0,
+  "firstFailure": null,
+  "ms": 319
+ },
+ "restoredUnderPreviousBuild": {
+  "exit": 0,
+  "ms": 167,
+  "ledgers": 2,
+  "consistent": 2,
+  "receipts": 59,
+  "chainsIntact": 2,
+  "lines": [
+   "ledger consistent; receipts 57 intact",
+   "ledger consistent; receipts 2 intact"
+  ]
+ },
+ "restoredMigratedAgain": {
+  "exit": 0,
+  "ms": 330,
+  "ledgers": 2,
+  "consistent": 2,
+  "receipts": 59,
+  "chainsIntact": 2,
+  "lines": [
+   "ledger consistent; receipts 57 intact",
+   "ledger consistent; receipts 2 intact"
+  ]
+ },
+ "restoredEncrypted": {
+  "ok": true,
+  "integrity": "ok",
+  "foreignKeyIssues": 0,
+  "schemaVersion": "5",
+  "users": 2,
+  "ledgerBreaks": 0,
+  "receipts": 59,
+  "chainsBroken": 0,
+  "firstFailure": null,
+  "ms": 244
+ },
+ "checks": [
+  {
+   "step": "the copy is at schema v5, intact, with no foreign key issue",
+   "ok": true,
+   "detail": {
+    "schemaVersion": "5",
+    "integrity": "ok",
+    "foreignKeyIssues": 0
+   }
+  },
+  {
+   "step": "the duplicates are byte for byte the copy",
+   "ok": true,
+   "detail": null
+  },
+  {
+   "step": "this build migrates the copy and verifies every ledger and receipt chain",
+   "ok": true,
+   "detail": {
+    "exit": 0,
+    "ms": 395,
+    "ledgers": 2,
+    "consistent": 2,
+    "receipts": 59
+   }
+  },
+  {
+   "step": "the migrated file is at schema v6, intact, with no foreign key issue",
+   "ok": true,
+   "detail": {
+    "schemaVersion": "6",
+    "integrity": "ok"
+   }
+  },
+  {
+   "step": "every count is unchanged",
+   "ok": true,
+   "detail": {
+    "users": 2,
+    "accounts": 44,
+    "entries": 66,
+    "postings": 283,
+    "balances": 44,
+    "holds": 46,
+    "openHolds": 0,
+    "receipts": 59
+   }
+  },
+  {
+   "step": "receipts are unchanged, hash for hash",
+   "ok": true,
+   "detail": null
+  },
+  {
+   "step": "every v5 column of every row of postings, balances and holds is as it was (compared both ways)",
+   "ok": true,
+   "detail": {
+    "postings": 0,
+    "balances": 0,
+    "holds": 0
+   }
+  },
+  {
+   "step": "amount_text equals the INTEGER in every row of the three tables",
+   "ok": true,
+   "detail": {
+    "postings": 0,
+    "balances": 0,
+    "holds": 0
+   }
+  },
+  {
+   "step": "the books sum to zero in every asset (amount_sum over the text)",
+   "ok": true,
+   "detail": null
+  },
+  {
+   "step": "openDb sealed one copy before the change, under the migration-copy key, and left no plaintext copy",
+   "ok": true,
+   "detail": {
+    "sealed": 1,
+    "plaintextLeft": 0
+   }
+  },
+  {
+   "step": "that copy is the v5 database: same version, counts and receipts as before",
+   "ok": true,
+   "detail": {
+    "migration": {
+     "from": "5",
+     "to": "6"
+    },
+    "schemaVersion": "5",
+    "restoreVerified": true
+   }
+  },
+  {
+   "step": "restored, the pre-migration copy verifies read-only under this build, still at v5",
+   "ok": true,
+   "detail": {
+    "ok": true,
+    "schemaVersion": "5",
+    "users": 2,
+    "receipts": 59
+   }
+  },
+  {
+   "step": "under the previous build (the rollback) it verifies too, and stays at v5",
+   "ok": true,
+   "detail": {
+    "exit": 0,
+    "ledgers": 2,
+    "receipts": 59
+   }
+  },
+  {
+   "step": "migrated again, it verifies and its three tables equal the first migration's, every column",
+   "ok": true,
+   "detail": {
+    "postings": 0,
+    "balances": 0,
+    "holds": 0
+   }
+  },
+  {
+   "step": "backed up encrypted and restored, the pre-migration file verifies, at v5",
+   "ok": true,
+   "detail": {
+    "users": 2,
+    "receipts": 59
+   }
+  },
+  {
+   "step": "the encrypted restore then migrates and verifies under this build",
+   "ok": true,
+   "detail": {
+    "ledgers": 2
+   }
+  }
+ ],
+ "ok": true
+}

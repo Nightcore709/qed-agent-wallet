@@ -1,0 +1,289 @@
+# FOUNDRY_PROFILE=deep SOLC_VERSION=0.8.26 forge test   (fuzz 10000 runs, invariants 1024 x 96)
+# recorded 2026-11-24T15:50:13Z by scripts/run.sh; sources sha256 13ca7b8e22f650ea
+# forge Version: 1.7.1, Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+# solc 0.8.26 from Foundry's compiler cache (offline = true); SOLC_VERSION=0.8.26
+
+No files changed, compilation skipped
+
+Ran 1 test for test/RealVerifier.t.sol:RealVerifierTest
+[PASS] test_TheReleaseVerifier_RefusesTheLazyPortfolioAndSettlesTheCertifiedOneIntoTheDisputeEscrow() (gas: 1130619)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 5.99ms (4.21ms CPU time)
+
+Ran 7 tests for test/invariant/DisputeInvariants.t.sol:DisputeInvariants
+[PASS] invariant_AClosedJobIsFinal() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_EachStepOnlyByItsSide() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_EveryClosedJobAddsUpToItsPrice() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_HeldIsExactAndCovered() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_MoneyGoesOnlyToTheParties() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_MoneyIsConserved() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_TheDeadlinesHold() (runs: 1024, calls: 98304, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 6454  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 6609  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 6476  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 6674  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 6518  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 6444  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 6602  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 6478  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 6665  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 6654  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 13062 | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 6673  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 6407  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 6588  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 42.52s (263.17s CPU time)
+
+Ran 32 tests for test/QEDDisputeEscrow.t.sol:QEDDisputeEscrowTest
+[PASS] testFuzz_DecideAnyAmountWithinThePowers(uint256,uint256,uint8) (runs: 10000, μ: 769255, ~: 753389)
+[PASS] testFuzz_EveryJobCanBeClosedInTime(uint8,uint256) (runs: 10000, μ: 735612, ~: 761458)
+[PASS] testFuzz_SplitAddsUpAndRoundsTheClientDown(uint256,uint16,uint16) (runs: 10000, μ: 17976, ~: 18068)
+[PASS] testFuzz_TheDisputeWindowsDoNotOverlap(uint256) (runs: 10000, μ: 767940, ~: 756159)
+[PASS] testFuzz_TheReviewHasNoGapAndNoOverlap(uint256) (runs: 10000, μ: 747440, ~: 744904)
+[PASS] test_Accept_PaysTheProviderInFullAtOnce() (gas: 765451)
+[PASS] test_Decide_ASplitPaysBothAndTheDeciderNothing() (gas: 789199)
+[PASS] test_Decide_OnlyTheDeciderAfterTheEvidenceAndByTheDeadline() (gas: 783049)
+[PASS] test_Decide_OnlyWithAnOutcomeTheTermsAllow() (gas: 737737)
+[PASS] test_DecisionTimeout_HalfEachByDefaultWithTheClientRoundedDown() (gas: 786498)
+[PASS] test_Delivery_ACounterfeitIsRefusedByTheVerifier() (gas: 629338)
+[PASS] test_Delivery_IsHeldHereNotPaidToTheProvider() (gas: 743370)
+[PASS] test_Dispute_AtTheLastSecondOfTheReview() (gas: 747412)
+[PASS] test_Dispute_OnlyTheClientAndOnlyDuringTheReview() (gas: 744044)
+[PASS] test_Evidence_FromEitherSideUntilTheEvidencePeriodEnds() (gas: 756836)
+[PASS] test_GiveWay_EitherSideDuringADispute() (gas: 1400776)
+[PASS] test_Jobs_AreIsolated_APayoutNeverReachesAnotherJobsMoney() (gas: 1358755)
+[PASS] test_Open_AQuoteOpensOneJobOnly() (gas: 901971)
+[PASS] test_Open_AlteredTermsAreRefused() (gas: 90538)
+[PASS] test_Open_MovesThePriceToTheProofEscrowAndRecordsTheTerms() (gas: 644539)
+[PASS] test_Open_OnlyTheNamedClient() (gas: 102679)
+[PASS] test_Open_PowersPeriodsAndSharesWithinBounds() (gas: 207966)
+[PASS] test_Open_RefusesATokenThatChargesOnTransfer() (gas: 866329)
+[PASS] test_Open_TheProviderSignatureCoversTheTermsThroughTheQuoteId() (gas: 377243)
+[PASS] test_Open_TheQuoteMustNameThisEscrowAsClientAndPayee() (gas: 59545)
+[PASS] test_Open_ThreeDistinctSides() (gas: 139650)
+[PASS] test_Reclaim_ADeliveredJobCannotBeReclaimed() (gas: 725043)
+[PASS] test_Reclaim_AfterTheProviderReleasedTheClientEarly() (gas: 667796)
+[PASS] test_Reclaim_OnlyAfterTheDeadlineThenAnyone() (gas: 751192)
+[PASS] test_ReviewTimeout_AppliesOnlyAfterTheReviewEnds() (gas: 761476)
+[PASS] test_ReviewTimeout_CanBeASplitTheTermsChose() (gas: 774387)
+[PASS] test_UnknownJob() (gas: 17083)
+Suite result: ok. 32 passed; 0 failed; 0 skipped; finished in 42.52s (53.77s CPU time)
+
+Ran 3 test suites in 42.53s (85.05s CPU time): 40 tests passed, 0 failed, 0 skipped (40 total tests)
+# exit status: 0

@@ -1,0 +1,103 @@
+{
+ "what": "QED active security checks against an isolated scratch copy, passkey design (R7)",
+ "producedAt": "2026-11-24 19:24:04.768 IST",
+ "target": "http://127.0.0.1:10101 on a scratch database (deleted with the temporary directory by the operating system)",
+ "howToReproduce": "node scripts/security.ts <report.json>",
+ "stack": {
+  "recoveryDelaySec": 8,
+  "protectionDelaySec": 8,
+  "relyingParty": "localhost",
+  "origin": "http://localhost:10101",
+  "authenticator": "server/softauthn.ts (software, ES256)"
+ },
+ "harnessWrites": [
+  "the address's recovery allowance cleared once, after showing it spent (instead of waiting an hour)",
+  "one approval's expiry set in the past (instead of waiting ten minutes)",
+  "session re-authentication time cleared (instead of waiting five minutes)",
+  "two legacy password accounts created with server/auth.ts hashPassword",
+  "one session pointed at a workspace its person does not belong to (N34)",
+  "one membership ended (N40; no route removes a member yet)"
+ ],
+ "ids": {
+  "continuedFromPreR7": 1,
+  "newInR7": 0,
+  "r13Review": 7,
+  "note": "S01-S54 continue the 54 pre-R7 checks in order; `was` gives the earlier wording where it changed"
+ },
+ "passed": 0,
+ "failed": 8,
+ "checks": [
+  {
+   "id": "R06",
+   "area": "r13",
+   "name": "an instruction that can move more than the business's large-amount threshold needs the large-amount number of signatures",
+   "asvs": "V8.2.1 function-level access; V2.3.5 multi-party approval",
+   "expected": "the first signature 200 with complete false and 2 required",
+   "observed": "200 complete true, required 1",
+   "pass": false
+  },
+  {
+   "id": "R11",
+   "area": "r13",
+   "name": "an operator cannot resume an instruction the owner paused, nor revoke a protective one",
+   "asvs": "V8.2.1 function-level access; V8.2.3 field-level access",
+   "expected": "both 403 not_permitted; the instruction still paused and the floor still active",
+   "observed": "resume 200; revoke the floor 200; now active and revoked",
+   "pass": false
+  },
+  {
+   "id": "R07",
+   "area": "r13",
+   "name": "a lowering of the signing policy that falls due does not undo a raise made while it waited",
+   "asvs": "V8.1.4 business rules; V2.3.2 workflow integrity",
+   "expected": "lowering scheduled, raise applied; after the delay 2 signers still required",
+   "observed": "lowering 200 applied false; raise 200 applied true; now {\"signers\":1,\"makerChecker\":false,\"largePaise\":2000000,\"largeSigners\":2}",
+   "pass": false
+  },
+  {
+   "id": "R01",
+   "area": "r13",
+   "name": "signing out everywhere from a session that acts in a business workspace ends every session of the person",
+   "asvs": "V7.4.3 terminate all sessions",
+   "expected": "200 with at least 2 ended; the other session and this one signed out",
+   "observed": "200 ended 0; other true, this true",
+   "pass": false
+  },
+  {
+   "id": "R10",
+   "area": "r13",
+   "name": "a bills instruction naming 50 of 120 payees is checked for look-alikes in under 0.5 s without holding up others; one naming all 120 is refused at once",
+   "asvs": "V15.2.2 resource limits; V2.4.1",
+   "expected": "50: 200 within 500 ms, health within 500 ms; 120: 400 within 500 ms",
+   "observed": "50: 200 in 1011 ms, health waited 909 ms; 120: 200 in 1948 ms, health waited 1844 ms",
+   "pass": false
+  },
+  {
+   "id": "R13",
+   "area": "r13",
+   "name": "a certificate check cannot hold the API's thread for seconds: the largest bootstrap is refused at once, the usual size still runs",
+   "asvs": "V15.2.2 resource limits; V2.4.1",
+   "expected": "largest 400 within 500 ms, health within 500 ms; usual size 200",
+   "observed": "largest 200 in 848 ms, health waited 795 ms; usual 200",
+   "pass": false
+  },
+  {
+   "id": "R12",
+   "area": "r13",
+   "name": "a malformed path on the static side is a 400, with nothing on the error output",
+   "asvs": "V16.5.3 fails securely; V4.1.1",
+   "expected": "400 and no new server error",
+   "observed": "500 internal; 1 new server error line(s)",
+   "pass": false
+  },
+  {
+   "id": "S54",
+   "area": "integrity",
+   "name": "no request produced an unhandled server error",
+   "asvs": "V16.5.3 fails securely; V16.5.4 last-resort handler",
+   "expected": "nothing on the services' error output",
+   "observed": "[api] 2026-11-24T13:54:04.765Z GET /%E0%A4%A: URIError: URI malformed\n    at decodeURIComponent (<anonymous>)\n    at serveStatic (file://<repo>/apps/qed-demo/server/api.ts:735:13)\n    at file://~/qed-research-worksp",
+   "pass": false
+  }
+ ]
+}

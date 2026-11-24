@@ -1,0 +1,23 @@
+/* Rules from before "Proof" that several screens still share, restated in Bounds' tokens. Nothing here is used by the
+   Activity screens alone (checked by search, 23 Nov 2026), so none could move into activity.css; each names the screens
+   that use it and the shared file it belongs in, for whoever owns that file. When all have moved, this file and its
+   import in app.css go. Removed on 23 Nov as used by no element: the `.asof a`, `.eyebrow a` and `.drafts a` targets
+   (only `.rv-asof`, `.drafts-p` and `.am-drafts` exist). */
+
+/* raw records shown as text (Compose, Instructions, Record, Vault, Workspace, Evidence): belongs in components.css */
+pre.doc { white-space: pre-wrap; word-break: break-word; background: var(--well); border-radius: var(--r-sm); padding: var(--s3) var(--s4); max-height: 320px; overflow: auto; font-size: var(--t-small); }
+/* every disclosure (thirteen screens): belongs in base.css */
+summary { cursor: pointer; padding: 6px 0; min-height: 32px; color: var(--ink-2); font-weight: 560; } summary:hover { color: var(--ink); }
+
+/* Targets (Fitts; WCAG 2.5.8): a link that stands on its own, a disclosure and a link-like button get 32 px or more to
+   press (measured by scripts/design-measures.ts). Vertical padding with an equal negative margin enlarges what can be
+   pressed without moving anything around it; inline links in running text keep their size. Shared by every screen:
+   belongs in components.css. */
+td a, .num a.small, p.small a, .row > a:not(.btn), .kv dd summary { padding-block: 8px; margin-block: -8px; }
+
+/* the point a time chart is read at (ui/timechart.tsx): belongs in components.css, with the charts */
+.chart .dot.at { fill: var(--sheet); stroke: var(--brand); stroke-width: 2; }
+
+/* the on-chain wallet's signers and earning (Security, Vault): belongs in protect.css or vault.css */
+.wallet-code { white-space: normal; overflow-wrap: anywhere; }
+.wallet-signers h3 { margin-top: var(--s4); }

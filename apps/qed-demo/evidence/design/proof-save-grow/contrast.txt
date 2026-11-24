@@ -1,0 +1,12 @@
+/save 390 light: 214 texts, lowest 5.18:1, 0 under the minimum
+/holdings 390 light: 268 texts, lowest 4.77:1, 0 under the minimum
+/safeguards 390 light: 318 texts, lowest 4.77:1, 0 under the minimum
+/save 1440 dark: 209 texts, lowest 5.54:1, 0 under the minimum
+/holdings 1440 dark: 288 texts, lowest 5.93:1, 0 under the minimum
+/safeguards 1440 dark: 330 texts, lowest 5.54:1, 0 under the minimum
+/save 390 dark: 214 texts, lowest 5.54:1, 0 under the minimum
+/holdings 390 dark: 268 texts, lowest 5.93:1, 0 under the minimum
+/safeguards 390 dark: 318 texts, lowest 5.54:1, 0 under the minimum
+/save 1440 light: 209 texts, lowest 5.18:1, 0 under the minimum
+/holdings 1440 light: 288 texts, lowest 4.77:1, 0 under the minimum
+/safeguards 1440 light: 330 texts, lowest 4.77:1, 0 under the minimum

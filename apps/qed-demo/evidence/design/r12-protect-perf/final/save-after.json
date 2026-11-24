@@ -1,0 +1,54 @@
+{
+  "profile": "phone: 390 x 844, CPU 4x, 150 ms, 1.6 Mb/s down",
+  "runs": 5,
+  "measured": "2026-11-24T10:30:44.368Z",
+  "note": "Lab figures on one computer under load from other work; not field data.",
+  "results": {
+    "/save": {
+      "runs": [
+        {
+          "head": 1880.5,
+          "figure": 2177.699999988079,
+          "control": 1880.5,
+          "lcp": 2052,
+          "response": 88
+        },
+        {
+          "head": 1884.3999999761581,
+          "figure": 2166.0999999940395,
+          "control": 1884.3999999761581,
+          "lcp": 2052,
+          "response": 88
+        },
+        {
+          "head": 1874.9000000059605,
+          "figure": 2189.300000011921,
+          "control": 1874.9000000059605,
+          "lcp": 2040,
+          "response": 72
+        },
+        {
+          "head": 1880.7999999821186,
+          "figure": 2179.199999988079,
+          "control": 1880.7999999821186,
+          "lcp": 2064,
+          "response": 80
+        },
+        {
+          "head": 1877.5,
+          "figure": 2198.399999976158,
+          "control": 1877.5,
+          "lcp": 2064,
+          "response": 80
+        }
+      ],
+      "median": {
+        "head": 1881,
+        "figure": 2179,
+        "control": 1881,
+        "lcp": 2052,
+        "response": 80
+      }
+    }
+  }
+}

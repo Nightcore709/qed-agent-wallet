@@ -1,0 +1,601 @@
+/* Grow (/holdings), its price record (PriceRecord.tsx) and the price chart (src/ui/timechart.tsx); design system
+   "Meridian", DESIGN.md M4 and M6. A command grid: what the investments are worth beside the room above the floor; each
+   holding on one grid (a ruled table on a wide screen, cards with the same rows on a phone), its figures right-aligned
+   in tabular figures and its four actions in one place; the price record across the page; the ticket with its fills
+   beside the market's prices; deposits and debts; the dollar reserve. Value and risk speak one language everywhere:
+   lit is what would be left if a limit held, hatched is what the limit could take, QED's bracket is the room a purchase
+   may use. Live figures never move a column: every table has a fixed layout with a reserved width for each figure.
+   Tokens only; every class here is Grow's own (shared ones are only ever scoped under .gr-page).
+
+   The phone is designed, not squeezed (R12): one column with 16 px gutters; every figure in a list stands right-aligned
+   on its row with its label on the left, on one baseline; actions are 44 px and fill an even grid; nothing wraps a
+   label into two lines beside a figure. */
+
+.gr-page { display: grid; gap: var(--s5); min-width: 0; }
+.gr-page > * { min-width: 0; }
+.gr-n { font-variant-numeric: tabular-nums lining-nums; }
+
+/* ------------------------------------------------------------------------------------------------ the head */
+.gr-head { margin-bottom: var(--s1); }
+.gr-head h1 .dim { color: var(--ink-3); font-weight: 560; }
+.gr-head h1 { max-width: 18ch; }
+.gr-acts { display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+/* ------------------------------------------------------------------------------------------------ the two lead panels */
+.gr-top { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: var(--s5); align-items: stretch; }
+.gr-worth, .gr-floor { display: flex; flex-direction: column; padding: var(--s6) var(--s6) var(--s5); }
+/* the lead panel is lit from the section's light, as Home's position is: a brass light at its head, a warm one at its foot */
+.gr-worth { background: radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--glow-a) 40%, transparent), transparent 62%), radial-gradient(70% 60% at 100% 100%, color-mix(in oklab, var(--glow-b) 22%, transparent), transparent 70%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.gr-lead-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s1) var(--s3); flex-wrap: wrap; }
+.gr-lead-head h2 { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-body); font-weight: 600; color: var(--ink-2); letter-spacing: -.005em; }
+.gr-asof { font-size: var(--t-small); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.gr-hero { margin-top: var(--s2); font-size: var(--t-fig-hero); line-height: .95; font-weight: 640; letter-spacing: var(--track-hero); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+/* the paise one step dimmer by colour, not by opacity, so they keep 4.5:1 over the glass at any size */
+.gr-hero .paise { font-size: var(--t-fig-m); opacity: 1; color: var(--ink-2); letter-spacing: -.02em; }
+.gr-hero-sub { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin-top: var(--s3); color: var(--ink-2); }
+/* the change since bought: a chip in the colour of its sign, with the sign and the words (never colour alone) */
+.gr-chg { display: inline-block; max-width: 100%; padding: 3px 10px; border-radius: var(--r-sm); font-weight: 650; color: var(--ink); background: color-mix(in oklab, var(--pane-2) 70%, transparent); box-shadow: inset 0 0 0 1px var(--rule-2); font-variant-numeric: tabular-nums lining-nums; }
+.gr-chg.gain { color: var(--gain); background: var(--gain-bg); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--gain) 30%, transparent); }
+.gr-chg.loss { color: var(--loss); background: var(--loss-bg); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--loss) 30%, transparent); }
+.gr-chg-pct { font-weight: 560; }
+.gr-lead { margin-top: var(--s2); font-size: var(--t-fig-l); line-height: 1; font-weight: 650; letter-spacing: var(--track-fig); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.gr-lead.loss { color: var(--loss); }
+.gr-lead .paise { font-size: var(--t-fig-s); opacity: 1; color: var(--ink-2); }
+.gr-lead.loss .paise { color: var(--loss); }
+.gr-lead-sub { margin-top: var(--s3); color: var(--ink-2); max-width: 52ch; }
+
+/* swatches: the same marks as the bars they name */
+.gr-sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.gr-sw.keep { background: var(--c1); }
+/* R13 colour: what a limit could take is a possible loss, so its hatch is laid on the loss hue, faintly, everywhere on Grow */
+.gr-sw.fall { background: var(--hatch), color-mix(in oklab, var(--loss) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--loss) 55%, var(--ink-3)); }
+/* the paid mark is a thin line, centred in a swatch's width so every label in a key starts at one edge */
+.gr-sw.paid { width: 2px; height: 12px; margin-inline: 4px; border-radius: 1px; background: var(--ink); }
+/* room above the floor is the mirror of "short": the same swatch, in the gain hue (the old tide bracket is gone from the bars) */
+.gr-sw.room { background: var(--gain-bg); box-shadow: inset 0 0 0 1.5px var(--gain); }
+.gr-sw.short { background: var(--loss-bg); box-shadow: inset 0 0 0 1.5px var(--loss); }
+
+/* the holdings at one scale: lit what the limits would leave, hatched what they could take, a mark at what was paid */
+.gr-vbar { position: relative; height: 14px; margin-top: var(--s5); border-radius: var(--r-pill); background: color-mix(in oklab, var(--well) 70%, transparent); box-shadow: inset 0 0 0 1px var(--rule); }
+.gr-vbar > span { position: absolute; top: 0; bottom: 0; }
+.gr-vbar .keep { left: 0; border-radius: var(--r-pill) 3px 3px var(--r-pill); background: linear-gradient(90deg, color-mix(in oklab, var(--c1) 92%, transparent), color-mix(in oklab, var(--c1) 72%, transparent)); box-shadow: 0 0 18px -2px color-mix(in oklab, var(--c1) 28%, transparent); transform-origin: left; animation: meter-in var(--d4) var(--ease-out) both; }
+.gr-vbar .fall { margin-left: 3px; border-radius: 3px var(--r-pill) var(--r-pill) 3px; background: var(--hatch), color-mix(in oklab, var(--loss) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--loss) 32%, transparent); }
+.gr-vbar .paid { top: -6px; bottom: -6px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--ink); box-shadow: 0 0 0 2px color-mix(in oklab, var(--ground) 55%, transparent); }
+/* the bar's key, with each figure once, as the floor's subtraction beside it is written: each on its row, the label
+   and its swatch on the left, the figure right-aligned on the same baseline */
+.gr-legend { display: grid; margin-top: var(--s4); font-variant-numeric: tabular-nums lining-nums; }
+.gr-legend > div, .gr-eq > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--s3); padding: 7px 0; min-width: 0; }
+.gr-legend dt, .gr-eq dt { flex: 1 1 8rem; min-width: 0; }
+.gr-legend dd, .gr-eq dd { margin-left: auto; }
+.gr-legend > div + div { border-top: 1px solid var(--rule); }
+.gr-legend dt { display: flex; align-items: center; gap: 8px; font-size: var(--t-small); color: var(--ink-2); }
+.gr-legend dt .basis { font-size: var(--t-small); font-weight: inherit; color: inherit; }
+.gr-legend dt .basis::first-letter { text-transform: uppercase; }
+.gr-legend dd { font-size: var(--t-body); font-weight: 620; color: var(--ink); text-align: right; white-space: nowrap; }
+.gr-legend-pct { font-weight: 620; color: var(--ink); }
+.gr-transit { display: flex; gap: var(--s2); align-items: baseline; margin-top: auto; padding-top: var(--s4); font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.gr-transit svg { width: 15px; height: 15px; flex: none; align-self: center; color: var(--hold); }
+.gr-transit b { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+/* the money with the fund house closes the panel, under a rule, at the foot of a panel as tall as the floor's beside it */
+.gr-worth .gr-legend { margin-bottom: var(--s4); }
+.gr-worth .gr-legend + .gr-transit { border-top: 1px solid var(--rule); }
+
+/* the rule: the worst case from nothing, what limit-falls would take hatched, the floor as a mark, and over the room
+   between the floor and the worst case QED's bracket; one label above it, the floor's below it */
+.gr-rule { margin-top: var(--s5); }
+.gr-rule-top, .gr-rule-foot { position: relative; height: 18px; font-size: var(--t-micro); line-height: 18px; color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.gr-rule-lab { position: absolute; top: 0; white-space: nowrap; transform: translateX(-50%); }
+.gr-rule-lab.start { transform: none; }
+.gr-rule-lab.end { transform: translateX(-100%); }
+.gr-rule-top .gr-rule-lab { color: var(--ink); font-weight: 650; }
+.gr-rule-foot .gr-rule-lab + .gr-rule-lab { font-weight: 600; color: var(--ink); }
+.gr-rule-bar { position: relative; height: 14px; margin: 14px 0 7px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--well) 70%, transparent); box-shadow: inset 0 0 0 1px var(--rule); }
+.gr-rule-bar > span { position: absolute; top: 0; height: 100%; }
+.gr-rule-bar .keep { border-radius: var(--r-pill) 0 0 var(--r-pill); background: linear-gradient(90deg, color-mix(in oklab, var(--c1) 92%, transparent), color-mix(in oklab, var(--c1) 72%, transparent)); box-shadow: 0 0 18px -2px color-mix(in oklab, var(--c1) 28%, transparent); transform-origin: left; animation: meter-in var(--d4) var(--ease-out) both; }
+.gr-rule-bar .fall { background: var(--hatch), color-mix(in oklab, var(--loss) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--loss) 32%, transparent); }
+.gr-rule-bar .short { background: var(--loss-bg); box-shadow: inset 0 0 0 1.5px var(--loss); }
+.gr-rule-bar .room { top: -9px; height: calc(100% + 9px); border: 2px solid var(--qed); border-bottom: 0; border-radius: 8px 8px 0 0; pointer-events: none; }
+.gr-rule-bar .floor { top: -7px; width: 2px; height: calc(100% + 14px); margin-left: -1px; border-radius: 1px; background: var(--ink); box-shadow: 0 0 0 2px color-mix(in oklab, var(--ground) 55%, transparent); }
+/* the subtraction the room comes from: each term on its row, the operator in front, the figure right-aligned */
+.gr-eq { display: grid; margin-top: var(--s4); font-variant-numeric: tabular-nums lining-nums; }
+.gr-eq > div + div { border-top: 1px solid var(--rule); }
+.gr-eq > .sum { border-top: 1px solid var(--rule-2); }
+.gr-eq dt { display: flex; align-items: center; gap: 8px; font-size: var(--t-small); color: var(--ink-2); }
+.gr-eq dd { font-size: var(--t-body); font-weight: 620; color: var(--ink); text-align: right; white-space: nowrap; }
+.gr-eq .sum dt { font-weight: 650; color: var(--ink); }
+.gr-eq .sum dd { font-weight: 700; }
+.gr-eq dd.loss { color: var(--loss); }
+.gr-op { display: inline-block; width: 10px; text-align: center; font-weight: 650; color: var(--ink-3); }
+.gr-floor-what { margin-top: var(--s3); font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.gr-floor-what b { color: var(--ink); font-weight: 620; }
+.gr-floor .note { margin-top: var(--s3); }
+.gr-parts { margin-top: auto; padding-top: var(--s3); }
+.gr-parts > summary { padding: 10px 0 6px; font-size: var(--t-small); font-weight: 600; color: var(--brand); }
+.gr-parts-t { max-width: 640px; margin-top: var(--s1); }
+.gr-parts-t col.c-sum { width: min(10.5rem, 46%); }
+/* On a phone, or with text at 200%, the label and its figure stack: a fixed 10.5rem figure column left no room for the label and ran past a 320 px screen */
+@media (max-width: 420px) {
+  .gr-parts-t :is(tbody, tfoot) tr { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .gr-parts-t :is(th, td) { min-width: 0; overflow-wrap: anywhere; }
+  .gr-parts-t td.num { padding-top: 0; text-align: left; }
+  .gr-parts-t col { width: auto; }
+}
+.gr-page .gr-parts-t tfoot :is(th, td) { padding-top: var(--s3); box-shadow: inset 0 1px 0 var(--rule-2); font-weight: 680; }
+.gr-parts-foot { margin-top: var(--s2); font-size: var(--t-small); }
+.gr-parts-foot a { display: inline-flex; align-items: center; gap: 4px; padding-block: 8px; margin-block: -8px; font-weight: 600; text-decoration: none; }
+.gr-parts-foot a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.gr-parts-foot svg { width: 15px; height: 15px; }
+
+/* ------------------------------------------------------------------------------------------------ every table on the page */
+.gr-page table.ledger.fixed { table-layout: fixed; width: 100%; }
+.gr-page .ledger :is(tbody, tfoot) th { font-size: var(--t-body); font-weight: 560; color: var(--ink); text-align: left; white-space: normal; background: none; letter-spacing: -.004em; border-radius: 0; padding: var(--s3); border-bottom: 1px solid var(--rule); }
+.gr-page .ledger :is(tbody, tfoot) th:first-child { padding-left: var(--s4); }
+.gr-page .ledger tbody tr:last-child th { border-bottom: 0; }
+.gr-page .ledger th .sub { display: block; margin-top: 2px; font-size: var(--t-small); font-weight: 430; color: var(--ink-3); }
+.gr-scroll { overflow-x: auto; overscroll-behavior-x: contain; border-radius: var(--r-sm); }
+.gr-scroll:focus-visible { outline-offset: 4px; }
+.gr-scroll-y { max-height: 320px; overflow-y: auto; }
+.gr-scroll-y thead th { position: sticky; top: 0; z-index: 1; background: var(--sheet-2); }
+
+/* ------------------------------------------------------------------------------------------------ what you hold: the table */
+.gr-hold-panel { padding: var(--s6); }
+.gr-hold :is(th, td) { vertical-align: top; }
+.gr-hold thead th { vertical-align: bottom; white-space: normal; line-height: 1.3; }
+.gr-hold thead .c-px { width: 11.5rem; }
+.gr-hold thead .c-val { width: 9rem; }
+.gr-hold thead .c-chg { width: 9.5rem; }
+.gr-hold thead .c-worst { width: 9rem; }
+.gr-hold thead .c-lim { width: 12.5rem; }
+/* a holding's rule is under its row of actions, not under its figures */
+.gr-page .gr-hold tbody :is(th, td) { padding-top: var(--s4); padding-bottom: var(--s2); border-bottom: 0; }
+.gr-page .gr-hold .gr-h-act td { padding-top: var(--s1); padding-bottom: var(--s4); border-bottom: 1px solid var(--rule); }
+.gr-page .gr-hold tbody tr.gr-h-act:last-child td { border-bottom: 0; }
+.gr-page .gr-hold tfoot :is(th, td) { padding-top: var(--s3); padding-bottom: var(--s1); border-bottom: 0; box-shadow: inset 0 1px 0 var(--rule-2); }
+.gr-page .gr-hold tfoot th { font-weight: 680; }
+.gr-h-name { display: block; font-weight: 650; letter-spacing: -.01em; }
+.gr-hold .gr-n { display: block; font-size: var(--t-body); font-weight: 620; color: var(--ink); white-space: nowrap; }
+.gr-hold .gr-n.gr-val { font-size: var(--t-lead); font-weight: 680; letter-spacing: -.012em; }
+.gr-page :is(.gr-hold, .gr-cards) .gr-n.gain, .gr-page :is(.gr-hold, .gr-cards) .sub.gain { color: var(--gain); }
+.gr-page :is(.gr-hold, .gr-cards) .gr-n.loss, .gr-page :is(.gr-hold, .gr-cards) .sub.loss { color: var(--loss); }
+.gr-hold .sub { display: block; margin-top: 2px; font-size: var(--t-small); line-height: 1.4; color: var(--ink-3); white-space: normal; }
+.gr-hold td.num .px { justify-content: flex-end; }
+/* the limit: one bar of one width in every row, then its share in a fixed width; the words under it open its note */
+.gr-lim-line { display: flex; align-items: center; justify-content: flex-end; gap: var(--s2); min-height: 24px; }
+.gr-lim-line .gr-n { flex: none; min-width: 3.9em; text-align: right; }
+.gr-page .gr-hold .gr-lim-line .gr-n { display: inline; }
+.gr-risk { flex: none; display: flex; gap: 2px; width: 96px; height: 8px; padding: 0; border-radius: var(--r-pill); overflow: hidden; background: color-mix(in oklab, var(--well) 70%, transparent); box-shadow: inset 0 0 0 1px var(--rule-2); }
+.gr-risk i { display: block; height: 100%; }
+.gr-risk .keep { border-radius: var(--r-pill) 2px 2px var(--r-pill); background: linear-gradient(90deg, color-mix(in oklab, var(--c1) 92%, transparent), color-mix(in oklab, var(--c1) 72%, transparent)); transform-origin: left; animation: meter-in var(--d4) var(--ease-out) both; }
+.gr-risk .fall { flex: 1; background: var(--hatch), color-mix(in oklab, var(--loss) 14%, transparent); }
+.gr-limit-words .basis { font-size: var(--t-small); font-weight: 430; white-space: normal; text-align: inherit; }
+.gr-limit-words .basis.gr-illus { color: var(--due); }
+/* a note opened at the right edge of the page opens leftward, inside the page */
+.gr-page td.num .gr-limit-words .basis-pop, .gr-card-facts dd .gr-limit-words .basis-pop { left: auto; right: 0; }
+/* the four actions: one group, in one order, starting at the holding's own left edge */
+.gr-h-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.gr-h-acts .btn svg { width: 15px; height: 15px; }
+.gr-empty { padding: var(--s2) 0; color: var(--ink-2); }
+.gr-waiting { margin-top: var(--s4); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: var(--hold-bg); border: 1px solid color-mix(in oklab, var(--hold) 22%, transparent); font-size: var(--t-small); color: var(--ink-2); }
+.gr-waiting-h { display: flex; align-items: center; gap: var(--s2); color: var(--ink); }
+.gr-waiting-h svg { width: 16px; height: 16px; flex: none; color: var(--hold); }
+.gr-waiting-h b { font-weight: 680; font-variant-numeric: tabular-nums; }
+.gr-waiting ul { margin: 2px 0 0 24px; }
+.gr-waiting a { color: var(--ink); }
+.gr-waiting li + li { margin-top: 4px; }
+
+/* what a holding was bought at, and why it changed (R12 task comparison, T4-b and T4-c): the bought-at line under the
+   name; under the figures, two disclosures, each a sum written as the floor's subtraction is (label and its one line
+   on the left, the figure right-aligned on the same baseline, the total under a heavier rule) */
+.gr-page .gr-hold .sub.gr-bought, .gr-page .gr-card .sub.gr-bought { color: var(--ink-2); }
+.gr-story { display: grid; justify-items: start; max-width: 46rem; margin-bottom: var(--s2); }
+.gr-story > details { width: 100%; }
+.gr-story > details > summary { width: fit-content; min-height: 32px; padding: 6px 0 4px; font-size: var(--t-small); font-weight: 600; color: var(--brand); }
+/* a day is one word: "Tue 24 Nov" never breaks across lines */
+.gr-nb { white-space: nowrap; }
+.gr-story > details[open] { padding-bottom: var(--s3); }
+.gr-why-since { margin-top: var(--s1); font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.gr-why-lines { display: grid; margin-top: var(--s2); font-variant-numeric: tabular-nums lining-nums; }
+.gr-why-lines > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--s3); padding: 8px 0; min-width: 0; }
+.gr-why-lines > div + div { border-top: 1px solid var(--rule); }
+.gr-why-lines > .sum { border-top: 1px solid var(--rule-2); }
+.gr-why-lines dt { flex: 1 1 11rem; min-width: 0; font-size: var(--t-small); font-weight: 600; color: var(--ink); line-height: 1.4; }
+.gr-why-lines dt .sub { display: block; margin-top: 1px; font-weight: 430; color: var(--ink-3); }
+.gr-why-lines dd { margin-left: auto; font-size: var(--t-body); font-weight: 620; color: var(--ink); text-align: right; white-space: nowrap; }
+.gr-why-lines .sum dt { font-size: var(--t-body); font-weight: 650; }
+.gr-why-lines .sum dd { font-weight: 700; }
+.gr-page .gr-why-lines dd.gain { color: var(--gain); }
+.gr-page .gr-why-lines dd.loss { color: var(--loss); }
+.gr-why-rate { margin-top: var(--s2); font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+.gr-why-rate b { font-weight: 650; color: var(--ink); }
+.gr-lot-list { display: grid; margin-top: var(--s2); list-style: none; padding: 0; }
+.gr-lot-list li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--s3); padding: 8px 0; font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.gr-lot-list li + li { border-top: 1px solid var(--rule); }
+.gr-lot-what { flex: 1 1 16rem; min-width: 0; font-variant-numeric: tabular-nums lining-nums; }
+.gr-lot-what b { font-weight: 650; color: var(--ink); margin-right: 4px; white-space: nowrap; }
+.gr-lot-cost { margin-left: auto; font-size: var(--t-body); font-weight: 620; color: var(--ink); white-space: nowrap; }
+.gr-lot-foot { margin-top: var(--s1); font-size: var(--t-small); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ your ideas (R13) */
+.gr-idea-list { display: grid; gap: var(--s2); }
+.gr-idea-row { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 60%, transparent); color: inherit; text-decoration: none; }
+.gr-idea-row:hover { border-color: var(--brand-line); }
+.gr-idea-t { display: grid; gap: 2px; min-width: 0; }
+.gr-idea-t strong { overflow-wrap: anywhere; font-weight: 620; }
+.gr-idea-t .sub { font-size: var(--t-small); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ what you hold: the cards */
+/* every card on one grid: the name and the value on one baseline, the ticker and the change under them, then the facts
+   as rows with their figures right-aligned, then the actions in an even grid */
+.gr-cards { display: grid; gap: var(--s3); }
+.gr-card { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: linear-gradient(180deg, var(--gloss), transparent 48%), color-mix(in oklab, var(--pane-2) 72%, transparent); box-shadow: inset 0 1px 0 var(--edge-hi); }
+.gr-card-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 2px var(--s3); }
+/* R13: the value stands on the name's baseline at every width (it fell to its own line on a phone); the code under the
+   name, the bought-at line across the card */
+.gr-card-top .gr-card-name { grid-column: 1; grid-row: 1; min-width: 0; overflow-wrap: anywhere; }
+.gr-card-top .gr-card-v { grid-column: 2; grid-row: 1; }
+.gr-card-top .gr-card-code { grid-column: 1 / -1; }
+.gr-card-top .gr-bought { grid-column: 1 / -1; margin-top: 2px; }
+.gr-card-name { font-size: var(--t-lead); font-weight: 650; letter-spacing: -.012em; line-height: 1.25; }
+.gr-card-v { font-size: var(--t-fig-s); font-weight: 680; letter-spacing: var(--track-fig); color: var(--ink); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.gr-card-top .sub { font-size: var(--t-small); color: var(--ink-3); line-height: 1.4; }
+.gr-card-facts { display: grid; border-top: 1px solid var(--rule); }
+.gr-card-facts > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--s3); padding: 10px 0; }
+/* a fact's label at its own width; its figure takes the rest of the line, right-aligned, and the line under the figure
+   wraps inside that width (it adds nothing to the width the figure asks for); when label and figure cannot share a
+   line (enlarged text, a long translation) the figure moves under the label */
+.gr-card-facts dt { flex: 0 1 auto; min-width: 0; }
+.gr-card-facts > div + div { border-top: 1px solid var(--rule); }
+.gr-card-facts dt { font-size: var(--t-small); font-weight: 560; color: var(--ink-2); }
+.gr-card-facts dd { flex: 1 1 auto; display: grid; justify-items: end; gap: 2px; text-align: right; min-width: 0; }
+.gr-card-facts dd > .gr-n { font-size: var(--t-body); font-weight: 620; color: var(--ink); white-space: nowrap; }
+.gr-card-facts dd > .sub { width: 0; min-width: 100%; font-size: var(--t-small); color: var(--ink-3); line-height: 1.4; }
+.gr-card-facts dd > .sub:empty { display: none; }
+.gr-card-facts .px { justify-content: flex-end; }
+.gr-card-held { color: var(--ink-3); font-size: var(--t-small); }
+.gr-card .gr-h-acts { display: grid; grid-template-columns: repeat(4, max-content); gap: var(--s2); }
+.gr-card .gr-h-acts .btn { min-height: 44px; }
+
+/* a live price: its direction mark and figure keep their space whatever the figure says */
+.px { display: inline-flex; align-items: center; justify-content: flex-end; gap: 5px; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.px-dir { width: 8px; height: 8px; flex: none; }
+.px-dir path { fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; animation: px-in var(--d2) var(--ease-out); }
+.px-dir.up path { stroke: var(--gain); }
+.px-dir.down path { stroke: var(--loss); }
+@keyframes px-in { from { opacity: 0; } }
+
+/* ------------------------------------------------------------------------------------------------ the ticket and its fills, beside the prices */
+.gr-trade { display: grid; grid-template-columns: minmax(340px, 5fr) minmax(0, 7fr); grid-template-rows: auto 1fr; grid-template-areas: "ticket prices" "fills prices"; gap: var(--s5); align-items: stretch; }
+.gr-ticket { grid-area: ticket; min-width: 0; padding: var(--s6); scroll-margin-top: calc(var(--bar-top, 0px) + 16px); }
+.gr-fills { grid-area: fills; min-width: 0; padding: var(--s5) var(--s6); display: flex; flex-direction: column; }
+.gr-fills .panel-head { margin-bottom: var(--s2); }
+/* the fills end in their own foot, so the column ends with the prices beside it by design */
+.gr-fills > :is(ul, p) { margin-bottom: var(--s4); }
+.gr-fills .panel-foot { margin-top: auto; }
+.gr-trade > .gr-market { grid-area: prices; }
+.gr-skel { display: grid; gap: var(--s5); }
+
+/* the record: a panel lit from below, its light spilling around it (Peak Chart's halo, in the section's colour) */
+.price-chart { --gr-light: var(--c3); margin: 0; min-width: 0; display: flex; flex-direction: column; padding: var(--s6); scroll-margin-top: calc(var(--bar-top, 0px) + 16px);
+  background: radial-gradient(80% 55% at 40% 100%, color-mix(in oklab, var(--glow-a) 30%, transparent), transparent 72%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane);
+  box-shadow: var(--lift-1), 0 34px 90px -46px color-mix(in oklab, var(--glow-a) 90%, transparent); }
+.pc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s4); flex-wrap: wrap; }
+.pc-title h2 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; }
+.pc-title p { margin-top: 2px; font-size: var(--t-small); color: var(--ink-3); }
+.pc-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--s2) var(--s3); }
+.pc-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 22rem); gap: var(--s5) var(--s8); margin-top: var(--s5); align-items: stretch; }
+.pc-left { display: flex; flex-direction: column; min-width: 0; }
+.pc-side { display: flex; flex-direction: column; gap: var(--s4); min-width: 0; padding-left: var(--s6); border-left: 1px solid var(--rule); }
+.pc-figure { min-width: 0; }
+.pc-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); letter-spacing: .004em; overflow-wrap: anywhere; }
+.pc-v { margin-top: 6px; font-size: var(--t-fig-l); line-height: 1; font-weight: 600; letter-spacing: var(--track-fig); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+/* the day a published value is for (or when a recorded one was heard), and how current it is: "stale" in words and colour */
+.pc-when { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s2); margin-top: var(--s2); font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.pc-when b { font-weight: 650; color: var(--ink); }
+.pc-when span::before { content: "·"; margin-right: var(--s2); color: var(--ink-3); }
+.pc-when.stale span { color: var(--due); font-weight: 600; }
+.pc-s { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 4px; font-size: var(--t-small); color: var(--ink-2); letter-spacing: .004em; }
+.pc-chg { font-weight: 650; color: var(--ink); }
+.pc-chg.up { color: var(--gain); }
+.pc-chg.down { color: var(--loss); }
+.pc-unit::before { content: "·"; margin-right: 8px; color: var(--ink-3); }
+/* the picker: a glass pill, as the period's track is */
+.pc-pick { flex: 0 1 18rem; min-width: min(14rem, 100%); }
+.pc-pick .input { min-height: 44px; border-radius: var(--r-pill); padding-left: 18px; background-color: color-mix(in oklab, var(--well) 55%, transparent); border-color: var(--rim); }
+.pc-short { margin: 0; color: var(--ink-2); line-height: 1.45; }
+.pc-short b { color: var(--ink); font-weight: 640; }
+.pc-key { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s5); margin-top: var(--s2); font-size: var(--t-micro); color: var(--ink-3); letter-spacing: .012em; }
+.pc-key span { display: inline-flex; align-items: center; gap: 7px; }
+.pc-key i { display: inline-block; width: 18px; height: 2px; border-radius: 1px; }
+.pc-key .k-line { background: var(--ink); box-shadow: 0 0 6px var(--gr-light); }
+/* a step: a held level, a thin riser, the next level */
+.pc-key .k-step { height: 9px; border-radius: 0; background: linear-gradient(var(--ink), var(--ink)) 0 0 / 9px 2px no-repeat, linear-gradient(var(--ink-3), var(--ink-3)) 8px 0 / 1px 9px no-repeat, linear-gradient(var(--ink), var(--ink)) 9px 7px / 9px 2px no-repeat; }
+.pc-key .k-pub { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); }
+.pc-key .k-tick { width: 1px; height: 8px; border-radius: 0; background: var(--ink-2); }
+.pc-key .k-level { background: repeating-linear-gradient(90deg, var(--ink-2) 0 5px, transparent 5px 9px); }
+.pc-key .k-gap { width: 9px; height: 11px; border-radius: 0; border-left: 1px dashed var(--ink-3); border-right: 1px dashed var(--ink-3); }
+/* the key names the publication mark the chart drew: a dot on each step, or a tick on the axis when they are too close */
+.tchart:not(.tc-marks-dots) ~ .pc-key .pk-dots, .tchart:not(.tc-marks-ticks) ~ .pc-key .pk-ticks { display: none; }
+.pc-words { display: grid; gap: 4px; }
+.price-chart .chart-q { font-size: var(--t-body); font-weight: 640; letter-spacing: -.008em; }
+.price-chart :is(.chart-a, .chart-note) { margin: 0; color: var(--ink-2); line-height: 1.5; }
+.price-chart .chart-a { font-variant-numeric: tabular-nums lining-nums; }
+.price-chart .chart-note b { color: var(--ink); font-weight: 640; }
+.price-chart .chart-table { margin-top: var(--s4); padding-top: var(--s1); border-top: 1px solid var(--rule); }
+.price-chart .chart-table > summary { padding: 10px 0 6px; font-weight: 600; color: var(--brand); }
+.price-chart .chart-table .gr-scroll { margin-top: var(--s2); border: 1px solid var(--rim); background: color-mix(in oklab, var(--sheet-2) 70%, transparent); }
+.price-chart .chart-table col.c-px { width: 10rem; }
+.price-chart .chart-table td .sub { display: block; margin-top: 1px; color: var(--ink-3); }
+.price-chart .chart-table td.num { font-variant-numeric: tabular-nums lining-nums; }
+.price-chart .gr-gap-row td { color: var(--ink-3); font-style: italic; }
+/* what explains the price: what a purchase pays, what was paid, what the worst case allows */
+.pc-facts { display: grid; margin-top: auto; border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 50%, transparent); overflow: hidden; }
+.pc-facts > div { display: grid; gap: 2px; padding: 10px 14px; }
+.pc-facts > div + div { border-top: 1px solid var(--rule); }
+.pc-facts dt { font-weight: 650; color: var(--ink); }
+.pc-facts dd { color: var(--ink-2); line-height: 1.45; }
+.pc-facts b { color: var(--ink); font-weight: 640; }
+.price-chart figcaption { margin-top: var(--s2); line-height: 1.5; }
+.pc-loading { margin-top: var(--s4); display: grid; gap: var(--s3); }
+.pc-loading .pc-line.short { width: 45%; }
+
+/* the chart: an ink line lit from beneath, a grid that fades upward, a glass label beside the reading; a stretch with
+   nothing recorded is two dashed edges and its name, never a filled shape over the plot */
+.tchart { position: relative; display: flex; flex-direction: column; margin-top: var(--s4); min-height: 0; }
+.tchart.tc-fill { flex: 1 1 auto; }
+.tchart .chart-read { min-height: 2.9em; margin-bottom: var(--s1); line-height: 1.45; font-variant-numeric: tabular-nums lining-nums; }
+.tchart .chart-read strong { font-weight: 650; color: var(--ink); }
+.tc-plot { position: relative; flex: 1 1 auto; }
+.tc-plot > svg { position: absolute; left: 0; top: 0; }
+.tchart .chart { overflow: visible; cursor: crosshair; }
+.tchart .chart:focus-visible { outline-offset: 4px; border-radius: 6px; }
+/* a chart focused by a pointer or a finger is being read, not navigated: the keyboard's ring only */
+.tchart .chart:focus:not(:focus-visible) { outline: none; }
+.tchart .chart text { font: 460 var(--t-micro)/1 var(--font); fill: var(--ink-3); letter-spacing: .02em; font-variant-numeric: tabular-nums lining-nums; }
+.tc-fade-top { stop-color: var(--ink); stop-opacity: .03; }
+.tc-fade-bottom { stop-color: var(--ink); stop-opacity: .17; }
+.tc-grid line { stroke-width: 1; shape-rendering: crispEdges; }
+.tc-grid .tc-vgrid { stroke-dasharray: 2 4; }
+.tc-axis { stroke: var(--rule-2); stroke-width: 1; shape-rendering: crispEdges; }
+.tc-minor { stroke: var(--rule-2); }
+.tc-major { stroke: var(--ink-3); }
+.tchart .chart text.tc-unit { fill: var(--ink-2); font-weight: 600; letter-spacing: .01em; }
+.tchart .chart text.tc-day { fill: var(--ink-2); font-weight: 600; }
+.tc-gap-edge { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; shape-rendering: crispEdges; }
+.tc-gap-span { stroke: var(--ink-3); stroke-width: 3; }
+.tchart .chart text.tc-gap-label { fill: var(--ink-2); }
+.tc-glow { fill: none; stroke: var(--gr-light, var(--c3)); stroke-width: 7; opacity: var(--gr-glow, .45); stroke-linejoin: round; stroke-linecap: round; }
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .price-chart { --gr-glow: .28; } }
+:root[data-theme="light"] .price-chart { --gr-glow: .28; }
+.tc-line { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+/* published values: the held levels carry the line's weight; a jump between two values is a thin riser, never a slope */
+.tc-steps .tc-line { stroke-linecap: butt; stroke-linejoin: miter; }
+.tc-steps .tc-glow { stroke-width: 6; stroke-linecap: butt; }
+.tc-riser { fill: none; stroke: var(--ink-3); stroke-width: 1; shape-rendering: crispEdges; }
+/* each day a value was published: a dot on its step, or a tick on the time axis when the steps are too close */
+.tc-pub { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.tc-pub-ticks { fill: none; stroke: var(--ink-2); stroke-width: 1; shape-rendering: crispEdges; }
+.tc-halo-in { stop-color: var(--gr-light, var(--c3)); stop-opacity: .6; }
+.tc-halo-out { stop-color: var(--gr-light, var(--c3)); stop-opacity: 0; }
+.tc-last { fill: var(--ink); stroke: var(--sheet); stroke-width: 2; }
+.tc-level line { stroke: var(--ink-2); stroke-width: 1.25; stroke-dasharray: 6 5; }
+.tchart .chart .tc-level text, .tchart .chart text.tc-level-far { fill: var(--ink); font-weight: 620; letter-spacing: .01em; paint-order: stroke; stroke: color-mix(in oklab, var(--sheet) 82%, transparent); stroke-width: 4px; stroke-linejoin: round; }
+/* the reading glides to the nearest recorded point (or, on a published series, to the step that holds): the dot, its
+   line and its label travel; values never interpolate */
+.tc-cursor { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; transition: transform var(--d1) var(--ease-out); }
+.tc-at { transition: transform var(--d1) var(--ease-out); }
+.tc-at-halo { fill: color-mix(in oklab, var(--gr-light, var(--c3)) 30%, transparent); }
+.tc-at-dot { fill: var(--sheet); stroke: var(--ink); stroke-width: 2.5; }
+.tc-pill rect { fill: var(--ink); }
+.tchart .chart .tc-pill text { fill: var(--sheet); font-weight: 650; letter-spacing: 0; }
+.tc-pill.at rect { fill: var(--act); }
+.tchart .chart .tc-pill.at text { fill: var(--on-act); }
+.tc-tip { position: absolute; left: 0; top: 0; z-index: 3; display: grid; gap: 1px; min-width: min(148px, 100%); max-width: min(220px, calc(100% - 4px)); padding: 8px 13px; pointer-events: none; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
+  background: var(--pane-3); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); font-size: var(--t-small); line-height: 1.35;
+  transition: transform var(--d1) var(--ease-out), translate var(--d2) var(--ease-out); }
+.tc-tip.up { translate: -50% calc(-100% - 14px); }
+.tc-tip.down { translate: -50% 14px; }
+.tc-tip-when { font-size: var(--t-micro); color: var(--ink-2); font-weight: 600; letter-spacing: .012em; }
+.tc-tip b { font-size: var(--t-lead); font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.tc-tip-sub { font-size: var(--t-micro); color: var(--ink-2); }
+/* the line draws from the left when the chart is first seen; every value is there from the first frame */
+.tc-reveal { animation: tc-draw var(--d-scene) var(--ease-out) both; }
+.tc-wait .tc-reveal { animation: none; clip-path: inset(0 100% 0 0); }
+@keyframes tc-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media print { .tc-wait .tc-reveal { clip-path: none; } }
+@media (prefers-reduced-motion: reduce) { .tc-reveal { animation: none; } .tc-cursor, .tc-at, .tc-tip { transition: none; } }
+:root[data-fx="plain"] .tc-glow { display: none; }
+.tc-empty { display: grid; place-items: center; padding: var(--s4); border-radius: var(--r-md); border: 1px dashed var(--rule-2); color: var(--ink-2); text-align: center; }
+
+/* the ticket: an indicative price, the order, what it promises */
+.ticket { display: grid; gap: var(--s4); }
+.tk-now { display: grid; gap: 6px; }
+.tk-stage { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s2); font-size: var(--t-small); }
+.tk-stage b { font-weight: 650; color: var(--ink); }
+.tk-stage span { color: var(--ink-2); }
+.ticket-quote { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s5); padding: 12px 16px; border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 55%, transparent); border: 1px solid var(--rim); font-size: var(--t-small); }
+.ticket-quote > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--s2); min-width: 0; }
+.ticket-quote dt { color: var(--ink-2); }
+.ticket-quote dd { font-weight: 620; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+/* the age keeps one width, left-aligned in it, so its box never moves as "2 s ago" becomes "12 s ago" */
+.ticket-quote .age { margin-left: auto; min-width: min(9.5em, 100%); }
+.ticket-quote .age dd { font-weight: 500; }
+.ticket-side { display: grid; grid-template-columns: 1fr 1fr; width: 100%; max-width: 280px; }
+.ticket-side button { justify-content: center; min-height: 36px; }
+.ticket-all { align-self: end; min-height: 44px; align-items: center; }
+.ticket-floor { display: flex; gap: 8px; align-items: baseline; max-width: 58ch; }
+.tk-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); }
+.tk-go .small { flex: 1 1 13rem; }
+.tk-promise { display: grid; overflow: hidden; border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 50%, transparent); font-size: var(--t-small); }
+.tk-promise > div { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: var(--s1) var(--s3); padding: 12px 16px; }
+.tk-promise > div + div { border-top: 1px solid var(--rule); }
+.tk-promise dt { font-weight: 650; color: var(--ink); }
+.tk-promise dd { color: var(--ink-2); line-height: 1.45; }
+.tk-full { display: none; }
+.tk-fill-list > li { padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.tk-fill-list > li:first-child { border-top: 0; padding-top: 0; }
+.tk-fill-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s1) var(--s3); }
+.tk-fill-top a { font-size: var(--t-small); font-weight: 600; color: var(--ink); padding-block: 4px; }
+.tk-fill-list p { margin-top: 2px; }
+.tk-fill-list b { font-weight: 640; color: var(--ink); white-space: nowrap; }
+
+/* ------------------------------------------------------------------------------------------------ the market's prices */
+.gr-market { padding: var(--s6); min-width: 0; }
+.gr-table-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s3); margin: var(--s5) 0 var(--s2); }
+.gr-market .panel-head + .gr-table-head { margin-top: 0; }
+.gr-table-head h3 { font-size: var(--t-body); font-weight: 650; letter-spacing: -.01em; }
+.gr-page table.market th.num, .gr-page table.market td.num { white-space: nowrap; }
+.gr-page table.market td.num { overflow: hidden; text-overflow: clip; font-weight: 600; }
+.gr-page table.market col.c-px { width: 10.5rem; }
+.gr-page table.market col.c-age { width: 7rem; }
+.gr-page table.market col.c-day { width: 10rem; }
+.gr-page table.market col.c-src { width: 9rem; }
+.gr-page table.market :is(td.age, td.day) { font-variant-numeric: tabular-nums lining-nums; line-height: 1.35; overflow-wrap: anywhere; }
+.gr-page table.market th[scope="row"] { padding-top: 6px; padding-bottom: 6px; vertical-align: middle; }
+.gr-page table.market td { vertical-align: middle; }
+.gr-page table.market th[scope="row"] .sub { margin-top: 0; }
+.gr-page table.market :is(th[scope="row"] .narrow-age, .narrow-day, .narrow-ask) { display: none; font-variant-numeric: tabular-nums lining-nums; }
+.gr-pick { display: inline-block; padding: 9px 0 7px; margin: -3px 0; border: 0; background: none; font: inherit; font-weight: 600; line-height: 1.3; color: var(--brand); text-align: left; cursor: pointer; }
+.gr-pick:hover { text-decoration: underline; text-underline-offset: .2em; }
+/* the one on the chart: in ink, with a bar under it (not colour alone) */
+.gr-pick[aria-pressed="true"] { color: var(--ink); font-weight: 680; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .3em; text-decoration-color: var(--brand); }
+.gr-none { padding: var(--s2) 0 var(--s3); }
+.gr-more { margin-top: var(--s3); border-top: 1px solid var(--rule); padding-top: var(--s1); }
+.gr-more > summary { padding: 10px 0; font-weight: 600; color: var(--brand); }
+.gr-more > p { margin: var(--s1) 0 var(--s2); max-width: 90ch; }
+.gr-src { margin-top: var(--s3); }
+.gr-src a { padding-block: 8px; margin-block: -8px; }
+.gr-rows { display: grid; }
+.gr-rows > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4); align-items: start; padding: 12px 0; border-bottom: 1px solid var(--rule); min-width: 0; }
+.gr-rows > li:last-child { border-bottom: 0; }
+.gr-rows b { font-weight: 620; }
+.gr-rows .sub { display: block; margin-top: 2px; font-size: var(--t-small); color: var(--ink-3); }
+.gr-sources { max-width: 720px; margin-top: var(--s1); }
+.gr-sources > li { display: block; }
+.gr-src-name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+
+/* ------------------------------------------------------------------------------------------------ deposits and debts: three tiles */
+.gr-debts { padding: var(--s6); }
+.gr-debt-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); }
+.gr-page .gr-debt-tiles .tile { display: grid; grid-template-rows: auto auto 1fr auto; gap: 4px; align-content: start; }
+.gr-page .gr-debt-tiles .tile .k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.gr-page .gr-debt-tiles .tile .v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.gr-page .gr-debt-tiles .tile .s { font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.gr-tile-go { justify-self: start; display: inline-flex; align-items: center; gap: 2px; min-height: 44px; margin: var(--s1) 0 -10px; font-size: var(--t-small); font-weight: 600; text-decoration: none; }
+.gr-tile-go:hover { text-decoration: underline; text-underline-offset: .2em; }
+.gr-tile-go svg { width: 15px; height: 15px; }
+
+/* the wallet's dollar reserve (WalletInline.tsx, used as is): one panel with two columns, its forms part of it */
+.gr-chain > section { padding: var(--s6); border-radius: var(--r-lg); border: 1px solid var(--rim); box-shadow: var(--lift-1); background: linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.gr-chain .section-head { margin: 0 0 var(--s4); }
+.gr-chain .section-head h2 { font-size: var(--t-h3); }
+.gr-chain .tablet { padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.gr-chain .cols.even { gap: var(--s6) var(--s8); }
+.gr-chain .cols.even > div + div { padding-left: var(--s8); box-shadow: inset 1px 0 0 var(--rule); }
+.gr-chain .cols.even h3 { font-size: var(--t-body); }
+/* an action that waits for input still reads (the convert button waits for an amount): WCAG exempts inactive controls,
+   the screen's own contrast rule does not. Scoped here; the same for every screen is a proposed shared change. */
+.gr-chain .btn.fill[disabled] { opacity: 1; filter: none; color: var(--ink-2); background: color-mix(in oklab, var(--pane-2) 70%, transparent); border-color: var(--rule-2); box-shadow: none; }
+
+/* ------------------------------------------------------------------------------------------------ touch: 44 px targets */
+@media (pointer: coarse) {
+  .gr-page :is(.gr-h-acts .btn, .pc-range button, .ticket-side button, .gr-story > details > summary) { min-height: 44px; }
+}
+
+/* ------------------------------------------------------------------------------------------------ narrower */
+@media (max-width: 1279px) {
+  .gr-page table.market col.c-px { width: 8.75rem; }
+  .gr-page table.market col.c-age { width: 6rem; }
+  .gr-hold thead .c-px { width: 10.5rem; }
+  .gr-hold thead .c-lim { width: 11rem; }
+}
+@media (max-width: 1099px) {
+  .gr-top { grid-template-columns: minmax(0, 1fr); }
+  .gr-trade { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "ticket" "fills" "prices"; }
+  .pc-main { grid-template-columns: minmax(0, 1fr); }
+  .pc-side { padding-left: 0; border-left: 0; padding-top: var(--s4); border-top: 1px solid var(--rule); }
+}
+@media (max-width: 959px) { .gr-chain .cols.even > div + div { padding: var(--s5) 0 0; box-shadow: inset 0 1px 0 var(--rule); } }
+@media (max-width: 899px) {
+  .gr-debt-tiles { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 759px) {
+  .gr-page { gap: var(--s4); }
+  /* R13: four ways in, two by two and even, the idea first */
+  .gr-acts { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gr-acts .btn { min-height: 48px; padding: 0 var(--s3); justify-content: center; text-align: center; }
+  :is(.gr-worth, .gr-floor, .gr-hold-panel, .gr-market, .gr-debts, .gr-ticket, .price-chart, .gr-chain > section) { padding: var(--s5) var(--s4) var(--s4); }
+  .gr-fills { padding: var(--s4); }
+  /* the lead figure at the phone's own hero size (as Home's), its light filling the top of a narrow, tall panel */
+  .gr-hero { font-size: min(var(--t-fig-hero-sm), 13vw); margin-top: var(--s3); }
+  .gr-hero .paise { font-size: var(--t-fig-s); }
+  .gr-worth { background: radial-gradient(120% 60% at 0% 0%, color-mix(in oklab, var(--glow-a) 46%, transparent), transparent 70%), radial-gradient(90% 50% at 100% 100%, color-mix(in oklab, var(--glow-b) 26%, transparent), transparent 72%), linear-gradient(160deg, var(--gloss), transparent 40%), var(--pane); }
+  /* the room above the floor and the record's latest price: at their step, held to the panel's width at enlarged text */
+  :is(.gr-lead, .pc-v) { font-size: min(var(--t-fig-m), 9.5vw); }
+  .gr-lead .paise { font-size: var(--t-lead); }
+  .gr-legend { margin-top: var(--s3); }
+  :is(.gr-legend, .gr-eq) > div { padding: 9px 0; }
+  .gr-hold-panel .panel-head { margin-bottom: var(--s3); }
+  .gr-card { padding: var(--s4) var(--s4) var(--s3); }
+  .gr-card .gr-h-acts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gr-card .gr-h-acts .btn { width: 100%; padding: 0 var(--s3); }
+  .pc-pick { flex-basis: 100%; }
+  .pc-tools { width: 100%; justify-content: stretch; }
+  .pc-range { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .pc-range button { justify-content: center; min-height: 40px; }
+  .gr-page table.market col.c-px { width: 7.4rem; }
+  .gr-page table.market :is(td, th) { padding-left: 6px; padding-right: 6px; }
+  .gr-page table.market :is(tbody, tfoot) th:first-child, .gr-page table.market thead th:first-child { padding-left: var(--s3); }
+  .gr-pick { font-size: var(--t-small); }
+  /* only ever the last columns go on a phone: a hidden cell in the middle would slide its neighbours into its place */
+  .gr-page table.market :is(col.c-age, col.c-src, col.c-day) { width: 0; }
+  .gr-page table.market :is(.age, .day), .gr-page table.market.refs :is(th:nth-child(3), td:nth-child(3)) { display: none; }
+  /* the ask goes under the bid, and the age and the day under the name; weighted as the rule that hides them */
+  .gr-page table.market:not(.funds):not(.refs) :is(col.c-ask) { width: 0; }
+  .gr-page table.market:not(.funds):not(.refs) .ask { display: none; }
+  .gr-page table.market th[scope="row"] .narrow-day { display: inline; }
+  .gr-page table.market td.num { font-size: var(--t-small); }
+  .gr-page table.market th[scope="row"] .narrow-age { display: block; }
+  .gr-page table.market td.num .narrow-ask { display: grid; justify-items: end; margin-top: 4px; font-weight: 500; line-height: 1.3; color: var(--ink-3); }
+  .gr-page table.market td.num .narrow-ask .px { color: var(--ink-2); font-weight: 600; }
+  .ticket-quote .age { margin-left: 0; }
+  /* deposits and debts as rows: what it is and its one line on the left, the figure right-aligned beside it */
+  .gr-page .gr-debt-tiles .tile { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: none; column-gap: var(--s3); align-items: baseline; }
+  .gr-page .gr-debt-tiles .tile .k { grid-column: 1; grid-row: 1; font-size: var(--t-body); color: var(--ink); }
+  .gr-page .gr-debt-tiles .tile .v { grid-column: 2; grid-row: 1; font-size: var(--t-body); text-align: right; }
+  .gr-page .gr-debt-tiles .tile :is(.s, .gr-tile-go) { grid-column: 1 / -1; }
+}
+@media (max-width: 559px) {
+  .tk-promise > div { grid-template-columns: minmax(0, 1fr); }
+  /* an idea's title takes the row; where it stands goes under it */
+  .gr-idea-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .gr-idea-row .stamp { justify-self: start; }
+  .gr-card-v { font-size: var(--t-lead); }
+  /* a phone's select cuts a long fund name short: the whole name under it */
+  .ticket .tk-full { display: block; margin-top: calc(-1 * var(--s2)); }
+  .ticket-side { max-width: none; }
+}
+@media (max-width: 359px) {
+  /* the head's four ways in keep their words on one line at the narrowest width: the words, not the icons */
+  .gr-acts .btn svg { display: none; }
+  .gr-acts .btn { padding: 0 var(--s2); }
+}
+@media (min-width: 560px) and (max-width: 1099px) {
+  /* a tablet: each card's four facts in columns under the name and the value (two by two, or four in a row), the
+     actions in one row */
+  .gr-card-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); padding-top: var(--s3); }
+  .gr-card-facts > div { display: grid; grid-template-columns: minmax(0, 1fr); padding: 0; gap: 4px; }
+  .gr-card-facts > div + div { border-top: 0; }
+  .gr-card-facts dd { justify-items: start; text-align: left; }
+  .gr-card-facts .px, .gr-card-facts .gr-lim-line { justify-content: flex-start; }
+  .gr-card-facts dd .gr-limit-words .basis-pop { left: 0; right: auto; }
+}
+@media (min-width: 760px) and (max-width: 1099px) { .gr-card-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .tchart .chart-read { min-height: 1.6em; } }
+
+/* Text enlarged to 200% on a 320 px screen (R13 leftovers, checked with the root size at 200%): what grows with the text gives way to the width. */
+@media (max-width: 479px) {
+  .ticket { grid-template-columns: minmax(0, 1fr); }
+  .tk-now { grid-template-columns: minmax(0, 1fr); }
+  .ticket > *, .tk-now, .ticket-quote > * { min-width: 0; }
+  .tk-stage, .ticket-quote { overflow-wrap: anywhere; }
+}

@@ -1,0 +1,7 @@
+Running 5 tests using 1 worker
+  ✓  1 browser/tests/passkeys.spec.ts:34:1 › a fresh account is created with a passkey and no password, shows ten recovery codes once, and the database agrees (1.9s)
+  ✓  2 browser/tests/passkeys.spec.ts:52:1 › signs out and back in with the passkey; a sign-in without user verification is refused (3.0s)
+  ✓  3 browser/tests/passkeys.spec.ts:112:1 › a saved code and a contact’s code start a recovery that the signed-in owner sees and cancels; it can then not be completed (25.7s)
+  ✓  4 browser/tests/passkeys.spec.ts:151:1 › a recovery left alone completes after the delay with a new passkey, and shows a new set of saved codes once; the old ones stop working (22.0s)
+  ✓  5 browser/tests/passkeys.spec.ts:182:1 › a stolen passkey is suspended at once from another: its session ends and it can no longer sign in (4.1s)
+  5 passed (1.1m)

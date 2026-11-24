@@ -1,0 +1,42 @@
+// QED on Railway, in Railway's Infrastructure as Code form (docs/DEPLOY.md, "Railway configuration"). NOT VERIFIED: never
+// planned or applied. Prepared 24 Nov 2026 from docs.railway.com/infrastructure-as-code and /infrastructure-as-code/reference,
+// which document ONLY the fields used below. The Dockerfile builder, the restart policy and the draining time are not
+// documented there, so they are carried by service variables and dashboard settings (the fallback list in DEPLOY.md);
+// `railway config migrate` converts the live railway.json and is the safer source for those.
+//
+// Use: copy to <repository root>/.railway/railway.ts (not before: the CLI uses the nearest .railway/railway.ts), replace
+// the two placeholders, `npm install railway` where the CLI asks, then `railway config plan` and READ it: the plan must show
+// no change to the existing volume (never accept a plan that deletes, detaches or shrinks it). `railway config pull` imports
+// the live project and shows what Railway holds today.
+import { defineRailway, github, preserve, project, service, volume } from "railway/iac";
+
+export default defineRailway(() => {
+  // The volume made by `railway volume add --mount-path /data`. Keep the declaration and the mount: removing either, shrinking
+  // sizeMB or changing the region is destructive by Railway's own rules. Match the live size (`railway config pull`).
+  const data = volume("qed-data", { region: "<region id of the live volume>", sizeMB: 1024 });
+
+  const qed = service("qed", {
+    source: github("<github-owner>/<repository>", { branch: "main" }), // root directory: the repository root, not apps/qed-demo
+    healthcheck: "/api/ready",
+    healthcheckTimeout: 300,
+    replicas: 1, // a service with a volume cannot have more
+    volumeMounts: { "/data": data },
+    env: {
+      // The build: Railway reads the Dockerfile path from this variable (set today with `railway variable set`).
+      RAILWAY_DOCKERFILE_PATH: "apps/qed-demo/Dockerfile",
+      RAILWAY_DEPLOYMENT_DRAINING_SECONDS: "30",
+      RAILWAY_HEALTHCHECK_TIMEOUT_SEC: "300",
+      QED_PUBLIC_ORIGIN: "https://<name>.up.railway.app", // exactly the origin; chosen before the first account
+      QED_EXTRA_HOSTS: "healthcheck.railway.app",
+      QED_TRUST_PROXY_HOPS: "1",
+      QED_SESSION_IDLE_MINUTES: "60",
+      QED_SESSION_MAX_MINUTES: "1440",
+      QED_BACKUP_EVERY_MIN: "60",
+      QED_STOP_GRACE_MS: "15000",
+      // Secrets stay in Railway, never in this file: preserve() keeps what the dashboard or CLI already holds.
+      QED_KEK: preserve(),
+    },
+  });
+
+  return project("qed-demo", { resources: [qed, data] });
+});

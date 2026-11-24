@@ -1,0 +1,263 @@
+{
+ "what": "An instruction signed in the browser kept running after the browser was closed",
+ "stack": {
+  "isolated": true,
+  "apiAndInterface": "http://127.0.0.1:5196",
+  "database": "/var/folders/14/sz9jcx7x2j95zc69h3k61bl80000gn/T/qed-away-dMax3k/qed.db",
+  "note": "Started by this script; nothing else knows the port, so the interface connections the API reports are all there are."
+ },
+ "timeline": {
+  "interfaceOpened": "2026-11-20 15:47:05.180 IST",
+  "signed": "2026-11-20 15:47:07.696 IST",
+  "browserClosed": "2026-11-20 15:48:03.817 IST",
+  "awayFrom": "2026-11-20 15:48:03.818 IST",
+  "awayTo": "2026-11-20 16:00:04.287 IST",
+  "interfaceReopened": "2026-11-20 16:00:04.948 IST"
+ },
+ "instruction": {
+  "id": "prg_1m7w7behe75v4nmvgfx",
+  "document": "Standing instruction Draft, not signed Buy Bitcoin in rupees with ₹200 from your bank account, every 2 minutes. two hundred rupees, each time. Not over ₹80,000 before 18 Feb 2027 Limits At most ₹200 in one run. At most ₹20,000 in one calendar month. Only if Only if the money is free in your bank account at that moment: what is left must still cover everything due before your income is certain to arrive. Only if your worst case stays at or above your floor after the purchase. Only at prices no more than 1.00% above the best price on the book, with price data no older than 15 seconds that agrees"
+ },
+ "interfaceConnections": {
+  "samples": 408,
+  "everySeconds": 2,
+  "whileAway": {
+   "samples": 360,
+   "withAConnectionOrNoAnswer": 0
+  },
+  "changes": [
+   {
+    "at": "2026-11-20 15:47:01.973 IST",
+    "interfaces": null
+   },
+   {
+    "at": "2026-11-20 15:47:03.995 IST",
+    "interfaces": 0
+   },
+   {
+    "at": "2026-11-20 15:47:08.004 IST",
+    "interfaces": 1
+   },
+   {
+    "at": "2026-11-20 15:48:04.121 IST",
+    "interfaces": 0
+   },
+   {
+    "at": "2026-11-20 16:00:07.303 IST",
+    "interfaces": 1
+   }
+  ]
+ },
+ "runsWhileAway": [
+  {
+   "due": "2026-11-20 15:50:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "startedAfterDueMs": 359,
+   "actions": 1,
+   "decided": "2026-11-20 15:50:00.363 IST",
+   "sent": "2026-11-20 15:50:00.363 IST",
+   "executed": "2026-11-20 15:50:00.436 IST",
+   "comparedWithVenue": "reconciled",
+   "reconciled": "2026-11-20 15:50:00.436 IST",
+   "receipt": "rcp_1m7w7gqhmhx466enhsq",
+   "interfaceConnectionsDuringIt": [
+    0
+   ]
+  },
+  {
+   "due": "2026-11-20 15:52:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "startedAfterDueMs": 490,
+   "actions": 1,
+   "decided": "2026-11-20 15:52:00.492 IST",
+   "sent": "2026-11-20 15:52:00.492 IST",
+   "executed": "2026-11-20 15:52:00.511 IST",
+   "comparedWithVenue": "reconciled",
+   "reconciled": "2026-11-20 15:52:00.511 IST",
+   "receipt": "rcp_1m7w7mcszpv1hx2y96r",
+   "interfaceConnectionsDuringIt": [
+    0
+   ]
+  },
+  {
+   "due": "2026-11-20 15:54:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "startedAfterDueMs": 623,
+   "actions": 1,
+   "decided": "2026-11-20 15:54:00.625 IST",
+   "sent": "2026-11-20 15:54:00.627 IST",
+   "executed": "2026-11-20 15:54:00.711 IST",
+   "comparedWithVenue": "reconciled",
+   "reconciled": "2026-11-20 15:54:00.711 IST",
+   "receipt": "rcp_1m7w7r2673afdzm26qz",
+   "interfaceConnectionsDuringIt": [
+    0
+   ]
+  },
+  {
+   "due": "2026-11-20 15:56:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "startedAfterDueMs": 760,
+   "actions": 1,
+   "decided": "2026-11-20 15:56:00.764 IST",
+   "sent": "2026-11-20 15:56:00.765 IST",
+   "executed": "2026-11-20 15:56:00.806 IST",
+   "comparedWithVenue": "reconciled",
+   "reconciled": "2026-11-20 15:56:00.807 IST",
+   "receipt": "rcp_1m7w7vqf7v8jemr76mg",
+   "interfaceConnectionsDuringIt": [
+    0
+   ]
+  },
+  {
+   "due": "2026-11-20 15:58:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "startedAfterDueMs": 889,
+   "actions": 1,
+   "decided": "2026-11-20 15:58:00.895 IST",
+   "sent": "2026-11-20 15:58:00.896 IST",
+   "executed": "2026-11-20 15:58:00.916 IST",
+   "comparedWithVenue": "reconciled",
+   "reconciled": "2026-11-20 15:58:00.916 IST",
+   "receipt": "rcp_1m7w7zcrmryznz6jvpc",
+   "interfaceConnectionsDuringIt": [
+    0
+   ]
+  }
+ ],
+ "allRuns": [
+  {
+   "due": "2026-11-20 15:48:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "open"
+  },
+  {
+   "due": "2026-11-20 15:50:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "closed"
+  },
+  {
+   "due": "2026-11-20 15:52:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "closed"
+  },
+  {
+   "due": "2026-11-20 15:54:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "closed"
+  },
+  {
+   "due": "2026-11-20 15:56:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "closed"
+  },
+  {
+   "due": "2026-11-20 15:58:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "closed"
+  },
+  {
+   "due": "2026-11-20 16:00:00.000 IST",
+   "outcome": "done",
+   "reason": null,
+   "interface": "closed"
+  }
+ ],
+ "steps": [
+  {
+   "name": "Live prices arrived on the isolated engine",
+   "expected": "fresh venue and independent prices for bitcoin within two minutes",
+   "observed": "fresh",
+   "pass": true,
+   "at": "2026-11-20 15:47:04.518 IST"
+  },
+  {
+   "name": "The instruction was signed through the interface",
+   "expected": "in force, approved with the password, bound to one document",
+   "observed": "instruction active, version 1; approved on the password entered minutes earlier to create the account; document 5166be13526e…",
+   "pass": true,
+   "at": "2026-11-20 15:47:07.698 IST"
+  },
+  {
+   "name": "A first run completed with the interface open",
+   "expected": "one run done; the API holds at least one interface connection",
+   "observed": "run due 2026-11-20 15:48:00.000 IST done; interface connections at the samples: 1",
+   "pass": true,
+   "at": "2026-11-20 15:48:03.676 IST"
+  },
+  {
+   "name": "Closing the browser closed every interface connection",
+   "expected": "the API reports none within ten seconds",
+   "observed": "none, 1 ms after the browser exited",
+   "pass": true,
+   "at": "2026-11-20 15:48:03.818 IST"
+  },
+  {
+   "name": "No interface was open at any point while away",
+   "expected": "zero interface connections at every sample for 12 minutes",
+   "observed": "360 samples two seconds apart; 0 with a connection or no answer; engine reported running at 360",
+   "pass": true,
+   "at": "2026-11-20 16:00:04.287 IST"
+  },
+  {
+   "name": "Runs that fell due while away were executed by the engine alone",
+   "expected": "about 5 runs, two minutes apart, each done once, started when due, with no interface connected",
+   "observed": "5 fell due: 5 done, none otherwise; started 889 ms after due at most; interface connections during them: 0",
+   "pass": true,
+   "at": "2026-11-20 16:00:04.289 IST"
+  },
+  {
+   "name": "Each of them was compared with the venue and has a receipt",
+   "expected": "reconciled, one receipt each, no occurrence twice",
+   "observed": "5 reconciled, 5 receipts; 7 distinct occurrences for 7 runs; 7 distinct orders for 7 actions",
+   "pass": true,
+   "at": "2026-11-20 16:00:04.289 IST"
+  },
+  {
+   "name": "Back at the interface, the passbook shows what happened while away",
+   "expected": "7 purchases listed, each attributed to the instruction",
+   "observed": "7 purchase lines on the page; 7 runs done on record",
+   "pass": true,
+   "at": "2026-11-20 16:00:37.690 IST"
+  },
+  {
+   "name": "The books hold after it all",
+   "expected": "ledger consistent, receipts chained, books agree with the venue",
+   "observed": "ledger breaks 0; receipt chain intact (7); against the venue agrees",
+   "pass": true,
+   "at": "2026-11-20 16:00:38.867 IST"
+  },
+  {
+   "name": "The interface raised no error",
+   "expected": "no page error and no console error in either visit",
+   "observed": "none",
+   "pass": true,
+   "at": "2026-11-20 16:00:38.867 IST"
+  }
+ ],
+ "passed": 10,
+ "of": 10,
+ "screenshots": [
+  "evidence/20261120-away/1-instruction-before-signing.png",
+  "evidence/20261120-away/2-interface-open-first-run.png",
+  "evidence/20261120-away/3-passbook-after-return.png",
+  "evidence/20261120-away/4-instruction-after-return.png"
+ ],
+ "notShown": [
+  "The computer staying on: if it sleeps or is shut down the engine stops, and runs due in that time are recorded as missed and never executed late (evidence/20261120-overnight-sleep.json).",
+  "A hosted engine: this is one computer. Running the engine elsewhere is a production decision, not something shown here.",
+  "Real money: every order is a paper order against the live order book."
+ ],
+ "serverErrors": []
+}

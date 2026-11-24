@@ -1,0 +1,357 @@
+{
+ "about": "QED's cryptographic inventory (ASVS 5.0 V11.1.2): what each primitive is used for, and every file of QED's own code that uses one. docs/CRYPTO.md explains it; scripts/crypto-inventory.ts --check and server/crypto-inventory.test.ts hold it equal to the code (V11.1.3).",
+ "written": "2026-11-24",
+ "primitives": {
+  "@noble/curves/p256": "P-256 in the browser for a wallet's recovery key: the key is derived from the recovery code the person keeps (never sent), and signs the owner account's recovery digest (src/lib/passkey.ts, as chain/accounts/webauthn.ts RecoveryKey). Low-S signatures.",
+  "@noble/curves/secp256k1": "secp256k1 public keys from candidate private keys, to recognise a published key by its address without storing the key (scripts/never-appear.ts). Never signs.",
+  "@noble/hashes/scrypt": "scrypt in the browser (N=2^15, r=8, p=1, 48 bytes) turning a wallet's recovery code into its P-256 recovery key (src/lib/passkey.ts).",
+  "@noble/hashes/sha2": "SHA-256 of the digest a wallet's recovery key signs, in the browser (src/lib/passkey.ts).",
+  "@noble/hashes/sha3": "Keccak-256: Ethereum addresses and instrument ids (shared/instrument.ts, scripts/never-appear.ts).",
+  "@simplewebauthn/browser": "The browser side of the WebAuthn ceremonies (src/lib/passkey.ts): the platform authenticator holds the private key; QED never sees it.",
+  "@simplewebauthn/server": "WebAuthn ceremonies: passkey registration and assertion verification, ES256 (P-256) only, user verification required (server/passkeys.ts, recovery.ts); the software authenticator of the tests and scripts (server/softauthn.ts, scripts/security.ts).",
+  "node:crypto.KeyObject": "Typed key handles for AES-GCM data keys and HMAC keys (server/keys.ts) and the software authenticator's P-256 key (server/softauthn.ts).",
+  "node:crypto.X509Certificate": "Reads a self-signed certificate a rehearsal makes for its own loopback TLS (scripts/prod-rehearsal.ts). No certificate is trusted from elsewhere.",
+  "node:crypto.createCipheriv": "AES-256-GCM sealing (random 96-bit nonce, 128-bit tag): data-encryption keys and backups (server/keys.ts), a person's export key (server/records.ts). docs/ENCRYPTION.md section 3.",
+  "node:crypto.createDecipheriv": "AES-256-GCM opening, the tag checked first (server/keys.ts, server/records.ts).",
+  "node:crypto.createHash": "SHA-256 only: session-token and link-token hashes at rest, approval and document hashes, receipt and decision hash chains, a dispute pack's digest and its offline re-check (server/dispute-pack-verify.ts), file and release fingerprints, the SHA-256 of a WebAuthn RP id; SHA-256 over pre-v3 recovery codes (layered under scrypt, server/core.ts layerLegacyCodes); the SHA-256 of a WebAuthn assertion's clientDataJSON, in the data a passkey signs over a workspace's currency configuration (chain/rail/webauthn.ts); and a one-way digest of a session's stored hash, naming the session in Ask's spending records (server/ask-models.ts).",
+  "node:crypto.createHmac": "HMAC-SHA-256: the keyring's metadata check (server/keys.ts) and AWS Signature V4 for the off-site copy (server/offsite.ts).",
+  "node:crypto.createPublicKey": "P-256 public keys (JWK) to verify passkey signatures without the server (evidence re-verification, server/evidence-verify.ts; vault signers, server/rail-signers.ts, chain/rail/signers.ts, chain/rail/host.ts; a workspace's currency configuration, chain/rail/webauthn.ts; scripts/security.ts).",
+  "node:crypto.createSecretKey": "Wraps 32 random bytes as a secret KeyObject (server/keys.ts).",
+  "node:crypto.createSign": "ECDSA P-256 signing by the software authenticator, for tests and scripts only (server/softauthn.ts); never a person's key.",
+  "node:crypto.generateKeyPairSync": "Key pairs made for tests and rehearsals only: the software authenticator's P-256 credential, an Ed25519 key the security suite offers to prove it is refused, a rehearsal's TLS key.",
+  "node:crypto.hkdfSync": "HKDF-SHA-256: two keys from the KEK, one to wrap data keys and one for the keyring's HMAC (server/keys.ts); the vault host's per-purpose keys from its master secret (chain/rail/keys.ts).",
+  "node:crypto.randomBytes": "The CSPRNG for every secret and id: session tokens (256 bits), CSRF tokens (192), CSP nonces (144), approval nonces (128), recovery and contact codes (80 bits, stored with scrypt), link tokens, salts, data keys and KEKs (256), the vault service's bearer token and master secret (256), object ids (50 random bits: identifiers, not secrets).",
+  "node:crypto.randomUUID": "Identifiers that are not secrets (the vault service's request ids, chain/rail).",
+  "node:crypto.scrypt": "Password hashing (N=2^17, r=8, p=1, 32-byte key, per-user 128-bit salt: server/auth.ts) and recovery-code checks off the event loop (N=2^14: server/passkeys.ts).",
+  "node:crypto.scryptSync": "Recovery and contact codes at rest (N=2^14, r=8, p=1: server/passkeys.ts) and the layering of pre-v3 codes (server/core.ts).",
+  "node:crypto.timingSafeEqual": "Constant-time comparison of every secret: password hashes, recovery codes, reference secrets, the CSRF token (since R13 hardening), the vault service's bearer token, the adviser's token, keyring checks.",
+  "node:crypto.verify": "ECDSA P-256 verification of stored passkey signatures without the server's own code path (server/evidence-verify.ts, server/rail-signers.ts, scripts/security.ts); and of the passkey assertions over a workspace's currency configuration, checked by the vault service before anything is deployed for it, as the owner account would check them (chain/rail/webauthn.ts verifyAssertionOffChain, money-model S5).",
+  "solidity.signatures-or-hashes": "On chain: QEDOwnerAccount verifies passkey (P-256, EIP-7951 precompile) signatures over EIP-712 digests; the bounty and dispute escrows hash and check signed terms (keccak256, ECDSA). Outside this app's runtime; Slither and Forge are their checks.",
+  "viem.hashTypedData": "EIP-712 digests of the bounty board's terms (chain/rail/bounties.ts).",
+  "viem.keccak256": "Keccak-256 for chain digests, ids and EIP-712 parts (chain/rail).",
+  "viem.privateKeyToAccount": "secp256k1 accounts of the vault service's own roles (agent, co-signer, guardian, relayer, deployer), derived from its sealed master secret (chain/rail/keys.ts), and the Security Lab's ephemeral test chains. Never an owner: owners are passkey accounts.",
+  "viem.recoverAddress": "The co-signer recovers who signed a certificate (chain/rail/cosigner-engine.ts).",
+  "viem.recoverMessageAddress": "As recoverAddress, for signed messages (chain/rail/cosigner.ts, cosigner-engine.ts; chain/rail/self-test.ts recovers the signer of the co-signer's self-test for the deployed image's isolation check).",
+  "viem.sha256": "SHA-256 in the vault service (chain/rail).",
+  "viem.signMessage": "The vault service's own roles sign certificates and mandates on the test chain (chain/rail). No person's authority: the owner account checks the person's passkey. The co-signer also signs one fixed self-test text (EIP-191, never a certificate; chain/rail/cosigner.ts COSIGNER_SELF_TEST) so the deployed image's isolation check can see it still signs.",
+  "webcrypto.getRandomValues": "Browser-side random values: the wallet recovery code (130 bits, src/lib/passkey.ts).",
+  "webcrypto.randomUUID": "Idempotency keys the interface sends with a request (src/screens, src/ui): identifiers, not secrets."
+ },
+ "sites": {
+  "chain/accounts/src/QEDOwnerAccount.sol": [
+   "solidity.signatures-or-hashes"
+  ],
+  "chain/bounties/src/QEDBountyBoard.sol": [
+   "solidity.signatures-or-hashes"
+  ],
+  "chain/disputes/src/QEDDisputeEscrow.sol": [
+   "solidity.signatures-or-hashes"
+  ],
+  "chain/rail/bounties.ts": [
+   "node:crypto.randomBytes",
+   "viem.hashTypedData",
+   "viem.keccak256"
+  ],
+  "chain/rail/cosigner-engine.ts": [
+   "viem.keccak256",
+   "viem.recoverAddress",
+   "viem.recoverMessageAddress"
+  ],
+  "chain/rail/cosigner-main.ts": [
+   "node:crypto.randomBytes",
+   "viem.privateKeyToAccount"
+  ],
+  "chain/rail/cosigner.ts": [
+   "viem.recoverMessageAddress",
+   "viem.signMessage"
+  ],
+  "chain/rail/denylist.ts": [
+   "node:crypto.createHash",
+   "viem.sha256"
+  ],
+  "chain/rail/escrow.ts": [
+   "viem.keccak256"
+  ],
+  "chain/rail/host.ts": [
+   "node:crypto.createHash",
+   "node:crypto.createPublicKey",
+   "node:crypto.randomUUID",
+   "viem.sha256"
+  ],
+  "chain/rail/http.ts": [
+   "node:crypto.timingSafeEqual"
+  ],
+  "chain/rail/keys.ts": [
+   "node:crypto.createHash",
+   "node:crypto.hkdfSync",
+   "node:crypto.randomBytes",
+   "viem.keccak256",
+   "viem.privateKeyToAccount",
+   "viem.sha256",
+   "viem.signMessage"
+  ],
+  "chain/rail/lab.ts": [
+   "node:crypto.randomBytes",
+   "viem.keccak256",
+   "viem.privateKeyToAccount",
+   "viem.signMessage"
+  ],
+  "chain/rail/main.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "chain/rail/owner.ts": [
+   "node:crypto.createHash",
+   "viem.sha256",
+   "viem.signMessage"
+  ],
+  "chain/rail/policy.ts": [
+   "viem.signMessage"
+  ],
+  "chain/rail/scenarios.ts": [
+   "viem.keccak256"
+  ],
+  "chain/rail/sealed-at-rest.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "chain/rail/self-test.ts": [
+   "viem.recoverMessageAddress"
+  ],
+  "chain/rail/service.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomUUID",
+   "viem.keccak256",
+   "viem.sha256",
+   "viem.signMessage"
+  ],
+  "chain/rail/signers.ts": [
+   "node:crypto.createPublicKey"
+  ],
+  "chain/rail/store.ts": [
+   "node:crypto.createHash"
+  ],
+  "chain/rail/treasury.ts": [
+   "viem.keccak256",
+   "viem.signMessage"
+  ],
+  "chain/rail/vendored.ts": [
+   "node:crypto.createHash"
+  ],
+  "chain/rail/webauthn.ts": [
+   "node:crypto.createHash",
+   "node:crypto.createPublicKey",
+   "node:crypto.verify",
+   "viem.keccak256",
+   "viem.sha256"
+  ],
+  "scripts/adversarial-ask.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomBytes"
+  ],
+  "scripts/away.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/deploy/supervise.ts": [
+   "node:crypto.createHash"
+  ],
+  "scripts/design-onboarding.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/import-limits.ts": [
+   "node:crypto.createHash"
+  ],
+  "scripts/judge-journey.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomBytes"
+  ],
+  "scripts/lab-evidence.ts": [
+   "node:crypto.createHash"
+  ],
+  "scripts/migration-rehearsal.ts": [
+   "node:crypto.createHash"
+  ],
+  "scripts/never-appear.ts": [
+   "@noble/curves/secp256k1",
+   "@noble/hashes/sha3"
+  ],
+  "scripts/password-shots.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/prod-rehearsal.ts": [
+   "node:crypto.X509Certificate",
+   "node:crypto.createHash",
+   "node:crypto.generateKeyPairSync",
+   "node:crypto.randomBytes"
+  ],
+  "scripts/restore-drill.ts": [
+   "node:crypto.createHash"
+  ],
+  "scripts/review-password.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/security.ts": [
+   "@simplewebauthn/server",
+   "node:crypto.createHash",
+   "node:crypto.createPublicKey",
+   "node:crypto.generateKeyPairSync",
+   "node:crypto.randomBytes",
+   "node:crypto.verify"
+  ],
+  "scripts/seed-review.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/smoke.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/vault-journey.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "scripts/wallet-sealing.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/adviser.ts": [
+   "node:crypto.createHash",
+   "node:crypto.timingSafeEqual"
+  ],
+  "server/api.ts": [
+   "node:crypto.randomBytes",
+   "node:crypto.timingSafeEqual"
+  ],
+  "server/approvals.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "server/ask-models.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/auth.ts": [
+   "node:crypto.randomBytes",
+   "node:crypto.scrypt",
+   "node:crypto.timingSafeEqual"
+  ],
+  "server/backup-fixture.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomBytes"
+  ],
+  "server/commerce-sim.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "server/conversation.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/core.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomBytes",
+   "node:crypto.scryptSync"
+  ],
+  "server/earn-chain.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/engine.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "server/dispute-pack-verify.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/evidence-verify.ts": [
+   "node:crypto.createHash",
+   "node:crypto.createPublicKey",
+   "node:crypto.verify"
+  ],
+  "server/keys.ts": [
+   "node:crypto.KeyObject",
+   "node:crypto.createCipheriv",
+   "node:crypto.createDecipheriv",
+   "node:crypto.createHash",
+   "node:crypto.createHmac",
+   "node:crypto.createSecretKey",
+   "node:crypto.hkdfSync",
+   "node:crypto.randomBytes",
+   "node:crypto.timingSafeEqual"
+  ],
+  "server/offsite.ts": [
+   "node:crypto.createHash",
+   "node:crypto.createHmac"
+  ],
+  "server/passkeys.ts": [
+   "@simplewebauthn/server",
+   "node:crypto.createHash",
+   "node:crypto.randomBytes",
+   "node:crypto.scrypt",
+   "node:crypto.scryptSync",
+   "node:crypto.timingSafeEqual"
+  ],
+  "server/plaintext-archive.ts": [
+   "node:crypto.randomBytes"
+  ],
+  "server/rail-fake.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomBytes"
+  ],
+  "server/rail-signers.ts": [
+   "node:crypto.createHash",
+   "node:crypto.createPublicKey",
+   "node:crypto.randomBytes",
+   "node:crypto.verify",
+   "webcrypto.getRandomValues"
+  ],
+  "server/rail.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/receipts.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/records.ts": [
+   "node:crypto.createCipheriv",
+   "node:crypto.createDecipheriv",
+   "node:crypto.createHash",
+   "node:crypto.randomBytes"
+  ],
+  "server/recovery.ts": [
+   "@simplewebauthn/server",
+   "node:crypto.randomBytes",
+   "node:crypto.timingSafeEqual"
+  ],
+  "server/release-integrity.ts": [
+   "node:crypto.createHash"
+  ],
+  "server/sealed.ts": [
+   "node:crypto.createHash",
+   "node:crypto.randomBytes"
+  ],
+  "server/softauthn.ts": [
+   "@simplewebauthn/server",
+   "node:crypto.KeyObject",
+   "node:crypto.createHash",
+   "node:crypto.createSign",
+   "node:crypto.generateKeyPairSync",
+   "node:crypto.randomBytes"
+  ],
+  "server/synthetic.ts": [
+   "node:crypto.createHash"
+  ],
+  "shared/instrument.ts": [
+   "@noble/hashes/sha3"
+  ],
+  "src/lib/passkey.ts": [
+   "@noble/curves/p256",
+   "@noble/hashes/scrypt",
+   "@noble/hashes/sha2",
+   "@simplewebauthn/browser",
+   "webcrypto.getRandomValues"
+  ],
+  "src/screens/Bounties.tsx": [
+   "webcrypto.randomUUID"
+  ],
+  "src/screens/Judge.tsx": [
+   "webcrypto.randomUUID"
+  ],
+  "src/screens/Security.tsx": [
+   "webcrypto.randomUUID"
+  ],
+  "src/screens/Vault.tsx": [
+   "webcrypto.randomUUID"
+  ],
+  "src/ui/earn-chain.tsx": [
+   "webcrypto.randomUUID"
+  ]
+ }
+}

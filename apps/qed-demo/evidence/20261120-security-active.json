@@ -1,0 +1,442 @@
+{
+ "what": "QED active security checks against an isolated scratch copy",
+ "producedAt": "2026-11-20 15:46:28.079 IST",
+ "target": "http://127.0.0.1:5198 on a scratch database (deleted with the temporary directory by the operating system)",
+ "howToReproduce": "node scripts/security.ts <report.json>",
+ "passed": 54,
+ "failed": 0,
+ "checks": [
+  {
+   "area": "session",
+   "name": "every owner route refuses a request with no session",
+   "asvs": "V8.2 authorization at a trusted layer",
+   "expected": "401 from all 15 read routes",
+   "observed": "401 from all 15",
+   "pass": true
+  },
+  {
+   "area": "session",
+   "name": "every state-changing route refuses a request with no session",
+   "asvs": "V8.2",
+   "expected": "401 from all 11 write routes",
+   "observed": "401 from all 11",
+   "pass": true
+  },
+  {
+   "area": "session",
+   "name": "the public session route gives nothing about any owner when signed out",
+   "asvs": "V8.1",
+   "expected": "authenticated false and no user, csrf or sessions",
+   "observed": "[\"authenticated\",\"ai\",\"defaults\"]",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "a state change with the cookie but no CSRF token is refused",
+   "asvs": "V3.5 browser origin separation",
+   "expected": "403 csrf",
+   "observed": "403 csrf",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "another owner's CSRF token does not work with this owner's cookie",
+   "asvs": "V3.5",
+   "expected": "403 csrf",
+   "observed": "403 csrf",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "a request carrying a foreign Origin is refused even with a valid cookie and token",
+   "asvs": "V3.5",
+   "expected": "403 cross_site",
+   "observed": "403 cross_site",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "a cross-site read is refused (Sec-Fetch-Site)",
+   "asvs": "V3.5",
+   "expected": "403 cross_site",
+   "observed": "403 cross_site",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "a request for any other Host is refused (DNS rebinding)",
+   "asvs": "V3.5 / V13 configuration",
+   "expected": "421 wrong_host",
+   "observed": "421 wrong_host",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "sign-in without the interface's own header is refused (plain form post)",
+   "asvs": "V3.5",
+   "expected": "403 csrf",
+   "observed": "403 csrf",
+   "pass": true
+  },
+  {
+   "area": "csrf",
+   "name": "none of the refused requests changed anything",
+   "asvs": "V3.5",
+   "expected": "no owner has been stopped",
+   "observed": "0 stopped",
+   "pass": true
+  },
+  {
+   "area": "session",
+   "name": "the session cookie is HttpOnly, SameSite=Strict and scoped to the site",
+   "asvs": "V3.3 cookie setup",
+   "expected": "HttpOnly; SameSite=Strict; Path=/",
+   "observed": "qed_session=…; Path=/; HttpOnly; SameSite=Strict; Max-Age=604800",
+   "pass": true
+  },
+  {
+   "area": "session",
+   "name": "the session token is never returned in a response body",
+   "asvs": "V7.2 session tokens",
+   "expected": "token only in the cookie",
+   "observed": "not in the body",
+   "pass": true
+  },
+  {
+   "area": "session",
+   "name": "the database stores only a hash of the session token",
+   "asvs": "V7.2",
+   "expected": "no row keyed by the raw token",
+   "observed": "0 rows keyed by the raw token",
+   "pass": true
+  },
+  {
+   "area": "headers",
+   "name": "every response carries a restrictive Content-Security-Policy",
+   "asvs": "V3.4 browser security headers",
+   "expected": "default-src 'self', no unsafe-inline scripts, frame-ancestors 'none'",
+   "observed": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base",
+   "pass": true
+  },
+  {
+   "area": "headers",
+   "name": "nosniff, no framing, no referrer, no caching of API replies",
+   "asvs": "V3.4",
+   "expected": "nosniff; DENY; no-referrer; no-store",
+   "observed": "nosniff; DENY; no-referrer; no-store",
+   "pass": true
+  },
+  {
+   "area": "access",
+   "name": "an owner cannot read, confirm, use or change another owner's instruction, approval, bill or payee",
+   "asvs": "V8.2 object-level authorization",
+   "expected": "no 200 among 10 attempts",
+   "observed": "read the instruction: 404 not_found; read the approval: 404 not_found; confirm the approval: 404 not_found; cancel the approval: 404 not_found; use the approval: 404 not_found; request signing of the instruction: 404 not_found; revoke the instruction: 404 not_found; discard the draft: 404 not_found; remove the bill: 409 bill_not_due; pay with the victim's payee: 400 invalid",
+   "pass": true
+  },
+  {
+   "area": "access",
+   "name": "after those attempts the victim's approval, bill and draft are unchanged",
+   "asvs": "V8.2",
+   "expected": "approval open, bill due, draft present",
+   "observed": "all unchanged",
+   "pass": true
+  },
+  {
+   "area": "access",
+   "name": "an owner cannot read, cancel or dispute another owner's payment",
+   "asvs": "V8.2",
+   "expected": "no 200 among 3 attempts",
+   "observed": "200 confirm by the victim; read the action: 404 not_found; cancel the action: 404 not_found; dispute the payment: 404 not_found",
+   "pass": true
+  },
+  {
+   "area": "access",
+   "name": "an owner cannot read another owner's receipt",
+   "asvs": "V8.2",
+   "expected": "404",
+   "observed": "404 not_found for a real receipt",
+   "pass": true
+  },
+  {
+   "area": "access",
+   "name": "the attacker's ledger, activity and receipts contain nothing of the victim's",
+   "asvs": "V8.2",
+   "expected": "no victim data",
+   "observed": "none visible",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "a used approval cannot be used again",
+   "asvs": "V2.3 business logic: single use",
+   "expected": "refused, and still one action",
+   "observed": "409 approval_used; 1 action(s) for that approval",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "confirming with a different document fingerprint is refused",
+   "asvs": "V2.3: approval bound to exact content",
+   "expected": "refused",
+   "observed": "409 approval_mismatch",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "an approval that was never confirmed cannot be used",
+   "asvs": "V2.3",
+   "expected": "refused",
+   "observed": "409 approval_missing",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "25 simultaneous uses of one approval create exactly one payment",
+   "asvs": "V2.3 / V15.4 safe concurrency",
+   "expected": "one action",
+   "observed": "1 action(s); 25 of 25 requests answered 200 (all returning the same action)",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "what runs is built from the approved document: parameters sent with the request are ignored",
+   "asvs": "V2.3",
+   "expected": "amount 70000 paise, as approved",
+   "observed": "amount 70000 paise",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "an approval for one instruction cannot put another in force",
+   "asvs": "V2.3",
+   "expected": "refused",
+   "observed": "409 approval_mismatch",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "a draft changed after it was signed cannot be put in force with the old signature",
+   "asvs": "V2.3: approval bound to exact content",
+   "expected": "refused, instruction not in force",
+   "observed": "409 approval_mismatch; in force: 0",
+   "pass": true
+  },
+  {
+   "area": "approval",
+   "name": "guessing the signing password is cut off after eight wrong tries, and then even the right one waits",
+   "asvs": "V6.3 authentication throttling",
+   "expected": "8 rejected, then 429 including for the right password",
+   "observed": "8 rejected, 2 limited, right password afterwards: 429 too_many",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "a body over 64 KB is refused",
+   "asvs": "V4.4 / V2.2 input limits",
+   "expected": "413, or the connection closed",
+   "observed": "connection closed",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "a form-encoded body is refused: JSON only",
+   "asvs": "V4.1 content type",
+   "expected": "415",
+   "observed": "415 json_only",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "malformed JSON is refused without a server error",
+   "asvs": "V2.2 validation",
+   "expected": "400",
+   "observed": "400 invalid",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "a JSON body that is not an object is refused",
+   "asvs": "V2.2",
+   "expected": "400",
+   "observed": "400 invalid",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "an amount that is not a positive whole number of paise within range is refused",
+   "asvs": "V2.2",
+   "expected": "none of 9 bad amounts accepted",
+   "observed": "none accepted",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "SQL and path metacharacters in ids and query values cause no server error and reveal nothing",
+   "asvs": "V1.2 injection prevention",
+   "expected": "no 500; users table intact; no stored password hash in any reply",
+   "observed": "statuses 404,200; 2 users; 2 stored hashes searched for",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "markup in a name is stored as text and served as JSON that a browser will not sniff as HTML",
+   "asvs": "V1.2 / V3.2 output encoding",
+   "expected": "application/json with nosniff; the interface renders text nodes only",
+   "observed": "application/json; charset=utf-8; nosniff nosniff",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "prototype-pollution keys in a body do not pollute anything",
+   "asvs": "V1.5 safe deserialization",
+   "expected": "no polluted property on a fresh object",
+   "observed": "200; {}.admin is undefined",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "no path leaves the built interface's folder",
+   "asvs": "V5.4 / V13 file handling",
+   "expected": "none of 9 traversal paths returns a file from outside it",
+   "observed": "statuses 200,404, no outside content",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "the static side accepts only GET and HEAD",
+   "asvs": "V4.1",
+   "expected": "405",
+   "observed": "405 method",
+   "pass": true
+  },
+  {
+   "area": "account",
+   "name": "short, common and handle-derived passwords are refused at registration",
+   "asvs": "V6.2 password security",
+   "expected": "all three refused",
+   "observed": "400 invalid; 400 invalid; 400 invalid",
+   "pass": true
+  },
+  {
+   "area": "account",
+   "name": "a wrong password and an unknown handle get the same answer, and both cost a password hash",
+   "asvs": "V6.3 no account enumeration",
+   "expected": "same status and message; both take the time of a hash",
+   "observed": "401 bad_credentials \"That handle and password do not match.\" in 581 ms; 401 bad_credentials \"That handle and password do not match.\" in 305 ms",
+   "pass": true
+  },
+  {
+   "area": "account",
+   "name": "after repeated wrong passwords the account is locked, and the right password does not open it until the lock ends",
+   "asvs": "V6.3 throttling and lockout",
+   "expected": "locked: the right password is refused",
+   "observed": "4 of 5 further guesses rejected; right password then: 429 locked",
+   "pass": true
+  },
+  {
+   "area": "session",
+   "name": "after signing out, the old cookie is worthless",
+   "asvs": "V7.4 session termination",
+   "expected": "401",
+   "observed": "401 signed_out",
+   "pass": true
+  },
+  {
+   "area": "limits",
+   "name": "one owner cannot hold more than six live connections",
+   "asvs": "V2.4 anti-automation",
+   "expected": "six accepted, the rest 429",
+   "observed": "6 accepted, 2 refused",
+   "pass": true
+  },
+  {
+   "area": "protection",
+   "name": "asking the bank reserve to withstand less needs the password again; asking it to withstand more does not",
+   "asvs": "V6.4 re-authentication for sensitive changes",
+   "expected": "401 stepup_required, then 200 for the stronger setting, then 200 once the password is entered",
+   "observed": "401 stepup_required; 200; 200",
+   "pass": true
+  },
+  {
+   "area": "protection",
+   "name": "lowering the everyday spending figure lowers what must stay in the bank, so it needs the password; raising it does not",
+   "asvs": "V6.4 re-authentication for sensitive changes",
+   "expected": "401 stepup_required naming both figures; 200 for the higher figure",
+   "observed": "401 stepup_required \"This lowers what must stay in your bank account from ₹1,69,215.33 to ₹60,000, which frees \"; 200",
+   "pass": true
+  },
+  {
+   "area": "protection",
+   "name": "lowering the floor needs the password; raising it does not",
+   "asvs": "V6.4 re-authentication for sensitive changes",
+   "expected": "401 stepup_required, then 200",
+   "observed": "401 stepup_required; 200",
+   "pass": true
+  },
+  {
+   "area": "protection",
+   "name": "removing a bill that is counted in what must stay needs the password",
+   "asvs": "V6.4 re-authentication for sensitive changes",
+   "expected": "401 stepup_required, then 200 once the password is entered",
+   "observed": "added 200, 200; remove 401 stepup_required; with the password 200",
+   "pass": true
+  },
+  {
+   "area": "protection",
+   "name": "anyone with the session can stop everything; undoing the stop, and signing out everywhere, need the password",
+   "asvs": "V6.4 re-authentication for sensitive changes",
+   "expected": "200 to stop; 401 stepup_required to undo it and to sign out everywhere",
+   "observed": "stop 200; undo 401 stepup_required; sign out everywhere 401 stepup_required",
+   "pass": true
+  },
+  {
+   "area": "protection",
+   "name": "without the password a session cannot approve ₹10,000 in a day by splitting it: two payments of ₹6,000 prepared together, the second is refused at confirmation",
+   "asvs": "V6.4 re-authentication for sensitive changes",
+   "expected": "neither asks for the password when prepared; the first confirms; the second answers 401 stepup_required; a third says it needs the password",
+   "observed": "prepared 200 false, 200 false; confirm 200, 401 stepup_required; third requires the password: true",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "reserve assumptions outside their range are refused with a message per field",
+   "asvs": "V2.2 input validation",
+   "expected": "400 naming both fields",
+   "observed": "400 invalid lateDays,lostSalaries",
+   "pass": true
+  },
+  {
+   "area": "input",
+   "name": "the absence summary clamps its time to the life of the account and never reaches another owner",
+   "asvs": "V2.2 / V8.2",
+   "expected": "200 with nothing done for a new account, whatever time is asked for",
+   "observed": "200 done=0; 200 done=0",
+   "pass": true
+  },
+  {
+   "area": "interface",
+   "name": "a nested route of the built interface serves the page with absolute asset paths, and a missing file is 404, not the page",
+   "asvs": "V13 configuration",
+   "expected": "the page with /assets/ paths; 404 for the missing file",
+   "observed": "200, script absolute; missing file 404",
+   "pass": true
+  },
+  {
+   "area": "integrity",
+   "name": "after every attack the ledger still balances and the rail holds one payment for each action",
+   "asvs": "V2.3 / V15.4",
+   "expected": "no unbalanced entry; payments on the rail equal actions sent",
+   "observed": "0 unbalanced entries; 2 rail payments for 2 actions",
+   "pass": true
+  },
+  {
+   "area": "integrity",
+   "name": "no request produced an unhandled server error",
+   "asvs": "V16.5 error handling",
+   "expected": "nothing on the services' error output",
+   "observed": "nothing",
+   "pass": true
+  }
+ ]
+}

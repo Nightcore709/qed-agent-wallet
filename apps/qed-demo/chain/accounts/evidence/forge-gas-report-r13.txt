@@ -1,0 +1,18 @@
+[PASS] test_construction_lists_the_protective_calls_and_the_sentinel() (gas: 5628569)
+[PASS] test_construction_refuses_a_bad_protective_list_or_sentinel() (gas: 7152669)
+[PASS] test_only_the_sentinel_can_freeze_and_never_anything_but_a_member() (gas: 304411)
+[PASS] test_protect_is_bound_to_its_calls_nonce_deadline_and_a_member() (gas: 695978)
+[PASS] test_protect_refuses_every_call_outside_the_list() (gas: 578259)
+[PASS] test_sentinel_abuse_freezes_everyone_moves_nothing_and_a_recovery_ends_it() (gas: 1333046)
+[PASS] test_the_sentinel_freezes_a_member_at_once_and_its_approval_stops_counting() (gas: 499732)
+[PASS] test_the_release_protective_list_holds_only_calls_that_move_no_money() (gas: 9883165)
+| Function Name                                    | Min             | Avg    | Median | Max    | # Calls |
+| cancel                                           |           36736 |  69013 |  73722 |  91872 |       4 |
+| execute                                          |           35448 |  94398 |  84451 | 233906 |      38 |
+| freeze                                           |           25035 |  30068 |  31735 |  31747 |      20 |
+| protect                                          |           36480 |  67775 |  39920 | 154423 |      24 |
+| protectDigest                                    |            1968 |   3660 |   3468 |   7970 |      24 |
+| protectNonce                                     |            2445 |   2445 |   2445 |   2445 |      25 |
+| protectiveCalls                                  |            8714 |   8714 |   8714 |   8714 |       1 |
+| setSentinel                                      |           21480 |  21480 |  21480 |  21480 |       1 |
+| unfreeze                                         |           22601 |  22601 |  22601 |  22601 |       1 |

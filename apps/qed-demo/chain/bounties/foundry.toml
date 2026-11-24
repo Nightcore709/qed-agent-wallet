@@ -1,0 +1,129 @@
+# QEDBountyBoard: the local claim path for the release's refutation bounties (R11 section 9; R10-009).
+# Local research build. Nothing here is deployed anywhere but a local Anvil chain.
+#
+# The release's contracts are read in place from the vendored tree (../vendor), which is never modified or built in
+# place; everything is built into this folder's out/ and cache/ (ignored by chain/.gitignore). The compiler settings
+# are the deployed bounties' own (vendor/verification/OptimalityBounty.json and MaximalityBounty.json: solc 0.8.26,
+# via-IR, optimizer 200 runs, EVM cancun, bytecodeHash none, no CBOR metadata), so the judges built here are the
+# release's bytecode and the board is compiled the same way.
+#
+# By hand (always name the compiler): SOLC_VERSION=0.8.26 forge test
+# Everything, with outputs recorded in evidence/: scripts/run.sh
+
+[profile.default]
+src = "src"
+test = "test"
+script = "scripts"
+out = "out"
+cache_path = "cache"
+libs = ["../vendor/lib", "../vendor/contracts"]
+auto_detect_remappings = false
+remappings = [
+  "@openzeppelin/contracts/=../vendor/lib/openzeppelin-contracts/contracts/",
+  "forge-std/=../vendor/lib/forge-std/src/",
+  "qed/=../vendor/contracts/",
+]
+allow_paths = ["../vendor"]
+fs_permissions = [{ access = "read", path = "../vendor/contracts/test/fixtures" }]
+solc_version = "0.8.26"
+offline = true
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+bytecode_hash = "none"
+cbor_metadata = false
+# The release's own suite comes in with the import of its positive controls (Bounties.t.sol); it is not run here.
+no_match_contract = "^BountiesTest$"
+
+[profile.default.fuzz]
+runs = 1000
+seed = "0xb0a7d"
+
+[profile.default.invariant]
+runs = 256
+depth = 64
+fail_on_revert = true
+
+[profile.default.lint]
+lint_on_build = false
+
+# Longer fuzzing and invariant runs: FOUNDRY_PROFILE=deep SOLC_VERSION=0.8.26 forge test
+[profile.deep]
+src = "src"
+test = "test"
+script = "scripts"
+out = "out"
+cache_path = "cache"
+libs = ["../vendor/lib", "../vendor/contracts"]
+auto_detect_remappings = false
+remappings = [
+  "@openzeppelin/contracts/=../vendor/lib/openzeppelin-contracts/contracts/",
+  "forge-std/=../vendor/lib/forge-std/src/",
+  "qed/=../vendor/contracts/",
+]
+allow_paths = ["../vendor"]
+fs_permissions = [{ access = "read", path = "../vendor/contracts/test/fixtures" }]
+solc_version = "0.8.26"
+offline = true
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+bytecode_hash = "none"
+cbor_metadata = false
+no_match_contract = "^BountiesTest$"
+
+[profile.deep.fuzz]
+runs = 10000
+seed = "0xb0a7d"
+
+[profile.deep.invariant]
+runs = 1024
+depth = 96
+fail_on_revert = true
+
+[profile.deep.lint]
+lint_on_build = false
+
+# The seeded-bug twins: the same invariant harness and the same domain checks against boards with one binding removed
+# each. EXPECTED TO FAIL; they show the invariants and checks can fail. Run: FOUNDRY_PROFILE=seeded SOLC_VERSION=0.8.26 forge test
+[profile.seeded]
+src = "src"
+test = "seeded"
+script = "scripts"
+out = "out-seeded"
+cache_path = "cache-seeded"
+libs = ["../vendor/lib", "../vendor/contracts"]
+auto_detect_remappings = false
+remappings = [
+  "@openzeppelin/contracts/=../vendor/lib/openzeppelin-contracts/contracts/",
+  "forge-std/=../vendor/lib/forge-std/src/",
+  "qed/=../vendor/contracts/",
+  "board-test/=test/",
+]
+allow_paths = ["../vendor"]
+fs_permissions = [{ access = "read", path = "../vendor/contracts/test/fixtures" }]
+solc_version = "0.8.26"
+offline = true
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+bytecode_hash = "none"
+cbor_metadata = false
+no_match_contract = "^BountiesTest$"
+
+[profile.seeded.fuzz]
+runs = 1000
+seed = "0xb0a7d"
+failure_persist_dir = "cache-seeded/fuzz"
+
+[profile.seeded.invariant]
+runs = 256
+depth = 64
+fail_on_revert = true
+failure_persist_dir = "cache-seeded/invariant"
+
+[profile.seeded.lint]
+lint_on_build = false

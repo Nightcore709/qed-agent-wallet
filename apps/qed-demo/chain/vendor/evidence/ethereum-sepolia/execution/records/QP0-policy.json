@@ -1,0 +1,13 @@
+{
+  "message": "QED treasury policy\nvault: 0x04D1eF625AD58e3641032267A8f4fB7bC191D117\nreserve: 0x6fb7178744FA0b76be8ec9Bb58A262E541bd9C53\nkeep free in reserve at least: 55000000 of 0x98D1A388120e5A535341532047B604655fe1362F\nconvert from: 0x7AdB609421E30b3dF3063FF2De9d425564893F35\ntranche: 2000000 to 25000000\nmax impact bps: 150\nvalid until: 1795068685\nnonce: policy-2-11155111",
+  "signature": "0x63ac16e64cea175d1b9885ae60ce22e942a74d96be7be7f11d58652958f1a00a7249e5d8d56219dd74f502a072745e2a1db83bb2cf429bf6294bf891ea0a07c81c",
+  "signer": "0x9c61629911658eDf3Fe27415bdD48baaFBc188d4",
+  "onchain": {
+    "targetFree": "55000000",
+    "minTranche": "2000000",
+    "maxTranche": "25000000",
+    "maxImpactBps": 150,
+    "needSlackBps": 10,
+    "validUntil": "1795068685"
+  }
+}

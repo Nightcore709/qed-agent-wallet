@@ -1,0 +1,2957 @@
+{
+ "base": "http://localhost:5741",
+ "at": "2026-11-22T16:10:37.237Z",
+ "routes": [
+  "/",
+  "/pay",
+  "/save",
+  "/holdings",
+  "/earn",
+  "/protect",
+  "/activity",
+  "/instructions",
+  "/instructions/new",
+  "/vault",
+  "/safeguards",
+  "/security",
+  "/workspace",
+  "/ask",
+  "/readiness",
+  "/more",
+  "/evidence",
+  "/instructions/prg_1m8207v3cw3776x7q6k",
+  "/record/act_1m8207v2r7d21j9kawh"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/ 1440 light": {
+   "words": 684,
+   "wordsFirst": 343,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    22,
+    24,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 0,
+   "under44": 29,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.066,
+   "inkFirst": 0.297,
+   "blankPage": 0.33,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 2047,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 1440 light": {
+   "words": 393,
+   "wordsFirst": 221,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.098,
+   "inkFirst": 0.378,
+   "blankPage": 0.09,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 1434,
+   "axe": {},
+   "fault": false
+  },
+  "/save 1440 light": {
+   "words": 660,
+   "wordsFirst": 322,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 17,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.157,
+   "inkFirst": 0.438,
+   "blankPage": 0.34,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 2074,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 1440 light": {
+   "words": 934,
+   "wordsFirst": 304,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 51,
+   "small24": 0,
+   "under32": 0,
+   "under44": 46,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.112,
+   "inkFirst": 0.329,
+   "blankPage": 0.2,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 2692,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 1440 light": {
+   "words": 406,
+   "wordsFirst": 372,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.105,
+   "inkFirst": 0.341,
+   "blankPage": 0.14,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 1181,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 1440 light": {
+   "words": 444,
+   "wordsFirst": 444,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 29,
+   "small24": 0,
+   "under32": 0,
+   "under44": 22,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.078,
+   "inkFirst": 0.34,
+   "blankPage": 0.07,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 1042,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 1440 light": {
+   "words": 209,
+   "wordsFirst": 209,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.212,
+   "inkFirst": 0.26,
+   "blankPage": 0.12,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 1440 light": {
+   "words": 289,
+   "wordsFirst": 230,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 23,
+   "small24": 0,
+   "under32": 0,
+   "under44": 17,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.388,
+   "inkFirst": 0.185,
+   "blankPage": 0.36,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 1213,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 1440 light": {
+   "words": 251,
+   "wordsFirst": 225,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 0,
+   "under32": 0,
+   "under44": 20,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.299,
+   "inkFirst": 0.166,
+   "blankPage": 0.28,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1121,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 1440 light": {
+   "words": 839,
+   "wordsFirst": 375,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 34,
+   "small24": 0,
+   "under32": 0,
+   "under44": 29,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.135,
+   "inkFirst": 0.353,
+   "blankPage": 0.14,
+   "edgesFirst": 29,
+   "overflow": false,
+   "height": 1525,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 1440 light": {
+   "words": 1913,
+   "wordsFirst": 413,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 37,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.167,
+   "inkFirst": 0.303,
+   "blankPage": 0.86,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 3526,
+   "axe": {},
+   "fault": false
+  },
+  "/security 1440 light": {
+   "words": 562,
+   "wordsFirst": 338,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.139,
+   "inkFirst": 0.274,
+   "blankPage": 0.14,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 1582,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 1440 light": {
+   "words": 67,
+   "wordsFirst": 67,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.35,
+   "inkFirst": 0.231,
+   "blankPage": 0.1,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 1440 light": {
+   "words": 165,
+   "wordsFirst": 165,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.178,
+   "inkFirst": 0.271,
+   "blankPage": 0.12,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 1440 light": {
+   "words": 3999,
+   "wordsFirst": 363,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.255,
+   "inkFirst": 0.291,
+   "blankPage": 1.88,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 3205,
+   "axe": {},
+   "fault": false
+  },
+  "/more 1440 light": {
+   "words": 133,
+   "wordsFirst": 133,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.255,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 1440 light": {
+   "words": 2826,
+   "wordsFirst": 312,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 181,
+   "small24": 0,
+   "under32": 0,
+   "under44": 107,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.156,
+   "inkFirst": 0.284,
+   "blankPage": 0.41,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 1459,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m8207v3cw3776x7q6k 1440 light": {
+   "words": 804,
+   "wordsFirst": 456,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 0,
+   "under32": 0,
+   "under44": 15,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.072,
+   "inkFirst": 0.387,
+   "blankPage": 0.2,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 2050,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m8207v2r7d21j9kawh 1440 light": {
+   "words": 384,
+   "wordsFirst": 310,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 13,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.15,
+   "inkFirst": 0.262,
+   "blankPage": 0.18,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1214,
+   "axe": {},
+   "fault": false
+  },
+  "/ 390 light": {
+   "words": 676,
+   "wordsFirst": 135,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    18,
+    19,
+    24,
+    36
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 31,
+   "small24": 0,
+   "under32": 0,
+   "under44": 23,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.106,
+   "inkFirst": 0.438,
+   "blankPage": 0.18,
+   "edgesFirst": 8,
+   "overflow": false,
+   "height": 3905,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 390 light": {
+   "words": 385,
+   "wordsFirst": 111,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 31,
+   "small24": 0,
+   "under32": 0,
+   "under44": 22,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.058,
+   "inkFirst": 0.614,
+   "blankPage": 0.15,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 2443,
+   "axe": {},
+   "fault": false
+  },
+  "/save 390 light": {
+   "words": 651,
+   "wordsFirst": 192,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 13,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.108,
+   "inkFirst": 0.548,
+   "blankPage": 0.12,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 2734,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 390 light": {
+   "words": 924,
+   "wordsFirst": 177,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 49,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.08,
+   "inkFirst": 0.516,
+   "blankPage": 0.12,
+   "edgesFirst": 10,
+   "overflow": false,
+   "height": 4002,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 light": {
+   "words": 398,
+   "wordsFirst": 183,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 19,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.057,
+   "inkFirst": 0.523,
+   "blankPage": 0.12,
+   "edgesFirst": 7,
+   "overflow": false,
+   "height": 2186,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 390 light": {
+   "words": 436,
+   "wordsFirst": 206,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 27,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.07,
+   "inkFirst": 0.5,
+   "blankPage": 0.07,
+   "edgesFirst": 7,
+   "overflow": false,
+   "height": 2042,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 390 light": {
+   "words": 204,
+   "wordsFirst": 137,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 17,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.081,
+   "inkFirst": 0.406,
+   "blankPage": 0.08,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1248,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 390 light": {
+   "words": 281,
+   "wordsFirst": 181,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.059,
+   "inkFirst": 0.478,
+   "blankPage": 0.05,
+   "edgesFirst": 9,
+   "overflow": false,
+   "height": 1467,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 390 light": {
+   "words": 243,
+   "wordsFirst": 162,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 19,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.078,
+   "inkFirst": 0.443,
+   "blankPage": 0.07,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 1284,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 390 light": {
+   "words": 831,
+   "wordsFirst": 122,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 32,
+   "small24": 0,
+   "under32": 0,
+   "under44": 27,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.1,
+   "inkFirst": 0.377,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 3601,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 390 light": {
+   "words": 1771,
+   "wordsFirst": 161,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 30,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.065,
+   "inkFirst": 0.45,
+   "blankPage": 0.15,
+   "edgesFirst": 9,
+   "overflow": false,
+   "height": 5934,
+   "axe": {},
+   "fault": false
+  },
+  "/security 390 light": {
+   "words": 554,
+   "wordsFirst": 180,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 16,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.092,
+   "inkFirst": 0.509,
+   "blankPage": 0.21,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 2676,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 390 light": {
+   "words": 59,
+   "wordsFirst": 59,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.495,
+   "inkFirst": 0.26,
+   "blankPage": 0.45,
+   "edgesFirst": 4,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 390 light": {
+   "words": 157,
+   "wordsFirst": 133,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.145,
+   "inkFirst": 0.522,
+   "blankPage": 0.13,
+   "edgesFirst": 7,
+   "overflow": false,
+   "height": 1111,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 390 light": {
+   "words": 3991,
+   "wordsFirst": 221,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 13,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.06,
+   "inkFirst": 0.577,
+   "blankPage": 0.59,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 5769,
+   "axe": {},
+   "fault": false
+  },
+  "/more 390 light": {
+   "words": 129,
+   "wordsFirst": 117,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 19,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.1,
+   "inkFirst": 0.344,
+   "blankPage": 0.09,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 968,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 390 light": {
+   "words": 2590,
+   "wordsFirst": 150,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 179,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.112,
+   "inkFirst": 0.425,
+   "blankPage": 0.41,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 2309,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m8207v3cw3776x7q6k 390 light": {
+   "words": 796,
+   "wordsFirst": 172,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 13,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.078,
+   "inkFirst": 0.513,
+   "blankPage": 0.1,
+   "edgesFirst": 8,
+   "overflow": false,
+   "height": 3780,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m8207v2r7d21j9kawh 390 light": {
+   "words": 376,
+   "wordsFirst": 203,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 4.94,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.097,
+   "inkFirst": 0.524,
+   "blankPage": 0.24,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 1984,
+   "axe": {},
+   "fault": false
+  },
+  "/ 1440 dark": {
+   "words": 684,
+   "wordsFirst": 343,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    22,
+    24,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 0,
+   "under44": 29,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.066,
+   "inkFirst": 0.297,
+   "blankPage": 0.33,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 2047,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 1440 dark": {
+   "words": 393,
+   "wordsFirst": 221,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.098,
+   "inkFirst": 0.378,
+   "blankPage": 0.09,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 1434,
+   "axe": {},
+   "fault": false
+  },
+  "/save 1440 dark": {
+   "words": 660,
+   "wordsFirst": 322,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 17,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.157,
+   "inkFirst": 0.438,
+   "blankPage": 0.34,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 2074,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 1440 dark": {
+   "words": 950,
+   "wordsFirst": 304,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 51,
+   "small24": 0,
+   "under32": 0,
+   "under44": 46,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.112,
+   "inkFirst": 0.329,
+   "blankPage": 0.2,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 2692,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 1440 dark": {
+   "words": 406,
+   "wordsFirst": 372,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.105,
+   "inkFirst": 0.341,
+   "blankPage": 0.14,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 1181,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 1440 dark": {
+   "words": 444,
+   "wordsFirst": 444,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 29,
+   "small24": 0,
+   "under32": 0,
+   "under44": 22,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.078,
+   "inkFirst": 0.34,
+   "blankPage": 0.07,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 1042,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 1440 dark": {
+   "words": 209,
+   "wordsFirst": 209,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.212,
+   "inkFirst": 0.26,
+   "blankPage": 0.12,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 1440 dark": {
+   "words": 289,
+   "wordsFirst": 230,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 23,
+   "small24": 0,
+   "under32": 0,
+   "under44": 17,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.388,
+   "inkFirst": 0.185,
+   "blankPage": 0.36,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 1213,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 1440 dark": {
+   "words": 251,
+   "wordsFirst": 225,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 0,
+   "under32": 0,
+   "under44": 20,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.299,
+   "inkFirst": 0.166,
+   "blankPage": 0.28,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1121,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 1440 dark": {
+   "words": 839,
+   "wordsFirst": 375,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 34,
+   "small24": 0,
+   "under32": 0,
+   "under44": 29,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.135,
+   "inkFirst": 0.353,
+   "blankPage": 0.14,
+   "edgesFirst": 29,
+   "overflow": false,
+   "height": 1525,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 1440 dark": {
+   "words": 1920,
+   "wordsFirst": 413,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 37,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.167,
+   "inkFirst": 0.305,
+   "blankPage": 0.85,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 3529,
+   "axe": {},
+   "fault": false
+  },
+  "/security 1440 dark": {
+   "words": 562,
+   "wordsFirst": 338,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.139,
+   "inkFirst": 0.274,
+   "blankPage": 0.14,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 1582,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 1440 dark": {
+   "words": 67,
+   "wordsFirst": 67,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.35,
+   "inkFirst": 0.231,
+   "blankPage": 0.1,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 1440 dark": {
+   "words": 165,
+   "wordsFirst": 165,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.178,
+   "inkFirst": 0.271,
+   "blankPage": 0.12,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 1440 dark": {
+   "words": 3999,
+   "wordsFirst": 363,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.255,
+   "inkFirst": 0.291,
+   "blankPage": 1.88,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 3205,
+   "axe": {},
+   "fault": false
+  },
+  "/more 1440 dark": {
+   "words": 133,
+   "wordsFirst": 133,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.255,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 1440 dark": {
+   "words": 2826,
+   "wordsFirst": 312,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 181,
+   "small24": 0,
+   "under32": 0,
+   "under44": 107,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.156,
+   "inkFirst": 0.284,
+   "blankPage": 0.41,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 1459,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m8207v3cw3776x7q6k 1440 dark": {
+   "words": 804,
+   "wordsFirst": 456,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 0,
+   "under32": 0,
+   "under44": 15,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.072,
+   "inkFirst": 0.387,
+   "blankPage": 0.2,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 2050,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m8207v2r7d21j9kawh 1440 dark": {
+   "words": 384,
+   "wordsFirst": 310,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 13,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 188x32",
+   "smallList": [],
+   "blankFirst": 0.15,
+   "inkFirst": 0.262,
+   "blankPage": 0.18,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1214,
+   "axe": {},
+   "fault": false
+  },
+  "/ 390 dark": {
+   "words": 676,
+   "wordsFirst": 135,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    18,
+    19,
+    24,
+    36
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 31,
+   "small24": 0,
+   "under32": 0,
+   "under44": 23,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.106,
+   "inkFirst": 0.438,
+   "blankPage": 0.18,
+   "edgesFirst": 8,
+   "overflow": false,
+   "height": 3905,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 390 dark": {
+   "words": 385,
+   "wordsFirst": 111,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 31,
+   "small24": 0,
+   "under32": 0,
+   "under44": 22,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.058,
+   "inkFirst": 0.614,
+   "blankPage": 0.15,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 2443,
+   "axe": {},
+   "fault": false
+  },
+  "/save 390 dark": {
+   "words": 651,
+   "wordsFirst": 192,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 13,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.108,
+   "inkFirst": 0.548,
+   "blankPage": 0.12,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 2734,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 390 dark": {
+   "words": 941,
+   "wordsFirst": 177,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 49,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.08,
+   "inkFirst": 0.516,
+   "blankPage": 0.12,
+   "edgesFirst": 10,
+   "overflow": false,
+   "height": 4002,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 dark": {
+   "words": 398,
+   "wordsFirst": 183,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 19,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.057,
+   "inkFirst": 0.523,
+   "blankPage": 0.12,
+   "edgesFirst": 7,
+   "overflow": false,
+   "height": 2186,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 390 dark": {
+   "words": 436,
+   "wordsFirst": 206,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 27,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.07,
+   "inkFirst": 0.5,
+   "blankPage": 0.07,
+   "edgesFirst": 7,
+   "overflow": false,
+   "height": 2042,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 390 dark": {
+   "words": 204,
+   "wordsFirst": 137,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 17,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.081,
+   "inkFirst": 0.406,
+   "blankPage": 0.08,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1248,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 390 dark": {
+   "words": 281,
+   "wordsFirst": 181,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.059,
+   "inkFirst": 0.478,
+   "blankPage": 0.05,
+   "edgesFirst": 9,
+   "overflow": false,
+   "height": 1467,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 390 dark": {
+   "words": 243,
+   "wordsFirst": 162,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 19,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.078,
+   "inkFirst": 0.443,
+   "blankPage": 0.07,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 1284,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 390 dark": {
+   "words": 831,
+   "wordsFirst": 122,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 32,
+   "small24": 0,
+   "under32": 0,
+   "under44": 27,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.1,
+   "inkFirst": 0.377,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 3601,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 390 dark": {
+   "words": 1770,
+   "wordsFirst": 161,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 30,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.065,
+   "inkFirst": 0.45,
+   "blankPage": 0.15,
+   "edgesFirst": 9,
+   "overflow": false,
+   "height": 5934,
+   "axe": {},
+   "fault": false
+  },
+  "/security 390 dark": {
+   "words": 554,
+   "wordsFirst": 180,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 6,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 16,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.092,
+   "inkFirst": 0.509,
+   "blankPage": 0.21,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 2676,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 390 dark": {
+   "words": 59,
+   "wordsFirst": 59,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.495,
+   "inkFirst": 0.26,
+   "blankPage": 0.45,
+   "edgesFirst": 4,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 390 dark": {
+   "words": 157,
+   "wordsFirst": 133,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 6,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.145,
+   "inkFirst": 0.522,
+   "blankPage": 0.13,
+   "edgesFirst": 7,
+   "overflow": false,
+   "height": 1111,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 390 dark": {
+   "words": 3991,
+   "wordsFirst": 221,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 13,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.06,
+   "inkFirst": 0.577,
+   "blankPage": 0.59,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 5769,
+   "axe": {},
+   "fault": false
+  },
+  "/more 390 dark": {
+   "words": 129,
+   "wordsFirst": 117,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen"
+   ],
+   "colours": 4,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 19,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.1,
+   "inkFirst": 0.344,
+   "blankPage": 0.09,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 968,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 390 dark": {
+   "words": 2627,
+   "wordsFirst": 151,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 179,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.152,
+   "inkFirst": 0.435,
+   "blankPage": 0.41,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 2555,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m8207v3cw3776x7q6k 390 dark": {
+   "words": 796,
+   "wordsFirst": 172,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 6.23,
+   "contrastFails": 0,
+   "targets": 14,
+   "small24": 0,
+   "under32": 0,
+   "under44": 13,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.078,
+   "inkFirst": 0.513,
+   "blankPage": 0.1,
+   "edgesFirst": 8,
+   "overflow": false,
+   "height": 3780,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m8207v2r7d21j9kawh 390 dark": {
+   "words": 376,
+   "wordsFirst": 203,
+   "sizes": [
+    12.5,
+    13.5,
+    15,
+    17,
+    19,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "QED Familjen",
+    "ui-monospace"
+   ],
+   "colours": 5,
+   "contrastMin": 6.73,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QEDPractice money, live pricesPractice\" 90x32",
+   "smallList": [],
+   "blankFirst": 0.097,
+   "inkFirst": 0.524,
+   "blankPage": 0.24,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 1984,
+   "axe": {},
+   "fault": false
+  }
+ }
+}

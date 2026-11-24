@@ -1,0 +1,561 @@
+/* The on-chain wallet (Meridian, DESIGN.md M1 to M11). The page leads with what it holds and who owns it; QED's own
+   hand (what it may move, the meters of its authority, its checks) is drawn in tide (--qed); every rule carries the mark
+   of who enforces it (src/ui/enforced.tsx: the contract, QED, or nobody: observed only); setting it up is a checkout of
+   three steps with the wallet forming beside them; a job is a record in panels. Every colour, size and duration is a
+   Meridian token from tokens.css. Classes are `vt-` (src/styles/collisions.test.ts); `vault-acct` and `va-*` stay, as
+   the browser journeys read the accounts by them. Every control on these pages is a 44 px target. */
+
+/* ------------------------------------------------------------------------------------------------ the page */
+.vt { display: grid; gap: var(--s6); min-width: 0; }
+.vt > * { min-width: 0; }
+.vt .btn, .vt .btn.sm, .vt-inline .btn, .vt-inline .btn.sm { --h: 44px; }
+.vt .btn.lg { --h: 52px; }
+/* a control that cannot be used now stays readable (4.5:1 over its glass) and says so by its dashed edge, not by fading */
+.vt .btn[disabled], .vt-inline .btn[disabled] { opacity: 1; filter: none; color: var(--ink-3); background: transparent; border: 1px dashed var(--rule-2); box-shadow: none; }
+
+/* the head: drawn before any data (M11); its state stamp waits for the vault service in a slot of its own height */
+.vt-head { margin-bottom: 0; align-items: flex-end; }
+.vt-head h1 { max-width: 24ch; }
+.vt-head h1 .dim { display: block; color: var(--ink-3); font-weight: 560; }
+.vt-head-text > p { font-size: var(--t-body); color: var(--ink-2); max-width: 66ch; }
+.vt-head-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); min-height: 32px; }
+
+/* the wallet's sections: quieter than the Protect tabs above them, the current one a raised pill of glass */
+.vt-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s4); }
+.vt-tabs { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.vt-tabs a, .vt-lab-link { display: inline-flex; align-items: center; gap: var(--s2); min-height: 44px; padding: 0 var(--s4); border-radius: var(--r-pill); border: 1px solid transparent; color: var(--ink-2); font-size: var(--t-small); font-weight: 600; text-decoration: none; white-space: nowrap; transition: color var(--d1) var(--ease-out), background-color var(--d2) var(--ease-out), border-color var(--d2) var(--ease-out), box-shadow var(--d2) var(--ease-out); }
+.vt-tabs a:hover, .vt-lab-link:hover { color: var(--ink); background: color-mix(in oklab, var(--pane-2) 70%, transparent); border-color: var(--rim); }
+.vt-tabs a[aria-current="page"], .vt-lab-link[aria-current] { color: var(--ink); font-weight: 650; background: linear-gradient(180deg, var(--gloss), transparent 60%), var(--pane-2); border-color: var(--rim); box-shadow: var(--lift-1); }
+.vt-lab-link svg { width: 16px; height: 16px; stroke-width: 1.8; }
+
+/* two columns that stack on their own (useMasonry), and a plain pair */
+.vt-board.board { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: var(--s5); }
+.vt-board.board > * { margin-bottom: var(--s5); }
+.vt-split { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
+.vt-split.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.vt-col { display: grid; gap: var(--s5); align-content: start; min-width: 0; }
+
+/* what a panel says under its head, quiet text, folds and feet */
+.vt-panel-say { margin: calc(var(--s2) * -1) 0 var(--s4); font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); max-width: 80ch; }
+.vt-say { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); max-width: 80ch; }
+.vt-say a, .vt-panel-say a { font-weight: 600; }
+.vt-stack { display: grid; gap: var(--s3); }
+.vt-empty { padding: var(--s2) 0; font-size: var(--t-small); color: var(--ink-2); max-width: 72ch; }
+.vt-after { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); margin-top: var(--s3); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); max-width: 84ch; }
+.vt-fold > summary { display: list-item; min-height: 44px; padding: 12px 0; font-size: var(--t-small); font-weight: 600; line-height: 20px; color: var(--ink-2); }
+.vt-fold > summary:hover, .vt-fold[open] > summary { color: var(--ink); }
+.vt-fold > * + * { margin-top: var(--s2); }
+.vt-fold-p { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); max-width: 84ch; }
+.vt-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s1) var(--s4); margin-top: var(--s4); padding-top: var(--s1); border-top: 1px solid var(--rule); font-size: var(--t-small); color: var(--ink-3); }
+.vt-foot a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 620; }
+.vt-foot-say { justify-content: flex-start; padding-top: var(--s3); line-height: 1.5; }
+.vt-sub-h { margin: var(--s5) 0 var(--s2); font-size: var(--t-small); font-weight: 650; color: var(--ink-2); }
+.vt-block { display: block; }
+.vt-contents { display: contents; }
+.vt-pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; }
+.vt-skel { display: inline-block; width: 7ch; height: .9em; vertical-align: middle; border-radius: var(--r-xs); }
+.vt-test { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 620; white-space: nowrap; color: var(--due); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 26%, transparent); }
+.vt-test::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.vt .panel .ledger-wrap { padding: 0; background: none; border: 0; box-shadow: none; border-radius: var(--r-sm); }
+
+/* ------------------------------------------------------------------------------------------------ who enforces a rule */
+.vt-by { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 620; line-height: 1; white-space: nowrap; vertical-align: middle; color: var(--ink-2); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rule-2); }
+.vt-by svg { width: 13px; height: 13px; stroke-width: 2; flex: none; }
+.vt-by .seal { --size: 13px; vertical-align: 0; }
+.vt-by.contract { color: var(--ink); background: color-mix(in oklab, var(--ink) 7%, var(--pane-2)); border-color: color-mix(in oklab, var(--ink) 30%, transparent); }
+.vt-by.qed { color: var(--qed); background: var(--qed-bg); border-color: var(--qed-line); }
+.vt-by.seen { background: transparent; border-style: dashed; }
+.vt-key { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3) var(--s5); padding: var(--s4) 0; margin-bottom: var(--s4); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.vt-key > div { display: grid; gap: 6px; align-content: start; justify-items: start; }
+.vt-key dd { font-size: var(--t-micro); line-height: 1.45; color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ setting it up: a checkout */
+.vt-setup { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: var(--s5); align-items: start; }
+.vt-setup-flow { padding: 0; }
+.vt-setup-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--s4) var(--s5); padding: var(--s6); border-bottom: 1px solid var(--rule); }
+.vt-setup-title { display: grid; gap: var(--s2); max-width: 60ch; }
+.vt-setup-title h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; }
+.vt-setup-title p { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-rail { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.vt-rail li { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px 0 5px; border-radius: var(--r-pill); font-size: var(--t-small); font-weight: 600; color: var(--ink-3); background: color-mix(in oklab, var(--well) 45%, transparent); border: 1px solid var(--rim); }
+.vt-rail li + li::before { content: ""; width: 10px; height: 1px; margin-left: -12px; margin-right: 4px; background: var(--rule-2); }
+.vt-rail i { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-style: normal; font-size: var(--t-micro); font-weight: 700; color: var(--ink-3); background: var(--pane-2); }
+.vt-rail i svg { width: 13px; height: 13px; stroke-width: 3; }
+.vt-rail li.done { color: var(--ink-2); }
+.vt-rail li.done i { color: var(--gain); background: var(--gain-bg); }
+.vt-rail li.now { color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); border-color: transparent; box-shadow: var(--shadow-btn); }
+.vt-rail li.now i { color: var(--on-act); background: color-mix(in oklab, var(--on-act) 14%, transparent); }
+.vt-steps { display: grid; }
+.vt-step { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: var(--s4); padding: var(--s5) var(--s6); border-top: 1px solid var(--rule); }
+.vt-step:first-child { border-top: 0; }
+.vt-step.now { background: linear-gradient(90deg, color-mix(in oklab, var(--act) 7%, transparent), transparent 70%); }
+.vt-step-n { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; font-size: var(--t-small); font-weight: 700; color: var(--ink-3); background: var(--pane-2); border: 1px solid var(--rim); font-variant-numeric: tabular-nums; }
+.vt-step-n svg { width: 16px; height: 16px; stroke-width: 2.6; }
+.vt-step.done .vt-step-n { color: var(--gain); background: var(--gain-bg); border-color: transparent; }
+.vt-step.now .vt-step-n { color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); border-color: transparent; box-shadow: var(--shadow-btn); }
+.vt-step-body { display: grid; gap: var(--s1); min-width: 0; }
+.vt-step-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s1) var(--s3); min-height: 36px; }
+.vt-step h3 { font-size: var(--t-body); font-weight: 650; }
+.vt-step.next h3 { color: var(--ink-2); font-weight: 600; }
+.vt-step-state { font-size: var(--t-micro); font-weight: 650; color: var(--ink-3); }
+.vt-step.done .vt-step-state { color: var(--gain); }
+.vt-step.now .vt-step-state { color: var(--ink); }
+.vt-step-does { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); max-width: 72ch; }
+.vt-step.next .vt-step-does { color: var(--ink-3); }
+.vt-step-act { display: grid; gap: var(--s4); margin-top: var(--s4); justify-items: start; }
+.vt-step-act > * { max-width: 100%; }
+.vt-step-act .note, .vt-step-act .vt-device, .vt-step-does { overflow-wrap: anywhere; } /* an address in a sentence may break, so a narrow phone at a large text size keeps the step inside its panel */
+.vt-step-act > .vt-mform, .vt-step-act > .note, .vt-step-act > .vt-fold, .vt-step-act > .vt-device { justify-self: stretch; }
+/* the wallet as it forms, beside the steps */
+.vt-setup-sum { position: sticky; top: calc(var(--bar-top, 0px) + var(--s4)); display: grid; gap: var(--s4);
+  background: radial-gradient(110% 70% at 100% 0%, color-mix(in oklab, var(--glow-a) 30%, transparent), transparent 60%), linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); }
+.vt-sum-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s2); }
+.vt-sum-head h2 { font-size: var(--t-body); font-weight: 600; color: var(--ink-2); }
+.vt-sum { display: grid; border-top: 1px solid var(--rule); }
+.vt-sum > div { display: grid; gap: 3px; padding: var(--s3) 0; border-bottom: 1px solid var(--rule); }
+.vt-sum dt { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-sum dd { padding-left: 26px; font-size: var(--t-small); line-height: 1.5; color: var(--ink); overflow-wrap: anywhere; }
+.vt-sum dd b { font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+.vt-sum-mark { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--rule-2); flex: none; }
+.vt-sum-mark svg { width: 11px; height: 11px; stroke-width: 3; }
+.vt-sum > div.done .vt-sum-mark { color: var(--gain); background: var(--gain-bg); border-color: transparent; }
+.vt-sum-foot { font-size: var(--t-micro); line-height: 1.45; color: var(--ink-3); }
+/* what the device asks for: a fingerprint, a face or a PIN stays on the device; QED receives a signature only */
+.vt-device { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); max-width: 74ch; }
+.vt-device-i { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; color: var(--brand); background: var(--brand-bg); border: 1px solid var(--brand-line); flex: none; }
+.vt-device-i svg { width: 20px; height: 20px; stroke-width: 1.8; }
+.vt-mform { display: grid; gap: var(--s4); }
+/* fields of one form line up by their inputs, whatever their labels and hints wrap to */
+.vt-mgrid.form-grid, .vt-two.form-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); align-items: end; }
+.vt-form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s5); }
+.vt-form-foot p { flex: 1 1 260px; max-width: 64ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+
+/* ------------------------------------------------------------------------------------------------ what the wallet holds */
+.vt-hold { container-type: inline-size; padding: var(--s6) var(--s6) var(--s5); background: radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--glow-a) 34%, transparent), transparent 62%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.vt-acct-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s1) var(--s4); }
+.vt-acct-note { font-size: var(--t-small); color: var(--ink-3); }
+.va-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s2); min-height: 26px; }
+.va-head h3 { font-size: var(--t-body); font-weight: 600; letter-spacing: -.005em; color: var(--ink-2); }
+.va-unit { font-size: var(--t-small); color: var(--ink-3); }
+.vault-acct.primary .lead { margin-top: var(--s2); font-size: var(--t-fig-hero); line-height: .95; font-weight: 640; letter-spacing: var(--track-hero); color: var(--ink); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.vault-acct .lead .paise, .vt-now-v .paise, .vt-fig-v .paise { opacity: 1; color: var(--ink-3); }
+.va-exact { margin-top: var(--s1); font-size: var(--t-small); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+/* the treasury at true scale on the money bar (kit.tsx MoneyBar): free, set aside for promises, and the span of what QED
+   may still move under the free part */
+.vt-bar { margin-top: var(--s6); }
+.vt-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s5); }
+.vt-tiles > .tile { display: grid; align-content: start; gap: 4px; }
+.vt-tiles dt { display: inline-flex; align-items: center; gap: 7px; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-tile-v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-tile-v small { display: block; margin-top: 2px; font-size: var(--t-micro); font-weight: 500; letter-spacing: 0; color: var(--ink-3); }
+.vt-tile-s { font-size: var(--t-micro); line-height: 1.4; color: var(--ink-3); }
+.tile.vt-qed { background: linear-gradient(160deg, var(--qed-bg), transparent 70%), color-mix(in oklab, var(--pane-2) 70%, transparent); }
+.vt-also-k { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--rule); font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-also { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s3); }
+.vt-mini { display: grid; align-content: start; gap: 2px; padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); min-width: 0; }
+.vt-mini .va-head h3, .vt-mini-h { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-mini .lead, .vt-mini-v { margin-top: var(--s1); font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-mini .va-exact { margin-top: 0; font-size: var(--t-micro); }
+.vt-mini .va-lines { display: grid; gap: 2px; margin-top: var(--s2); }
+.vt-mini .va-lines > div { display: flex; justify-content: space-between; gap: var(--s3); font-size: var(--t-micro); }
+.vt-mini .va-lines dt { color: var(--ink-3); }
+.vt-mini .va-lines dd { font-weight: 620; color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; text-align: right; }
+.vt-mini .va-lines dd small { display: block; font-weight: 450; color: var(--ink-3); }
+.vt-mini-s { font-size: var(--t-micro); line-height: 1.4; color: var(--ink-3); }
+/* balances by currency (money-model S5): one row per test token, its total, and below it where it is */
+.vt-bycur { display: grid; gap: var(--s2); margin-top: var(--s2); }
+.vt-bycur > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); font-size: var(--t-small); }
+.vt-bycur dt { font-weight: 600; color: var(--ink-2); min-width: 0; }
+/* a figure stays whole with its unit on a phone ("0 test yen" split at 390 px, 25 Nov) */
+.vt-bycur dd { font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; text-align: right; white-space: nowrap; flex-shrink: 0; }
+.vt-bycur dd small { display: block; font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ what QED may do: meters of its authority */
+.vt-now { display: grid; gap: 2px; margin-bottom: var(--s5); }
+.vt-now-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-now-v { font-size: var(--t-fig-l); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.04; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-now-s { font-size: var(--t-small); color: var(--ink-2); }
+.vt-now-s a { font-weight: 600; }
+.vt-lims { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: var(--s3); }
+.vt-lim { display: grid; align-content: start; gap: 4px; }
+.vt-lim-k { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--s2); font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-lim-v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-lim-v small { font-size: var(--t-small); font-weight: 560; letter-spacing: 0; color: var(--ink-2); }
+.vt-lim .meter { min-width: 0; margin-top: var(--s1); }
+.vt-lim-s { font-size: var(--t-micro); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.vt-lim-n { font-size: var(--t-micro); line-height: 1.4; color: var(--ink-3); }
+.vt-lim .vt-by { justify-self: start; margin-top: var(--s2); }
+/* the limit that binds now: its pill and a tint say so; no double tide outline (R13) */
+.tile.vt-lim.binds { background: linear-gradient(160deg, var(--qed-bg), transparent 75%), color-mix(in oklab, var(--pane-2) 70%, transparent); }
+.vt-binds { display: inline-flex; flex: none; align-items: center; height: 20px; padding: 0 8px; white-space: nowrap; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 680; color: var(--sheet); background: var(--qed); }
+.meter.vt-meter-time i { background: color-mix(in oklab, var(--ink-3) 75%, transparent); box-shadow: none; }
+.vt-scope { display: grid; margin-top: var(--s4); border-top: 1px solid var(--rule); }
+.vt-scope > div { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: var(--s1) var(--s4); padding: var(--s3) 0; border-bottom: 1px solid var(--rule); }
+.vt-scope dt { padding-top: 2px; font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.vt-scope dd { display: grid; gap: var(--s2); justify-items: start; font-size: var(--t-small); line-height: 1.55; color: var(--ink); }
+.vt-scope dd a { font-weight: 600; }
+.vt-worst { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s3); margin-top: var(--s4); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 45%, transparent); border: 1px solid var(--rim); font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }
+.vt-worst-i svg { width: 20px; height: 20px; margin-top: 1px; color: var(--due); stroke-width: 1.8; }
+.vt-worst-t { min-width: 0; }
+.vt-worst strong { font-weight: 650; color: var(--ink); }
+.vt-worst-v { font-variant-numeric: tabular-nums lining-nums; }
+
+/* ------------------------------------------------------------------------------------------------ who owns it, and who may do what */
+.vt-own-lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--s3); margin-bottom: var(--s1); }
+.vt-own-v { font-size: var(--t-fig-l); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-own-v small { font-size: var(--t-fig-s); font-weight: 560; letter-spacing: -.02em; color: var(--ink-3); }
+.vt-own-k { max-width: 24ch; font-size: var(--t-small); font-weight: 600; line-height: 1.35; color: var(--ink-2); }
+.vt-own-line { margin-top: var(--s2); font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }
+.vt-own-line strong { font-weight: 650; color: var(--ink); }
+.vt-own-line[data-tone="wait"] { padding: var(--s2) var(--s3); border-radius: var(--r-sm); color: var(--ink); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 26%, transparent); }
+.vt-own-line[data-tone="wait"] strong { color: var(--due); }
+.vt-own-names { margin-top: var(--s2); font-size: var(--t-small); color: var(--ink); }
+.vt-signers { display: grid; gap: 6px; margin-top: var(--s3); }
+.vt-signers li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); min-height: 48px; padding: 6px var(--s3); border-radius: var(--r-md); font-size: var(--t-small); font-weight: 600; background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
+.vt-signer-i { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: var(--ink-2); background: var(--pane-2); border: 1px solid var(--rim); flex: none; }
+.vt-signer-i svg { width: 16px; height: 16px; stroke-width: 1.8; }
+.vt-signers li.rec .vt-signer-i { color: var(--brand); border-color: var(--brand-line); background: var(--brand-bg); }
+.vt-signer-n { flex: 1 1 160px; min-width: 0; color: var(--ink); overflow-wrap: anywhere; }
+.vt-you { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 680; color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); }
+.vt-roles { display: grid; border-top: 1px solid var(--rule); }
+.vt-roles li { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "who by" "does does"; gap: 4px var(--s3); align-items: center; padding: var(--s3) 0; border-bottom: 1px solid var(--rule); }
+.vt-role-who { grid-area: who; font-size: var(--t-small); font-weight: 650; color: var(--ink); }
+.vt-role-does { grid-area: does; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-roles .vt-by { grid-area: by; }
+
+/* ------------------------------------------------------------------------------------------------ needs you, stop or change it, promises, records */
+.vt-needs .panel-head { justify-content: flex-start; align-items: center; }
+.vt-need-list { display: grid; gap: var(--s3); }
+.vt-need { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 72%, transparent); border: 1px solid var(--rim); }
+.vt-need.due { background: linear-gradient(160deg, var(--due-bg), transparent 75%), color-mix(in oklab, var(--pane-2) 72%, transparent); border-color: color-mix(in oklab, var(--due) 34%, transparent); }
+.vt-need.loss { background: linear-gradient(160deg, var(--loss-bg), transparent 75%), color-mix(in oklab, var(--pane-2) 72%, transparent); border-color: color-mix(in oklab, var(--loss) 34%, transparent); }
+.vt-need h3 { font-size: var(--t-body); font-weight: 650; letter-spacing: -.012em; }
+.vt-need-t p { margin-top: 4px; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.vt-need-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.vt-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: var(--s3); }
+.vt-acts > .tile { display: grid; grid-template-rows: auto 1fr auto; gap: var(--s2); }
+.vt-acts > .tile.vt-on { border-color: color-mix(in oklab, var(--due) 40%, transparent); background: linear-gradient(160deg, var(--due-bg), transparent 75%), color-mix(in oklab, var(--pane-2) 70%, transparent); }
+.vt-act-k { font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+.vt-act-s { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-act-go { padding-top: var(--s1); }
+.vt-keys { margin-top: var(--s3); border-top: 1px solid var(--rule); }
+.vt-select { width: auto; min-height: 44px; }
+.vt-rows { display: grid; }
+.vt-rows > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s2) var(--s4); align-items: center; padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.vt-rows > li:first-child { border-top: 0; padding-top: var(--s1); }
+.vt-rows > li:has(> .vt-rv):has(> .vt-ra) { grid-template-columns: minmax(0, 1fr) auto auto; }
+.vt-rn { display: grid; gap: 2px; min-width: 0; }
+.vt-rn b { font-weight: 620; color: var(--ink); }
+.vt-rn > span { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-rv { display: grid; justify-items: end; text-align: right; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.vt-rv small { font-size: var(--t-micro); font-weight: 450; white-space: normal; color: var(--ink-3); }
+.vt-ra { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--s2); }
+.vt-scenario { align-items: start; }
+.vt-inline-field { display: block; max-width: 640px; margin-top: var(--s2); }
+.vt-inline-field .vt-json { min-height: 64px; }
+.vt-sched.waits { border-color: color-mix(in oklab, var(--due) 34%, transparent); }
+.vt-recs-line { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }
+.vt-recs-line + .vt-recs-line { margin-top: var(--s2); }
+.vt-recs-line strong { font-weight: 650; color: var(--ink); }
+.vt-recs-line[data-tone="wait"] strong { color: var(--due); }
+.vt-recs-line[data-tone="void"] strong { color: var(--loss); }
+.vt-tech .kv + .kv { margin-top: var(--s3); }
+
+/* ------------------------------------------------------------------------------------------------ the section pages: figures, forms and what they must fit */
+.vt-figs { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); margin: 0; }
+.vt-figs > .tile { container-type: inline-size; display: grid; align-content: start; gap: 4px; padding: var(--s5); border-radius: var(--r-lg); background: linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); box-shadow: var(--lift-1); }
+.vt-figs > .tile.vt-qed { background: linear-gradient(160deg, var(--qed-bg), transparent 70%), linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); }
+.vt-figs dt { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-fig-v { font-size: var(--t-fig-m-fit); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-fig-lead .vt-fig-v { font-size: var(--t-fig-l-fit); }
+.vt-fig-s { font-size: var(--t-small); color: var(--ink-3); }
+.vt-act-form { display: grid; gap: var(--s4); min-width: 0; }
+.vt-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.vt-act-form > .vt-sub-h { margin: var(--s1) 0 0; }
+.vt-fits { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--s3); }
+.vt-fit { display: grid; align-content: start; justify-items: start; gap: var(--s2); min-width: 0; padding: var(--s4); border-radius: var(--r-md); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); background: color-mix(in oklab, var(--pane-2) 65%, transparent); border: 1px solid var(--rim); }
+.vt-fit.qed { background: linear-gradient(160deg, var(--qed-bg), transparent 70%), color-mix(in oklab, var(--pane-2) 65%, transparent); }
+.vt-fit dl { display: grid; gap: 2px; }
+.vt-fit dt { margin-top: var(--s2); font-weight: 620; color: var(--ink); }
+.vt-fit dt:first-child { margin-top: 0; }
+.vt-fit strong { font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-means { display: grid; justify-items: start; gap: var(--s2); padding: var(--s3) var(--s4); border-radius: var(--r-md); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); }
+.vt-bullets { display: grid; gap: var(--s1); padding-left: 18px; list-style: disc; font-size: var(--t-small); color: var(--ink-2); }
+.vt-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: var(--s2); }
+.vt-picks label { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s3); align-items: start; min-height: 44px; padding: var(--s3); border-radius: var(--r-md); cursor: pointer; background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); transition: border-color var(--d1) var(--ease-out), background-color var(--d2) var(--ease-out); }
+.vt-picks label:hover { border-color: var(--edge); }
+.vt-picks label:has(input:checked) { border-color: var(--brand-line); background: color-mix(in oklab, var(--brand-bg) 80%, var(--pane-2)); }
+.vt-picks input { margin-top: 2px; }
+.vt-picks span { display: grid; gap: 1px; min-width: 0; }
+.vt-picks b { font-size: var(--t-small); font-weight: 620; }
+.vt-picks small { font-size: var(--t-micro); color: var(--ink-2); }
+.vt-quota { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: var(--s3); }
+.vt-quota > li { display: grid; align-content: start; gap: 2px; padding: var(--s3); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); }
+.vt-quota span { font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); }
+.vt-quota b { font-size: var(--t-lead); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+.vt-quota small { font-size: var(--t-micro); color: var(--ink-3); }
+.vt-venues { display: grid; }
+.vt-venues > li { display: grid; gap: 2px; min-width: 0; padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.vt-venues > li:first-child { border-top: 0; padding-top: 0; }
+.vt-venues b { font-size: var(--t-small); font-weight: 620; }
+.vt-venues span { font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.vt-last-v { margin-bottom: var(--s2); font-size: var(--t-fig-m); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; }
+.vt-last-v .faint { font-size: var(--t-body); font-weight: 500; letter-spacing: 0; }
+.vt-quote-figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: var(--s3); }
+.vt-quote-figs > div { display: grid; gap: 2px; padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); }
+.vt-quote-figs dt { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-quote-figs dd { font-size: var(--t-small); line-height: 1.45; color: var(--ink-2); }
+.vt-quote-figs dd strong { display: block; font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+
+/* ------------------------------------------------------------------------------------------------ the signed documents: the mandate and the policy */
+.vt-doc .i-pay, .vt-doc .i-words { max-width: 60ch; }
+.vt-doc .clauses dd { display: grid; gap: var(--s2); justify-items: start; }
+.vt-doc .clauses dd > ul { display: grid; gap: var(--s1); }
+/* the most that may ever leave, drawn as the money bar's span (DESIGN.md M14), not the old lit bracket */
+.vt-bracket { display: inline-block; width: 14px; height: 9px; margin-right: var(--s2); border: solid var(--part-reach); border-width: 0 2px; background: linear-gradient(var(--part-reach), var(--part-reach)) bottom / 100% 3px no-repeat; vertical-align: 0; }
+.vt-doc .signature .vt-fold { margin-top: var(--s1); }
+.vt-policy-acts { justify-content: flex-start; gap: var(--s2); }
+.vt-more > summary { display: list-item; min-height: 44px; padding: 10px 0; font-size: var(--t-h3); font-weight: 650; color: var(--ink); cursor: pointer; }
+.vt-more > summary span { display: block; margin-top: 2px; font-size: var(--t-small); font-weight: 450; color: var(--ink-2); }
+.vt-more[open] > summary { margin-bottom: var(--s4); }
+.vt-enf { display: grid; gap: var(--s2); }
+
+/* ------------------------------------------------------------------------------------------------ the exact terms, in the approval sheet */
+.vt-terms-where { margin: var(--s1) 0 var(--s2); font-size: var(--t-small); font-weight: 600; color: var(--due); }
+.vt-terms .note, .vt-terms .vt-limit-table, .vt-terms .vt-fold { margin-top: var(--s3); }
+.vt-terms .ledger-wrap.vt-limit-table { padding: 0; background: none; border: 0; box-shadow: none; }
+/* the rule takes the room; the figures and the result keep to their own width */
+.vt-limit-table .ledger th:first-child, .vt-limit-table .ledger td:first-child { width: 100%; }
+.vt-limit-table .ledger td:last-child { white-space: nowrap; }
+.vt-terms-note { margin-top: var(--s3); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-sheet-intro { display: grid; gap: 6px; }
+.vt-signs { margin-top: var(--s4); }
+.vt-signs h3 { font-size: var(--t-body); font-weight: 650; }
+.vt-signs ol { display: grid; gap: var(--s2); margin-top: var(--s2); }
+.vt-signs li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: var(--s3); padding: var(--s3); border-radius: var(--r-md); font-size: var(--t-small); line-height: 1.5; background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
+.vt-signs-n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-size: var(--t-micro); font-weight: 700; color: var(--ink-2); background: var(--pane-2); border: 1px solid var(--rim); }
+.vt-signs-t { min-width: 0; }
+.vt-res { display: inline-flex; align-items: center; gap: 4px; }
+.vt-res .mark svg { width: 14px; height: 14px; stroke-width: 2.6; }
+
+/* ------------------------------------------------------------------------------------------------ the standing policy's ticks, repeats folded */
+.vt-ticks { display: grid; grid-template-columns: minmax(0, 1fr); }
+.vt-ticks > li { display: grid; grid-template-columns: 168px minmax(0, 1fr) auto; gap: var(--s2) var(--s5); align-items: start; padding: var(--s4) 0; border-top: 1px solid var(--rule); }
+.vt-ticks > li:first-child { border-top: 0; padding-top: var(--s1); }
+.vt-tick-when { display: grid; gap: 2px; }
+.vt-tick-when b { font-weight: 620; }
+.vt-tick-when span { font-size: var(--t-small); color: var(--ink-2); }
+.vt-tick-what { display: grid; gap: var(--s1); min-width: 0; }
+.vt-tick-asked { color: var(--ink); }
+.vt-tick-why { font-size: var(--t-small); color: var(--ink-2); }
+.vt-tick-figs { margin-top: var(--s1); font-size: var(--t-small); }
+.vt-jobs { display: flex; flex-wrap: wrap; gap: 0 var(--s4); font-size: var(--t-small); }
+.vt-jobs a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* ------------------------------------------------------------------------------------------------ records and the test lab */
+.vt-chain { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin-bottom: var(--s4); font-size: var(--t-small); color: var(--ink-2); }
+.vt-joblist .vt-job-t { display: inline-block; padding: 10px 0; font-weight: 620; line-height: 1.4; color: var(--ink); text-decoration: none; }
+.vt-joblist .vt-job-t:hover { text-decoration: underline; text-underline-offset: .2em; }
+.vt-lab-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--s3) var(--s6); }
+.vt-lab-intro { display: grid; gap: var(--s1); max-width: 70ch; }
+.vt-lab-intro h2 { font-size: var(--t-h2); }
+.vt-lab-intro p { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+
+/* ------------------------------------------------------------------------------------------------ a job, as a record */
+.vt-job-head { margin-bottom: 0; }
+.vt-job-head h1 { max-width: 30ch; font-size: var(--t-h1); line-height: 1.15; letter-spacing: var(--track-h); }
+.vt-job-head .wrap-any { max-width: 80ch; font-size: var(--t-body); }
+.vt-job-head .vt-job-when { font-size: var(--t-small); color: var(--ink-3); }
+.vt-skel-h1 { width: min(520px, 80%); height: 36px; margin: var(--s2) 0; border-radius: var(--r-sm); }
+.vt-job-board.board { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
+.vt-rec-h { margin-bottom: var(--s3); font-size: var(--t-small); font-weight: 650; color: var(--ink-2); }
+.vt-asked-what { font-size: var(--t-lead); line-height: 1.45; color: var(--ink); }
+.vt-asked-what + .vt-say { margin-top: var(--s2); }
+.vt-result-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); line-height: 1.5; }
+.vt-result-line + .vt-say { margin-top: var(--s2); }
+.vt-result-by { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); margin-top: var(--s3); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-checks-panel > .vt-say { margin-bottom: var(--s3); }
+.vt-checks { display: grid; }
+.vt-checks > li { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: var(--s2) var(--s3); align-items: start; padding: 8px 0; }
+.vt-checks > li::before { content: ""; position: absolute; left: 11px; top: 34px; bottom: -6px; width: 2px; border-radius: 1px; background: var(--rule-2); }
+.vt-checks > li:last-child::before { display: none; }
+.vt-check-mark { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: var(--gain); background: var(--gain-bg); }
+.vt-check-mark .mark { display: inline-grid; place-items: center; }
+.vt-check-mark .mark svg { width: 14px; height: 14px; stroke-width: 2.8; }
+.vt-checks li.bad .vt-check-mark { color: var(--loss); background: var(--loss-bg); }
+.vt-checks li.todo .vt-check-mark { background: transparent; }
+.vt-ring { display: inline-block; width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.vt-checks li.todo { color: var(--ink-2); }
+.vt-check { display: grid; gap: 2px; min-width: 0; padding-top: 2px; font-size: var(--t-small); line-height: 1.5; }
+.vt-why { color: var(--ink-2); overflow-wrap: anywhere; }
+.vt-checks time { padding-top: 4px; font-size: var(--t-micro); color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.vt-steps-said { display: grid; gap: var(--s3); font-size: var(--t-small); }
+.vt-steps-said li { display: grid; gap: 1px; }
+.vt-steps-said .t { font-size: var(--t-micro); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ the wallet inside other pages
+   Content without chrome: the page that holds it gives it its panel. It fits the width it is given, not the window's. */
+.vt-inline { container-type: inline-size; display: grid; gap: var(--s4); min-width: 0; }
+.vt-wmissing { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-wmissing a { font-weight: 600; }
+.vt-wto { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
+.vt-wto-av { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-size: var(--t-small); font-weight: 700; color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); flex: none; }
+.vt-wto-who { display: grid; gap: 1px; flex: 1 1 200px; min-width: 0; }
+.vt-wto-who b { font-weight: 650; }
+.vt-wto-who small { font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); }
+.vt-wfields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3) var(--s4); align-items: start; }
+.vt-wroom { display: grid; gap: 4px; padding: var(--s4); border-radius: var(--r-md); background: linear-gradient(160deg, var(--qed-bg), transparent 70%), color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
+.vt-wroom-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-wroom-v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.vt-wroom-v small { font-size: var(--t-small); font-weight: 500; letter-spacing: 0; color: var(--ink-2); }
+.vt-wroom-s { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-wroom-s a { font-weight: 600; }
+.vt-wroom-by { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.vt-wroom-by > span:last-child { flex: 1 1 220px; min-width: 0; }
+.vt-wroom .vt-wroom-by { margin-top: var(--s2); }
+.vt-wgo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); }
+.vt-wlink { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--t-small); font-weight: 620; }
+.vt-wsay { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); max-width: 80ch; }
+.vt-wsay a { font-weight: 600; }
+.vt-wfree { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: var(--s2); }
+.vt-wfree > div { display: grid; align-content: start; gap: 2px; padding: var(--s3); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); }
+.vt-wfree dt { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.vt-wfree dd { font-size: var(--t-lead); font-weight: 650; letter-spacing: -.01em; font-variant-numeric: tabular-nums lining-nums; }
+.vt-wfree dd small { display: block; font-size: var(--t-micro); font-weight: 450; letter-spacing: 0; color: var(--ink-3); }
+.vt-wcheck { display: grid; gap: var(--s2); }
+.vt-wget { color: var(--ink); }
+.vt-wget strong { font-size: var(--t-lead); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+.vt-wpol-lead, .vt-wmandate-lead { max-width: 90ch; font-size: var(--t-body); line-height: 1.55; color: var(--ink); }
+.vt-wpol-lead strong, .vt-wmandate-lead strong { font-weight: 650; }
+.vt-wform { display: grid; gap: var(--s3); }
+.vt-wgrow { container-type: inline-size; display: grid; gap: var(--s4); min-width: 0; }
+.vt-whead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s2) var(--s4); }
+.vt-whead h2 { font-size: var(--t-h3); font-weight: 650; }
+.vt-wgrow-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
+.vt-wgrow-col { display: grid; gap: var(--s3); align-content: start; min-width: 0; }
+.vt-wgrow-col h3 { font-size: var(--t-body); font-weight: 650; }
+.vt-wgrow-col + .vt-wgrow-col { padding-top: var(--s5); border-top: 1px solid var(--rule); }
+@container (min-width: 680px) {
+  .vt-wgrow-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .vt-wgrow-col + .vt-wgrow-col { padding: 0 0 0 var(--s5); border-top: 0; border-left: 1px solid var(--rule); }
+}
+@container (min-width: 760px) { .vt-wfields.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@container (max-width: 420px) { .vt-wfields, .vt-wfields.four { grid-template-columns: minmax(0, 1fr); } }
+
+/* ------------------------------------------------------------------------------------------------ narrower windows */
+@media (max-width: 1099px) {
+  .vt-setup, .vt-split, .vt-split.even { grid-template-columns: minmax(0, 1fr); }
+  .vt-setup-sum { position: static; }
+  .vt-figs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .vt-figs > .vt-fig-lead { grid-column: 1 / -1; }
+}
+@media (max-width: 759px) {
+  .vt { gap: var(--s5); }
+  /* a phone's panels keep 16 px at the sides, as Home's and Protect's do */
+  .vt .panel { padding: var(--s5) var(--s4) var(--s4); }
+  .vt-head h1 { max-width: none; }
+  .vt-tabs a, .vt-lab-link { padding: 0 var(--s3); }
+  .vt-hold { padding: var(--s5) var(--s4) var(--s4); }
+  /* never wider than its panel, at any text size the browser is set to (R13, as Home's hero) */
+  .vault-acct.primary .lead { font-size: var(--t-fig-hero-fit); }
+  .vt-tiles, .vt-also, .vt-key { grid-template-columns: minmax(0, 1fr); }
+  .vt-setup-head { padding: var(--s4); }
+  .vt-step { grid-template-columns: 30px minmax(0, 1fr); gap: var(--s3); padding: var(--s4); }
+  .vt-step-n { width: 30px; height: 30px; }
+  .vt-rail li span { display: none; }
+  .vt-rail li.now span { display: inline; }
+  .vt-rail li { padding-right: 5px; }
+  .vt-rail li.now { padding-right: 12px; }
+  .vt-scope > div { grid-template-columns: minmax(0, 1fr); }
+  .vt-rows > li { grid-template-columns: minmax(0, 1fr); }
+  .vt-rows > li > .vt-rv { justify-items: start; text-align: left; }
+  .vt-rows > li > .vt-ra { justify-content: flex-start; }
+  .vt-rows > li:has(> .vt-rv):has(> .vt-ra) { grid-template-columns: minmax(0, 1fr) auto; }
+  .vt-rows > li:has(> .vt-rv):has(> .vt-ra) > .vt-rv { justify-items: end; text-align: right; }
+  .vt-rows > li:has(> .vt-rv):has(> .vt-ra) > .vt-ra { grid-column: 1 / -1; }
+  .vt-figs { grid-template-columns: minmax(0, 1fr); }
+  .vt-figs > .tile { padding: var(--s4); }
+  /* each tick one column on a phone: when, what it asked, what came of it (R13: two columns ran 126 px past a 390 px
+     phone at a large text size) */
+  .vt-ticks > li { grid-template-columns: minmax(0, 1fr); }
+  .vt-tick-when { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s2); }
+  .vt-checks > li { grid-template-columns: 24px minmax(0, 1fr); }
+  .vt-checks time { grid-column: 2; padding-top: 0; }
+}
+
+/* phones: the sections in one row that scrolls sideways (the edge with more beyond it fades); the figures as compact
+   rows, the figure and who enforces it on one line */
+@media (max-width: 759px) {
+  .vt-nav { flex-wrap: nowrap; justify-content: flex-start; gap: 4px; overflow-x: auto; padding: 4px; margin: -4px; scrollbar-width: none; scroll-padding-inline: 44px; }
+  .vt-nav::-webkit-scrollbar { display: none; }
+  .vt-tabs { flex: none; flex-wrap: nowrap; }
+  .vt-tabs a, .vt-lab-link { flex: none; }
+  .vt-nav[data-more="right"] { mask-image: linear-gradient(to right, var(--ink) calc(100% - 40px), transparent); }
+  .vt-nav[data-more="left"] { mask-image: linear-gradient(to left, var(--ink) calc(100% - 40px), transparent); }
+  .vt-nav[data-more="left right"] { mask-image: linear-gradient(to right, transparent, var(--ink) 40px, var(--ink) calc(100% - 40px), transparent); }
+  .vt-tiles > .tile { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "k v" "s s"; align-items: baseline; column-gap: var(--s3); padding: var(--s3) var(--s4); }
+  .vt-tiles dt { grid-area: k; }
+  .vt-tiles .vt-tile-v { grid-area: v; font-size: var(--t-lead); text-align: right; }
+  .vt-tiles .vt-tile-s { grid-area: s; }
+  .vt-lim { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "k by" "v v" "m m" "s s" "n n"; column-gap: var(--s3); }
+  .vt-lim-k { grid-area: k; }
+  .vt-lim-v { grid-area: v; }
+  .vt-lim .meter { grid-area: m; }
+  .vt-lim-s { grid-area: s; }
+  .vt-lim-n { grid-area: n; }
+  .vt-lim .vt-by { grid-area: by; align-self: center; margin-top: 0; }
+  .vt-rows > li:has(> .vt-rv):not(:has(> .vt-ra)) { grid-template-columns: minmax(0, 1fr) auto; }
+  .vt-rows > li:has(> .vt-rv):not(:has(> .vt-ra)) > .vt-rv { justify-items: end; text-align: right; }
+  /* the treasury's parts, the other accounts and the mandate's limits as rows of one list, not cards inside a card
+     (R12, as Home's figures under its bar): each row keeps its words, its swatch and who enforces it */
+  .vt-tiles, .vt-also, .vt-lims { gap: 0; }
+  .vt-tiles > .tile, .vt-also > .vt-mini, .vt-lims > .tile { padding: var(--s3) 0; background: none; border: 0; border-top: 1px solid var(--rule); border-radius: 0; box-shadow: none; }
+  .vt-tiles > .tile:first-child, .vt-also > .vt-mini:first-child, .vt-lims > .tile:first-child { border-top: 0; }
+  .vt-lims > .tile { padding: var(--s4) 0; }
+  .tile.vt-lim.binds { margin-inline: calc(-1 * var(--s4)); padding-inline: var(--s4); background: linear-gradient(90deg, var(--qed-bg), transparent 85%); box-shadow: none; }
+}
+
+/* the narrowest phones: a figure is read under its label, and who enforces it comes last */
+@media (max-width: 379px) {
+  .vt-tiles > .tile { grid-template-columns: minmax(0, 1fr); grid-template-areas: "k" "v" "s"; }
+  .vt-tiles .vt-tile-v { text-align: left; }
+  .vt-lim { grid-template-columns: minmax(0, 1fr); grid-template-areas: "k" "v" "m" "s" "n" "by"; }
+  .vt-lim .vt-by { justify-self: start; margin-top: var(--s2); }
+}
+
+/* the limits a request was checked against: on a phone each limit is a stack of labelled figures, not a table wider than
+   the sheet (R12 task comparison: "Left" was cut off and "Result" hidden in a 306 px box) */
+@media (max-width: 560px) {
+  .vt-limit-table { overflow: visible; }
+  .vt-limit-table table, .vt-limit-table tbody, .vt-limit-table tr, .vt-limit-table td { display: block; width: auto; }
+  .vt-limit-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .vt-limit-table tr { padding: var(--s3) 0; border-bottom: 1px solid var(--rule); }
+  .vt-limit-table tbody tr:last-child { border-bottom: 0; }
+  .vt-limit-table td { padding: 2px 0; border: 0; text-align: left; }
+  .vt-limit-table td[data-label] { display: flex; gap: var(--s2); align-items: baseline; }
+  .vt-limit-table td[data-label]::before { content: attr(data-label); min-width: 7ch; font-size: var(--t-small); color: var(--ink-3); }
+}
+/* Receive (Vault.tsx Receive): the address in groups of four, read aloud whole; the check's verdict in words, colour repeating it */
+.vt-receive { display: grid; gap: var(--s3); }
+.vt-rc-id { display: flex; flex-wrap: wrap; gap: 2px 8px; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 70%, transparent); font-size: var(--t-small); line-height: 1.6; overflow-wrap: anywhere; }
+.vt-rc-verdict { min-height: 1.4em; font-size: var(--t-small); font-weight: 600; }
+.vt-rc-verdict.ok { color: var(--gain); }
+.vt-rc-verdict.due { color: var(--due); }
+
+/* Text enlarged to 200% on a 320 px screen (R13 leftovers, checked with the root size at 200%): what grows with the text gives way to the width. */
+@media (max-width: 479px) {
+  .vt-test { white-space: normal; }
+  .vt-whead, .vt-wgrow, .vt-wgrow > * { min-width: 0; overflow-wrap: anywhere; }
+  .vt-wgrow { grid-template-columns: minmax(0, 1fr); }
+  /* who may do what: the badge sits under the name instead of squeezing it */
+  .vt-roles li { grid-template-columns: minmax(0, 1fr); grid-template-areas: "who" "by" "does"; align-items: start; }
+  .vt-roles .vt-by { justify-self: start; max-width: 100%; }
+  .vt-role-who { min-width: 0; overflow-wrap: anywhere; }
+  .vt-ra, .vt-select { min-width: 0; max-width: 100%; }
+}
+
+/* Ownership and claims (R13 S5): short forms inside the panel, in the same rows as the panel's other lines. */
+.vt-own-form { display: grid; gap: var(--s3); margin-top: var(--s3); }
+.vt-own-fields { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.vt-own-go { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.vt-own .vt-rows li { flex-wrap: wrap; }

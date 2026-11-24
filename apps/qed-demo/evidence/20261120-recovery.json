@@ -1,0 +1,130 @@
+{
+ "what": "QED failure and recovery, live on an isolated scratch copy",
+ "producedAt": "2026-11-20 15:46:10.558 IST",
+ "howToReproduce": "node scripts/recovery.ts <report.json>",
+ "passed": 15,
+ "failed": 0,
+ "steps": [
+  {
+   "scenario": "setup",
+   "name": "services up and a live rupee price for bitcoin is arriving",
+   "expected": "a quote under 10 seconds old",
+   "observed": "fresh quote on record",
+   "pass": true,
+   "at": "2026-11-20 15:39:31.466 IST"
+  },
+  {
+   "scenario": "1 crash mid-payment",
+   "name": "the payment reached the rail and is pending there",
+   "expected": "action working, rail pending",
+   "observed": "action working; rail pending",
+   "pass": true,
+   "at": "2026-11-20 15:39:32.175 IST"
+  },
+  {
+   "scenario": "2 approved while down",
+   "name": "the API records the approved order but nothing executes it",
+   "expected": "action planned, no venue order",
+   "observed": "action planned; venue orders 0",
+   "pass": true,
+   "at": "2026-11-20 15:39:32.810 IST"
+  },
+  {
+   "scenario": "1 crash mid-payment",
+   "name": "with the engine dead the API says so",
+   "expected": "health 503",
+   "observed": "health 503",
+   "pass": true,
+   "at": "2026-11-20 15:40:02.817 IST"
+  },
+  {
+   "scenario": "1 crash mid-payment",
+   "name": "on restart the engine writes down the time it was not running",
+   "expected": "one gap of about 30 seconds",
+   "observed": "2026-11-20 15:39:29.646 IST to 2026-11-20 15:40:02.945 IST (33 s): The engine process was not running. Detected at start-up from the last heartbeat.",
+   "pass": true,
+   "at": "2026-11-20 15:40:03.327 IST"
+  },
+  {
+   "scenario": "2 approved while down",
+   "name": "back on stale prices, the order waits for a fresh one and then executes once",
+   "expected": "done; one venue order; decided after the restart",
+   "observed": "done; venue orders 1; asked 2026-11-20 15:39:32.807 IST, decided 2026-11-20 15:40:03.990 IST, 31.2 s after it was asked for; it waited because: The price sellers ask was received 33.2 s ago; it may be at most 15 s old.",
+   "pass": true,
+   "at": "2026-11-20 15:40:04.334 IST"
+  },
+  {
+   "scenario": "1 crash mid-payment",
+   "name": "the payment settles once after the restart, and the books agree with the rail",
+   "expected": "done; entries out and settle once each; reconciled; receipt issued",
+   "observed": "done; entries out, settle; compared with the rail: reconciled; receipt issued; settled 90 s after the crash",
+   "pass": true,
+   "at": "2026-11-20 15:41:02.172 IST"
+  },
+  {
+   "scenario": "1 crash mid-payment",
+   "name": "exactly the payment and the purchase left the bank account",
+   "expected": "bank lower by ₹800 plus what the bitcoin cost",
+   "observed": "bank moved by -1255.52 rupees",
+   "pass": true,
+   "at": "2026-11-20 15:41:02.176 IST"
+  },
+  {
+   "scenario": "3 revoked while waiting",
+   "name": "the instruction asks before its first run",
+   "expected": "a run waiting for approval",
+   "observed": "run run_1m7w722f22q6m3db0fx is waiting",
+   "pass": true,
+   "at": "2026-11-20 15:42:00.241 IST"
+  },
+  {
+   "scenario": "3 revoked while waiting",
+   "name": "revoking cancels the waiting run at once, and it can no longer be approved",
+   "expected": "run cancelled; approval request refused",
+   "observed": "run cancelled: You revoked the instruction before this run started.; approval request afterwards: 409 not_waiting",
+   "pass": true,
+   "at": "2026-11-20 15:42:00.249 IST"
+  },
+  {
+   "scenario": "4 API down",
+   "name": "with the API dead the engine still runs the instruction on schedule",
+   "expected": "API unreachable; at least one run done in that time",
+   "observed": "API health unreachable; runs started while it was down: done at 15:43:00",
+   "pass": true,
+   "at": "2026-11-20 15:43:16.313 IST"
+  },
+  {
+   "scenario": "3 revoked while waiting",
+   "name": "minutes later the revoked instruction has started nothing and executed nothing",
+   "expected": "no action ever created for it",
+   "observed": "0 actions; state revoked",
+   "pass": true,
+   "at": "2026-11-20 15:43:16.316 IST"
+  },
+  {
+   "scenario": "5 too late to start",
+   "name": "an order the engine could not start within its limit is refused, not sent late",
+   "expected": "refused on started-in-time; no venue order; bank unchanged",
+   "observed": "blocked: The price sellers ask was received 2 min 49 s ago; it may be at most 15 s old. Failing checks: price-fresh, started-in-time; new venue orders 0; bank moved by 0 paise",
+   "pass": true,
+   "at": "2026-11-20 15:46:06.551 IST"
+  },
+  {
+   "scenario": "integrity",
+   "name": "after two crashes of the engine and one of the API the records are whole",
+   "expected": "every entry balances; no reference used twice; nothing disagrees with a venue; nothing left reserved; receipt numbers unbroken",
+   "observed": "0 unbalanced entries; 0 duplicated references; 0 records disagreeing with a venue; 0 reservations still open; 4 receipts numbered 1 to 4",
+   "pass": true,
+   "at": "2026-11-20 15:46:10.557 IST"
+  },
+  {
+   "scenario": "integrity",
+   "name": "both periods without an engine are on record",
+   "expected": "two gaps",
+   "observed": "33 s, 167 s",
+   "pass": true,
+   "at": "2026-11-20 15:46:10.558 IST"
+  }
+ ],
+ "serviceErrorOutput": []
+}

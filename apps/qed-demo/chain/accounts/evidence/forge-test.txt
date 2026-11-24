@@ -1,0 +1,551 @@
+No files changed, compilation skipped
+
+Ran 1 test for test/Gas.t.sol:GasTest
+[PASS] test_gas_precompile_and_erc1271() (gas: 10061366)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 25.34ms (16.89ms CPU time)
+
+Ran 3 tests for test/VaultContainment.t.sol:VaultContainmentTest
+[PASS] test_a_frozen_passkey_moves_no_money_and_its_mandate_stops_paying() (gas: 15407475)
+[PASS] test_one_passkey_stops_the_agent_at_threshold_two_and_cannot_resume_or_spend() (gas: 15463563)
+[PASS] test_the_release_protective_list_holds_only_calls_that_move_no_money() (gas: 8815359)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 135.72ms (127.30ms CPU time)
+
+Ran 6 tests for test/VaultIntegration.t.sol:BusinessGuardsTest
+[PASS] test_a_scheduled_guarded_call_is_cancelled_by_any_one_member() (gas: 246409)
+[PASS] test_pause_and_other_protective_calls_stay_immediate_for_one_member() (gas: 311177)
+[PASS] test_the_delayed_path_applies_every_guarded_call() (gas: 500230)
+[PASS] test_the_guard_list_is_recorded_with_its_reasons() (gas: 5431597)
+[PASS] test_threshold_member_cannot_make_any_guarded_call_immediately() (gas: 586266)
+[PASS] test_threshold_member_cannot_schedule_a_guarded_call() (gas: 67635)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 121.00ms (117.97ms CPU time)
+
+Ran 9 tests for test/VaultIntegration.t.sol:VaultIntegrationTest
+[PASS] test_a_nobody_but_the_account_could_accept() (gas: 2071731)
+[PASS] test_a_old_eoa_can_no_longer_call_any_owner_function() (gas: 106477)
+[PASS] test_a_unguarded_owner_calls_stay_immediate() (gas: 333840)
+[PASS] test_b_mandate_signed_through_erc1271_is_accepted_for_a_payment() (gas: 299249)
+[PASS] test_c_mandate_signature_for_another_mandate_is_refused() (gas: 97140)
+[PASS] test_c_mandate_signature_made_for_another_account_is_refused() (gas: 5615595)
+[PASS] test_c_old_eoa_mandate_signature_is_refused() (gas: 49403)
+[PASS] test_even_the_only_member_cannot_make_a_guarded_call_immediately() (gas: 245949)
+[PASS] test_moving_the_vault_to_a_business_account_takes_the_delayed_path() (gas: 6223354)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 45.21ms (38.18ms CPU time)
+
+Ran 20 tests for test/Containment.t.sol:ContainmentTest
+[PASS] test_a_frozen_assertion_spoils_a_batch_even_beside_enough_others() (gas: 84551)
+[PASS] test_a_frozen_member_can_still_stop_things() (gas: 157084)
+[PASS] test_a_frozen_member_changes_nothing_about_the_account() (gas: 208567)
+[PASS] test_a_frozen_member_keeps_its_veto_over_changes_and_recoveries() (gas: 433757)
+[PASS] test_a_frozen_member_signs_no_erc1271_message() (gas: 89576)
+[PASS] test_a_frozen_member_still_cannot_cancel_its_own_removal() (gas: 392396)
+[PASS] test_a_scheduled_sentinel_is_cancelled_by_one_member_and_refused_when_stale() (gas: 449860)
+[PASS] test_an_account_without_a_sentinel_cannot_be_frozen_by_anyone() (gas: 5069342)
+[PASS] test_construction_lists_the_protective_calls_and_the_sentinel() (gas: 5105849)
+[PASS] test_construction_refuses_a_bad_protective_list_or_sentinel() (gas: 1950347)
+[PASS] test_dropping_the_sentinel_is_immediate_and_a_new_one_waits_the_delay() (gas: 234140)
+[PASS] test_one_passkey_stops_things_whatever_the_threshold() (gas: 5423862)
+[PASS] test_only_the_sentinel_can_freeze_and_never_anything_but_a_member() (gas: 149967)
+[PASS] test_protect_is_bound_to_its_calls_nonce_deadline_and_a_member() (gas: 324441)
+[PASS] test_protect_refuses_every_call_outside_the_list() (gas: 193505)
+[PASS] test_sentinel_abuse_freezes_everyone_moves_nothing_and_a_recovery_ends_it() (gas: 819240)
+[PASS] test_the_sentinel_freezes_a_member_at_once_and_its_approval_stops_counting() (gas: 271248)
+[PASS] test_the_sentinel_has_no_other_power() (gas: 73075)
+[PASS] test_two_of_two_with_one_frozen_moves_nothing() (gas: 5379551)
+[PASS] test_unfreezing_takes_the_unfrozen_admin_quorum_and_applies_at_once() (gas: 294155)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 551.32ms (533.84ms CPU time)
+
+Ran 8 tests for test/Construction.t.sol:ConstructionTest
+[PASS] testFuzz_threshold_rule_at_construction(uint8,uint8,uint8) (runs: 1000, μ: 1316575, ~: 641907)
+[PASS] test_constructs_and_reports_its_configuration() (gas: 5183079)
+[PASS] test_rejects_bad_delays() (gas: 493964)
+[PASS] test_rejects_bad_origins() (gas: 281894)
+[PASS] test_rejects_bad_thresholds() (gas: 1553713)
+[PASS] test_rejects_more_than_sixteen_signers() (gas: 1696061)
+[PASS] test_rejects_off_curve_and_duplicate_keys_and_role_none() (gas: 416403)
+[PASS] test_rejects_zero_rp_id_hash() (gas: 57329)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 11.08s (11.07s CPU time)
+
+Ran 16 tests for test/Guards.t.sol:GuardsTest
+[PASS] testFuzz_exactly_the_listed_selectors_are_refused(bytes4,bytes) (runs: 1000, μ: 129138, ~: 129132)
+[PASS] testFuzz_guarded_call_never_immediate_whatever_the_approvals(uint8,uint256) (runs: 1000, μ: 64976, ~: 67387)
+[PASS] test_a_failing_scheduled_batch_stays_pending_and_cancellable() (gas: 236792)
+[PASS] test_a_guarded_call_hidden_in_a_batch_is_refused() (gas: 51788)
+[PASS] test_any_one_member_cancels_a_scheduled_guarded_batch() (gas: 261047)
+[PASS] test_apply_must_present_exactly_the_scheduled_calls() (gas: 249811)
+[PASS] test_delayed_path_runs_the_guarded_call_after_the_delay() (gas: 288234)
+[PASS] test_guard_list_views_and_reasons() (gas: 5079269)
+[PASS] test_invalid_guard_lists_refused() (gas: 1905808)
+[PASS] test_kinds_are_not_interchangeable() (gas: 457889)
+[PASS] test_not_even_every_member_together_can_make_it_immediately() (gas: 81579)
+[PASS] test_other_selectors_on_a_guarded_target_stay_immediate() (gas: 109682)
+[PASS] test_schedule_only_through_execute() (gas: 13934)
+[PASS] test_schedule_refuses_empty_batches_and_calls_to_the_account() (gas: 278551)
+[PASS] test_threshold_member_cannot_make_a_guarded_call() (gas: 46083)
+[PASS] test_threshold_member_cannot_schedule() (gas: 51631)
+Suite result: ok. 16 passed; 0 failed; 0 skipped; finished in 12.97s (12.97s CPU time)
+
+Ran 17 tests for test/Recovery.t.sol:RecoveryTest
+[PASS] testFuzz_finish_never_before_delay(uint256) (runs: 1000, μ: 198736, ~: 198898)
+[PASS] testFuzz_recovery_signature_by_any_other_key_refused(uint256) (runs: 1000, μ: 53874, ~: 53862)
+[PASS] test_any_member_cancels_during_delay_and_the_code_is_burnt() (gas: 291150)
+[PASS] test_expired_recovery_request_refused() (gas: 27018)
+[PASS] test_finish_refused_if_the_new_key_was_added_meanwhile() (gas: 367492)
+[PASS] test_full_recovery_flow() (gas: 323787)
+[PASS] test_high_s_recovery_signature_refused() (gas: 39129)
+[PASS] test_invalid_recovery_signature_refused() (gas: 88261)
+[PASS] test_member_key_cannot_start_recovery() (gas: 28540)
+[PASS] test_new_key_must_be_new_and_on_the_curve() (gas: 46607)
+[PASS] test_one_pending_recovery_per_code() (gas: 197233)
+[PASS] test_recovery_key_cannot_cancel_another_recovery() (gas: 211650)
+[PASS] test_recovery_key_signatures_accepted_nowhere_else() (gas: 63261)
+[PASS] test_recovery_restores_one_member_it_does_not_lower_thresholds() (gas: 5349465)
+[PASS] test_recovery_signature_binds_the_new_key_and_deadline() (gas: 84065)
+[PASS] test_recovery_signature_for_another_account_refused() (gas: 5333594)
+[PASS] test_removing_a_recovery_key_drops_its_pending_recovery() (gas: 369069)
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 13.34s (13.33s CPU time)
+
+Ran 27 tests for test/Execute.t.sol:ExecuteTest
+[PASS] testFuzz_any_nonce_but_current_rejected(uint256) (runs: 1000, μ: 55454, ~: 55454)
+[PASS] testFuzz_other_chain_ids_rejected(uint64) (runs: 1000, μ: 86887, ~: 86887)
+[PASS] testFuzz_past_deadline_rejected(uint64) (runs: 1000, μ: 57941, ~: 57841)
+[PASS] testFuzz_relayer_tampering_with_value_rejected(uint256,uint256) (runs: 1000, μ: 87642, ~: 87642)
+[PASS] test_anyone_may_relay() (gas: 199846)
+[PASS] test_call_to_account_needs_admin_threshold() (gas: 346612)
+[PASS] test_deadline_equal_to_now_accepted() (gas: 197756)
+[PASS] test_duplicate_signer_is_not_counted_twice() (gas: 79415)
+[PASS] test_empty_batch_consumes_nonce() (gas: 138742)
+[PASS] test_execute_approvals_for_another_account_rejected() (gas: 5450598)
+[PASS] test_execute_approvals_from_another_chain_rejected() (gas: 86773)
+[PASS] test_execute_digest_matches_eip712_by_hand() (gas: 20278)
+[PASS] test_expired_deadline_rejected() (gas: 55382)
+[PASS] test_failing_call_reverts_whole_batch_and_keeps_nonce() (gas: 216267)
+[PASS] test_future_nonce_rejected() (gas: 54803)
+[PASS] test_member_id_with_other_key_signature_rejected() (gas: 125006)
+[PASS] test_mixed_batch_with_one_self_call_needs_admin_threshold() (gas: 73153)
+[PASS] test_non_signer_rejected() (gas: 97867)
+[PASS] test_one_approval_is_not_enough_under_threshold_two() (gas: 48273)
+[PASS] test_recovery_signer_cannot_approve_execute() (gas: 98087)
+[PASS] test_reentrancy_into_admin_paths_blocked() (gas: 194239)
+[PASS] test_reentrancy_into_execute_blocked() (gas: 323845)
+[PASS] test_relayer_cannot_change_calls_or_deadline() (gas: 165039)
+[PASS] test_reused_nonce_rejected() (gas: 201315)
+[PASS] test_two_of_three_executes_and_emits() (gas: 205599)
+[PASS] test_unsorted_assertions_rejected() (gas: 95984)
+[PASS] test_value_transfer_from_account() (gas: 223697)
+Suite result: ok. 27 passed; 0 failed; 0 skipped; finished in 20.87s (30.15s CPU time)
+
+Ran 14 tests for test/ERC1271.t.sol:ERC1271Test
+[PASS] testFuzz_other_chain_ids_invalid(uint64) (runs: 1000, μ: 75152, ~: 75152)
+[PASS] testFuzz_random_bytes_never_valid_never_revert(bytes) (runs: 1000, μ: 11037, ~: 11049)
+[PASS] testFuzz_valid_for_any_hash(bytes32) (runs: 1000, μ: 112062, ~: 112062)
+[PASS] test_below_threshold_is_invalid_and_check_names_the_reason() (gas: 42609)
+[PASS] test_cross_account_replay_refused() (gas: 5357298)
+[PASS] test_cross_chain_replay_refused() (gas: 148159)
+[PASS] test_duplicate_member_does_not_reach_threshold() (gas: 67110)
+[PASS] test_malformed_signatures_return_invalid_without_reverting() (gas: 32524)
+[PASS] test_recovery_key_cannot_sign_messages() (gas: 85782)
+[PASS] test_replay_safe_hash_matches_eip712_by_hand() (gas: 21245)
+[PASS] test_signature_for_other_hash_is_invalid() (gas: 73722)
+[PASS] test_signature_over_raw_hash_is_invalid() (gas: 71486)
+[PASS] test_threshold_change_applies_to_old_signatures() (gas: 286735)
+[PASS] test_threshold_members_make_a_valid_signature() (gas: 200529)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 23.19s (23.23s CPU time)
+
+Ran 26 tests for test/Admin.t.sol:AdminTest
+[PASS] testFuzz_change_never_applies_early(uint256) (runs: 1000, μ: 308070, ~: 308230)
+[PASS] testFuzz_thresholds_rule(uint256,uint256) (runs: 1000, μ: 169160, ~: 158185)
+[PASS] test_add_invalid_or_duplicate_key_refused() (gas: 415166)
+[PASS] test_add_member_is_immediate_with_admin_threshold() (gas: 284475)
+[PASS] test_admin_functions_only_through_execute() (gas: 23523)
+[PASS] test_cancel_assertion_cannot_be_replayed_on_a_later_change() (gas: 482067)
+[PASS] test_cancel_by_one_member_under_threshold_two() (gas: 271654)
+[PASS] test_cancel_needs_assertion_over_that_id() (gas: 349366)
+[PASS] test_cancel_of_unknown_id_refused() (gas: 34234)
+[PASS] test_delay_bounds() (gas: 276303)
+[PASS] test_invalid_thresholds_refused() (gas: 539046)
+[PASS] test_last_member_removal_refused() (gas: 5014592)
+[PASS] test_lengthening_delays_is_immediate_shortening_is_scheduled() (gas: 314916)
+[PASS] test_lowering_a_threshold_is_scheduled() (gas: 244762)
+[PASS] test_lowering_change_is_stale_after_a_raise() (gas: 388249)
+[PASS] test_member_cannot_cancel_its_own_removal() (gas: 313527)
+[PASS] test_quorum_is_rechecked_when_applying() (gas: 466548)
+[PASS] test_raising_thresholds_is_immediate() (gas: 160988)
+[PASS] test_recovery_key_cannot_cancel() (gas: 317134)
+[PASS] test_removal_below_admin_threshold_refused_at_schedule() (gas: 159889)
+[PASS] test_removal_input_validation() (gas: 413448)
+[PASS] test_removal_is_stale_after_target_was_re_added() (gas: 718500)
+[PASS] test_remove_signer_is_scheduled_then_applied_after_delay() (gas: 291111)
+[PASS] test_schedule_event_carries_the_terms() (gas: 293628)
+[PASS] test_signer_set_is_bounded() (gas: 2406230)
+[PASS] test_two_compromised_members_removed_together_cannot_cancel() (gas: 5402598)
+Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 30.52s (31.67s CPU time)
+
+Ran 26 tests for test/Verifier.t.sol:VerifierTest
+[PASS] testFuzz_any_bit_flip_in_authenticator_data_rejected(uint256,uint8) (runs: 1000, μ: 33451, ~: 31062)
+[PASS] testFuzz_any_bit_flip_in_client_data_rejected(uint256,uint8) (runs: 1000, μ: 43834, ~: 47405)
+[PASS] testFuzz_flags(uint8) (runs: 1000, μ: 41795, ~: 40339)
+[PASS] testFuzz_high_s_always_rejected(uint256,bytes32) (runs: 1000, μ: 24083, ~: 24071)
+[PASS] testFuzz_only_exact_indices_accepted(uint256,uint256,uint256) (runs: 1000, μ: 27511, ~: 27495)
+[PASS] testFuzz_signature_for_other_challenge_rejected(bytes32,bytes32) (runs: 1000, μ: 40090, ~: 40090)
+[PASS] testFuzz_valid_assertions_verify(uint256,bytes32) (runs: 1000, μ: 43954, ~: 43942)
+[PASS] test_accepts_synced_passkey_flags() (gas: 48973)
+[PASS] test_out_of_range_indices_return_false_without_reverting() (gas: 72736)
+[PASS] test_rejects_backup_state_without_eligibility() (gas: 39869)
+[PASS] test_rejects_high_s_but_accepts_low_s() (gas: 61376)
+[PASS] test_rejects_missing_UP_flag() (gas: 39686)
+[PASS] test_rejects_missing_UV_flag() (gas: 39616)
+[PASS] test_rejects_off_curve_key() (gas: 28938)
+[PASS] test_rejects_origin_index_moved() (gas: 27394)
+[PASS] test_rejects_origin_prefix_extension() (gas: 27730)
+[PASS] test_rejects_short_authenticator_data() (gas: 35242)
+[PASS] test_rejects_signature_by_another_key() (gas: 47510)
+[PASS] test_rejects_tampered_authenticator_data() (gas: 43755)
+[PASS] test_rejects_tampered_client_data() (gas: 43227)
+[PASS] test_rejects_wrong_challenge() (gas: 40082)
+[PASS] test_rejects_wrong_origin() (gas: 27305)
+[PASS] test_rejects_wrong_rpIdHash() (gas: 27303)
+[PASS] test_rejects_wrong_type() (gas: 36984)
+[PASS] test_rejects_zero_r_and_zero_s() (gas: 42056)
+[PASS] test_valid_assertion_verifies() (gas: 48568)
+Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 57.23s (35.61s CPU time)
+
+Ran 8 tests for test/Invariant.t.sol:AccountInvariantTest
+[PASS] invariant_delays_in_bounds() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_frozen_member_never_approves() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_frozen_only_on_members() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_guarded_call_never_runs_immediately() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_pending_recoveries_linked() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_protect_and_sentinel_reach_nothing_else() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_quorum() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_signer_set_consistent() (runs: 256, calls: 12288, reverts: 0)
+
+╭----------------+----------------------+-------+---------+----------╮
+| Contract       | Selector             | Calls | Reverts | Discards |
++====================================================================+
+| AccountHandler | addMember            | 662   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | addRecovery          | 651   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | applyChange          | 686   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | cancel               | 678   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeAsFrozen      | 641   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | executeGuarded       | 685   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | finishRecovery       | 679   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | freeze               | 712   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protect              | 710   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | protectNonProtective | 709   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeOne            | 724   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | removeTwo            | 656   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setDelays            | 676   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setSentinel          | 682   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | setThresholds        | 693   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | startRecovery        | 718   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | unfreeze             | 669   | 0       | 0        |
+|----------------+----------------------+-------+---------+----------|
+| AccountHandler | warp                 | 657   | 0       | 0        |
+╰----------------+----------------------+-------+---------+----------╯
+
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 78.60s (356.18s CPU time)
+
+Ran 13 test suites in 78.63s (248.69s CPU time): 181 tests passed, 0 failed, 0 skipped (181 total tests)

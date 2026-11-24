@@ -1,0 +1,11 @@
+# node scripts/export-artifacts.mjs --check
+# recorded 2026-11-24T15:49:03Z by scripts/run.sh; sources sha256 13ca7b8e22f650ea
+# forge Version: 1.7.1, Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+# solc 0.8.26 from Foundry's compiler cache (offline = true); SOLC_VERSION=0.8.26
+
+identical  ProofEscrow: Forge build 02c571505dcc7009 vs release embedded 02c571505dcc7009
+up to date  artifacts/QEDDisputeEscrow.json
+source sha256 45c792b8b2917ba7c042eca5347eacef0e6cd11ba71acfaa861bda4c3e4f1baf; bytecode sha256 e57d436bbb8fc8c39e2437d37c97f431b62b0b3c6c9430462ff6e8cf2f18ae3f
+# exit status: 0
+up to date  seeded/SeededDisputeEscrow.sol
+# seeded copy check exit status: 0

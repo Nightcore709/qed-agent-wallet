@@ -1,0 +1,20 @@
+# Dependabot proposes updates; nothing merges itself. Actions are pinned by commit SHA in the workflows, so Dependabot
+# proposes the new SHA and keeps the version comment current. npm updates of the app and the chain are proposed weekly.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /apps/qed-demo
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /apps/qed-demo/chain
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: docker
+    directory: /apps/qed-demo
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3

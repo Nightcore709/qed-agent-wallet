@@ -1,0 +1,1194 @@
+# FOUNDRY_PROFILE=seeded SOLC_VERSION=0.8.26 forge test -vv   (EXPECTED TO FAIL; after forge clean)
+# recorded 2026-11-24T20:30:53Z by scripts/run.sh; sources sha256 81b8ae048870ab47
+# forge Version: 1.7.1, Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+# solc 0.8.26 from Foundry's compiler cache (offline = true); SOLC_VERSION=0.8.26
+
+Compiling 65 files with Solc 0.8.26
+Solc 0.8.26 finished in 37.66s
+Compiler run successful!
+
+Ran 7 tests for seeded/SeededTwins.t.sol:UncheckedJudgesChecks
+[FAIL: assertion failed: true != false; counterexample: calldata=0x7dcb43d400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 args=[false, 0]] testFuzz_Allowlist_OpenAcceptsExactlyTheAllowedCodeHashes(bool,uint8) (runs: 0, μ: 0, ~: 0)
+[FAIL: a judge outside the allowlist was opened] test_Allowlist_AJudgeThatKeepsThePoolCannotBeOpened_SoNoPoolIsStranded() (gas: 211657)
+[FAIL: a disallowed judge opens no new bounty] test_Allowlist_OnlyTheDeployerChangesIt_AndOnlyForBountiesOpenedLater() (gas: 377051)
+[PASS] test_Allowlist_RefusesTheHashesOfNoAccountAndOfAnAccountWithoutCode() (gas: 10489)
+[PASS] test_Allowlist_TheFourJudgesAreAllowedFromConstruction_AndAnyoneOpensWithThem() (gas: 997386)
+[FAIL: the same code over another token was opened] test_Allowlist_TheSameCodeOverAnotherTokenOrVerifierIsAnotherJudge() (gas: 1096446)
+[FAIL: opened with another claim function] test_Binding_AnAllowedJudgeOpensOnlyWithItsOwnClaimFunctionAndToken() (gas: 138612)
+Suite result: FAILED. 2 passed; 5 failed; 0 skipped; finished in 24.49ms (16.51ms CPU time)
+
+Ran 5 tests for seeded/SeededTwins.t.sol:UndomainedBoardChecks
+[FAIL: a field is not bound into the digest; counterexample: calldata=0x1f93be2300000000000000000000000000000000000000000000000000000000000000000000000000000000717b697900dffbe9119e17d18566155a8a7b99d6f2a78bcd args=[0, 2782572459366638158892466070841661772583482649703069748173 [2.782e57]]] testFuzz_Domain_EveryFieldIsBound(uint8,uint256) (runs: 0, μ: 0, ~: 0)
+Logs:
+  Bound result 4995010672250435288516594393919529960641590598
+
+[FAIL: two boards share a digest] test_Domain_ACommitmentForAnotherBoardNeverRevealsHere() (gas: 1773533)
+[FAIL: a digest computed for one bounty revealed on another] test_Domain_ACommitmentForOneBountyNeverRevealsOnAnother() (gas: 1169481)
+[FAIL: a commitment from before the fork revealed on the forked chain] test_Domain_AfterTheChainIdChanges_ACommitmentFromBeforeDoesNotReveal() (gas: 425218)
+[PASS] test_Replay_ACommitmentIsRevealedOnce_AndASettledBountyIsClosed() (gas: 481451)
+Suite result: FAILED. 1 passed; 4 failed; 0 skipped; finished in 42.57ms (23.76ms CPU time)
+{"timestamp":1795552292,"event":"failure","invariant":"invariant_Canary_NoRevealIsForcedIn","target":"seeded/SeededTwins.t.sol:ReachabilityCanaries","reason":"canary: a finder reveal was included at its last chance: 1 != 0"}
+{"timestamp":1795552292,"event":"failure","invariant":"invariant_ASettlementPaysTheFindersRecipientEverything","target":"seeded/SeededTwins.t.sol:UnboundClaimantRace","reason":"assertion failed: 0 != 1000186521"}
+
+Ran 7 tests for seeded/Sanity.t.sol:SanityJudges
+[PASS] testFuzz_Allowlist_OpenAcceptsExactlyTheAllowedCodeHashes(bool,uint8) (runs: 1000, μ: 1039818, ~: 975494)
+[PASS] test_Allowlist_AJudgeThatKeepsThePoolCannotBeOpened_SoNoPoolIsStranded() (gas: 107405)
+[PASS] test_Allowlist_OnlyTheDeployerChangesIt_AndOnlyForBountiesOpenedLater() (gas: 609262)
+[PASS] test_Allowlist_RefusesTheHashesOfNoAccountAndOfAnAccountWithoutCode() (gas: 10489)
+[PASS] test_Allowlist_TheFourJudgesAreAllowedFromConstruction_AndAnyoneOpensWithThem() (gas: 1004105)
+[PASS] test_Allowlist_TheSameCodeOverAnotherTokenOrVerifierIsAnotherJudge() (gas: 987700)
+[PASS] test_Binding_AnAllowedJudgeOpensOnlyWithItsOwnClaimFunctionAndToken() (gas: 675192)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 106.34ms (103.79ms CPU time)
+
+Ran 5 tests for seeded/Sanity.t.sol:SanityDomain
+[PASS] testFuzz_Domain_EveryFieldIsBound(uint8,uint256) (runs: 1000, μ: 221921, ~: 221730)
+Logs:
+  Bound result 2448976475913413592165767987938
+
+[PASS] test_Domain_ACommitmentForAnotherBoardNeverRevealsHere() (gas: 1842505)
+[PASS] test_Domain_ACommitmentForOneBountyNeverRevealsOnAnother() (gas: 1025165)
+[PASS] test_Domain_AfterTheChainIdChanges_ACommitmentFromBeforeDoesNotReveal() (gas: 282762)
+[PASS] test_Replay_ACommitmentIsRevealedOnce_AndASettledBountyIsClosed() (gas: 482468)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 108.53ms (103.63ms CPU time)
+{"timestamp":1795552292,"event":"failure","invariant":"invariant_Canary_TheCopierNeverLeads","target":"seeded/SeededTwins.t.sol:ReachabilityCanaries","reason":"canary: the copier led the race at some point"}
+{"timestamp":1795552292,"event":"failure","invariant":"invariant_Canary_TheFinderNeverTakesTheLeadFromTheCopier","target":"seeded/SeededTwins.t.sol:ReachabilityCanaries","reason":"canary: the finder took the lead from the copier"}
+{"timestamp":1795552292,"event":"failure","invariant":"invariant_Canary_NobodySettles","target":"seeded/SeededTwins.t.sol:ReachabilityCanaries","reason":"canary: a bounty was settled: 1 != 0"}
+{"timestamp":1795552293,"event":"failure","invariant":"invariant_TheCopierIsNeverPaid","target":"seeded/SeededTwins.t.sol:UnboundClaimantRace","reason":"assertion failed: 1000186521 != 0"}
+{"timestamp":1795552294,"event":"failure","invariant":"invariant_Canary_TheGrieferIsNeverRefused","target":"seeded/SeededTwins.t.sol:ReachabilityCanaries","reason":"canary: the judge refused the griefer's claim: 1 != 0"}
+{"timestamp":1795552294,"event":"failure","invariant":"invariant_OnceTheFindersRevealIsIncludedTheFinderLeads","target":"seeded/SeededTwins.t.sol:UnboundClaimantRace","reason":"the finder's reveal reverted"}
+
+Ran 5 tests for seeded/SeededTwins.t.sol:ReachabilityCanaries
+[FAIL: canary: a finder reveal was included at its last chance: 1 != 0]
+	[Sequence] (original: 62, shrunk: 6)
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[88366831845490046979975482759258690473398844419164035517492587501194 [8.836e67]]
+		sender=0x990dEa823892807128EF176a3c225d2c5894B441 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[13685863428779750623909126969922352055905091313614637828358415666027635285941 [1.368e76]]
+		sender=0x7A13692e1C77F3b501dAC7f82D6107c0d8896C4C addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[64712829 [6.471e7]]
+ invariant_Canary_NoRevealIsForcedIn() (runs: 9, calls: 576, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 44    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 45    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 43    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 59    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 47    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 54    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 40    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 38    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 39    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 38    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 47    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 40    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 45    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 28    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 31    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 354
+  Bound result 221
+  Bound result 309
+
+[FAIL: canary: a bounty was settled: 1 != 0]
+	[Sequence] (original: 61, shrunk: 7)
+		sender=0x1eE8DDCa6894550dCA6916EA2AC6bAa90d11F5CD addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x1Ee8Ddca6894550dCa6916eA2AC6Baa90D1201a1 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x1eE8ddCa6894550dCa6916Ea2AC6BAa90d11F225 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[67864639490252358732652123357392363385661320248625 [6.786e49]]
+		sender=0x1eE8dDCA6894550Dca6916EA2AC6Baa90d11Ff75 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x47E97baA1d6b8F06d0ca9BE10e226eB319a62578 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[115792089237316195423570985008687907853269984665640564039457584007913129639932 [1.157e77]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[115792089237316195423570985008687907853269984665640564039457584007913129639933 [1.157e77]]
+		sender=0x1eE8dDca6894550dcA6916eA2aC6Baa90D11ebdA addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=someoneSettles(bool) args=[false]
+ invariant_Canary_NobodySettles() (runs: 26, calls: 1664, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 105   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 105   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 109   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 130   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 134   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 145   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 114   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 108   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 117   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 113   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 120   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 108   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 129   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 91    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 97    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 265
+  Bound result 357
+  Bound result 358
+
+[FAIL: canary: the copier led the race at some point]
+	[Sequence] (original: 37, shrunk: 7)
+		sender=0x1eE8ddCA6894550DCa6916eA2AC6BaA90D11e986 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[31536000 [3.153e7]]
+		sender=0x1eE8ddCA6894550dCA6916ea2Ac6baA90D11FcFb addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x2a905e3E0d280241ec83eb3A1fC4659f62b4e67B addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCommitsTheClaimAsItsOwn(uint256) args=[3417283 [3.417e6]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[11615075618426350801096114330429475817802 [1.161e40]]
+		sender=0xD508c78d42ccb724a910Df6Fb87096EcF8B1C29e addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierRevealsItsOwn(uint256) args=[43880275961168830825126493365946484747370565303400739422783595429428448068358 [4.388e76]]
+ invariant_Canary_TheCopierNeverLeads() (runs: 21, calls: 1344, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 82    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 88    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 90    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 106   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 110   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 119   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 96    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 84    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 90    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 91    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 100   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 83    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 98    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 76    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 68    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 360
+  Bound result 82
+
+[FAIL: canary: the finder took the lead from the copier]
+	[Sequence] (original: 41, shrunk: 8)
+		sender=0x1eE8ddCA6894550DCa6916eA2AC6BaA90D11e986 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[31536000 [3.153e7]]
+		sender=0x1eE8ddCA6894550dCA6916ea2Ac6baA90D11FcFb addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x2a905e3E0d280241ec83eb3A1fC4659f62b4e67B addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCommitsTheClaimAsItsOwn(uint256) args=[3417283 [3.417e6]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[11615075618426350801096114330429475817802 [1.161e40]]
+		sender=0xD508c78d42ccb724a910Df6Fb87096EcF8B1C29e addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierRevealsItsOwn(uint256) args=[43880275961168830825126493365946484747370565303400739422783595429428448068358 [4.388e76]]
+		sender=0x1Ee8ddCA6894550dca6916eA2aC6Baa90D120555 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderRevealIsMined() args=[]
+ invariant_Canary_TheFinderNeverTakesTheLeadFromTheCopier() (runs: 21, calls: 1344, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 82    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 88    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 90    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 107   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 110   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 120   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 96    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 84    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 90    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 92    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 100   | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 83    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 98    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 76    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 69    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 360
+  Bound result 82
+
+[FAIL: canary: the judge refused the griefer's claim: 1 != 0]
+	[Sequence] (original: 58, shrunk: 2)
+		sender=0x00000000000000000000000000000000000025E3 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=grieferCommits(uint256,bool) args=[0, false]
+		sender=0x5602A07055c7ee5ce43F851BcaaD7650e91Afa07 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=grieferRevealsARejectedClaim(uint256) args=[0]
+ invariant_Canary_TheGrieferIsNeverRefused() (runs: 1, calls: 64, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 9     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 8     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 10    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 11    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 11    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 13    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 7     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 5     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 9     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 4     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 6     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 7     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 9     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 4     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 9     | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Suite result: FAILED. 0 passed; 5 failed; 0 skipped; finished in 4.46s (11.48s CPU time)
+
+Ran 8 tests for seeded/Sanity.t.sol:SanityRace
+[PASS] invariant_ASettlementPaysTheFindersRecipientEverything() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_AnOpenBountyKeepsItsJudge() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_NoTokenIsCreatedOrLost() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067921
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_OnceTheFindersRevealIsIncludedTheFinderLeads() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_PoolsAreExactlyTheBoardsBalance() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_TheCopierIsNeverPaid() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_TheJudgesHoldNothingBetweenTransactions() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_TheSoundBountyIsUntouched() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067918
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 4.71s (13.26s CPU time)
+
+Ran 8 tests for seeded/SeededTwins.t.sol:UnboundClaimantRace
+[FAIL: assertion failed: 0 != 1000186521]
+	[Sequence] (original: 63, shrunk: 8)
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[13685863428779750623909126969922352055905091313614637828358415666027635285941 [1.368e76]]
+		sender=0x0000000000000000000000000000000000002560 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x0000000000000000000000000000000000000b9d addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheReveal(bool) args=[true]
+		sender=0x7A13692e1C77F3b501dAC7f82D6107c0d8896C4C addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[64712829 [6.471e7]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=someoneSettles(bool) args=[false]
+ invariant_ASettlementPaysTheFindersRecipientEverything() (runs: 9, calls: 576, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 44    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 45    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 43    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 59    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 47    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 54    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 40    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 38    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 39    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 38    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 47    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 40    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 45    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 29    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 31    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 221
+  Bound result 309
+
+[PASS] invariant_AnOpenBountyKeepsItsJudge() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067917
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_NoTokenIsCreatedOrLost() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067919
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 208
+  Bound result 3
+
+[FAIL: the finder's reveal reverted]
+	[Sequence] (original: 46, shrunk: 7)
+		sender=0x1Ee8DDcA6894550dca6916EA2AC6Baa90d1201b8 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x1Ee8DDcA6894550DCA6916eA2aC6BAa90D12085E addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheCommit() args=[]
+		sender=0x00000000000000000000000000000000000020dB addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[6597552737134873072423674538148850007979714 [6.597e42]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x1eE8dDcA6894550dca6916eA2aC6bAa90d11F34c addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheReveal(bool) args=[false]
+		sender=0x000000000000000000000000000000006b49D279 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderRevealIsMined() args=[]
+ invariant_OnceTheFindersRevealIsIncludedTheFinderLeads() (runs: 3, calls: 192, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 18    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 19    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 14    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 21    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 17    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 17    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 15    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 12    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 15    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 12    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 18    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 14    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 20    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 8     | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 18    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 194
+
+[PASS] invariant_PoolsAreExactlyTheBoardsBalance() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067917
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[FAIL: assertion failed: 1000186521 != 0]
+	[Sequence] (original: 63, shrunk: 8)
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[13685863428779750623909126969922352055905091313614637828358415666027635285941 [1.368e76]]
+		sender=0x0000000000000000000000000000000000002560 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x0000000000000000000000000000000000000b9d addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheReveal(bool) args=[true]
+		sender=0x7A13692e1C77F3b501dAC7f82D6107c0d8896C4C addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[64712829 [6.471e7]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=someoneSettles(bool) args=[false]
+ invariant_TheCopierIsNeverPaid() (runs: 9, calls: 576, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 44    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 45    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 43    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 59    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 47    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 54    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 40    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 38    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 39    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 38    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 47    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 40    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 45    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 29    | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 31    | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 221
+  Bound result 309
+
+[PASS] invariant_TheJudgesHoldNothingBetweenTransactions() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067917
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+[PASS] invariant_TheSoundBountyIsUntouched() (runs: 256, calls: 16384, reverts: 0)
+
+╭------------------+-------------------------------+-------+---------+----------╮
+| Contract         | Selector                      | Calls | Reverts | Discards |
++===============================================================================+
+| BoardRaceHandler | copierCommitsTheClaimAsItsOwn | 1071  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheCommit         | 1067  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierCopiesTheReveal         | 1127  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierGoesStraightToTheJudge  | 1101  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | copierRevealsItsOwn           | 1115  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | deployerChangesTheAllowlist   | 1095  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsCommit        | 1111  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderBroadcastsReveal        | 1078  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderCommitIsMined           | 1102  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | finderRevealIsMined           | 1097  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferCommits                | 1105  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | grieferRevealsARejectedClaim  | 1077  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneFunds                  | 1066  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | someoneSettles                | 1072  | 0       | 0        |
+|------------------+-------------------------------+-------+---------+----------|
+| BoardRaceHandler | timePasses                    | 1100  | 0       | 0        |
+╰------------------+-------------------------------+-------+---------+----------╯
+
+Logs:
+  Bound result 448067917
+  Bound result 1
+  Bound result 1854722
+  Bound result 26
+  Bound result 304
+  Bound result 106
+  Bound result 663535867
+  Bound result 138
+  Bound result 1357
+  Bound result 206
+  Bound result 3
+
+Suite result: FAILED. 5 passed; 3 failed; 0 skipped; finished in 4.71s (16.57s CPU time)
+
+Ran 7 test suites in 4.71s (14.16s CPU time): 28 tests passed, 17 failed, 0 skipped (45 total tests)
+
+Failing tests:
+Encountered 5 failing tests in seeded/SeededTwins.t.sol:ReachabilityCanaries
+[FAIL: canary: a finder reveal was included at its last chance: 1 != 0]
+	[Sequence] (original: 62, shrunk: 6)
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[88366831845490046979975482759258690473398844419164035517492587501194 [8.836e67]]
+		sender=0x990dEa823892807128EF176a3c225d2c5894B441 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[13685863428779750623909126969922352055905091313614637828358415666027635285941 [1.368e76]]
+		sender=0x7A13692e1C77F3b501dAC7f82D6107c0d8896C4C addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[64712829 [6.471e7]]
+ invariant_Canary_NoRevealIsForcedIn() (runs: 9, calls: 576, reverts: 0)
+[FAIL: canary: a bounty was settled: 1 != 0]
+	[Sequence] (original: 61, shrunk: 7)
+		sender=0x1eE8DDCa6894550dCA6916EA2AC6bAa90d11F5CD addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x1Ee8Ddca6894550dCa6916eA2AC6Baa90D1201a1 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x1eE8ddCa6894550dCa6916Ea2AC6BAa90d11F225 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[67864639490252358732652123357392363385661320248625 [6.786e49]]
+		sender=0x1eE8dDCA6894550Dca6916EA2AC6Baa90d11Ff75 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x47E97baA1d6b8F06d0ca9BE10e226eB319a62578 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[115792089237316195423570985008687907853269984665640564039457584007913129639932 [1.157e77]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[115792089237316195423570985008687907853269984665640564039457584007913129639933 [1.157e77]]
+		sender=0x1eE8dDca6894550dcA6916eA2aC6Baa90D11ebdA addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=someoneSettles(bool) args=[false]
+ invariant_Canary_NobodySettles() (runs: 26, calls: 1664, reverts: 0)
+[FAIL: canary: the copier led the race at some point]
+	[Sequence] (original: 37, shrunk: 7)
+		sender=0x1eE8ddCA6894550DCa6916eA2AC6BaA90D11e986 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[31536000 [3.153e7]]
+		sender=0x1eE8ddCA6894550dCA6916ea2Ac6baA90D11FcFb addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x2a905e3E0d280241ec83eb3A1fC4659f62b4e67B addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCommitsTheClaimAsItsOwn(uint256) args=[3417283 [3.417e6]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[11615075618426350801096114330429475817802 [1.161e40]]
+		sender=0xD508c78d42ccb724a910Df6Fb87096EcF8B1C29e addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierRevealsItsOwn(uint256) args=[43880275961168830825126493365946484747370565303400739422783595429428448068358 [4.388e76]]
+ invariant_Canary_TheCopierNeverLeads() (runs: 21, calls: 1344, reverts: 0)
+[FAIL: canary: the finder took the lead from the copier]
+	[Sequence] (original: 41, shrunk: 8)
+		sender=0x1eE8ddCA6894550DCa6916eA2AC6BaA90D11e986 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[31536000 [3.153e7]]
+		sender=0x1eE8ddCA6894550dCA6916ea2Ac6baA90D11FcFb addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x2a905e3E0d280241ec83eb3A1fC4659f62b4e67B addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCommitsTheClaimAsItsOwn(uint256) args=[3417283 [3.417e6]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[11615075618426350801096114330429475817802 [1.161e40]]
+		sender=0xD508c78d42ccb724a910Df6Fb87096EcF8B1C29e addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierRevealsItsOwn(uint256) args=[43880275961168830825126493365946484747370565303400739422783595429428448068358 [4.388e76]]
+		sender=0x1Ee8ddCA6894550dca6916eA2aC6Baa90D120555 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderRevealIsMined() args=[]
+ invariant_Canary_TheFinderNeverTakesTheLeadFromTheCopier() (runs: 21, calls: 1344, reverts: 0)
+[FAIL: canary: the judge refused the griefer's claim: 1 != 0]
+	[Sequence] (original: 58, shrunk: 2)
+		sender=0x00000000000000000000000000000000000025E3 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=grieferCommits(uint256,bool) args=[0, false]
+		sender=0x5602A07055c7ee5ce43F851BcaaD7650e91Afa07 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=grieferRevealsARejectedClaim(uint256) args=[0]
+ invariant_Canary_TheGrieferIsNeverRefused() (runs: 1, calls: 64, reverts: 0)
+
+Encountered 3 failing tests in seeded/SeededTwins.t.sol:UnboundClaimantRace
+[FAIL: assertion failed: 0 != 1000186521]
+	[Sequence] (original: 63, shrunk: 8)
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[13685863428779750623909126969922352055905091313614637828358415666027635285941 [1.368e76]]
+		sender=0x0000000000000000000000000000000000002560 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x0000000000000000000000000000000000000b9d addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheReveal(bool) args=[true]
+		sender=0x7A13692e1C77F3b501dAC7f82D6107c0d8896C4C addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[64712829 [6.471e7]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=someoneSettles(bool) args=[false]
+ invariant_ASettlementPaysTheFindersRecipientEverything() (runs: 9, calls: 576, reverts: 0)
+[FAIL: the finder's reveal reverted]
+	[Sequence] (original: 46, shrunk: 7)
+		sender=0x1Ee8DDcA6894550dca6916EA2AC6Baa90d1201b8 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x1Ee8DDcA6894550DCA6916eA2aC6BAa90D12085E addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheCommit() args=[]
+		sender=0x00000000000000000000000000000000000020dB addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[6597552737134873072423674538148850007979714 [6.597e42]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x1eE8dDcA6894550dca6916eA2aC6bAa90d11F34c addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheReveal(bool) args=[false]
+		sender=0x000000000000000000000000000000006b49D279 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderRevealIsMined() args=[]
+ invariant_OnceTheFindersRevealIsIncludedTheFinderLeads() (runs: 3, calls: 192, reverts: 0)
+[FAIL: assertion failed: 1000186521 != 0]
+	[Sequence] (original: 63, shrunk: 8)
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheCommit() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderCommitIsMined() args=[]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[13685863428779750623909126969922352055905091313614637828358415666027635285941 [1.368e76]]
+		sender=0x0000000000000000000000000000000000002560 addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=finderBroadcastsReveal() args=[]
+		sender=0x0000000000000000000000000000000000000b9d addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=copierCopiesTheReveal(bool) args=[true]
+		sender=0x7A13692e1C77F3b501dAC7f82D6107c0d8896C4C addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=timePasses(uint256) args=[64712829 [6.471e7]]
+		sender=0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f addr=[test/invariant/BoardRace.sol:BoardRaceHandler]0x1d1499e622D69689cdf9004d05Ec547d650Ff211 calldata=someoneSettles(bool) args=[false]
+ invariant_TheCopierIsNeverPaid() (runs: 9, calls: 576, reverts: 0)
+
+Encountered 5 failing tests in seeded/SeededTwins.t.sol:UncheckedJudgesChecks
+[FAIL: assertion failed: true != false; counterexample: calldata=0x7dcb43d400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 args=[false, 0]] testFuzz_Allowlist_OpenAcceptsExactlyTheAllowedCodeHashes(bool,uint8) (runs: 0, μ: 0, ~: 0)
+[FAIL: a judge outside the allowlist was opened] test_Allowlist_AJudgeThatKeepsThePoolCannotBeOpened_SoNoPoolIsStranded() (gas: 211657)
+[FAIL: a disallowed judge opens no new bounty] test_Allowlist_OnlyTheDeployerChangesIt_AndOnlyForBountiesOpenedLater() (gas: 377051)
+[FAIL: the same code over another token was opened] test_Allowlist_TheSameCodeOverAnotherTokenOrVerifierIsAnotherJudge() (gas: 1096446)
+[FAIL: opened with another claim function] test_Binding_AnAllowedJudgeOpensOnlyWithItsOwnClaimFunctionAndToken() (gas: 138612)
+
+Encountered 4 failing tests in seeded/SeededTwins.t.sol:UndomainedBoardChecks
+[FAIL: a field is not bound into the digest; counterexample: calldata=0x1f93be2300000000000000000000000000000000000000000000000000000000000000000000000000000000717b697900dffbe9119e17d18566155a8a7b99d6f2a78bcd args=[0, 2782572459366638158892466070841661772583482649703069748173 [2.782e57]]] testFuzz_Domain_EveryFieldIsBound(uint8,uint256) (runs: 0, μ: 0, ~: 0)
+[FAIL: two boards share a digest] test_Domain_ACommitmentForAnotherBoardNeverRevealsHere() (gas: 1773533)
+[FAIL: a digest computed for one bounty revealed on another] test_Domain_ACommitmentForOneBountyNeverRevealsOnAnother() (gas: 1169481)
+[FAIL: a commitment from before the fork revealed on the forked chain] test_Domain_AfterTheChainIdChanges_ACommitmentFromBeforeDoesNotReveal() (gas: 425218)
+
+Encountered a total of 17 failing tests, 28 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 17 failed tests
+
+Fuzz seed: 0xb0a7d (use `--fuzz-seed` to reproduce)
+# exit status: 1 (expected non-zero)

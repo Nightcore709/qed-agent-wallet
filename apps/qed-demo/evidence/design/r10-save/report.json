@@ -1,0 +1,50 @@
+{
+ "/save 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/passbook 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/save 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/passbook 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/save 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/passbook 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/save 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/passbook 390 dark": {
+  "errors": [],
+  "fault": false
+ }
+}

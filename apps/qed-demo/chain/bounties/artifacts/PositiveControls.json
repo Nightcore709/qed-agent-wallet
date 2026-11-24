@@ -1,0 +1,416 @@
+{
+ "source": "chain/vendor/contracts/test/Bounties.t.sol (the release's suite, unmodified)",
+ "sourceSha256": "0bcf6d25542cb832970342b7688a792bc376db85f3c3c56243a4b63561f117ac",
+ "compiler": {
+  "solc": "0.8.26",
+  "evmVersion": "cancun",
+  "optimizer": {
+   "enabled": true,
+   "runs": 200
+  },
+  "viaIR": true,
+  "bytecodeHash": "none",
+  "cborMetadata": false
+ },
+ "builtWith": "forge Version: 1.7.1",
+ "note": "TEST ONLY. The release's positive controls: a verifier that accepts anything, and a netting rule that under-reports by 7 tUSD. A bounty judged by either can be claimed. rail/bounties.ts opens them only when QED_RAIL_BOUNTY_CONTROLS=1, labelled as positive controls.",
+ "contracts": {
+  "AcceptAnything": {
+   "abi": [
+    {
+     "type": "function",
+     "name": "problemClass",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "string",
+       "internalType": "string"
+      }
+     ],
+     "stateMutability": "pure"
+    },
+    {
+     "type": "function",
+     "name": "verify",
+     "inputs": [
+      {
+       "name": "",
+       "type": "bytes",
+       "internalType": "bytes"
+      },
+      {
+       "name": "",
+       "type": "bytes",
+       "internalType": "bytes"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "bytes32",
+       "internalType": "bytes32"
+      }
+     ],
+     "stateMutability": "pure"
+    }
+   ],
+   "bytecode": "0x60808060405234601557610144908161001a8239f35b5f80fdfe6080806040526004361015610012575f80fd5b5f3560e01c908163db61e88a14610095575063f7e83aee14610032575f80fd5b346100915760403660031901126100915760043567ffffffffffffffff811161009157610063903690600401610116565b505060243567ffffffffffffffff811161009157610085903690600401610116565b505060206040515f8152f35b5f80fd5b34610091575f366003190112610091576040810181811067ffffffffffffffff821117610102576040526007815260406020820191661d5b9cdbdd5b9960ca1b83528151928391602083525180918160208501528484015e5f828201840152601f01601f19168101030190f35b634e487b7160e01b5f52604160045260245ffd5b9181601f840112156100915782359167ffffffffffffffff831161009157602083818601950101116100915756",
+   "bytecodeSha256": "d2599372eae58e3efacebcf1984d79a3fbe06d8f8711c5c934b1b106457a9964"
+  },
+  "UnsoundMaximality": {
+   "abi": [
+    {
+     "type": "constructor",
+     "inputs": [
+      {
+       "name": "t",
+       "type": "address",
+       "internalType": "contract IERC20"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "accepts",
+     "inputs": [
+      {
+       "name": "e",
+       "type": "tuple",
+       "internalType": "struct MaximalityBounty.Economy",
+       "components": [
+        {
+         "name": "members",
+         "type": "uint256",
+         "internalType": "uint256"
+        },
+        {
+         "name": "debtor",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "creditor",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "d",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        }
+       ]
+      },
+      {
+       "name": "p",
+       "type": "tuple",
+       "internalType": "struct MaximalityBounty.Certified",
+       "components": [
+        {
+         "name": "x",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "potential",
+         "type": "int256[]",
+         "internalType": "int256[]"
+        },
+        {
+         "name": "y",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        }
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "name": "",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "stateMutability": "pure"
+    },
+    {
+     "type": "function",
+     "name": "claim",
+     "inputs": [
+      {
+       "name": "e",
+       "type": "tuple",
+       "internalType": "struct MaximalityBounty.Economy",
+       "components": [
+        {
+         "name": "members",
+         "type": "uint256",
+         "internalType": "uint256"
+        },
+        {
+         "name": "debtor",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "creditor",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "d",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        }
+       ]
+      },
+      {
+       "name": "accepted",
+       "type": "tuple",
+       "internalType": "struct MaximalityBounty.Certified",
+       "components": [
+        {
+         "name": "x",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "potential",
+         "type": "int256[]",
+         "internalType": "int256[]"
+        },
+        {
+         "name": "y",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        }
+       ]
+      },
+      {
+       "name": "larger",
+       "type": "uint256[]",
+       "internalType": "uint256[]"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "payout",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "stateMutability": "nonpayable"
+    },
+    {
+     "type": "function",
+     "name": "token",
+     "inputs": [],
+     "outputs": [
+      {
+       "name": "",
+       "type": "address",
+       "internalType": "contract IERC20"
+      }
+     ],
+     "stateMutability": "view"
+    },
+    {
+     "type": "function",
+     "name": "validNetting",
+     "inputs": [
+      {
+       "name": "e",
+       "type": "tuple",
+       "internalType": "struct MaximalityBounty.Economy",
+       "components": [
+        {
+         "name": "members",
+         "type": "uint256",
+         "internalType": "uint256"
+        },
+        {
+         "name": "debtor",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "creditor",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        },
+        {
+         "name": "d",
+         "type": "uint256[]",
+         "internalType": "uint256[]"
+        }
+       ]
+      },
+      {
+       "name": "x",
+       "type": "uint256[]",
+       "internalType": "uint256[]"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "total",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ],
+     "stateMutability": "pure"
+    },
+    {
+     "type": "event",
+     "name": "Refuted",
+     "inputs": [
+      {
+       "name": "claimant",
+       "type": "address",
+       "indexed": true,
+       "internalType": "address"
+      },
+      {
+       "name": "payout",
+       "type": "uint256",
+       "indexed": false,
+       "internalType": "uint256"
+      },
+      {
+       "name": "provenMaximal",
+       "type": "uint256",
+       "indexed": false,
+       "internalType": "uint256"
+      },
+      {
+       "name": "larger",
+       "type": "uint256",
+       "indexed": false,
+       "internalType": "uint256"
+      }
+     ],
+     "anonymous": false
+    },
+    {
+     "type": "error",
+     "name": "BadEconomy",
+     "inputs": []
+    },
+    {
+     "type": "error",
+     "name": "DualInfeasible",
+     "inputs": [
+      {
+       "name": "index",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ]
+    },
+    {
+     "type": "error",
+     "name": "ExceedsObligation",
+     "inputs": [
+      {
+       "name": "index",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "cancelled",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "amount",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ]
+    },
+    {
+     "type": "error",
+     "name": "LengthMismatch",
+     "inputs": []
+    },
+    {
+     "type": "error",
+     "name": "NetPositionChanged",
+     "inputs": [
+      {
+       "name": "member",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "delta",
+       "type": "int256",
+       "internalType": "int256"
+      }
+     ]
+    },
+    {
+     "type": "error",
+     "name": "NotProvablyMaximal",
+     "inputs": [
+      {
+       "name": "cleared",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "dualBound",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ]
+    },
+    {
+     "type": "error",
+     "name": "NothingToNet",
+     "inputs": []
+    },
+    {
+     "type": "error",
+     "name": "ReentrancyGuardReentrantCall",
+     "inputs": []
+    },
+    {
+     "type": "error",
+     "name": "SafeERC20FailedOperation",
+     "inputs": [
+      {
+       "name": "token",
+       "type": "address",
+       "internalType": "address"
+      }
+     ]
+    },
+    {
+     "type": "error",
+     "name": "TheoremHolds",
+     "inputs": [
+      {
+       "name": "provenMaximal",
+       "type": "uint256",
+       "internalType": "uint256"
+      },
+      {
+       "name": "larger",
+       "type": "uint256",
+       "internalType": "uint256"
+      }
+     ]
+    },
+    {
+     "type": "error",
+     "name": "ValueOutOfRange",
+     "inputs": []
+    }
+   ],
+   "bytecode": "0x60a034607057601f610ad838819003918201601f19168301916001600160401b03831184841017607457808492602094604052833981010312607057516001600160a01b038116810360705760015f55608052604051610a4f90816100898239608051818181605a01526101440152f35b5f80fd5b634e487b7160e01b5f52604160045260245ffdfe60806040526004361015610011575f80fd5b5f3560e01c8063c14707181461030a578063e4dec4c4146102a2578063f9b7dbcc1461008d5763fc0c546a14610045575f80fd5b34610089575f366003190112610089576040517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b5f80fd5b346100895760603660031901126100895760043567ffffffffffffffff8111610089576080816004019160031990360301126100895760243567ffffffffffffffff811161008957606060031982360301126100895760443567ffffffffffffffff81116100895761010390369060040161036e565b9060025f5414610293576101216101279360025f556004018561039f565b9361088e565b8181111561027d576040516370a0823160e01b81523060048201527f00000000000000000000000000000000000000000000000000000000000000006001600160a01b038116939192909190602084602481885afa938415610238575f94610243575b50915f91602093604051918683528583015260408201527f7778dacdcf1f68eea3785d2a587c04c5f74d438601c5fdd980a8ef16d9ed409f60603392a2604051828482019163a9059cbb60e01b8352336024820152866044820152604481526101f4606482610796565b51925af115610238575f513d61022f5750813b155b61021c5760209060015f55604051908152f35b50635274afe760e01b5f5260045260245ffd5b60011415610209565b6040513d5f823e3d90fd5b91929093506020823d602011610275575b8161026160209383610796565b81010312610089579051929091905f61018a565b3d9150610254565b9063de53cf4360e01b5f5260045260245260445ffd5b633ee5aeb560e01b5f5260045ffd5b346100895760403660031901126100895760043567ffffffffffffffff811161008957608060031982360301126100895760243567ffffffffffffffff8111610089576020916102f961030292369060040161036e565b9160040161088e565b604051908152f35b346100895760403660031901126100895760043567ffffffffffffffff811161008957608060031982360301126100895760243567ffffffffffffffff8111610089576060600319823603011261008957602091610302916004019060040161039f565b9181601f840112156100895782359167ffffffffffffffff8311610089576020808501948460051b01011161008957565b905f916103af6060820182610760565b809391506103c06020840184610760565b905014801590610748575b8015610733575b801561071b575b8015610702575b6106f357821580156106e9575b80156106de575b80156106d3575b61064957915f5b8235811061068d575061041582356107e4565b905f935f915b8083106104c2575050505f5b8235811061048a57505050811561047b578082036104655750626acfbf1981019081116104515790565b634e487b7160e01b5f52601160045260245ffd5b9063502598fb60e11b5f5260045260245260445ffd5b63271a5cf760e11b5f5260045ffd5b610494818361083a565b516104a157600101610427565b6104ab818361083a565b5190630b942f1d60e41b5f5260045260245260445ffd5b9091946104dc866104d66020880188610760565b90610816565b35906104ef876104d66040890189610760565b35610501886104d660608a018a610760565b359887358410801590610682575b8015610679575b8015610671575b8015610658575b61064957610536896104d68880610760565b35918a831161062e576105508a6104d660408a018a610760565b3594600160401b861161061f576001610597876105928b61058b876104d661057f896104d66020870187610760565b35936020810190610760565b3590610869565b61084e565b1261060c5790816105c16105ba866105b46105e69897968e61083a565b5161084e565b918b61083a565b526105e06105d9846105d3848d61083a565b51610869565b918a61083a565b52610881565b978281029281840414901517156104515760019161060391610881565b9501919061041b565b8a632b7f27d960e01b5f5260045260245ffd5b634eb4f9fb60e01b5f5260045ffd5b8a838b63ccc744b760e01b5f5260045260245260445260645ffd5b637a2dab6960e11b5f5260045ffd5b506fffffffffffffffffffffffffffffffff8a11610524565b50891561051d565b50818414610516565b50873582101561050f565b6106a0816104d660208795970185610760565b35600160401b81139081156106c0575b5061061f57600101929092610402565b67ffffffffffffffff191390505f6106b0565b5060408235116103fb565b5060028235106103f4565b50608083116103ed565b631fec674760e31b5f5260045ffd5b506107106020820182610760565b9050823514156103e0565b508261072a6040830183610760565b905014156103d9565b508261073f8280610760565b905014156103d2565b50826107576040840184610760565b905014156103cb565b903590601e1981360301821215610089570180359067ffffffffffffffff821161008957602001918160051b3603831361008957565b90601f8019910116810190811067ffffffffffffffff8211176107b857604052565b634e487b7160e01b5f52604160045260245ffd5b67ffffffffffffffff81116107b85760051b60200190565b906107ee826107cc565b6107fb6040519182610796565b828152809261080c601f19916107cc565b0190602036910137565b91908110156108265760051b0190565b634e487b7160e01b5f52603260045260245ffd5b80518210156108265760209160051b010190565b9190915f838201938412911290801582169115161761045157565b81810392915f13801582851316918412161761045157565b9190820180921161045157565b5f93929160608201916108a18382610760565b809291508514801590610a37575b8015610a1f575b6106f357939291908435946108ca866107e4565b945f945b838610610900575050505050505f5b8281106108e957505050565b6108f3818361083a565b516104a1576001016108dd565b90919293949889610912818589610816565b35610921826104d68689610760565b35106109ea5750602084018861093b8c6104d68489610760565b35108015906109cf575b61064957600191886109b06105ba8e6105d361098c6109a1838f808f8f926109948c926109c39f61098c886104d66105b493610985838c61099b9a610816565b3595610760565b35809561083a565b918c61083a565b52610816565b35926104d660408e018e610760565b526109bc8c868a610816565b3590610881565b990194939291906108ce565b50886109e28c6104d66040890189610760565b351015610945565b84610a05826104d6866109fe838a8e610816565b3594610760565b359163ccc744b760e01b5f5260045260245260445260645ffd5b5081610a2e6040830183610760565b905014156108b6565b5081610a466020830183610760565b905014156108af56",
+   "bytecodeSha256": "606732b3883b0007d557e2422128d952b16da404931fb2ae083705e451a91dbd"
+  }
+ }
+}

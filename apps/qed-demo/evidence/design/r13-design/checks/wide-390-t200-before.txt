@@ -1,0 +1,15 @@
+# What reached past a 390 px window with the browser's text at 200% (Chrome default font size 32 px), outermost first,
+# on the code of 99dd3e4 (before R13), the design fixture's populated household; output of wide.ts as printed then.
+/ : li (Home "What QED may do" lanes, six) right=398 w=346
+/save : axis labels "₹6.5 lakh" right=393; div.sc-lanes-head and ul.sc-lane-list right=459 w=415; dt/dd "In 30 days ₹1,35,800" right=395
+/protect : (none before R13; R13's longer chip "Even if QED's server fails" reached 423 until chips could wrap)
+/activity : p.ac-lead-k / p.ac-lead-v "−₹38,136.22" / p.ac-lead-s right=400 w=348
+/vault : div.vt-head-state "Running on a local test chain" right=396; span.paise ".00" right=400
+/vault/treasury : div.vt-head-state right=396; dt/dd.vt-fig-v "₹99,981.00"/dd.vt-fig-s right=446 w=402
+/vault/mandate : div.vt-head-state right=396; span.stamp.ok.big "In force enforced by the contract" right=442
+/vault/convert : div.vt-head-state right=396; dt/dd.vt-fig-v "₹2,500.00" right=393
+/vault/policy : div.vt-head-state right=396; span.stamp.ok.big right=455; li (ticks) right=560 w=516
+/vault/records : div.vt-head-state right=396; span.stamp.void "Refused by QED's checks; nothing sent" right=540 w=496
+/security : a "suspend that device's passkey" right=399
+/safeguards : dt/dd "In 30 days ₹1,35,800" right=398
+top bar (every screen) : the practice chip ran under the Pause button at 150% and 200% on 390 px

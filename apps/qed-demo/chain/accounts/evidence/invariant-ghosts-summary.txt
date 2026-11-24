@@ -1,0 +1,9 @@
+All eight invariants, FOUNDRY_INVARIANT_FAIL_ON_REVERT=true, runs=256 depth=48 seed=0x7e5a, R13 build (2056 lines = 8 invariants x 257 incl. replays; evidence/invariant-ghosts.txt)
+handler reverts: 0 for every invariant (evidence/forge-invariants-fail-on-revert.txt)
+scheduled changes applied: 565
+cancellations (changes or recoveries, frozen Members among the cancellers): 2270
+recoveries finished: 121
+immediate guarded calls attempted with every Member signing: 5488 (successes asserted 0 by invariant_guarded_call_never_runs_immediately)
+freezes by the sentinel: 2092 (in 1302 runs)
+batches and ERC-1271 messages approved by frozen Members only, attempted: 2034 (in 965 runs; successes asserted 0 by invariant_frozen_member_never_approves)
+protective calls run through protect: 3934, of which by a frozen Member: 1258 (in 767 runs)

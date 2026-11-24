@@ -1,0 +1,888 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "vault.4e44f210-c66b-4a20-a55c-f78a903f941a",
+ "kind": "vault-job",
+ "title": "Owner ended the standing policy; the agent no longer converts on its own",
+ "outcome": "executed",
+ "venue": "local-chain",
+ "workspace": "usr_1m823h9ax3v64dv82zt",
+ "assembledAt": "2026-11-22T17:10:07.846Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "End the standing policy (target 10.00 tUSD). The co-signer refuses it from then on.",
+    "source": "the terms the owner was shown and signed",
+    "at": "2026-11-22T17:10:06.465Z"
+   },
+   "instruments": [
+    {
+     "kind": "standing-policy",
+     "id": "rail-policy-0b851d93-1",
+     "signedAt": "2026-11-22T17:06:08.403Z",
+     "status": "superseded or revoked since",
+     "text": "QED treasury policy\nvault: 0xF12460c7EfA439E25c32daEf3fd67e29ED34e547\nreserve: 0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602\nkeep free in reserve at least: 10000000 of 0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75\nconvert from: 0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99\ntranche: 20000 to 200000\nmax impact bps: 150\nvalid until: 1797959168\nnonce: rail-policy-0b851d93-1",
+     "limits": [
+      {
+       "name": "targetFree",
+       "value": "10000000",
+       "text": "keep at least 10 tUSD free in the reserve"
+      },
+      {
+       "name": "minTranche",
+       "value": "20000",
+       "text": "never convert less than 200 tINR at a time"
+      },
+      {
+       "name": "maxTranche",
+       "value": "200000",
+       "text": "never more than 2000 tINR at a time"
+      },
+      {
+       "name": "maxImpactBps",
+       "value": 150,
+       "text": "at most 1.5% execution cost"
+      }
+     ],
+     "expiresAt": "2026-12-22T17:06:08.000Z",
+     "enforcement": "cosigner",
+     "document": {
+      "text": "{\"action\":\"policy\",\"kind\":\"vault-proposal\",\"network\":\"Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts\",\"note\":\"Your passkey signs the digests listed under \\\"sign\\\", one prompt for each, and nothing else. Each commits to exactly these terms on the chain; the chain checks the signature against your vault's owner account before anything runs, and the vault service only relays. The tokens are valueless test tokens on a local test chain.\",\"proposalId\":\"f1565aca-06e5-46ec-b4f9-6668efbdaeef\",\"proposedBy\":{\"aiCall\":\"aic_1m823har376n0jyn47k\",\"model\":\"claude-opus-5-5\",\"proposal\":\"prp_1m823htb1fwaap9pwwh\",\"provider\":\"claude-cli\",\"rationale\":\"The engine converts tINR from your treasury into the reserve in batches whenever the reserve falls below 10 tUSD. Each batch must stay within your mandate: at most 250.00 tINR per payment, 600.00 tINR per 24 hours and 2000.00 tINR in total, until 29 November 2026. Money used for top-ups no longer sits in your treasury, and the policy stops when the mandate ends.\",\"statement\":\"A model (claude-opus-5-5, through claude-cli) proposed these terms from the owner's question. No licensed adviser reviewed them. The model holds no key and signs nothing.\"},\"sign\":[{\"digest\":\"0x77a27f2d670d8e7383cd23ded39dea0f1520ee8ca8bcee8d53bb2a700dde6e57\",\"item\":0,\"kind\":\"erc1271\",\"purpose\":\"message\",\"signers\":1}],\"summary\":\"Standing policy: keep ≥ 10.00 tUSD free in the dollar reserve; tranches 200.00–2,000.00 tINR; ≤ 1.5% execution cost; valid 30 days. Enforced by the co-signer, which re-derives every tranche.\",\"terms\":{\"actions\":[],\"chainId\":31337,\"enforcement\":\"cosigner\",\"genesisId\":\"0b851d93-3186-4e91-a67e-2eeb2f8f6f46\",\"kind\":\"policy\",\"message\":\"QED treasury policy\\nvault: 0xF12460c7EfA439E25c32daEf3fd67e29ED34e547\\nreserve: 0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602\\nkeep free in reserve at least: 10000000 of 0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75\\nconvert from: 0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99\\ntranche: 20000 to 200000\\nmax impact bps: 150\\nvalid until: 1797959168\\nnonce: rail-policy-0b851d93-1\",\"needSlackBps\":null,\"policy\":{\"maxImpactBps\":150,\"maxTranche\":\"200000\",\"minTranche\":\"20000\",\"nonce\":\"rail-policy-0b851d93-1\",\"reserve\":\"0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602\",\"targetFree\":\"10000000\",\"tokenIn\":\"0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99\",\"tokenOut\":\"0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75\",\"validUntil\":\"1797959168\",\"vault\":\"0xF12460c7EfA439E25c32daEf3fd67e29ED34e547\"},\"sequence\":1,\"supersedes\":null,\"toSign\":[{\"account\":\"0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA\",\"chainId\":31337,\"digest\":\"0x77a27f2d670d8e7383cd23ded39dea0f1520ee8ca8bcee8d53bb2a700dde6e57\",\"hash\":\"0xe1e0167c9d97b45b36ac7ec11ef5a0c744029ea54e2a6b536b5dc43f40731b52\",\"kind\":\"erc1271\",\"note\":\"The passkey signs the account's replay-safe hash of the EIP-191 hash of `message`.\",\"purpose\":\"message\",\"threshold\":1}]},\"termsHash\":\"sha256:f1299e35909fb2183de537da00b94fac8984e126862fcf06443da95cad019823\",\"v\":2,\"vault\":\"qed-b1a3c3f33facc4c2f0f63315\"}",
+      "sha256": "7be1b7d26351a90ed39eb0b7337fa20148a9aed5baf216ddab50ed85d9655d74"
+     },
+     "approval": {
+      "id": "apr_1m823htb9yb6jb2ba9b",
+      "docHash": "7be1b7d26351a90ed39eb0b7337fa20148a9aed5baf216ddab50ed85d9655d74"
+     },
+     "signatures": [
+      {
+       "type": "webauthn-es256",
+       "credential": "sha256:ba3e92bddda1fda0",
+       "publicKey": {
+        "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+        "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+       },
+       "challenge": "0x77a27f2d670d8e7383cd23ded39dea0f1520ee8ca8bcee8d53bb2a700dde6e57",
+       "challengeIs": "owner-account digest terms.toSign[0]",
+       "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000004",
+       "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"d6J_LWcNjnODzSPe053qDxUg7oyovO6NU7sqcA3eblc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+       "signature": "0x3044022046e03d0943cfa0f9db5778aa599cb2699e1e2df96947aa2a7c52b526d714661102204a7f57a3e4101a0d3bae9850aa67344764f7814087bc747174cc5b1c2547edb5",
+       "rpId": "localhost"
+      }
+     ],
+     "attestation": {
+      "aaguid": "00000000-0000-0000-0000-000000000000",
+      "attested": false
+     },
+     "terms": {
+      "actions": [],
+      "chainId": 31337,
+      "enforcement": "cosigner",
+      "genesisId": "0b851d93-3186-4e91-a67e-2eeb2f8f6f46",
+      "kind": "policy",
+      "message": "QED treasury policy\nvault: 0xF12460c7EfA439E25c32daEf3fd67e29ED34e547\nreserve: 0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602\nkeep free in reserve at least: 10000000 of 0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75\nconvert from: 0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99\ntranche: 20000 to 200000\nmax impact bps: 150\nvalid until: 1797959168\nnonce: rail-policy-0b851d93-1",
+      "needSlackBps": null,
+      "policy": {
+       "maxImpactBps": 150,
+       "maxTranche": "200000",
+       "minTranche": "20000",
+       "nonce": "rail-policy-0b851d93-1",
+       "reserve": "0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602",
+       "targetFree": "10000000",
+       "tokenIn": "0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99",
+       "tokenOut": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75",
+       "validUntil": "1797959168",
+       "vault": "0xF12460c7EfA439E25c32daEf3fd67e29ED34e547"
+      },
+      "sequence": 1,
+      "supersedes": null,
+      "toSign": [
+       {
+        "account": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+        "chainId": 31337,
+        "digest": "0x77a27f2d670d8e7383cd23ded39dea0f1520ee8ca8bcee8d53bb2a700dde6e57",
+        "hash": "0xe1e0167c9d97b45b36ac7ec11ef5a0c744029ea54e2a6b536b5dc43f40731b52",
+        "kind": "erc1271",
+        "note": "The passkey signs the account's replay-safe hash of the EIP-191 hash of `message`.",
+        "purpose": "message",
+        "threshold": 1
+       }
+      ]
+     },
+     "termsHash": "sha256:f1299e35909fb2183de537da00b94fac8984e126862fcf06443da95cad019823",
+     "digests": [
+      {
+       "kind": "erc1271",
+       "digest": "0x77a27f2d670d8e7383cd23ded39dea0f1520ee8ca8bcee8d53bb2a700dde6e57",
+       "purpose": "message",
+       "threshold": 1
+      }
+     ],
+     "decisionRecord": {
+      "n": 5,
+      "at": "2026-11-22T17:06:08.403Z",
+      "kind": "owner-policy",
+      "jobId": "338d1a41-96f1-4d3c-b46b-e944513e3f8d",
+      "verdict": "SIGNED",
+      "clock": {
+       "wallTime": "2026-11-22T17:06:08.403Z",
+       "wallSeconds": 1795367168,
+       "chainSeconds": 1795367151,
+       "skewSeconds": 17,
+       "limitSeconds": 5,
+       "withinLimit": true
+      },
+      "approval": {
+       "approvalId": "apr_1m823htb9yb6jb2ba9b",
+       "docHash": "sha256:7be1b7d26351a90ed39eb0b7337fa20148a9aed5baf216ddab50ed85d9655d74",
+       "termsHash": "sha256:f1299e35909fb2183de537da00b94fac8984e126862fcf06443da95cad019823",
+       "confirmedAt": "2026-11-22T17:06:08.383Z",
+       "method": "passkey",
+       "signatures": [
+        {
+         "assertions": [
+          {
+           "publicKey": {
+            "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+            "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+           },
+           "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000004",
+           "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"d6J_LWcNjnODzSPe053qDxUg7oyovO6NU7sqcA3eblc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+           "signature": "0x3044022046e03d0943cfa0f9db5778aa599cb2699e1e2df96947aa2a7c52b526d714661102204a7f57a3e4101a0d3bae9850aa67344764f7814087bc747174cc5b1c2547edb5"
+          }
+         ]
+        }
+       ]
+      },
+      "termsHash": "sha256:f1299e35909fb2183de537da00b94fac8984e126862fcf06443da95cad019823",
+      "record": {
+       "enforcement": "cosigner",
+       "needSlackBps": null,
+       "policy": {
+        "maxImpactBps": 150,
+        "maxTranche": "200000",
+        "minTranche": "20000",
+        "nonce": "rail-policy-0b851d93-1",
+        "reserve": "0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602",
+        "targetFree": "10000000",
+        "tokenIn": "0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99",
+        "tokenOut": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75",
+        "validUntil": "1797959168",
+        "vault": "0xF12460c7EfA439E25c32daEf3fd67e29ED34e547"
+       },
+       "sequence": 1,
+       "supersedes": null
+      },
+      "evidenceHash": null,
+      "prevHash": "147ed8511a7dc705ed5dbb6dd74670f357c8ee5a8e28159fa394fc32879f41e7",
+      "hash": "a41d80cd5b043ef87a4a9b607b91336fea8b0bc8f848c162b37c4308c3b8bc6e"
+     }
+    },
+    {
+     "kind": "owner-approval",
+     "id": "policy-revoke 4e709ba2…",
+     "signedAt": "2026-11-22T17:10:06.460Z",
+     "summary": "End the standing policy (target 10.00 tUSD). The co-signer refuses it from then on.",
+     "allowedWhenPrepared": true,
+     "checksWhenPrepared": [],
+     "document": {
+      "text": "{\"action\":\"policy-revoke\",\"kind\":\"vault-proposal\",\"network\":\"Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts\",\"note\":\"Your passkey signs the digests listed under \\\"sign\\\", one prompt for each, and nothing else. Each commits to exactly these terms on the chain; the chain checks the signature against your vault's owner account before anything runs, and the vault service only relays. The tokens are valueless test tokens on a local test chain.\",\"proposalId\":\"4e709ba2-5fd4-4e81-a92c-9d43be36e54b\",\"sign\":[{\"digest\":\"0x2d637880287f408788f8d8459ab7de4b34e21f22f81671041c03593d8354b963\",\"item\":0,\"kind\":\"erc1271\",\"purpose\":\"message\",\"signers\":1}],\"summary\":\"End the standing policy (target 10.00 tUSD). The co-signer refuses it from then on.\",\"terms\":{\"actions\":[],\"chainId\":31337,\"genesisId\":\"0b851d93-3186-4e91-a67e-2eeb2f8f6f46\",\"kind\":\"policy-revoke\",\"message\":\"QED treasury policy revocation\\nvault: 0xF12460c7EfA439E25c32daEf3fd67e29ED34e547\\nrevoke every policy through sequence: 1\",\"nonce\":\"rail-policy-0b851d93-1\",\"policyId\":1,\"sequence\":1,\"toSign\":[{\"account\":\"0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA\",\"chainId\":31337,\"digest\":\"0x2d637880287f408788f8d8459ab7de4b34e21f22f81671041c03593d8354b963\",\"hash\":\"0xe7ee58fe57fb47af7768ebe07022d82f344c724474971cd867394086e0535c31\",\"kind\":\"erc1271\",\"note\":\"The passkey signs the account's replay-safe hash of the EIP-191 hash of `message`.\",\"purpose\":\"message\",\"threshold\":1}]},\"termsHash\":\"sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda\",\"v\":2,\"vault\":\"qed-b1a3c3f33facc4c2f0f63315\"}",
+      "sha256": "7b74427f723e83883cb68780d098cc331e33bfb97f8ae4f8989cd1a7fddd9f30"
+     },
+     "approval": {
+      "id": "apr_1m823s2vgy2nnzgyq3x",
+      "docHash": "7b74427f723e83883cb68780d098cc331e33bfb97f8ae4f8989cd1a7fddd9f30"
+     },
+     "signatures": [
+      {
+       "type": "webauthn-es256",
+       "credential": "sha256:ba3e92bddda1fda0",
+       "publicKey": {
+        "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+        "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+       },
+       "challenge": "0x2d637880287f408788f8d8459ab7de4b34e21f22f81671041c03593d8354b963",
+       "challengeIs": "owner-account digest terms.toSign[0]",
+       "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763050000000e",
+       "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"LWN4gCh_QIeI-NhFmrfeSzTiHyL4FnEEHANZPYNUuWM\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+       "signature": "0x3046022100cbb8f9a9158e0c5c9b6b4e1c5fe5ea8a902ab2aad857ce80fcce0e6a9a77e3f40221009061b4dc0aae00005be80be317f179d1e8d8992261db958f994a535e22f3d404",
+       "rpId": "localhost"
+      }
+     ],
+     "attestation": {
+      "aaguid": "00000000-0000-0000-0000-000000000000",
+      "attested": false
+     },
+     "terms": {
+      "actions": [],
+      "chainId": 31337,
+      "genesisId": "0b851d93-3186-4e91-a67e-2eeb2f8f6f46",
+      "kind": "policy-revoke",
+      "message": "QED treasury policy revocation\nvault: 0xF12460c7EfA439E25c32daEf3fd67e29ED34e547\nrevoke every policy through sequence: 1",
+      "nonce": "rail-policy-0b851d93-1",
+      "policyId": 1,
+      "sequence": 1,
+      "toSign": [
+       {
+        "account": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+        "chainId": 31337,
+        "digest": "0x2d637880287f408788f8d8459ab7de4b34e21f22f81671041c03593d8354b963",
+        "hash": "0xe7ee58fe57fb47af7768ebe07022d82f344c724474971cd867394086e0535c31",
+        "kind": "erc1271",
+        "note": "The passkey signs the account's replay-safe hash of the EIP-191 hash of `message`.",
+        "purpose": "message",
+        "threshold": 1
+       }
+      ]
+     },
+     "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+     "digests": [
+      {
+       "kind": "erc1271",
+       "digest": "0x2d637880287f408788f8d8459ab7de4b34e21f22f81671041c03593d8354b963",
+       "purpose": "message",
+       "threshold": 1
+      }
+     ],
+     "decisionRecord": {
+      "n": 19,
+      "at": "2026-11-22T17:10:06.477Z",
+      "kind": "owner-policy-revoke",
+      "jobId": "4e44f210-c66b-4a20-a55c-f78a903f941a",
+      "verdict": "SIGNED",
+      "clock": {
+       "wallTime": "2026-11-22T17:10:06.477Z",
+       "wallSeconds": 1795367406,
+       "chainSeconds": 1795367405,
+       "skewSeconds": 1,
+       "limitSeconds": 5,
+       "withinLimit": true
+      },
+      "approval": {
+       "approvalId": "apr_1m823s2vgy2nnzgyq3x",
+       "docHash": "sha256:7b74427f723e83883cb68780d098cc331e33bfb97f8ae4f8989cd1a7fddd9f30",
+       "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+       "confirmedAt": "2026-11-22T17:10:06.460Z",
+       "method": "passkey",
+       "signatures": [
+        {
+         "assertions": [
+          {
+           "publicKey": {
+            "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+            "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+           },
+           "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763050000000e",
+           "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"LWN4gCh_QIeI-NhFmrfeSzTiHyL4FnEEHANZPYNUuWM\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+           "signature": "0x3046022100cbb8f9a9158e0c5c9b6b4e1c5fe5ea8a902ab2aad857ce80fcce0e6a9a77e3f40221009061b4dc0aae00005be80be317f179d1e8d8992261db958f994a535e22f3d404"
+          }
+         ]
+        }
+       ]
+      },
+      "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+      "record": {
+       "nonce": "rail-policy-0b851d93-1",
+       "revokedThrough": 1
+      },
+      "evidenceHash": null,
+      "prevHash": "7f602d09443c0532c0382baaeaaea3916ebe9d96bb9ff8f3ec3ef954adfb57cb",
+      "hash": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710"
+     }
+    }
+   ],
+   "venues": [
+    {
+     "index": null,
+     "address": "0xd842BeEa84a0479b3F936243Fb0Dfc0F75a9d870",
+     "name": "tINR/tUSD · 0.30% · deep"
+    },
+    {
+     "index": null,
+     "address": "0x1D9dD4A61ac605Cf4057AaDa80893e77f6978007",
+     "name": "tINR/tUSD · 0.05% · thin"
+    },
+    {
+     "index": null,
+     "address": "0x3B5FefeA35321B85Cb7968518a253e7230372857",
+     "name": "tINR/tEUR · 0.30%"
+    },
+    {
+     "index": null,
+     "address": "0x2ccE6552E2Fc164395E4D2815249dD19fc1C7a2B",
+     "name": "tUSD/tEUR · 0.30% · deep (the release's pool)"
+    },
+    {
+     "index": null,
+     "address": "0x5BBCbdeba246aAa062b4DE76505bc7fD411d6096",
+     "name": "tINR/tUSD · 1.00% · off-market"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 5,
+     "at": "2026-11-22T17:06:08.403Z",
+     "kind": "owner-policy",
+     "jobId": "338d1a41-96f1-4d3c-b46b-e944513e3f8d",
+     "verdict": "SIGNED",
+     "clock": {
+      "wallTime": "2026-11-22T17:06:08.403Z",
+      "wallSeconds": 1795367168,
+      "chainSeconds": 1795367151,
+      "skewSeconds": 17,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m823htb9yb6jb2ba9b",
+      "docHash": "sha256:7be1b7d26351a90ed39eb0b7337fa20148a9aed5baf216ddab50ed85d9655d74",
+      "termsHash": "sha256:f1299e35909fb2183de537da00b94fac8984e126862fcf06443da95cad019823",
+      "confirmedAt": "2026-11-22T17:06:08.383Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+           "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000004",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"d6J_LWcNjnODzSPe053qDxUg7oyovO6NU7sqcA3eblc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x3044022046e03d0943cfa0f9db5778aa599cb2699e1e2df96947aa2a7c52b526d714661102204a7f57a3e4101a0d3bae9850aa67344764f7814087bc747174cc5b1c2547edb5"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:f1299e35909fb2183de537da00b94fac8984e126862fcf06443da95cad019823",
+     "record": {
+      "enforcement": "cosigner",
+      "needSlackBps": null,
+      "policy": {
+       "maxImpactBps": 150,
+       "maxTranche": "200000",
+       "minTranche": "20000",
+       "nonce": "rail-policy-0b851d93-1",
+       "reserve": "0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602",
+       "targetFree": "10000000",
+       "tokenIn": "0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99",
+       "tokenOut": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75",
+       "validUntil": "1797959168",
+       "vault": "0xF12460c7EfA439E25c32daEf3fd67e29ED34e547"
+      },
+      "sequence": 1,
+      "supersedes": null
+     },
+     "evidenceHash": null,
+     "prevHash": "147ed8511a7dc705ed5dbb6dd74670f357c8ee5a8e28159fa394fc32879f41e7",
+     "hash": "a41d80cd5b043ef87a4a9b607b91336fea8b0bc8f848c162b37c4308c3b8bc6e"
+    },
+    {
+     "n": 19,
+     "at": "2026-11-22T17:10:06.477Z",
+     "kind": "owner-policy-revoke",
+     "jobId": "4e44f210-c66b-4a20-a55c-f78a903f941a",
+     "verdict": "SIGNED",
+     "clock": {
+      "wallTime": "2026-11-22T17:10:06.477Z",
+      "wallSeconds": 1795367406,
+      "chainSeconds": 1795367405,
+      "skewSeconds": 1,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m823s2vgy2nnzgyq3x",
+      "docHash": "sha256:7b74427f723e83883cb68780d098cc331e33bfb97f8ae4f8989cd1a7fddd9f30",
+      "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+      "confirmedAt": "2026-11-22T17:10:06.460Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+           "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763050000000e",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"LWN4gCh_QIeI-NhFmrfeSzTiHyL4FnEEHANZPYNUuWM\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x3046022100cbb8f9a9158e0c5c9b6b4e1c5fe5ea8a902ab2aad857ce80fcce0e6a9a77e3f40221009061b4dc0aae00005be80be317f179d1e8d8992261db958f994a535e22f3d404"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+     "record": {
+      "nonce": "rail-policy-0b851d93-1",
+      "revokedThrough": 1
+     },
+     "evidenceHash": null,
+     "prevHash": "7f602d09443c0532c0382baaeaaea3916ebe9d96bb9ff8f3ec3ef954adfb57cb",
+     "hash": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710"
+    }
+   ]
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": false,
+   "isModel": false,
+   "label": "none",
+   "statement": "No model took part: the owner asked for this, and the vault service's own code decided it.",
+   "decidedBy": "the vault service",
+   "information": [],
+   "constraints": []
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "allowed",
+   "statement": "Each step as the vault service recorded it, with the co-signer's own checks from its hash-chained decision record.",
+   "checks": [
+    {
+     "by": "vault service",
+     "name": "owner",
+     "pass": true,
+     "detail": "Approval apr_1m823s2vgy2nnzgyq3x binds the revocation. The co-signer verified the owner's signature and refuses every policy through sequence 1.",
+     "source": {
+      "step": 0
+     }
+    }
+   ],
+   "steps": [
+    {
+     "seq": 0,
+     "key": "owner",
+     "label": "Owner ends the standing policy",
+     "status": "ok",
+     "detail": "Approval apr_1m823s2vgy2nnzgyq3x binds the revocation. The co-signer verified the owner's signature and refuses every policy through sequence 1.",
+     "data": {
+      "revokedThrough": 1
+     },
+     "at": "2026-11-22T17:10:06.478Z"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 19,
+     "at": "2026-11-22T17:10:06.477Z",
+     "kind": "owner-policy-revoke",
+     "jobId": "4e44f210-c66b-4a20-a55c-f78a903f941a",
+     "verdict": "SIGNED",
+     "clock": {
+      "wallTime": "2026-11-22T17:10:06.477Z",
+      "wallSeconds": 1795367406,
+      "chainSeconds": 1795367405,
+      "skewSeconds": 1,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m823s2vgy2nnzgyq3x",
+      "docHash": "sha256:7b74427f723e83883cb68780d098cc331e33bfb97f8ae4f8989cd1a7fddd9f30",
+      "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+      "confirmedAt": "2026-11-22T17:10:06.460Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+           "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763050000000e",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"LWN4gCh_QIeI-NhFmrfeSzTiHyL4FnEEHANZPYNUuWM\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x3046022100cbb8f9a9158e0c5c9b6b4e1c5fe5ea8a902ab2aad857ce80fcce0e6a9a77e3f40221009061b4dc0aae00005be80be317f179d1e8d8992261db958f994a535e22f3d404"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:93095706679aa08fcfbc6a69d256746c56fe5c17bdcd4a7acc2b4e2d4311acda",
+     "record": {
+      "nonce": "rail-policy-0b851d93-1",
+      "revokedThrough": 1
+     },
+     "evidenceHash": null,
+     "prevHash": "7f602d09443c0532c0382baaeaaea3916ebe9d96bb9ff8f3ec3ef954adfb57cb",
+     "hash": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710"
+    }
+   ]
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": true,
+   "ranUnder": [
+    {
+     "kind": "standing-policy",
+     "id": "rail-policy-0b851d93-1",
+     "signedAt": "2026-11-22T17:06:08.403Z"
+    }
+   ],
+   "requestedBy": {
+    "who": "the owner, with a fresh passkey signature over these exact terms",
+    "evidence": "proposal 4e709ba2-5fd4-4e81-a92c-9d43be36e54b; approval apr_1m823s2vgy2nnzgyq3x",
+    "at": "2026-11-22T17:10:06.465Z"
+   },
+   "signaturesUsed": [
+    {
+     "approvalId": "apr_1m823htb9yb6jb2ba9b",
+     "when": "2026-11-22T17:06:08.403Z",
+     "what": "standing-policy"
+    },
+    {
+     "approvalId": "apr_1m823s2vgy2nnzgyq3x",
+     "when": "2026-11-22T17:10:06.460Z",
+     "what": "owner-approval"
+    }
+   ],
+   "statement": "This needed the owner's fresh passkey signature over its exact terms."
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": true,
+   "moved": [],
+   "balances": [],
+   "executions": null,
+   "authorityBudget": {
+    "rule": "d7",
+    "asset": {
+     "symbol": "tINR",
+     "decimals": 2
+    },
+    "base": "1000",
+    "grants": "2000",
+    "granted": "3000",
+    "earned": "0",
+    "used": "1103",
+    "usedBy": {
+     "payments": "807",
+     "conversions": "296",
+     "promisesPaid": "0"
+    },
+    "held": "0",
+    "reserved": "0",
+    "budget": "1897",
+    "available": "1897",
+    "rate": "1/2",
+    "confirmations": 2,
+    "pendingCredits": 0,
+    "notEarnings": 0,
+    "references": [
+     {
+      "symbol": "tUSD",
+      "lo": "83.58",
+      "mid": "84",
+      "hi": "84.42",
+      "divergenceBps": 0,
+      "source": "fixed in configuration: the test market's genesis rate, tINR/tUSD · 0.30% · deep at 84.00 tINR per tUSD, ± 0.5%; no trade moves it"
+     }
+    ],
+    "statement": "18.97 tINR available = granted 30.00 (base 10.00, owner grants 20.00) + earned 0.00 − used 11.03 (payments 8.07, conversion costs 2.96, promises paid 0.00) − promised and not yet paid 0.00 − reserved for certificates not yet used 0.00",
+    "limits": [
+     "Earned means paid for, through the escrow, by a client this workspace does not know to be its own: a client the wallet has never seen cannot be told apart from an unregistered address of a member (D7 assumption A-ID; a second workspace counts as the workspace's own only when it shares a member's passkey).",
+     "Conversions count only their cost against a fixed reference band, so the mandate's own limits on amounts per payment, per period and over its life are what bound how much can be converted."
+    ],
+    "note": "The co-signer's authority budget (D7), as it stands when the case is assembled."
+   },
+   "consequence": "Owner ended the standing policy; the agent no longer converts on its own",
+   "guidance": null,
+   "units": "Amounts are integers in the token's smallest unit: tINR has 2 decimals, tUSD 6."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "97eae284effe86bcca5cb1f5d754d5783f09a544",
+    "uncommittedChanges": true,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "local-chain",
+    "network": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts"
+   },
+   "chain": {
+    "chainId": 31337,
+    "name": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts",
+    "rpc": "127.0.0.1 (loopback only)",
+    "genesisId": "0b851d93-3186-4e91-a67e-2eeb2f8f6f46",
+    "versions": {
+     "node": "v26.12.0",
+     "anvil": "anvil Version: 1.7.1",
+     "release": "qed-20261023-health-gate-v3"
+    }
+   },
+   "contracts": {
+    "ownerAccount": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+    "vault": "0xF12460c7EfA439E25c32daEf3fd67e29ED34e547",
+    "reserve": "0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602",
+    "execution": "0xB63bD6347352F578f362ea7d8431A2F46d15Fb28",
+    "treasuryPolicy": "0x4Ebf4D77AEc92eb1529aedE6f20f63e7bAFa9Ec6",
+    "lens": "0xaf8F956792Df84C4fB86B04b076984e98c720993",
+    "tUSD": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75",
+    "tEUR": "0xcBd23E56ffce572ec83d7673eBCE876Df45aBF89",
+    "tETH": "0x27Fb7fe90c52289B5A69307390Ff53b42d949E62",
+    "pools": [
+     "0xd842BeEa84a0479b3F936243Fb0Dfc0F75a9d870",
+     "0x1D9dD4A61ac605Cf4057AaDa80893e77f6978007",
+     "0x3B5FefeA35321B85Cb7968518a253e7230372857",
+     "0x2ccE6552E2Fc164395E4D2815249dD19fc1C7a2B",
+     "0x5BBCbdeba246aAa062b4DE76505bc7fD411d6096"
+    ],
+    "asset": "0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99",
+    "reserveAsset": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75"
+   },
+   "roles": {
+    "owner": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+    "ownerCustody": "passkey owner account (QEDOwnerAccount): its signers are the members' passkeys; the service holds no key that can satisfy it and only relays",
+    "operator": "0x9740aD10271efDda0C83b5BD8f8EFe0AB4206e4A",
+    "cosigner": "0x1F5E91128AA34dF55c43E3C1D32C4992A5f401ed",
+    "guardian": "0xDCFd1BFB7988741AE97F279b613Df604dC3cDcd9",
+    "attacker": null,
+    "creditor": "0xbFD975f1d141D7dfBC07A8970DF9e64B0d77EE26",
+    "cosignerIsolation": "separate-process"
+   },
+   "keys": {
+    "agent": "0x9740aD10271efDda0C83b5BD8f8EFe0AB4206e4A",
+    "guardian": "0xDCFd1BFB7988741AE97F279b613Df604dC3cDcd9",
+    "relayer": "0xefFc074CFb8a817901118Db396e64DF094d197de",
+    "derivation": "HKDF-SHA256 from this installation's master secret (mode 600); none of them is a signer of the owner account"
+   },
+   "ownerAccount": {
+    "address": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+    "kind": "passkey-account",
+    "threshold": 1,
+    "signers": [
+     {
+      "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+      "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88",
+      "role": "member"
+     }
+    ],
+    "build": {
+     "sha256": "84566df15d0c3965fcd83672ab8522b76bdb44f281f2a77e60137c058523a5bd",
+     "solc": "0.8.38+commit.1835d247",
+     "declaredReady": true,
+     "label": "declared ready by chain/accounts/READY.json"
+    }
+   },
+   "transactions": [],
+   "ids": {
+    "job": "4e44f210-c66b-4a20-a55c-f78a903f941a",
+    "kind": "policy-revoke",
+    "proposal": "4e709ba2-5fd4-4e81-a92c-9d43be36e54b",
+    "vaultWorkspace": "qed-b1a3c3f33facc4c2f0f63315",
+    "tick": null
+   },
+   "decisionChain": {
+    "ok": true,
+    "records": 19,
+    "brokenAt": null,
+    "head": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710",
+    "note": "The vault service re-hashed its whole decision chain when the case was assembled."
+   }
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [],
+   "probes": [],
+   "note": "Recorded: other jobs of the same kind. Probes: the vault's own limit check now."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [],
+   "related": [
+    {
+     "caseId": "vault.bbcb2d9b-a3f4-4b33-b6a2-8abe71bb6c80",
+     "at": "2026-11-22T17:10:07.012Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "failed",
+       "detail": "No standing policy yet: the owner must sign one first."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.100a5fce-0255-4171-bb4c-30d62dff2e56",
+     "at": "2026-11-22T17:10:05.970Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "decide waited",
+       "detail": "Short 4.052955 tUSD but waiting: the market is too thin: any tranche ≥ 20000 would pay more than 150 bps."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+     "at": "2026-11-22T17:10:05.104Z",
+     "what": "attack",
+     "failed": [
+      {
+       "name": "receipt reverted",
+       "detail": "Status reverted in block 35 of the ephemeral chain (455,500 gas paid by the attacker). Defence: Weak duality: any price vector is a valid upper bound. Nothing moved: every balance and the spending window are unchanged."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0x68ef8b346a… reverted on a throwaway chain"
+    },
+    {
+     "caseId": "vault.54d7cbfe-f51a-4387-9b21-b066ef57a498",
+     "at": "2026-11-22T17:10:04.366Z",
+     "what": "withdraw",
+     "failed": [
+      {
+       "name": "refused",
+       "detail": "Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,491.93 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation with both figures. Nothing was sent."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.345707f7-04b5-4ce2-8e25-ec4ffe1afd76",
+     "at": "2026-11-22T17:10:03.828Z",
+     "what": "convert",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "Per-conversion limit in the owner's signed mandate: 300.00 > 250.00 tINR; Left in the mandate's current period: 300.00 > 91.93 tINR. The AI cannot raise a limit; only the owner can sign a new mandate."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.0d8fa413-6b28-444d-8a6b-12a5a55565bd",
+     "at": "2026-11-22T17:10:03.329Z",
+     "what": "policy-run",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "250.00 tINR breaks: Left in the mandate's current period. The agent cannot raise a limit."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0xc9746a0efb… success"
+    },
+    {
+     "caseId": "vault.00caeefc-5bda-45e8-a9c1-f09657fa8ff7",
+     "at": "2026-11-22T17:10:02.273Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "cosigner refused",
+       "detail": "Refused: C12 not met: Authority budget (R7 D7): this conversion's cost against the reference fits in what the owner granted and the workspace earned: 250.00 tINR into tUSD for 0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602, an account of the workspace, uses only its cost against the reference: what is g"
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.00caeefc-5bda-45e8-a9c1-f09657fa8ff7",
+     "at": "2026-11-22T17:10:02.253Z",
+     "what": "cosigner-policy-trade",
+     "failed": [
+      {
+       "name": "REFUSED",
+       "detail": "{\"block\":{\"number\":\"61\",\"timestamp\":1795367402},\"chainId\":31337,\"checks\":[{\"detail\":\"ERC-1271 owner account 0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA answered 0x1626ba7e\",\"id\":\"C1\",\"name\":\"Mandate signed by the vault owner\",\"pass\":true},{\"detail\":\"epoch 0\",\"id\":\"C2\",\"name\":\"Mandate active and curre"
+      }
+     ],
+     "executed": false,
+     "proof": "decision record #11"
+    }
+   ]
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "54e4700388159d3924902a302f6bfcc32d83403cf57dab5f30714e7cdd86000c",
+   "server": {
+    "ok": true,
+    "count": 3,
+    "brokenAt": null,
+    "head": "09a17c7f2840d9690e2c49d3e2d19c6cdc4bdf5cdfc80621246711245a1a5a8b",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled"
+  },
+  "vaultDecisions": {
+   "server": {
+    "ok": true,
+    "records": 19,
+    "brokenAt": null,
+    "head": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710"
+   },
+   "reHashedHere": 3
+  },
+  "note": "A vault job is recorded by the vault service, not in the wallet's receipt chain: its decision records are hash-chained there, and each one this case carries is re-hashed by the verifier. The wallet's receipt chain and ledger as a whole were verified too when the case was assembled."
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "The vault service's keys",
+   "how": "never held by this API; addresses only",
+   "why": "The agent, co-signer, guardian and relayer keys stay in the vault service."
+  }
+ ],
+ "cannotProve": [
+  "No model took part in this job: the owner asked for it directly, or the engine ran it under authority the owner wrote.",
+  "The transactions are on a local Anvil chain (chain id 31337) started for this installation, with valueless test tokens. Their hashes are not publicly verifiable; they can be re-read only from that chain while it runs (verify-evidence.ts --rpc).",
+  "The passkey's make is not attested (its AAGUID is all zeros): a signature proves possession of the key, not which device or software held it.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "44c68dd1b877cbbcf775fea4c61fea29da5632903b361f9511084b6ce81c8519",
+   "2": "dab73d16afb1a36a821590a67d18284a4dcd2f7e5c0ef0c3d2c79c730dfcc82a",
+   "3": "0c9fe55e3aa2dee0c189f4449f8e44f3b3e554bb78ed860c48b924d95eacac55",
+   "4": "6fe3d7b88b849f72fee4e8b83248479a3e72d59caf83b4ecf968cc155ee50a55",
+   "5": "a32bbdbdcfc1e445de93337da1a2376d1a40852351d88381bfa1870044e8cd7a",
+   "6": "aa984fa9fe8f0514a1ad0920f7458603ff9c5e89e770744c3a17a2e583146552",
+   "7": "3071d5e29fc05b873a3b9b9168fc8a49bd15d88d0c014ff8fcc939699af65c40",
+   "8": "6e2cae33d234cb093e143a74229aa1f7d6f49374c1843a186780b0b718a3e2d1"
+  },
+  "verification": "103020c7f03cf3c7a2c09f581fabe6defbb06fb54548e79859c24e6ac9155320",
+  "redactions": "1dde4be1ace84c813c6042e6a2d7bb38c062caaae268c2e7dd444caea666797f",
+  "cannotProve": "f8edec18b68663467d2f941b1d959f1d0d6eec60dbe826491817415e424f382d",
+  "root": "a53e6062ebc87d8798b36e524a4dc94cff6a2284b478661e1b8189a8782d91fd"
+ }
+}

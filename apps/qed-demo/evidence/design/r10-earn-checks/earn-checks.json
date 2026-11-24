@@ -1,0 +1,201 @@
+{
+ "what": "The Earn screen: axe, overflow, targets, focus walk, the submit sheet by keyboard",
+ "at": "2026-11-23T14:06:11.863Z",
+ "report": {
+  "@kiranc4ip9": {
+   "axe": [
+    {
+     "run": "light 1440",
+     "violations": []
+    },
+    {
+     "run": "light 390",
+     "violations": []
+    },
+    {
+     "run": "dark 1440",
+     "violations": []
+    },
+    {
+     "run": "dark 390",
+     "violations": []
+    }
+   ],
+   "overflow": [
+    {
+     "width": 320,
+     "over": 0
+    },
+    {
+     "width": 360,
+     "over": 0
+    },
+    {
+     "width": 375,
+     "over": 0
+    },
+    {
+     "width": 390,
+     "over": 0
+    },
+    {
+     "width": 640,
+     "over": 0
+    },
+    {
+     "width": 768,
+     "over": 0
+    },
+    {
+     "width": 1024,
+     "over": 0
+    },
+    {
+     "width": 1440,
+     "over": 0
+    }
+   ],
+   "smallTargets": [],
+   "focus": {
+    "stops": 1130,
+    "hiddenUnderABar": [],
+    "withoutAnOutline": []
+   },
+   "sheet": {
+    "opened": true,
+    "focusInsideOnOpen": true,
+    "tabStopsOutside": 0,
+    "closedByEscape": true,
+    "focusReturnedTo": "Submit the work"
+   }
+  },
+  "@ravic4ip9": {
+   "axe": [
+    {
+     "run": "light 1440",
+     "violations": []
+    },
+    {
+     "run": "light 390",
+     "violations": []
+    },
+    {
+     "run": "dark 1440",
+     "violations": []
+    },
+    {
+     "run": "dark 390",
+     "violations": []
+    }
+   ],
+   "overflow": [
+    {
+     "width": 320,
+     "over": 0
+    },
+    {
+     "width": 360,
+     "over": 0
+    },
+    {
+     "width": 375,
+     "over": 0
+    },
+    {
+     "width": 390,
+     "over": 0
+    },
+    {
+     "width": 640,
+     "over": 0
+    },
+    {
+     "width": 768,
+     "over": 0
+    },
+    {
+     "width": 1024,
+     "over": 0
+    },
+    {
+     "width": 1440,
+     "over": 0
+    }
+   ],
+   "smallTargets": [],
+   "focus": {
+    "stops": 855,
+    "hiddenUnderABar": [],
+    "withoutAnOutline": []
+   },
+   "sheet": "no \"Submit the work\" on this account"
+  },
+  "<repo>/apps/qed-demo/data/design-fixture.json": {
+   "axe": [
+    {
+     "run": "light 1440",
+     "violations": []
+    },
+    {
+     "run": "light 390",
+     "violations": []
+    },
+    {
+     "run": "dark 1440",
+     "violations": []
+    },
+    {
+     "run": "dark 390",
+     "violations": []
+    }
+   ],
+   "overflow": [
+    {
+     "width": 320,
+     "over": 0
+    },
+    {
+     "width": 360,
+     "over": 0
+    },
+    {
+     "width": 375,
+     "over": 0
+    },
+    {
+     "width": 390,
+     "over": 0
+    },
+    {
+     "width": 640,
+     "over": 0
+    },
+    {
+     "width": 768,
+     "over": 0
+    },
+    {
+     "width": 1024,
+     "over": 0
+    },
+    {
+     "width": 1440,
+     "over": 0
+    }
+   ],
+   "smallTargets": [],
+   "focus": {
+    "stops": 780,
+    "hiddenUnderABar": [],
+    "withoutAnOutline": []
+   },
+   "sheet": {
+    "opened": true,
+    "focusInsideOnOpen": true,
+    "tabStopsOutside": 0,
+    "closedByEscape": true,
+    "focusReturnedTo": "Submit the work"
+   }
+  }
+ }
+}

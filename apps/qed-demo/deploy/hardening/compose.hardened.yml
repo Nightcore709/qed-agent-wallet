@@ -1,0 +1,49 @@
+# QED container, hardened, for any Docker or Compose host (docs/DEPLOY.md, "Runtime hardening"). Railway does not read this
+# file and exposes none of these controls in what its documentation shows (read 24 Nov 2026): this is the form to use on a
+# host where they exist. NOT VERIFIED: no container runtime was available when it was written; run the checks in
+# DEPLOY.md section 16 (H-13) the first time.
+#
+#   docker build -f apps/qed-demo/Dockerfile --build-arg QED_REVISION=$(git rev-parse HEAD) -t qed-demo .
+#   QED_PUBLIC_ORIGIN=https://qed.example.com docker compose -f apps/qed-demo/deploy/hardening/compose.hardened.yml up -d
+# QED_KEK comes from your environment or a secret store (never this file); `docker secret` or an env file with mode 600.
+name: qed
+services:
+  qed:
+    image: qed-demo
+    read_only: true                      # root filesystem read-only; the writable places are /data, /run/qed and /tmp below
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER, DAC_OVERRIDE, SETUID, SETGID]   # only entrypoint.sh (as root) hands /data to "node" and drops to it
+    security_opt: ["no-new-privileges:true"]
+    init: false                          # the image runs tini itself
+    pids_limit: 256
+    mem_limit: 1g                        # measured 373 to 429 MB resident on macOS (DEPLOY.md section 11): 2x headroom
+    memswap_limit: 1g
+    cpus: 1.0
+    ulimits: { nofile: { soft: 4096, hard: 4096 } }
+    stop_grace_period: 40s               # > QED_STOP_GRACE_MS (15 s) x the three services' stops
+    restart: on-failure:10
+    environment:
+      QED_PUBLIC_ORIGIN: ${QED_PUBLIC_ORIGIN:?set the public https origin}
+      QED_KEK: ${QED_KEK:?set the key-encryption key record}
+      QED_TRUST_PROXY_HOPS: "1"          # one reverse proxy in front (terminating TLS); 0 if none
+      QED_SESSION_IDLE_MINUTES: "60"
+      QED_SESSION_MAX_MINUTES: "1440"
+      QED_BACKUP_EVERY_MIN: "60"
+      QED_STOP_GRACE_MS: "15000"
+    volumes:
+      - qed-data:/data
+    tmpfs:
+      - /run/qed:mode=700,uid=1000,gid=1000,size=1m     # the key-encryption key's private file (never on the volume)
+      - /tmp:mode=1777,size=512m                        # the restore drill and sealing scratch
+    ports: ["127.0.0.1:8080:8080"]       # publish only to a reverse proxy on the same host
+    logging:                             # one JSON object per line; rotated so the log never fills the host's disk
+      driver: json-file
+      options: { max-size: "10m", max-file: "5" }
+    healthcheck:                         # the Dockerfile's HEALTHCHECK, restated so that it is visible here
+      test: ["CMD", "node", "/app/apps/qed-demo/scripts/deploy/healthcheck.ts"]
+      interval: 30s
+      timeout: 6s
+      start_period: 90s
+      retries: 3
+volumes:
+  qed-data: {}

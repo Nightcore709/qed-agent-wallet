@@ -1,0 +1,213 @@
+{
+ "base": "http://localhost:6601",
+ "at": "2026-11-23T14:09:00.554Z",
+ "routes": [
+  "/earn"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/earn 1440 light": {
+   "words": 1210,
+   "wordsFirst": 262,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    19,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 38,
+   "small24": 1,
+   "under32": 3,
+   "under44": 37,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "a \"Change it\" 56x26",
+    "a \"Receipt\" 59x26",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.104,
+   "inkFirst": 0.257,
+   "blankPage": 0.29,
+   "edgesFirst": 29,
+   "overflow": false,
+   "height": 3613,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 light": {
+   "words": 1230,
+   "wordsFirst": 174,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    19,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 2,
+   "under44": 27,
+   "smallest": "a \"Change it\" 56x26",
+   "smallList": [
+    "a \"Change it\" 56x26",
+    "a \"Receipt\" 59x26"
+   ],
+   "blankFirst": 0.094,
+   "inkFirst": 0.489,
+   "blankPage": 0.65,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 5404,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 1440 dark": {
+   "words": 1210,
+   "wordsFirst": 262,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    19,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 9,
+   "contrastMin": 6.04,
+   "contrastFails": 0,
+   "targets": 38,
+   "small24": 1,
+   "under32": 3,
+   "under44": 37,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "a \"Change it\" 56x26",
+    "a \"Receipt\" 59x26",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.104,
+   "inkFirst": 0.257,
+   "blankPage": 0.29,
+   "edgesFirst": 29,
+   "overflow": false,
+   "height": 3613,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 dark": {
+   "words": 1230,
+   "wordsFirst": 174,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    19,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 9,
+   "contrastMin": 6.04,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 2,
+   "under44": 27,
+   "smallest": "a \"Change it\" 56x26",
+   "smallList": [
+    "a \"Change it\" 56x26",
+    "a \"Receipt\" 59x26"
+   ],
+   "blankFirst": 0.094,
+   "inkFirst": 0.489,
+   "blankPage": 0.65,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 5404,
+   "axe": {},
+   "fault": false
+  }
+ }
+}

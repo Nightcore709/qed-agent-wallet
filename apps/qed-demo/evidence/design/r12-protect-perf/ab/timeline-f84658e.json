@@ -1,0 +1,506 @@
+[
+ {
+  "t": {
+   "head": 2150.5999999940395,
+   "figure": 2987.2999999821186,
+   "prOpen": 2150.5999999940395
+  },
+  "lt": [
+   [
+    1298,
+    63
+   ],
+   [
+    2987,
+    63
+   ]
+  ],
+  "loaf": [
+   {
+    "start": 184,
+    "dur": 974,
+    "render": 7,
+    "styleLayout": 7,
+    "scripts": []
+   },
+   {
+    "start": 1298,
+    "dur": 64,
+    "render": 0,
+    "styleLayout": 0,
+    "scripts": [
+     "index-CRwbQaYq.js:http://localhost:7301/assets/index-CRwbQaYq.js 61ms"
+    ]
+   },
+   {
+    "start": 2955,
+    "dur": 88,
+    "render": 56,
+    "styleLayout": 5,
+    "scripts": [
+     "index-CRwbQaYq.js:te 28ms",
+     ":FrameRequestCallback 46ms"
+    ]
+   }
+  ],
+  "nav": {
+   "ttfb": 151,
+   "end": 161,
+   "dcl": 1361,
+   "load": 1361
+  },
+  "res": [
+   {
+    "name": "/assets/index-CRwbQaYq.js",
+    "start": 182,
+    "reqStart": 185,
+    "ttfb": 335,
+    "end": 1294,
+    "xfer": 95271,
+    "enc": 94971,
+    "dec": 331603,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/utils-DBY-DLGZ.js",
+    "start": 182,
+    "reqStart": 185,
+    "ttfb": 336,
+    "end": 379,
+    "xfer": 1779,
+    "enc": 1479,
+    "dec": 3641,
+    "initiator": "other"
+   },
+   {
+    "name": "/assets/kit-BL48oRuo.js",
+    "start": 182,
+    "reqStart": 186,
+    "ttfb": 336,
+    "end": 754,
+    "xfer": 25101,
+    "enc": 24801,
+    "dec": 70129,
+    "initiator": "other"
+   },
+   {
+    "name": "/assets/index-ahP_GoBo.css",
+    "start": 183,
+    "reqStart": 186,
+    "ttfb": 336,
+    "end": 1143,
+    "xfer": 64296,
+    "enc": 63996,
+    "dec": 435695,
+    "initiator": "link"
+   },
+   {
+    "name": "/assets/Protect-CPxf2aj-.js",
+    "start": 1356,
+    "reqStart": 1356,
+    "ttfb": 1506,
+    "end": 1615,
+    "xfer": 11754,
+    "enc": 11454,
+    "dec": 39983,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/landmark-BiyHF-Wk.js",
+    "start": 1356,
+    "reqStart": 1357,
+    "ttfb": 1507,
+    "end": 1519,
+    "xfer": 577,
+    "enc": 277,
+    "dec": 459,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/sliders-horizontal-CPbXEhjg.js",
+    "start": 1356,
+    "reqStart": 1357,
+    "ttfb": 1507,
+    "end": 1534,
+    "xfer": 560,
+    "enc": 260,
+    "dec": 508,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/messages-square-D87RXcEe.js",
+    "start": 1356,
+    "reqStart": 1357,
+    "ttfb": 1507,
+    "end": 1540,
+    "xfer": 588,
+    "enc": 288,
+    "dec": 446,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/kinds-CbMwYqLS.js",
+    "start": 1356,
+    "reqStart": 1357,
+    "ttfb": 1507,
+    "end": 1563,
+    "xfer": 1148,
+    "enc": 848,
+    "dec": 1784,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/plus-C9Iz6E07.js",
+    "start": 1357,
+    "reqStart": 1357,
+    "ttfb": 1507,
+    "end": 1548,
+    "xfer": 480,
+    "enc": 180,
+    "dec": 223,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/words-vV3G4HXp.js",
+    "start": 1357,
+    "reqStart": 1535,
+    "ttfb": 1685,
+    "end": 1721,
+    "xfer": 1624,
+    "enc": 1324,
+    "dec": 2912,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/WalletInline-CdgBAf3c.js",
+    "start": 1357,
+    "reqStart": 1540,
+    "ttfb": 1690,
+    "end": 1804,
+    "xfer": 5192,
+    "enc": 4892,
+    "dec": 18269,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/flask-conical-1Eu5cceq.js",
+    "start": 1357,
+    "reqStart": 1563,
+    "ttfb": 1713,
+    "end": 1751,
+    "xfer": 564,
+    "enc": 264,
+    "dec": 381,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/shield-exclamation-point-D-oIa8F_.js",
+    "start": 1357,
+    "reqStart": 1615,
+    "ttfb": 1765,
+    "end": 1796,
+    "xfer": 614,
+    "enc": 314,
+    "dec": 480,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/Vault-B0FF-Z7c.js",
+    "start": 1357,
+    "reqStart": 1549,
+    "ttfb": 1699,
+    "end": 2118,
+    "xfer": 32964,
+    "enc": 32664,
+    "dec": 134859,
+    "initiator": "script"
+   },
+   {
+    "name": "/assets/inter-tight-latin-wght-normal-DX-nOvPD.woff2",
+    "start": 1383,
+    "reqStart": 1520,
+    "ttfb": 1670,
+    "end": 2193,
+    "xfer": 45172,
+    "enc": 44872,
+    "dec": 44872,
+    "initiator": "css"
+   },
+   {
+    "name": "/api/session",
+    "start": 1407,
+    "reqStart": 1721,
+    "ttfb": 1871,
+    "end": 1915,
+    "xfer": 1718,
+    "enc": 1418,
+    "dec": 1418,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/favicon.svg",
+    "start": 1411,
+    "reqStart": 1751,
+    "ttfb": 1901,
+    "end": 1932,
+    "xfer": 450,
+    "enc": 150,
+    "dec": 210,
+    "initiator": "other"
+   },
+   {
+    "name": "/api/engine",
+    "start": 1979,
+    "reqStart": 1979,
+    "ttfb": 2129,
+    "end": 2142,
+    "xfer": 430,
+    "enc": 130,
+    "dec": 130,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/programs",
+    "start": 1979,
+    "reqStart": 1979,
+    "ttfb": 2129,
+    "end": 2179,
+    "xfer": 2568,
+    "enc": 2268,
+    "dec": 7324,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/notify",
+    "start": 1979,
+    "reqStart": 1980,
+    "ttfb": 2130,
+    "end": 2156,
+    "xfer": 582,
+    "enc": 282,
+    "dec": 282,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/programs",
+    "start": 2148,
+    "reqStart": 2148,
+    "ttfb": 2298,
+    "end": 2336,
+    "xfer": 2568,
+    "enc": 2268,
+    "dec": 7324,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/liquidity",
+    "start": 2148,
+    "reqStart": 2148,
+    "ttfb": 2298,
+    "end": 2321,
+    "xfer": 1882,
+    "enc": 1582,
+    "dec": 6643,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/home",
+    "start": 2148,
+    "reqStart": 2156,
+    "ttfb": 2306,
+    "end": 2382,
+    "xfer": 5044,
+    "enc": 4744,
+    "dec": 16715,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/security",
+    "start": 2149,
+    "reqStart": 2179,
+    "ttfb": 2329,
+    "end": 2351,
+    "xfer": 1078,
+    "enc": 778,
+    "dec": 778,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/vault",
+    "start": 2149,
+    "reqStart": 2193,
+    "ttfb": 2343,
+    "end": 2395,
+    "xfer": 4901,
+    "enc": 4601,
+    "dec": 17834,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/payees",
+    "start": 2149,
+    "reqStart": 2321,
+    "ttfb": 2471,
+    "end": 2478,
+    "xfer": 746,
+    "enc": 446,
+    "dec": 446,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/engine",
+    "start": 2149,
+    "reqStart": 2336,
+    "ttfb": 2486,
+    "end": 2493,
+    "xfer": 430,
+    "enc": 130,
+    "dec": 130,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/vault/signers",
+    "start": 2398,
+    "reqStart": 2398,
+    "ttfb": 2548,
+    "end": 2553,
+    "xfer": 984,
+    "enc": 684,
+    "dec": 1260,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/programs",
+    "start": 2425,
+    "reqStart": 2426,
+    "ttfb": 2576,
+    "end": 2598,
+    "xfer": 2568,
+    "enc": 2268,
+    "dec": 7324,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/engine",
+    "start": 2425,
+    "reqStart": 2644,
+    "ttfb": 2794,
+    "end": 2800,
+    "xfer": 430,
+    "enc": 130,
+    "dec": 130,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/notify",
+    "start": 2426,
+    "reqStart": 2426,
+    "ttfb": 2576,
+    "end": 2591,
+    "xfer": 582,
+    "enc": 282,
+    "dec": 282,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/programs",
+    "start": 2426,
+    "reqStart": 2674,
+    "ttfb": 2824,
+    "end": 2838,
+    "xfer": 2568,
+    "enc": 2268,
+    "dec": 7324,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/liquidity",
+    "start": 2426,
+    "reqStart": 2478,
+    "ttfb": 2628,
+    "end": 2644,
+    "xfer": 1882,
+    "enc": 1582,
+    "dec": 6643,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/home",
+    "start": 2426,
+    "reqStart": 2494,
+    "ttfb": 2644,
+    "end": 2674,
+    "xfer": 5044,
+    "enc": 4744,
+    "dec": 16715,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/security",
+    "start": 2426,
+    "reqStart": 2553,
+    "ttfb": 2703,
+    "end": 2711,
+    "xfer": 1078,
+    "enc": 778,
+    "dec": 778,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/vault",
+    "start": 2426,
+    "reqStart": 2591,
+    "ttfb": 2741,
+    "end": 2779,
+    "xfer": 4902,
+    "enc": 4602,
+    "dec": 17834,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/payees",
+    "start": 2426,
+    "reqStart": 2598,
+    "ttfb": 2748,
+    "end": 2763,
+    "xfer": 746,
+    "enc": 446,
+    "dec": 446,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/api/engine",
+    "start": 2427,
+    "reqStart": 2800,
+    "ttfb": 2950,
+    "end": 2958,
+    "xfer": 430,
+    "enc": 130,
+    "dec": 130,
+    "initiator": "fetch"
+   },
+   {
+    "name": "/assets/inter-tight-latin-ext-wght-normal-B4u9PlvR.woff2",
+    "start": 3000,
+    "reqStart": 3051,
+    "ttfb": 3201,
+    "end": 3693,
+    "xfer": 90100,
+    "enc": 89800,
+    "dec": 89800,
+    "initiator": "css"
+   },
+   {
+    "name": "/api/vault",
+    "start": 3052,
+    "reqStart": 3052,
+    "ttfb": 3202,
+    "end": 3265,
+    "xfer": 4903,
+    "enc": 4603,
+    "dec": 17834,
+    "initiator": "fetch"
+   }
+  ]
+ }
+]

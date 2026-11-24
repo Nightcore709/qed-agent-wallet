@@ -1,0 +1,82 @@
+{
+ "/protect 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/security 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/workspace 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/readiness 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/protect 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/security 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/workspace 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/readiness 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/protect 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/security 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/workspace 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/readiness 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/protect 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/security 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/workspace 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/readiness 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/safeguards 390 dark": {
+  "errors": [],
+  "fault": false
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "width": 390,
+ "seconds": 20,
+ "at": "2026-11-22T18:17:53.672Z",
+ "report": [
+  {
+   "table": "table 0",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 52
+  },
+  {
+   "table": "Digital asset prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 6.9,
+   "distinctFigureTexts": 21
+  },
+  {
+   "table": "Fund NAVs; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 19
+  },
+  {
+   "table": "Reference prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 46
+  }
+ ]
+}

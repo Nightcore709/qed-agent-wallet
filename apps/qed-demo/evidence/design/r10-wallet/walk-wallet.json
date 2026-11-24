@@ -1,0 +1,14 @@
+{
+ "overflow": [],
+ "smallTargets": [],
+ "focusHidden": [],
+ "halfHidden": [],
+ "focusStops": 3708,
+ "sheet": {
+  "opensWithFocusInside": true,
+  "tabLeftTheSheet": false,
+  "name": "Approve: pause the wallet",
+  "escapeCloses": true,
+  "focusReturnedTo": "Pause the wallet"
+ }
+}

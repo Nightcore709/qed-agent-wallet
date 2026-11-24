@@ -1,0 +1,47 @@
+TAP version 13
+# Subtest: certificate for the private model satisfies every circuit constraint, with zero duality gap
+ok 1 - certificate for the private model satisfies every circuit constraint, with zero duality gap
+  ---
+  duration_ms: 0.613708
+  type: 'test'
+  ...
+# Subtest: fixed-point optimum matches the exact solver to 1e-12 per weight
+ok 2 - fixed-point optimum matches the exact solver to 1e-12 per weight
+  ---
+  duration_ms: 0.265917
+  type: 'test'
+  ...
+# Subtest: Groth16 proof verifies, and its public signals commit to the data, the portfolio and the provider
+ok 3 - Groth16 proof verifies, and its public signals commit to the data, the portfolio and the provider
+  ---
+  duration_ms: 1494.444792
+  type: 'test'
+  ...
+# Subtest: a tampered public signal fails verification
+ok 4 - a tampered public signal fails verification
+  ---
+  duration_ms: 668.231292
+  type: 'test'
+  ...
+# ERROR:  4 Error in template Num2Bits_8 line: 38
+# Error in template AbsAtMost_9 line: 52
+# Error in template PrivateMinVariance_233 line: 123
+# ERROR:  4 Error in template Num2Bits_8 line: 38
+# Error in template AbsAtMost_9 line: 52
+# Error in template PrivateMinVariance_233 line: 123
+# ERROR:  4 Error in template PrivateMinVariance_233 line: 160
+# Subtest: no proof exists for a lazy 1/N portfolio, a nudged optimum, or a different data set
+ok 5 - no proof exists for a lazy 1/N portfolio, a nudged optimum, or a different data set
+  ---
+  duration_ms: 167.087375
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3428.187958

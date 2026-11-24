@@ -1,0 +1,154 @@
+/* The judge's walk-through (Judge.tsx; Meridian, DESIGN.md M4): six steps on one lit line, the meridian, each a glass
+   panel that says what happened at it, what kind of evidence it is and what to do next; then the branches, the runs
+   recorded earlier and the historical record. Loaded with the screen, not with every page. Tokens only: every colour,
+   size, radius, space and duration is a role of tokens.css. */
+
+.jg { display: flex; flex-direction: column; gap: var(--s6); }
+.jg > * { min-width: 0; }
+.jg-head { margin-bottom: 0; align-items: flex-end; }
+.jg-head-text { min-width: 0; max-width: 780px; }
+.jg-head-text p { font-size: var(--t-body); line-height: 1.55; max-width: 70ch; }
+.jg-head-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.jg-problem { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.jg-loading { display: grid; gap: var(--s3); }
+.jg-skel { display: block; height: 96px; border-radius: var(--r-md); }
+.jg-label { font-size: var(--t-small); font-weight: 620; color: var(--ink-2); letter-spacing: var(--track-label); margin-bottom: var(--s3); }
+
+/* ------------------------------------------------------------------------------------------------ who decides, and the kinds */
+.jg-top { display: grid; gap: var(--s5); grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; }
+.jg-who { display: flex; flex-direction: column; gap: var(--s3); }
+.jg-who > p { color: var(--ink-2); line-height: 1.5; }
+.jg-who-word .stamp { height: 32px; font-size: var(--t-body); padding: 0 var(--s4); }
+.jg-who-list { display: grid; gap: var(--s2); padding: var(--s3) 0 0; margin: 0; list-style: none; border-top: 1px solid var(--rule); color: var(--ink-2); }
+.jg-who-list li { padding-left: var(--s4); position: relative; line-height: 1.45; }
+.jg-who-list li::before { content: ""; position: absolute; left: 0; top: .55em; width: 6px; height: 6px; border-radius: var(--r-pill); background: var(--qed); }
+.jg-kinds ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); margin: 0; padding: 0; list-style: none; }
+.jg-kind { display: grid; gap: var(--s2); align-content: start; opacity: .82; }
+.jg-kind.is-on { opacity: 1; border-color: var(--edge); }
+.jg-kind > p:first-child { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2); }
+.jg-kind > p.small { color: var(--ink-2); line-height: 1.45; }
+
+/* a kind of evidence, named in words; its outline differs by kind so it is never colour alone */
+.jg-tag { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: var(--r-pill); font-size: var(--t-small); font-weight: 620; white-space: nowrap; border: 1px solid var(--rim); color: var(--ink-2); background: color-mix(in oklab, var(--pane-2) 80%, transparent); }
+.jg-tag-now, .jg-tag-reproduced { color: var(--ink); background: var(--qed-bg); border-color: var(--qed-line); }
+/* QED's own hand is the tide dot; the word stays in ink (the tide on its own tint read 4.2:1 over the day atmosphere) */
+.jg-tag-now::before, .jg-tag-reproduced::before { content: ""; flex: none; width: 7px; height: 7px; margin-right: 6px; border-radius: var(--r-pill); background: var(--qed); }
+.jg-tag-simulated { border-style: dashed; border-color: var(--edge); }
+.jg-tag-replayed, .jg-tag-scripted { color: var(--due); background: var(--due-bg); border-color: color-mix(in oklab, var(--due) 30%, transparent); border-style: dotted; }
+.jg-tag-historical { border-color: var(--edge); background: transparent; }
+/* R13: a genuine model call (the four provenance words, shared/judge.ts PROVENANCE) */
+.jg-tag-genuine { color: var(--ink); border-color: var(--qed-line); background: transparent; }
+.jg-run-notes { margin: var(--s-2, 8px) 0 0; padding-left: 1.2em; }
+
+/* ------------------------------------------------------------------------------------------------ the six steps */
+.jg-flow { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s4); counter-reset: jg; }
+.jg-st { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: var(--s4); align-items: start; }
+/* the meridian: one lit line through the steps, solid where the journey has been, faint where it has not */
+.jg-st::before { content: ""; position: absolute; left: 23px; top: 48px; bottom: calc(-1 * var(--s4)); width: 2px; border-radius: 2px; background: var(--rule-2); }
+.jg-st:last-child::before { display: none; }
+.jg-st.is-done::before { background: linear-gradient(to bottom, var(--meridian), color-mix(in oklab, var(--meridian) 40%, transparent)); }
+.jg-node { position: relative; z-index: 1; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--r-pill); font-size: var(--t-lead); font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--ink-3); background: var(--pane-2); border: 1.5px solid var(--edge); box-shadow: var(--lift-1); }
+.jg-node svg { width: 20px; height: 20px; stroke-width: 2.6; }
+.jg-st.is-done .jg-node { color: var(--gain); border-color: color-mix(in oklab, var(--gain) 55%, transparent); background: color-mix(in oklab, var(--gain-bg) 70%, var(--pane-2)); }
+.jg-st.is-current .jg-node { color: var(--on-act); background: var(--act); border-color: var(--act); box-shadow: var(--shadow-btn); }
+.jg-st.is-stopped .jg-node { color: var(--loss); border-color: color-mix(in oklab, var(--loss) 60%, transparent); background: color-mix(in oklab, var(--loss-bg) 70%, var(--pane-2)); }
+.jg-st.is-todo .jg-card { opacity: .86; }
+.jg-st.is-current .jg-card { border-color: var(--edge); box-shadow: var(--lift-2); }
+@media (prefers-reduced-motion: no-preference) {
+  .jg-st.is-current .jg-node::after { content: ""; position: absolute; inset: -6px; border-radius: inherit; border: 2px solid var(--act); opacity: 0; animation: jg-call 2.4s var(--ease-out) infinite; }
+}
+@keyframes jg-call { 0% { opacity: .55; transform: scale(.9); } 70%, 100% { opacity: 0; transform: scale(1.18); } }
+
+.jg-card { display: flex; flex-direction: column; gap: var(--s4); }
+.jg-card-head { display: grid; gap: var(--s2); }
+.jg-step { font-size: var(--t-small); color: var(--ink-3); font-weight: 560; }
+.jg-card-head h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: var(--track-h); line-height: 1.2; }
+.jg-tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.jg-finding { font-size: var(--t-lead); line-height: 1.55; color: var(--ink); max-width: 76ch; }
+.jg-group { display: grid; gap: var(--s3); }
+.jg-group + .jg-group { padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.jg-group-h { font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.jg-checks { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
+.jg-checks li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: var(--s2); align-items: start; line-height: 1.45; }
+.jg-checks .mark { display: grid; place-items: center; width: 22px; height: 22px; border-radius: var(--r-pill); }
+.jg-checks .mark svg { width: 14px; height: 14px; stroke-width: 2.6; }
+.jg-checks li.pass .mark { color: var(--gain); background: var(--gain-bg); }
+.jg-checks li.fail .mark { color: var(--loss); background: var(--loss-bg); }
+.jg-check-detail { display: block; color: var(--ink-3); font-size: var(--t-small); overflow-wrap: anywhere; }
+.jg-more { align-self: flex-start; justify-self: start; font-size: var(--t-small); }
+.jg-acts { display: grid; gap: var(--s3); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.jg-acts-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.jg-ask { display: grid; gap: var(--s2); }
+.jg-ask label { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.jg-ask textarea { resize: vertical; min-height: 64px; field-sizing: content; line-height: 1.45; font-size: var(--t-body); padding: var(--s3) var(--s4); }
+.jg-proof { display: grid; gap: var(--s3); }
+.jg-checked { display: flex; align-items: flex-start; gap: var(--s3); }
+.jg-checked > svg { width: 28px; height: 28px; color: var(--loss); flex: none; }
+.jg-checked .note { flex: 1; }
+.jg-expert { border-top: 1px solid var(--rule); padding-top: var(--s3); }
+.jg-expert > summary { cursor: pointer; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); min-height: 24px; display: inline-flex; align-items: center; }
+.jg-expert[open] > summary { margin-bottom: var(--s3); }
+.jg-expert .kv { grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); }
+.jg-fact { display: contents; }
+
+/* ------------------------------------------------------------------------------------------------ the branches */
+.jg-branches { display: grid; gap: var(--s4); }
+.jg-br-head h2 { font-size: var(--t-h1); font-weight: 650; letter-spacing: var(--track-h); line-height: 1.15; }
+.jg-br-head p { color: var(--ink-2); margin-top: var(--s2); }
+/* two branches a row, sharing the row's height by design (DESIGN.md M4: no empty half beside a short neighbour) */
+.jg-br-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); align-items: stretch; }
+.jg-br { display: flex; flex-direction: column; gap: var(--s3); }
+.jg-br h3 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; }
+.jg-br > p.small { color: var(--ink-2); line-height: 1.5; }
+.jg-br-sum { font-weight: 600; line-height: 1.5; padding: var(--s3) var(--s4); border-radius: var(--r-sm); background: var(--qed-bg); border: 1px solid var(--qed-line); }
+.jg-br-sub { color: var(--ink-3); }
+.jg-quote { margin: 0; padding: var(--s3) var(--s4); border-left: 3px solid var(--due-mark); background: color-mix(in oklab, var(--well) 55%, transparent); border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.jg-rows { display: grid; gap: var(--s2); margin: 0; padding: 0; list-style: none; }
+.jg-rows > li { display: grid; gap: var(--s1); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.jg-rows > li:first-child { border-top: 0; }
+.jg-rows p { line-height: 1.45; overflow-wrap: anywhere; }
+.jg-dl { margin: 0; }
+.jg-dl dd { line-height: 1.45; }
+.jg-ok { color: var(--gain); }
+.jg-void { color: var(--loss); }
+.jg-wait { color: var(--due); }
+.jg-plain { color: var(--ink-2); }
+.jg-ok svg, .jg-void svg { width: 14px; height: 14px; vertical-align: -2px; }
+.jg-others > summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+.jg-others[open] > summary { margin-bottom: var(--s3); }
+
+/* ------------------------------------------------------------------------------------------------ recorded and historical */
+.jg-rec { display: grid; gap: var(--s4); }
+.jg-rec .panel-head { margin-bottom: 0; }
+.jg-rec .panel-head p { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.jg-run { display: grid; gap: var(--s3); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.jg-run-line { line-height: 1.5; color: var(--ink-2); }
+.jg-run-line strong { color: var(--ink); }
+.jg-hist p { line-height: 1.55; color: var(--ink-2); }
+
+/* ------------------------------------------------------------------------------------------------ narrower screens */
+@media (max-width: 1099px) {
+  .jg-top { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 859px) {
+  .jg-br-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 599px) {
+  .jg-kinds ul { grid-template-columns: minmax(0, 1fr); }
+  .jg-st { grid-template-columns: 36px minmax(0, 1fr); gap: var(--s3); }
+  .jg-st::before { left: 17px; top: 36px; }
+  .jg-node { width: 36px; height: 36px; font-size: var(--t-body); }
+  .jg-node svg { width: 16px; height: 16px; }
+  .jg-card { padding: var(--s4); gap: var(--s3); }
+  .jg-finding { font-size: var(--t-body); }
+  .jg-br-head h2 { font-size: var(--t-h2); }
+  .jg-expert .kv { grid-template-columns: minmax(0, 1fr); gap: var(--s1); }
+  .jg-expert .kv dd { margin-bottom: var(--s2); }
+}
+/* plain look and forced colours: the line and the nodes keep their meaning without light or tint */
+html[data-fx="plain"] .jg-st.is-current .jg-node::after { display: none; }
+@media (forced-colors: active) {
+  .jg-node, .jg-tag { border: 1px solid CanvasText; }
+  .jg-st::before { background: CanvasText; }
+}

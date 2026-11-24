@@ -1,0 +1,150 @@
+# forge test --gas-report --match-contract 'GuardianTest|TimeLockTest|ContainmentTest'
+# recorded 2026-11-24T18:42:55Z; forge Version: 1.7.1; src/QEDOwnerAccount.sol sha256 3230a781d34c7b07f353ed164411a3784b982f8c9873faa73780079b1b2f6e29
+
+No files changed, compilation skipped
+
+Ran 11 tests for test/Guardian.t.sol:GuardianTest
+[PASS] test_a_colluding_guardian_and_code_thief_are_stopped_by_any_unfrozen_member() (gas: 829396)
+[PASS] test_a_frozen_member_cannot_cancel_a_cosigned_recovery_but_an_unfrozen_one_can() (gas: 938741)
+[PASS] test_a_frozen_member_keeps_its_veto_over_a_recovery_without_the_guardian() (gas: 375227)
+[PASS] test_replacing_and_removing_the_guardian_wait_the_delay_and_a_stale_change_is_refused() (gas: 1747477)
+[PASS] test_setting_a_guardian_waits_the_delay_and_any_member_can_cancel_it() (gas: 929163)
+[PASS] test_the_guardian_approves_cancels_and_protects_nothing() (gas: 1251191)
+[PASS] test_the_guardian_cosigns_exactly_one_recovery() (gas: 1259647)
+[PASS] test_the_guardian_is_set_only_through_setGuardian_and_never_at_once() (gas: 2037373)
+[PASS] test_the_two_of_two_hostage_case_ends_with_a_guardian() (gas: 1871481)
+[PASS] test_with_a_guardian_a_recovery_code_alone_starts_nothing() (gas: 525512)
+[PASS] test_without_a_guardian_the_cosigned_path_is_refused() (gas: 103436)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 18.15ms (36.68ms CPU time)
+
+Ran 7 tests for test/TimeLock.t.sol:TimeLockTest
+[PASS] test_a_threshold_quorum_cannot_drain_free_funds_at_once_while_time_locked() (gas: 17192886)
+[PASS] test_any_one_member_cancels_a_time_locked_withdrawal() (gas: 17200567)
+[PASS] test_construction_refuses_a_bad_lockable_list() (gas: 20619661)
+[PASS] test_the_lockable_list_is_the_release_vaults_four_calls_and_disjoint_from_the_other_lists() (gas: 16989041)
+[PASS] test_time_locked_the_four_calls_are_refused_at_once_whatever_the_approvals_and_run_after_the_delay() (gas: 18052546)
+[PASS] test_turning_it_on_is_immediate_and_turning_it_off_waits_the_delay_and_can_be_cancelled() (gas: 18056007)
+[PASS] test_without_the_time_lock_the_four_calls_run_at_once_as_before() (gas: 17701569)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 18.21ms (55.28ms CPU time)
+
+Ran 20 tests for test/Containment.t.sol:ContainmentTest
+[PASS] test_a_frozen_assertion_spoils_a_batch_even_beside_enough_others() (gas: 163863)
+[PASS] test_a_frozen_member_can_still_stop_things() (gas: 218466)
+[PASS] test_a_frozen_member_changes_nothing_about_the_account() (gas: 521706)
+[PASS] test_a_frozen_member_keeps_its_veto_over_changes_and_recoveries() (gas: 727247)
+[PASS] test_a_frozen_member_signs_no_erc1271_message() (gas: 132580)
+[PASS] test_a_frozen_member_still_cannot_cancel_its_own_removal() (gas: 872018)
+[PASS] test_a_scheduled_sentinel_is_cancelled_by_one_member_and_refused_when_stale() (gas: 773452)
+[PASS] test_an_account_without_a_sentinel_cannot_be_frozen_by_anyone() (gas: 5778504)
+[PASS] test_construction_lists_the_protective_calls_and_the_sentinel() (gas: 5807601)
+[PASS] test_construction_refuses_a_bad_protective_list_or_sentinel() (gas: 7526422)
+[PASS] test_dropping_the_sentinel_is_immediate_and_a_new_one_waits_the_delay() (gas: 539796)
+[PASS] test_one_passkey_stops_things_whatever_the_threshold() (gas: 6300817)
+[PASS] test_only_the_sentinel_can_freeze_and_never_anything_but_a_member() (gas: 298592)
+[PASS] test_protect_is_bound_to_its_calls_nonce_deadline_and_a_member() (gas: 683128)
+[PASS] test_protect_refuses_every_call_outside_the_list() (gas: 598809)
+[PASS] test_sentinel_abuse_freezes_everyone_moves_nothing_and_a_recovery_ends_it() (gas: 1319040)
+[PASS] test_the_sentinel_freezes_a_member_at_once_and_its_approval_stops_counting() (gas: 496384)
+[PASS] test_the_sentinel_has_no_other_power() (gas: 223390)
+[PASS] test_two_of_two_with_one_frozen_moves_nothing() (gas: 6211168)
+[PASS] test_unfreezing_takes_the_unfrozen_admin_quorum_and_applies_at_once() (gas: 487143)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 18.35ms (38.76ms CPU time)
+
+Ran 3 tests for test/VaultContainment.t.sol:VaultContainmentTest
+[PASS] test_a_frozen_passkey_moves_no_money_and_its_mandate_stops_paying() (gas: 17934597)
+[PASS] test_one_passkey_stops_the_agent_at_threshold_two_and_cannot_resume_or_spend() (gas: 18028936)
+[PASS] test_the_release_protective_list_holds_only_calls_that_move_no_money() (gas: 9883165)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 18.42ms (31.26ms CPU time)
+
+╭--------------------------------------------------+-----------------+--------+--------+--------+---------╮
+| src/QEDOwnerAccount.sol:QEDOwnerAccount Contract |                 |        |        |        |         |
++=========================================================================================================+
+| Deployment Cost                                  | Deployment Size |        |        |        |         |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+|                                          6521915 |           34244 |        |        |        |         |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+|                                                  |                 |        |        |        |         |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| Function Name                                    | Min             | Avg    | Median | Max    | # Calls |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| addSigner                                        |           24010 |  25054 |  25054 |  26099 |       2 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| applyCalls                                       |           27674 | 111850 |  38580 | 269298 |       3 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| applyChange                                      |           24868 |  96110 |  88028 | 161541 |      22 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| cancel                                           |           36360 |  61834 |  64225 |  92782 |      14 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| cancelDigest                                     |            1527 |   1527 |   1527 |   1527 |      14 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| checkSignature                                   |            4726 |  14152 |   8786 |  25367 |       8 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| execute                                          |           37621 | 112373 |  98404 | 241663 |      84 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| executeDigest                                    |            3737 |   3795 |   3750 |   6775 |      86 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| finishRecovery                                   |          135526 | 135526 | 135526 | 135526 |       2 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| freeze                                           |           25167 |  30295 |  31867 |  31879 |      24 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| getChange                                        |           21932 |  21932 |  21932 |  21932 |       5 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| getRecovery                                      |            9891 |   9891 |   9891 |   9891 |       6 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| getSigner                                        |            8105 |   8105 |   8105 |   8105 |      16 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| guardian                                         |            2709 |   2709 |   2709 |   2709 |      14 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| isGuarded                                        |            3749 |   3749 |   3749 |   3749 |       4 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| isProtective                                     |            2672 |   2672 |   2672 |   2672 |       6 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| isValidSignature                                 |            8229 |  17493 |  12398 |  29093 |       7 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| lockableCalls                                    |           13293 |  13293 |  13293 |  13293 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| memberCount                                      |            2313 |   2313 |   2313 |   2313 |       4 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| nonce                                            |            3306 |   3306 |   3306 |   3306 |      87 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| pendingRecoveryOf                                |            2488 |   2488 |   2488 |   2488 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| protect                                          |           36480 |  63256 |  39650 | 144878 |      25 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| protectDigest                                    |            1968 |   3653 |   3468 |   7970 |      25 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| protectNonce                                     |            2467 |   2467 |   2467 |   2467 |      26 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| protectiveCalls                                  |            8846 |   8846 |   8846 |   8846 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| recoveryDigest                                   |            1576 |   1576 |   1576 |   1576 |      15 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| removeSigners                                    |           23110 |  24401 |  24401 |  25693 |       2 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| replaySafeHash                                   |            2107 |   2107 |   2107 |   2107 |       4 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| sentinel                                         |            3594 |   3594 |   3594 |   3594 |       6 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| setGuardian                                      |           22990 |  24776 |  24958 |  26197 |       4 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| setSentinel                                      |           21480 |  21480 |  21480 |  21480 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| setTimeLock                                      |           25599 |  25599 |  25599 |  25599 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| signerIds                                        |           12765 |  12765 |  12765 |  12765 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| spentRecoveryKey                                 |            2412 |   2412 |   2412 |   2412 |       2 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| startCosignedRecovery                            |           41830 | 113725 |  60319 | 212320 |      10 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| startRecovery                                    |           27940 | 133760 | 186670 | 186670 |       6 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| threshold                                        |            2687 |   2687 |   2687 |   2687 |       1 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| timeLocked                                       |            2922 |   2922 |   2922 |   2922 |       5 |
+|--------------------------------------------------+-----------------+--------+--------+--------+---------|
+| unfreeze                                         |           22711 |  22711 |  22711 |  22711 |       1 |
+╰--------------------------------------------------+-----------------+--------+--------+--------+---------╯
+
+
+Ran 4 test suites in 26.05ms (73.12ms CPU time): 41 tests passed, 0 failed, 0 skipped (41 total tests)

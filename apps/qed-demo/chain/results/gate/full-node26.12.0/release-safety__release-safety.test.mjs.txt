@@ -1,0 +1,12 @@
+✔ public scripted execution remains allowlisted without extra configuration (1.017625ms)
+✔ costly crypto-workbench tasks have a global and per-connection sliding budget (0.266583ms)
+✔ sandbox certificate clock guards against Anvil idle-time drift without changing mainnet expiry semantics (0.345583ms)
+✔ public sandbox never gets unrestricted CLI or contract calldata from a user (0.227333ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 94.932417

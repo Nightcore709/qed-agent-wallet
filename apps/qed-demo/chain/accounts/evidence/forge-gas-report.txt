@@ -1,0 +1,125 @@
+No files changed, compilation skipped
+
+Ran 6 tests for test/VaultIntegration.t.sol:BusinessGuardsTest
+[PASS] test_a_scheduled_guarded_call_is_cancelled_by_any_one_member() (gas: 409153)
+[PASS] test_pause_and_other_protective_calls_stay_immediate_for_one_member() (gas: 567053)
+[PASS] test_the_delayed_path_applies_every_guarded_call() (gas: 778600)
+[PASS] test_the_guard_list_is_recorded_with_its_reasons() (gas: 5336147)
+[PASS] test_threshold_member_cannot_make_any_guarded_call_immediately() (gas: 1647239)
+[PASS] test_threshold_member_cannot_schedule_a_guarded_call() (gas: 137663)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 334.16ms (21.59ms CPU time)
+
+Ran 16 tests for test/Guards.t.sol:GuardsTest
+[PASS] testFuzz_exactly_the_listed_selectors_are_refused(bytes4,bytes) (runs: 1000, μ: 174169, ~: 174156)
+[PASS] testFuzz_guarded_call_never_immediate_whatever_the_approvals(uint8,uint256) (runs: 1000, μ: 120332, ~: 126244)
+Logs:
+  Bound result 1
+
+[PASS] test_a_failing_scheduled_batch_stays_pending_and_cancellable() (gas: 484816)
+[PASS] test_a_guarded_call_hidden_in_a_batch_is_refused() (gas: 91686)
+[PASS] test_any_one_member_cancels_a_scheduled_guarded_batch() (gas: 415898)
+[PASS] test_apply_must_present_exactly_the_scheduled_calls() (gas: 352361)
+[PASS] test_delayed_path_runs_the_guarded_call_after_the_delay() (gas: 507697)
+[PASS] test_guard_list_views_and_reasons() (gas: 4964274)
+[PASS] test_invalid_guard_lists_refused() (gas: 6312274)
+[PASS] test_kinds_are_not_interchangeable() (gas: 644726)
+[PASS] test_not_even_every_member_together_can_make_it_immediately() (gas: 156945)
+[PASS] test_other_selectors_on_a_guarded_target_stay_immediate() (gas: 151379)
+[PASS] test_schedule_only_through_execute() (gas: 37620)
+[PASS] test_schedule_refuses_empty_batches_and_calls_to_the_account() (gas: 391616)
+[PASS] test_threshold_member_cannot_make_a_guarded_call() (gas: 88491)
+[PASS] test_threshold_member_cannot_schedule() (gas: 91343)
+Suite result: ok. 16 passed; 0 failed; 0 skipped; finished in 569.20ms (1.06s CPU time)
+
+Ran 27 tests for test/Execute.t.sol:ExecuteTest
+[PASS] testFuzz_any_nonce_but_current_rejected(uint256) (runs: 1000, μ: 116038, ~: 115887)
+[PASS] testFuzz_other_chain_ids_rejected(uint64) (runs: 1000, μ: 130461, ~: 130461)
+[PASS] testFuzz_past_deadline_rejected(uint64) (runs: 1000, μ: 115600, ~: 115491)
+Logs:
+  Bound result 64286
+
+[PASS] testFuzz_relayer_tampering_with_value_rejected(uint256,uint256) (runs: 1000, μ: 133347, ~: 133288)
+[PASS] test_anyone_may_relay() (gas: 247377)
+[PASS] test_call_to_account_needs_admin_threshold() (gas: 475700)
+[PASS] test_deadline_equal_to_now_accepted() (gas: 243263)
+[PASS] test_duplicate_signer_is_not_counted_twice() (gas: 117989)
+[PASS] test_empty_batch_consumes_nonce() (gas: 183045)
+[PASS] test_execute_approvals_for_another_account_rejected() (gas: 5423499)
+[PASS] test_execute_approvals_from_another_chain_rejected() (gas: 127847)
+[PASS] test_execute_digest_matches_eip712_by_hand() (gas: 20188)
+[PASS] test_expired_deadline_rejected() (gas: 113092)
+[PASS] test_failing_call_reverts_whole_batch_and_keeps_nonce() (gas: 265291)
+[PASS] test_future_nonce_rejected() (gas: 112586)
+[PASS] test_member_id_with_other_key_signature_rejected() (gas: 168465)
+[PASS] test_mixed_batch_with_one_self_call_needs_admin_threshold() (gas: 118933)
+[PASS] test_non_signer_rejected() (gas: 140937)
+[PASS] test_one_approval_is_not_enough_under_threshold_two() (gas: 81334)
+[PASS] test_recovery_signer_cannot_approve_execute() (gas: 141169)
+[PASS] test_reentrancy_into_admin_paths_blocked() (gas: 243194)
+[PASS] test_reentrancy_into_execute_blocked() (gas: 432054)
+[PASS] test_relayer_cannot_change_calls_or_deadline() (gas: 276489)
+[PASS] test_reused_nonce_rejected() (gas: 295189)
+[PASS] test_two_of_three_executes_and_emits() (gas: 269031)
+[PASS] test_unsorted_assertions_rejected() (gas: 137058)
+[PASS] test_value_transfer_from_account() (gas: 276300)
+Suite result: ok. 27 passed; 0 failed; 0 skipped; finished in 570.84ms (2.27s CPU time)
+
+Ran 9 tests for test/VaultIntegration.t.sol:VaultIntegrationTest
+[PASS] test_a_nobody_but_the_account_could_accept() (gas: 2370021)
+[PASS] test_a_old_eoa_can_no_longer_call_any_owner_function() (gas: 410601)
+[PASS] test_a_unguarded_owner_calls_stay_immediate() (gas: 600864)
+[PASS] test_b_mandate_signed_through_erc1271_is_accepted_for_a_payment() (gas: 394158)
+[PASS] test_c_mandate_signature_for_another_mandate_is_refused() (gas: 164014)
+[PASS] test_c_mandate_signature_made_for_another_account_is_refused() (gas: 5593870)
+[PASS] test_c_old_eoa_mandate_signature_is_refused() (gas: 104769)
+[PASS] test_even_the_only_member_cannot_make_a_guarded_call_immediately() (gas: 665986)
+[PASS] test_moving_the_vault_to_a_business_account_takes_the_delayed_path() (gas: 6485376)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 570.78ms (18.75ms CPU time)
+
+╭--------------------------------------------------+-----------------+-------+--------+--------+---------╮
+| src/QEDOwnerAccount.sol:QEDOwnerAccount Contract |                 |       |        |        |         |
++========================================================================================================+
+| Deployment Cost                                  | Deployment Size |       |        |        |         |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+|                                          5471330 |           27259 |       |        |        |         |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+|                                                  |                 |       |        |        |         |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| Function Name                                    | Min             | Avg   | Median | Max    | # Calls |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| applyCalls                                       |           26963 | 63298 |  31333 | 285608 |      12 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| applyChange                                      |           24769 | 24769 |  24769 |  24769 |       1 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| callsHash                                        |            3136 |  3136 |   3136 |   3136 |       1 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| cancel                                           |           73825 | 73833 |  73837 |  73837 |       3 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| cancelDigest                                     |            1406 |  1406 |   1406 |   1406 |       3 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| checkSignature                                   |            1127 | 28134 |  25663 |  64837 |       9 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| execute                                          |           35230 | 71564 |  68954 | 276048 |    1599 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| executeDigest                                    |            2125 |  3642 |   3638 |   5162 |    1596 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| getChange                                        |           21723 | 21723 |  21723 |  21723 |       4 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| guardedCalls                                     |            8438 | 15958 |  15958 |  23478 |       2 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| isGuarded                                        |            3424 |  3424 |   3424 |   3424 |       2 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| isValidSignature                                 |            2078 | 30075 |  29220 |  66119 |       9 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| memberCount                                      |            2250 |  2250 |   2250 |   2250 |       1 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| nonce                                            |            1097 |  3093 |   3097 |   3097 |     575 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| replaySafeHash                                   |            1876 |  1876 |   1876 |   1876 |       4 |
+|--------------------------------------------------+-----------------+-------+--------+--------+---------|
+| scheduleCalls                                    |           24940 | 24940 |  24940 |  24940 |       1 |
+╰--------------------------------------------------+-----------------+-------+--------+--------+---------╯
+
+
+Ran 4 test suites in 695.73ms (2.04s CPU time): 58 tests passed, 0 failed, 0 skipped (58 total tests)
+exit: 0

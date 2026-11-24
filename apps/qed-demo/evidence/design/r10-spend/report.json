@@ -1,0 +1,162 @@
+{
+ "/pay 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay?bill=bil_1m846aa06anqj4r4gdr 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new?kind=invest 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0sknfqv01ak9 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0caatdw0b8hj 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa13bpfnzwgn1k 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw/amend 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay?bill=bil_1m846aa06anqj4r4gdr 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new?kind=invest 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0sknfqv01ak9 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0caatdw0b8hj 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa13bpfnzwgn1k 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw/amend 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay?bill=bil_1m846aa06anqj4r4gdr 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new?kind=invest 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0sknfqv01ak9 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0caatdw0b8hj 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa13bpfnzwgn1k 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw/amend 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/pay?bill=bil_1m846aa06anqj4r4gdr 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/new?kind=invest 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0sknfqv01ak9 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa0caatdw0b8hj 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa13bpfnzwgn1k 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/instructions/prg_1m846aa1n1kwmwcsvrw/amend 390 dark": {
+  "errors": [],
+  "fault": false
+ }
+}

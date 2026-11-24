@@ -1,0 +1,13 @@
+✔ a ready public service answers 200 with every readiness check true (2.02925ms)
+✔ public startup, failed initialisation, unresponsive Anvil, missing contracts and an unverified manifest all answer 503 (0.340875ms)
+✔ local development keeps HTTP 200 and reports the manifest as not required (0.1365ms)
+✔ readiness recovers on the next probe after a transient failure (no sticky state) (0.574917ms)
+✔ Anthropic availability never gates readiness, and the health response keeps its existing fields (0.9335ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 78.549625

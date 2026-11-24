@@ -1,0 +1,270 @@
+
+Detector: arbitrary-send-eth
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#775-780) sends eth to arbitrary user
+	Dangerous calls:
+	- (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#777)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Detector: incorrect-exp
+Base64._encode(bytes,bool) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#48-139) has bitwise-xor operator ^ instead of the exponentiation operator **: 
+	 - mstore(uint256,uint256)(0x3f,ghijklmnopqrstuvwxyz0123456789+/ ^ urlAndFilenameSafe * 0x670) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#83)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) has bitwise-xor operator ^ instead of the exponentiation operator **: 
+	 - inverse = (3 * denominator) ^ 2 (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#259)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-exponentiation
+
+Detector: divide-before-multiply
+Base64._encode(bytes,bool) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#48-139) performs a multiplication on the result of a division:
+	- resultLength = 4 * ((data.length + 2) / 3) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#70)
+Base64._decode(bytes) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#144-233) performs a multiplication on the result of a division:
+	- resultLength = (dataLength / 4) * 3 (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#150)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse = (3 * denominator) ^ 2 (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#259)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse *= 2 - denominator * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#263)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse *= 2 - denominator * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#264)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse *= 2 - denominator * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#265)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse *= 2 - denominator * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#266)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse *= 2 - denominator * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#267)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#244)
+	- inverse *= 2 - denominator * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#268)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) performs a multiplication on the result of a division:
+	- low = low / twos (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#247)
+	- result = low * inverse (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#274)
+Math.invMod(uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#317-363) performs a multiplication on the result of a division:
+	- quotient = gcd / remainder (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#339)
+	- (gcd,remainder) = (remainder,gcd - remainder * quotient) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#341-348)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Detector: calls-loop
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#775-780) has external calls inside a loop: (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#777)
+	Calls stack containing the loop:
+		QEDOwnerAccount.execute(QEDOwnerAccount.Call[],uint256,uint64,QEDOwnerAccount.Assertion[])
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#775-780) has external calls inside a loop: (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#777)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyCalls(bytes32,QEDOwnerAccount.Call[])
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Detector: timestamp
+QEDOwnerAccount.execute(QEDOwnerAccount.Call[],uint256,uint64,QEDOwnerAccount.Assertion[]) (src/QEDOwnerAccount.sol#331-354) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > deadline (src/QEDOwnerAccount.sol#336)
+QEDOwnerAccount.applyCalls(bytes32,QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#467-476) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < c.readyAt (src/QEDOwnerAccount.sol#471)
+QEDOwnerAccount.applyChange(bytes32) (src/QEDOwnerAccount.sol#479-510) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < c.readyAt (src/QEDOwnerAccount.sol#484)
+QEDOwnerAccount.startRecovery(bytes32,uint256,uint256,uint64,bytes32,bytes32) (src/QEDOwnerAccount.sol#550-578) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > deadline (src/QEDOwnerAccount.sol#558)
+QEDOwnerAccount.finishRecovery(bytes32) (src/QEDOwnerAccount.sol#582-591) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < p.readyAt (src/QEDOwnerAccount.sol#585)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Detector: assembly
+Base64._encode(bytes,bool) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#48-139) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#72-138)
+Base64._decode(bytes) (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#144-233) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#157-232)
+Bytes.slice(bytes,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#86-98) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#93-95)
+Bytes.splice(bytes,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#117-129) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#123-126)
+Bytes.replace(bytes,uint256,bytes,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#154-172) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#167-169)
+Bytes.concat(bytes[]) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#183-203) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#194-196)
+Bytes.toNibbles(bytes) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#210-245) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#211-244)
+Bytes._unsafeReadBytesOffset(bytes,uint256) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#326-331) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#328-330)
+Panic.panic(uint256) (lib/openzeppelin-contracts-5.6.1/utils/Panic.sol#50-56) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Panic.sol#51-55)
+Strings.toString(uint256) (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#42-60) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#47-49)
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#52-54)
+Strings.toChecksumHexString(address) (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#108-126) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#113-115)
+Strings.escapeJSON(string) (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#461-505) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#468-470)
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#499-502)
+Strings._unsafeReadBytesOffset(bytes,uint256) (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#513-518) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#515-517)
+Strings._unsafeWriteBytesOffset(bytes,uint256,bytes1) (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#526-531) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#528-530)
+TransientSlot.tload(TransientSlot.AddressSlot) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#97-101) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#98-100)
+TransientSlot.tstore(TransientSlot.AddressSlot,address) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#106-110) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#107-109)
+TransientSlot.tload(TransientSlot.BooleanSlot) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#115-119) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#116-118)
+TransientSlot.tstore(TransientSlot.BooleanSlot,bool) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#124-128) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#125-127)
+TransientSlot.tload(TransientSlot.Bytes32Slot) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#133-137) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#134-136)
+TransientSlot.tstore(TransientSlot.Bytes32Slot,bytes32) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#142-146) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#143-145)
+TransientSlot.tload(TransientSlot.Uint256Slot) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#151-155) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#152-154)
+TransientSlot.tstore(TransientSlot.Uint256Slot,uint256) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#160-164) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#161-163)
+TransientSlot.tload(TransientSlot.Int256Slot) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#169-173) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#170-172)
+TransientSlot.tstore(TransientSlot.Int256Slot,int256) (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#178-182) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#179-181)
+P256._rip7212(bytes32,bytes32,bytes32,bytes32,bytes32) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#116-135) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#117-134)
+P256.isValidPublicKey(bytes32,bytes32) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#188-195) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#189-194)
+P256._affineFromJacobian(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#213-222) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#217-221)
+P256._jAdd(P256.JPoint,uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#235-294) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#241-293)
+P256._jDouble(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#300-315) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#301-314)
+WebAuthn._validateExpectedTypeHash(string,uint256) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/WebAuthn.sol#132-148) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/WebAuthn.sol#136-147)
+WebAuthn.tryDecodeAuth(bytes) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/WebAuthn.sol#239-268) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/cryptography/WebAuthn.sol#240-242)
+Math.add512(uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#25-30) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#26-29)
+Math.mul512(uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#37-46) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#41-45)
+Math.tryMul(uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#73-84) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#76-80)
+Math.tryDiv(uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#89-97) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#92-95)
+Math.tryMod(uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#102-110) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#105-108)
+Math.mulDiv(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#206-277) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#229-236)
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#242-251)
+Math.tryModExp(uint256,uint256,uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#411-435) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#413-434)
+Math.tryModExp(bytes,bytes,bytes) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#451-473) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#463-472)
+Math._zeroBytes(bytes) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#478-490) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#482-484)
+Math.log2(uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#619-658) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#655-657)
+SafeCast.toUint(bool) (lib/openzeppelin-contracts-5.6.1/utils/math/SafeCast.sol#1157-1161) uses assembly
+	- INLINE ASM (lib/openzeppelin-contracts-5.6.1/utils/math/SafeCast.sol#1158-1160)
+QEDOwnerAccount._verifyAssertion(bytes32,QEDOwnerAccount.Assertion,uint256,uint256) (src/QEDOwnerAccount.sol#710-741) uses assembly
+	- INLINE ASM (src/QEDOwnerAccount.sol#718-720)
+QEDOwnerAccount._hasOriginField(bytes,uint256) (src/QEDOwnerAccount.sol#743-751) uses assembly
+	- INLINE ASM (src/QEDOwnerAccount.sol#747-749)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Detector: pragma
+3 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Errors.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Panic.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#3)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/SafeCast.sol#5)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/SignedMath.sol#4)
+	- Version constraint ^0.8.24 is used by:
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#4)
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/ReentrancyGuardTransient.sol#4)
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/Strings.sol#4)
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#5)
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/WebAuthn.sol#4)
+	- Version constraint 0.8.38 is used by:
+		-0.8.38 (src/QEDOwnerAccount.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Detector: costly-loop
+QEDOwnerAccount._addSigner(uint256,uint256,QEDOwnerAccount.Role) (src/QEDOwnerAccount.sol#786-799) has costly operations inside a loop:
+	- serial = ++ _serial (src/QEDOwnerAccount.sol#794)
+	Calls stack containing the loop:
+		QEDOwnerAccount.constructor(bytes32,string,QEDOwnerAccount.SignerInit[],uint256,uint256,uint64,uint64,QEDOwnerAccount.Guard[])
+QEDOwnerAccount._addSigner(uint256,uint256,QEDOwnerAccount.Role) (src/QEDOwnerAccount.sol#786-799) has costly operations inside a loop:
+	- ++ memberCount (src/QEDOwnerAccount.sol#797)
+	Calls stack containing the loop:
+		QEDOwnerAccount.constructor(bytes32,string,QEDOwnerAccount.SignerInit[],uint256,uint256,uint64,uint64,QEDOwnerAccount.Guard[])
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#801-823) has costly operations inside a loop:
+	- _signerIds.pop() (src/QEDOwnerAccount.sol#811)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#801-823) has costly operations inside a loop:
+	- delete _signers[id] (src/QEDOwnerAccount.sol#812)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#801-823) has costly operations inside a loop:
+	- -- memberCount (src/QEDOwnerAccount.sol#813)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#801-823) has costly operations inside a loop:
+	- delete _recoveries[pending] (src/QEDOwnerAccount.sol#817)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#801-823) has costly operations inside a loop:
+	- delete pendingRecoveryOf[id] (src/QEDOwnerAccount.sol#818)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#4)
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Errors.sol#4)
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Panic.sol#4)
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#3)
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#4)
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/SafeCast.sol#5)
+	- ^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/SignedMath.sol#4)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Detector: low-level-calls
+Low level call in QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#775-780):
+	- (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#777)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Detector: too-many-digits
+Bytes.toNibbles(bytes) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#210-245) uses literals with too many digits:
+	- chunk_toNibbles_asm_0 = 0x0000000000000000ffffffffffffffff0000000000000000ffffffffffffffff & chunk_toNibbles_asm_0 << 64 | chunk_toNibbles_asm_0 (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#222-225)
+Bytes.toNibbles(bytes) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#210-245) uses literals with too many digits:
+	- chunk_toNibbles_asm_0 = 0x00000000ffffffff00000000ffffffff00000000ffffffff00000000ffffffff & chunk_toNibbles_asm_0 << 32 | chunk_toNibbles_asm_0 (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#226-229)
+Bytes.reverseBytes32(bytes32) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#258-272) uses literals with too many digits:
+	- value = ((value >> 32) & 0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF) | ((value & 0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF) << 32) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#265-267)
+Bytes.reverseBytes32(bytes32) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#258-272) uses literals with too many digits:
+	- value = ((value >> 64) & 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF) | ((value & 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF) << 64) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#268-270)
+Bytes.reverseBytes16(bytes16) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#275-286) uses literals with too many digits:
+	- value = ((value & 0xFFFFFFFF00000000FFFFFFFF00000000) >> 32) | ((value & 0x00000000FFFFFFFF00000000FFFFFFFF) << 32) (lib/openzeppelin-contracts-5.6.1/utils/Bytes.sol#282-284)
+P256._tryVerifyNative(bytes32,bytes32,bytes32,bytes32,bytes32) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#84-111) uses literals with too many digits:
+	- _rip7212(0xbb5a52f42f9c9261ed4361f59422a1e30036e7c32b270c8807a419feca605023,0x0000000000000000000000000000000000000000000000000000000000000005,0x0000000000000000000000000000000000000000000000000000000000000001,0xa71af64de5126a4a4e02b7922d66ce9415ce88a4c9d25514d91082c8725ac957,0x5d47723c8fbe580bb369fec9c2665d8e30a435b9932645482e7c9f11e872296b) (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#99-105)
+P256.slitherConstructorConstantVariables() (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#21-408) uses literals with too many digits:
+	- P = 0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#33)
+P256.slitherConstructorConstantVariables() (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#21-408) uses literals with too many digits:
+	- N = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#35)
+P256.slitherConstructorConstantVariables() (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#21-408) uses literals with too many digits:
+	- A = 0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#37)
+P256.slitherConstructorConstantVariables() (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#21-408) uses literals with too many digits:
+	- P1DIV4 = 0x3fffffffc0000000400000000000000000000000400000000000000000000000 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#42)
+P256.slitherConstructorConstantVariables() (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#21-408) uses literals with too many digits:
+	- HALF_N = 0x7fffffff800000007fffffffffffffffde737d56d38bcf4279dce5617e3192a8 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#45)
+Math.log2(uint256) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#619-658) uses literals with too many digits:
+	- r = r | byte(uint256,uint256)(x >> r,0x0000010102020202030303030303030300000000000000000000000000000000) (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#656)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+. analyzed (13 contracts with 102 detectors), 87 result(s) found
+'forge clean' running (wd: <repo>/apps/qed-demo/chain/accounts)
+'forge config --json' running
+'forge build --build-info --deny never --skip ./test/** ./script/** --force' running (wd: <repo>/apps/qed-demo/chain/accounts)

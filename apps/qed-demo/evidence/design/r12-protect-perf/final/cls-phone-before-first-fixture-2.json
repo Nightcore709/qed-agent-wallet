@@ -1,0 +1,24 @@
+{
+ "measuredAt": "2026-11-24T10:02:18.965Z",
+ "base": "http://localhost:7301",
+ "watchMs": 15000,
+ "note": "Lab measures on this computer (headless Chrome, 390x844, CPU 4x slower, slow 4G); not field data.",
+ "results": {
+  "/protect": {
+   "lcpMs": 3752,
+   "cls": 0.0104,
+   "shifts": [
+    {
+     "value": 0.0095,
+     "sources": [
+      "body."
+     ]
+    }
+   ],
+   "interactionMs": 104,
+   "jsKB": 351,
+   "cssKB": 65,
+   "pass": false
+  }
+ }
+}

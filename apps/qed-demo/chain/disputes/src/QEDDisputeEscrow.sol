@@ -1,0 +1,444 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.26;
+
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {ProofEscrow} from "qed/src/ProofEscrow.sol";
+
+/// @title  QEDDisputeEscrow: a review and a dispute step for work paid through the release's ProofEscrow
+/// @notice The release's ProofEscrow pays its payee as soon as its verifier accepts a certificate. It has no review and
+///         no dispute ("acceptance is a theorem", ProofEscrow.sol). It stays unmodified. This contract stands between it
+///         and the two parties: it is the proof escrow's client and its payee, so the payment for verified work and the
+///         refund for missing work both come here first, and it pays them on under terms both sides accepted.
+///
+///         The terms (struct Terms) are fixed before any money moves:
+///           - the client: the only account that may open the job, accept the work or dispute it; refunds go to it;
+///           - the payee: where the provider's share is paid;
+///           - a named decider: it may rule only on a disputed job, only after the evidence period and by the decision
+///             deadline, only with an outcome its terms allow (pay the provider, refund the client, split). It can send
+///             money nowhere else and is paid nothing by this contract;
+///           - three periods (review, evidence, decision), and what happens when the review or the decision runs out:
+///             the provider's share in basis points (10000 pays the provider, 0 refunds the client).
+///         The provider accepts them by signing the proof escrow's own quote with this contract as the quote's client and
+///         payee and quoteId = termsHash(terms): one signature binds the price, the work, the deadline and these terms.
+///         The client accepts them by opening the job (only terms.client can).
+///
+///         Lifecycle:
+///           Funded     the proof escrow holds the price.
+///           Delivered  the verifier accepted the certificate and the proof escrow paid this contract. noteDelivered
+///                      (anyone; QED's delivery calls it in the same transaction) starts the review. Until the review
+///                      ends the client may accept (the provider is paid in full at once) or dispute. After it, anyone
+///                      may finish: the review timeout outcome applies.
+///           Disputed   both sides may add evidence (hashes; the texts are kept off chain) until the evidence period
+///                      ends; then the decider may rule until the decision deadline. After it, anyone may finish: the
+///                      decision timeout outcome applies. Either side may still give way: the client by accepting, the
+///                      provider by refunding.
+///           Closed     paid out once: toProvider to the payee and toClient to the client, always adding up to the price.
+///                      In a split the client's part is rounded down and the provider receives the rest.
+///           Without delivery: after the proof escrow's deadline, or once the provider has released the client there,
+///                      anyone may reclaim: the proof escrow refunds this contract and the client is paid in full.
+///         There is no owner, admin, pause or upgrade. Nobody, QED included, can change a job's terms or move its money
+///         outside them.
+/// @dev    Tokens that charge a fee on transfer, rebase, or block transfers are not supported: open() refuses a short
+///         receipt, and every payout checks that the money held for other jobs is still there. Research code: not
+///         audited.
+contract QEDDisputeEscrow is ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Types
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /// @notice What both sides accept. Periods in seconds; shares are the provider's, in basis points.
+    struct Terms {
+        address client;
+        address payee;
+        address decider;
+        uint8 deciderMay; //          MAY_PAY_PROVIDER | MAY_REFUND_CLIENT | MAY_SPLIT
+        uint32 reviewPeriod; //       from delivery: the client accepts or disputes
+        uint32 evidencePeriod; //     from a dispute: both sides add evidence; the decider waits
+        uint32 decisionPeriod; //     from a dispute: the decider's deadline (longer than the evidence period)
+        uint16 reviewTimeoutBps; //   the provider's share when the review ends with no answer
+        uint16 decisionTimeoutBps; // the provider's share when no decision comes in time
+        bytes32 salt; //              the provider's; makes each commitment unique
+    }
+
+    enum Status {
+        None,
+        Funded,
+        Delivered,
+        Disputed,
+        Closed
+    }
+
+    enum Outcome {
+        None,
+        Accepted, //        the client accepted the work
+        ReviewTimeout, //   the review ended with no answer
+        Decided, //         the decider ruled
+        DecisionTimeout, // no ruling by the decision deadline
+        ProviderGaveWay, // the provider refunded the client
+        NotDelivered //     no verified delivery: refunded through the proof escrow
+    }
+
+    struct Job {
+        address client;
+        address provider;
+        address payee;
+        address decider;
+        address token;
+        uint256 price;
+        uint256 escrowJobId;
+        bytes32 termsHash;
+        uint8 deciderMay;
+        uint32 reviewPeriod;
+        uint32 evidencePeriod;
+        uint32 decisionPeriod;
+        uint16 reviewTimeoutBps;
+        uint16 decisionTimeoutBps;
+        Status status;
+        Outcome outcome;
+        uint64 deliveredAt;
+        uint64 disputedAt;
+        uint64 closedAt;
+        uint256 toProvider;
+        uint256 toClient;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Constants and state
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    uint16 public constant BPS = 10_000;
+    uint8 public constant MAY_PAY_PROVIDER = 1;
+    uint8 public constant MAY_REFUND_CLIENT = 2;
+    uint8 public constant MAY_SPLIT = 4;
+    /// @notice Bounds on every period; the decision deadline comes at least MIN_PERIOD after the evidence period ends.
+    ///         The floor only rules out a zero window, as QEDOwnerAccount's MIN_DELAY does: QED itself offers periods
+    ///         in days (server/earn-chain.ts), and minutes only on an isolated test stack.
+    uint32 public constant MIN_PERIOD = 1 minutes;
+    uint32 public constant MAX_PERIOD = 60 days;
+    bytes32 public constant TERMS_TYPEHASH = keccak256(
+        "QEDDisputeTerms(uint256 chainId,address disputeEscrow,address client,address payee,address decider,uint8 deciderMay,uint32 reviewPeriod,uint32 evidencePeriod,uint32 decisionPeriod,uint16 reviewTimeoutBps,uint16 decisionTimeoutBps,bytes32 salt)"
+    );
+
+    /// @notice The release's ProofEscrow this contract stands in front of.
+    ProofEscrow public immutable proofEscrow;
+    uint256 public jobCount;
+    mapping(uint256 id => Job) internal _jobs;
+    /// @notice This contract's job for a job of the proof escrow (0: none).
+    mapping(uint256 escrowJobId => uint256 id) public jobOfEscrowJob;
+    /// @notice Per token, the money this contract holds for delivered and disputed jobs. A payout never reaches it.
+    mapping(address token => uint256) public held;
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Events and errors
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    event JobOpened(
+        uint256 indexed id,
+        uint256 indexed escrowJobId,
+        address indexed client,
+        address provider,
+        address payee,
+        address decider,
+        address token,
+        uint256 price,
+        bytes32 termsHash
+    );
+    event Delivered(uint256 indexed id, uint64 reviewEndsAt, bytes32 solutionHash, bytes32 resultDigest);
+    event Disputed(uint256 indexed id, bytes32 reasonHash, uint64 evidenceEndsAt, uint64 decideBy);
+    event EvidenceAdded(uint256 indexed id, address indexed by, bytes32 evidenceHash);
+    event Closed(uint256 indexed id, Outcome outcome, address indexed by, uint256 toProvider, uint256 toClient);
+
+    error ZeroAddress();
+    error NotClient(address caller);
+    error NotProvider(address caller);
+    error NotDecider(address caller);
+    error NotAParty(address caller);
+    error UnknownJob(uint256 id);
+    error WrongStatus(uint256 id, Status status);
+    error QuoteNotForThisEscrow(address quoteClient, address quotePayee);
+    error TermsMismatch(bytes32 quoteId, bytes32 termsHash);
+    error BadParties();
+    error BadPowers(uint8 deciderMay);
+    error BadPeriods();
+    error BadShares();
+    error UnsupportedToken(address token);
+    error EscrowJobMismatch(uint256 expected, uint256 opened);
+    error NotDeliveredYet(uint256 id);
+    error AlreadyDelivered(uint256 id);
+    error ReviewOver(uint64 reviewEndsAt);
+    error ReviewNotOver(uint64 reviewEndsAt);
+    error EvidenceClosed(uint64 evidenceEndsAt);
+    error EvidenceStillOpen(uint64 evidenceEndsAt);
+    error DecisionOver(uint64 decideBy);
+    error DecisionNotOver(uint64 decideBy);
+    error ShareTooLarge(uint256 toProvider, uint256 price);
+    error OutcomeNotAllowed(uint256 toProvider, uint8 deciderMay);
+    error HeldFundsTouched(address token);
+
+    constructor(ProofEscrow proofEscrow_) {
+        if (address(proofEscrow_) == address(0)) revert ZeroAddress();
+        proofEscrow = proofEscrow_;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Opening
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /// @notice The client accepts the terms and funds the job. The quote must name this contract as its client and its
+    ///         payee, and its quoteId must be termsHash(t); the proof escrow then checks the provider's signature over
+    ///         the quote, and so over the terms. The price moves from the client to the proof escrow through here.
+    function open(Terms calldata t, ProofEscrow.Quote calldata q, bytes calldata providerSig)
+        external
+        nonReentrant
+        returns (uint256 id)
+    {
+        if (msg.sender != t.client) revert NotClient(msg.sender);
+        if (q.client != address(this) || q.payee != address(this)) revert QuoteNotForThisEscrow(q.client, q.payee);
+        bytes32 th = termsHash(t);
+        if (q.quoteId != th) revert TermsMismatch(q.quoteId, th);
+        _checkTerms(t, q.provider);
+
+        uint256 expected = proofEscrow.jobCount() + 1;
+        id = ++jobCount;
+        Job storage j = _jobs[id];
+        j.client = t.client;
+        j.provider = q.provider;
+        j.payee = t.payee;
+        j.decider = t.decider;
+        j.token = q.token;
+        j.price = q.price;
+        j.escrowJobId = expected;
+        j.termsHash = th;
+        j.deciderMay = t.deciderMay;
+        j.reviewPeriod = t.reviewPeriod;
+        j.evidencePeriod = t.evidencePeriod;
+        j.decisionPeriod = t.decisionPeriod;
+        j.reviewTimeoutBps = t.reviewTimeoutBps;
+        j.decisionTimeoutBps = t.decisionTimeoutBps;
+        j.status = Status.Funded;
+        jobOfEscrowJob[expected] = id;
+        emit JobOpened(id, expected, t.client, q.provider, t.payee, t.decider, q.token, q.price, th);
+
+        IERC20 token = IERC20(q.token);
+        uint256 before = token.balanceOf(address(this));
+        token.safeTransferFrom(msg.sender, address(this), q.price);
+        if (token.balanceOf(address(this)) != before + q.price) revert UnsupportedToken(q.token);
+        token.forceApprove(address(proofEscrow), q.price);
+        uint256 opened = proofEscrow.open(q, providerSig);
+        if (opened != expected) revert EscrowJobMismatch(expected, opened);
+        // the proof escrow took exactly the price, and no allowance is left behind
+        if (token.balanceOf(address(this)) != before || token.allowance(address(this), address(proofEscrow)) != 0) {
+            revert UnsupportedToken(q.token);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Delivery, review and dispute
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /// @notice Records a verified delivery: the proof escrow settled the job, so its price is now here. Starts the
+    ///         review. Anyone may call it; QED's delivery calls it in the same transaction as ProofEscrow.deliver.
+    function noteDelivered(uint256 id) external nonReentrant {
+        Job storage j = _job(id);
+        if (j.status != Status.Funded) revert WrongStatus(id, j.status);
+        ProofEscrow.Job memory e = proofEscrow.getJob(j.escrowJobId);
+        if (e.status != ProofEscrow.Status.Settled) revert NotDeliveredYet(id);
+        j.status = Status.Delivered;
+        j.deliveredAt = uint64(block.timestamp);
+        held[j.token] += j.price;
+        emit Delivered(id, uint64(block.timestamp) + j.reviewPeriod, e.solutionHash, e.resultDigest);
+        if (IERC20(j.token).balanceOf(address(this)) < held[j.token]) revert HeldFundsTouched(j.token);
+    }
+
+    /// @notice The client accepts the work: the provider is paid in full at once. Also open during a dispute.
+    function accept(uint256 id) external nonReentrant {
+        Job storage j = _job(id);
+        if (msg.sender != j.client) revert NotClient(msg.sender);
+        if (j.status != Status.Delivered && j.status != Status.Disputed) revert WrongStatus(id, j.status);
+        _close(id, j, j.price, Outcome.Accepted);
+    }
+
+    /// @notice The client disputes the work before the review ends. reasonHash commits to the reason kept off chain.
+    function dispute(uint256 id, bytes32 reasonHash) external nonReentrant {
+        Job storage j = _job(id);
+        if (msg.sender != j.client) revert NotClient(msg.sender);
+        if (j.status != Status.Delivered) revert WrongStatus(id, j.status);
+        uint64 reviewEnds = j.deliveredAt + j.reviewPeriod;
+        if (block.timestamp > reviewEnds) revert ReviewOver(reviewEnds);
+        j.status = Status.Disputed;
+        j.disputedAt = uint64(block.timestamp);
+        emit Disputed(id, reasonHash, uint64(block.timestamp) + j.evidencePeriod, uint64(block.timestamp) + j.decisionPeriod);
+    }
+
+    /// @notice Either side adds evidence to a dispute until the evidence period ends. Only its hash is recorded.
+    function addEvidence(uint256 id, bytes32 evidenceHash) external nonReentrant {
+        Job storage j = _job(id);
+        if (msg.sender != j.client && msg.sender != j.provider) revert NotAParty(msg.sender);
+        if (j.status != Status.Disputed) revert WrongStatus(id, j.status);
+        uint64 evidenceEnds = j.disputedAt + j.evidencePeriod;
+        if (block.timestamp > evidenceEnds) revert EvidenceClosed(evidenceEnds);
+        emit EvidenceAdded(id, msg.sender, evidenceHash);
+    }
+
+    /// @notice The provider gives way: the client is refunded in full. Open after delivery and during a dispute.
+    function giveWay(uint256 id) external nonReentrant {
+        Job storage j = _job(id);
+        if (msg.sender != j.provider) revert NotProvider(msg.sender);
+        if (j.status != Status.Delivered && j.status != Status.Disputed) revert WrongStatus(id, j.status);
+        _close(id, j, 0, Outcome.ProviderGaveWay);
+    }
+
+    /// @notice The decider rules on a dispute: toProvider to the payee, the rest to the client. Only after the evidence
+    ///         period, by the decision deadline, and with an outcome the terms allow.
+    function decide(uint256 id, uint256 toProvider) external nonReentrant {
+        Job storage j = _job(id);
+        if (msg.sender != j.decider) revert NotDecider(msg.sender);
+        if (j.status != Status.Disputed) revert WrongStatus(id, j.status);
+        uint64 evidenceEnds = j.disputedAt + j.evidencePeriod;
+        uint64 decideBy = j.disputedAt + j.decisionPeriod;
+        if (block.timestamp <= evidenceEnds) revert EvidenceStillOpen(evidenceEnds);
+        if (block.timestamp > decideBy) revert DecisionOver(decideBy);
+        if (toProvider > j.price) revert ShareTooLarge(toProvider, j.price);
+        uint8 needed = toProvider == j.price ? MAY_PAY_PROVIDER : toProvider == 0 ? MAY_REFUND_CLIENT : MAY_SPLIT;
+        if (j.deciderMay & needed == 0) revert OutcomeNotAllowed(toProvider, j.deciderMay);
+        _close(id, j, toProvider, Outcome.Decided);
+    }
+
+    /// @notice Applies a timeout outcome once its period has run out: the review's for a delivered job, the decision's
+    ///         for a disputed one. Anyone may call it.
+    function finish(uint256 id) external nonReentrant {
+        Job storage j = _job(id);
+        if (j.status == Status.Delivered) {
+            uint64 reviewEnds = j.deliveredAt + j.reviewPeriod;
+            if (block.timestamp <= reviewEnds) revert ReviewNotOver(reviewEnds);
+            _close(id, j, _providerShare(j.price, j.reviewTimeoutBps), Outcome.ReviewTimeout);
+        } else if (j.status == Status.Disputed) {
+            uint64 decideBy = j.disputedAt + j.decisionPeriod;
+            if (block.timestamp <= decideBy) revert DecisionNotOver(decideBy);
+            _close(id, j, _providerShare(j.price, j.decisionTimeoutBps), Outcome.DecisionTimeout);
+        } else {
+            revert WrongStatus(id, j.status);
+        }
+    }
+
+    /// @notice Without a verified delivery the client is paid back in full. Anyone may call it once the proof escrow
+    ///         lets this contract refund (after its deadline), or after the provider released the client there.
+    function reclaim(uint256 id) external nonReentrant {
+        Job storage j = _job(id);
+        if (j.status != Status.Funded) revert WrongStatus(id, j.status);
+        ProofEscrow.Status es = proofEscrow.getJob(j.escrowJobId).status;
+        if (es == ProofEscrow.Status.Settled) revert AlreadyDelivered(id);
+        j.status = Status.Closed;
+        j.outcome = Outcome.NotDelivered;
+        j.toClient = j.price;
+        j.closedAt = uint64(block.timestamp);
+        emit Closed(id, Outcome.NotDelivered, msg.sender, 0, j.price);
+        IERC20 token = IERC20(j.token);
+        // the proof escrow refunds its client, this contract; before its deadline it refuses (NotRefundableYet)
+        if (es == ProofEscrow.Status.Open) proofEscrow.refund(j.escrowJobId);
+        token.safeTransfer(j.client, j.price);
+        if (token.balanceOf(address(this)) < held[j.token]) revert HeldFundsTouched(j.token);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Views
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /// @notice The commitment the provider signs as the quote's quoteId. Bound to this chain and this contract.
+    function termsHash(Terms calldata t) public view returns (bytes32) {
+        return keccak256(
+            abi.encode(
+                TERMS_TYPEHASH,
+                block.chainid,
+                address(this),
+                t.client,
+                t.payee,
+                t.decider,
+                t.deciderMay,
+                t.reviewPeriod,
+                t.evidencePeriod,
+                t.decisionPeriod,
+                t.reviewTimeoutBps,
+                t.decisionTimeoutBps,
+                t.salt
+            )
+        );
+    }
+
+    function getJob(uint256 id) external view returns (Job memory) {
+        return _jobs[id];
+    }
+
+    /// @notice The job's deadlines so far (0 until the step that starts each one).
+    function deadlines(uint256 id) external view returns (uint64 reviewEndsAt, uint64 evidenceEndsAt, uint64 decideBy) {
+        Job storage j = _jobs[id];
+        if (j.deliveredAt != 0) reviewEndsAt = j.deliveredAt + j.reviewPeriod;
+        if (j.disputedAt != 0) {
+            evidenceEndsAt = j.disputedAt + j.evidencePeriod;
+            decideBy = j.disputedAt + j.decisionPeriod;
+        }
+    }
+
+    /// @notice A share in basis points as the two amounts: the client's part rounded down, the provider the rest.
+    function split(uint256 price, uint16 providerBps) external pure returns (uint256 toProvider, uint256 toClient) {
+        if (providerBps > BPS) revert BadShares();
+        toProvider = _providerShare(price, providerBps);
+        toClient = price - toProvider;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Internal
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    function _job(uint256 id) internal view returns (Job storage j) {
+        j = _jobs[id];
+        if (j.status == Status.None) revert UnknownJob(id);
+    }
+
+    function _checkTerms(Terms calldata t, address provider) internal view {
+        if (t.client == address(0) || t.payee == address(0) || t.decider == address(0) || provider == address(0)) {
+            revert ZeroAddress();
+        }
+        // three distinct sides: the decider is neither party nor paid as one; nobody pays itself
+        if (
+            t.decider == t.client || t.decider == provider || t.decider == t.payee || t.payee == t.client
+                || provider == t.client || t.payee == address(this) || t.payee == address(proofEscrow)
+                || t.decider == address(this)
+        ) revert BadParties();
+        if (t.deciderMay == 0 || t.deciderMay > (MAY_PAY_PROVIDER | MAY_REFUND_CLIENT | MAY_SPLIT)) {
+            revert BadPowers(t.deciderMay);
+        }
+        if (
+            t.reviewPeriod < MIN_PERIOD || t.reviewPeriod > MAX_PERIOD || t.evidencePeriod < MIN_PERIOD
+                || t.evidencePeriod > MAX_PERIOD - MIN_PERIOD || t.decisionPeriod < t.evidencePeriod + MIN_PERIOD
+                || t.decisionPeriod > MAX_PERIOD
+        ) revert BadPeriods();
+        if (t.reviewTimeoutBps > BPS || t.decisionTimeoutBps > BPS) revert BadShares();
+    }
+
+    /// @dev The client's part is rounded down; the provider receives the rest, so the two add up to the price.
+    function _providerShare(uint256 price, uint16 providerBps) internal pure returns (uint256) {
+        return price - Math.mulDiv(price, BPS - providerBps, BPS);
+    }
+
+    /// @dev Effects first, then the two transfers; afterwards the money held for other jobs must still be here.
+    function _close(uint256 id, Job storage j, uint256 toProvider, Outcome outcome) internal {
+        uint256 toClient = j.price - toProvider;
+        j.status = Status.Closed;
+        j.outcome = outcome;
+        j.toProvider = toProvider;
+        j.toClient = toClient;
+        j.closedAt = uint64(block.timestamp);
+        held[j.token] -= j.price;
+        emit Closed(id, outcome, msg.sender, toProvider, toClient);
+        IERC20 token = IERC20(j.token);
+        if (toProvider != 0) token.safeTransfer(j.payee, toProvider);
+        if (toClient != 0) token.safeTransfer(j.client, toClient);
+        if (token.balanceOf(address(this)) < held[j.token]) revert HeldFundsTouched(j.token);
+    }
+}

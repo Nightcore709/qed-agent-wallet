@@ -1,0 +1,14 @@
+(node:46235) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ execution cost is non-decreasing in size (F* concave), so the impact search is well defined (314.6495ms)
+✔ the tranche never exceeds any of its limits, and covers the shortfall when need is the binding one (1224.179667ms)
+✔ no shortfall → no action; a market too thin for the minimum tranche → wait, never a forced trade (5.456875ms)
+✔ the decision is deterministic: the co-signer recomputes exactly what the agent decided (805.225417ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2545.94125

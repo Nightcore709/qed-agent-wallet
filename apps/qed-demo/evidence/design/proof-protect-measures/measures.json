@@ -1,0 +1,1724 @@
+{
+ "base": "http://localhost:5701",
+ "at": "2026-11-22T18:52:13.480Z",
+ "routes": [
+  "/protect",
+  "/security",
+  "/workspace",
+  "/readiness",
+  "/instructions",
+  "/instructions/new",
+  "/instructions/new?kind=invest",
+  "/instructions/prg_1m825m0jwvv2np5qp26"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/protect 1440 light": {
+   "words": 596,
+   "wordsFirst": 384,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    20,
+    21,
+    34,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 95,
+   "targets": 30,
+   "small24": 1,
+   "under32": 2,
+   "under44": 23,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21",
+    "a \"Invest ₹200 in Bitcoin in rupees\" 182x31"
+   ],
+   "blankFirst": 0.079,
+   "inkFirst": 0.268,
+   "blankPage": 0.11,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 1436,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/security 1440 light": {
+   "words": 789,
+   "wordsFirst": 483,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 92,
+   "targets": 23,
+   "small24": 1,
+   "under32": 1,
+   "under44": 18,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.099,
+   "inkFirst": 0.317,
+   "blankPage": 0.15,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 1705,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/workspace 1440 light": {
+   "words": 233,
+   "wordsFirst": 233,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    21,
+    34,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 61,
+   "targets": 16,
+   "small24": 1,
+   "under32": 1,
+   "under44": 12,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.139,
+   "inkFirst": 0.215,
+   "blankPage": 0.13,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 945,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/readiness 1440 light": {
+   "words": 4333,
+   "wordsFirst": 319,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    21,
+    24,
+    30,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 667,
+   "targets": 19,
+   "small24": 1,
+   "under32": 1,
+   "under44": 16,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.116,
+   "inkFirst": 0.24,
+   "blankPage": 1.7,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 3177,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions 1440 light": {
+   "words": 510,
+   "wordsFirst": 365,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 9,
+   "contrastMin": 1,
+   "contrastFails": 103,
+   "targets": 35,
+   "small24": 1,
+   "under32": 1,
+   "under44": 30,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.092,
+   "inkFirst": 0.234,
+   "blankPage": 0.11,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 1248,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions/new 1440 light": {
+   "words": 312,
+   "wordsFirst": 290,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    15.5,
+    17,
+    21,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 54,
+   "targets": 22,
+   "small24": 1,
+   "under32": 1,
+   "under44": 11,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.096,
+   "inkFirst": 0.216,
+   "blankPage": 0.12,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 1116,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions/new?kind=invest 1440 light": {
+   "words": 811,
+   "wordsFirst": 245,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    20,
+    21,
+    34,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 123,
+   "targets": 30,
+   "small24": 1,
+   "under32": 1,
+   "under44": 12,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.075,
+   "inkFirst": 0.291,
+   "blankPage": 0.67,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1751,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions/prg_1m825m0jwvv2np5qp26 1440 light": {
+   "words": 840,
+   "wordsFirst": 475,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    20,
+    21,
+    22,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 189,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 15,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.078,
+   "inkFirst": 0.341,
+   "blankPage": 0.26,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 2197,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/protect 390 light": {
+   "words": 576,
+   "wordsFirst": 171,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    28,
+    38
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 83,
+   "targets": 26,
+   "small24": 1,
+   "under32": 2,
+   "under44": 15,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18",
+    "a \"Invest ₹200 in Bitcoin in rupees\" 182x31"
+   ],
+   "blankFirst": 0.069,
+   "inkFirst": 0.473,
+   "blankPage": 0.13,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 2954,
+   "axe": {},
+   "fault": false
+  },
+  "/security 390 light": {
+   "words": 769,
+   "wordsFirst": 204,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    18,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 80,
+   "targets": 19,
+   "small24": 1,
+   "under32": 1,
+   "under44": 11,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.067,
+   "inkFirst": 0.556,
+   "blankPage": 0.18,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 3404,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 390 light": {
+   "words": 213,
+   "wordsFirst": 119,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    28,
+    44
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 49,
+   "targets": 12,
+   "small24": 1,
+   "under32": 1,
+   "under44": 5,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.087,
+   "inkFirst": 0.34,
+   "blankPage": 0.09,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 1688,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 390 light": {
+   "words": 4313,
+   "wordsFirst": 161,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    20,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 655,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 8,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.08,
+   "inkFirst": 0.408,
+   "blankPage": 0.74,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 6358,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 390 light": {
+   "words": 490,
+   "wordsFirst": 184,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    18,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 9,
+   "contrastMin": 1,
+   "contrastFails": 91,
+   "targets": 31,
+   "small24": 1,
+   "under32": 1,
+   "under44": 23,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.087,
+   "inkFirst": 0.466,
+   "blankPage": 0.21,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 2658,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 390 light": {
+   "words": 16,
+   "wordsFirst": 16,
+   "sizes": [
+    13
+   ],
+   "weights": [
+    400
+   ],
+   "families": [
+    "monospace"
+   ],
+   "colours": 1,
+   "contrastMin": 21,
+   "contrastFails": 0,
+   "targets": 0,
+   "small24": 0,
+   "under32": 0,
+   "under44": 0,
+   "smallest": null,
+   "smallList": [],
+   "blankFirst": 0.141,
+   "inkFirst": 0.859,
+   "blankPage": 0,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {
+    "document-title": 1,
+    "html-has-lang": 1
+   },
+   "fault": false
+  },
+  "/instructions/new?kind=invest 390 light": {
+   "words": 791,
+   "wordsFirst": 72,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    20,
+    28,
+    38
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 111,
+   "targets": 26,
+   "small24": 1,
+   "under32": 1,
+   "under44": 5,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.107,
+   "inkFirst": 0.509,
+   "blankPage": 0.14,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 3635,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m825m0jwvv2np5qp26 390 light": {
+   "words": 790,
+   "wordsFirst": 158,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    18,
+    19,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 147,
+   "targets": 14,
+   "small24": 1,
+   "under32": 1,
+   "under44": 8,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.061,
+   "inkFirst": 0.488,
+   "blankPage": 0.16,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 4285,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 1440 dark": {
+   "words": 596,
+   "wordsFirst": 384,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    20,
+    21,
+    34,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 95,
+   "targets": 30,
+   "small24": 1,
+   "under32": 2,
+   "under44": 23,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21",
+    "a \"Invest ₹200 in Bitcoin in rupees\" 182x31"
+   ],
+   "blankFirst": 0.079,
+   "inkFirst": 0.268,
+   "blankPage": 0.11,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 1436,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/security 1440 dark": {
+   "words": 789,
+   "wordsFirst": 483,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 92,
+   "targets": 23,
+   "small24": 1,
+   "under32": 1,
+   "under44": 18,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.099,
+   "inkFirst": 0.317,
+   "blankPage": 0.15,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 1705,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/workspace 1440 dark": {
+   "words": 233,
+   "wordsFirst": 233,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    21,
+    34,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 61,
+   "targets": 16,
+   "small24": 1,
+   "under32": 1,
+   "under44": 12,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.139,
+   "inkFirst": 0.215,
+   "blankPage": 0.13,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 945,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/readiness 1440 dark": {
+   "words": 4333,
+   "wordsFirst": 319,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    21,
+    24,
+    30,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 667,
+   "targets": 19,
+   "small24": 1,
+   "under32": 1,
+   "under44": 16,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.116,
+   "inkFirst": 0.24,
+   "blankPage": 1.7,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 3177,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions 1440 dark": {
+   "words": 510,
+   "wordsFirst": 365,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 9,
+   "contrastMin": 1,
+   "contrastFails": 103,
+   "targets": 35,
+   "small24": 1,
+   "under32": 1,
+   "under44": 30,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.092,
+   "inkFirst": 0.234,
+   "blankPage": 0.11,
+   "edgesFirst": 25,
+   "overflow": false,
+   "height": 1248,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions/new 1440 dark": {
+   "words": 312,
+   "wordsFirst": 290,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    15.5,
+    17,
+    21,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 54,
+   "targets": 22,
+   "small24": 1,
+   "under32": 1,
+   "under44": 11,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.096,
+   "inkFirst": 0.216,
+   "blankPage": 0.12,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 1116,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions/new?kind=invest 1440 dark": {
+   "words": 811,
+   "wordsFirst": 245,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    20,
+    21,
+    34,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 123,
+   "targets": 30,
+   "small24": 1,
+   "under32": 1,
+   "under44": 12,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.075,
+   "inkFirst": 0.291,
+   "blankPage": 0.67,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1751,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/instructions/prg_1m825m0jwvv2np5qp26 1440 dark": {
+   "words": 840,
+   "wordsFirst": 475,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    20,
+    21,
+    22,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 189,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 15,
+   "smallest": "a \"QED\" 73x21",
+   "smallList": [
+    "a \"QED\" 73x21"
+   ],
+   "blankFirst": 0.078,
+   "inkFirst": 0.341,
+   "blankPage": 0.26,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 2197,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/protect 390 dark": {
+   "words": 576,
+   "wordsFirst": 171,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    28,
+    38
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 83,
+   "targets": 26,
+   "small24": 1,
+   "under32": 2,
+   "under44": 15,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18",
+    "a \"Invest ₹200 in Bitcoin in rupees\" 182x31"
+   ],
+   "blankFirst": 0.069,
+   "inkFirst": 0.473,
+   "blankPage": 0.13,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 2954,
+   "axe": {},
+   "fault": false
+  },
+  "/security 390 dark": {
+   "words": 769,
+   "wordsFirst": 204,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    18,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 80,
+   "targets": 19,
+   "small24": 1,
+   "under32": 1,
+   "under44": 11,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.067,
+   "inkFirst": 0.556,
+   "blankPage": 0.18,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 3404,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 390 dark": {
+   "words": 213,
+   "wordsFirst": 119,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    28,
+    44
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 49,
+   "targets": 12,
+   "small24": 1,
+   "under32": 1,
+   "under44": 5,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.087,
+   "inkFirst": 0.34,
+   "blankPage": 0.09,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 1688,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 390 dark": {
+   "words": 4313,
+   "wordsFirst": 161,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    20,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 1,
+   "contrastFails": 655,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 8,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.08,
+   "inkFirst": 0.408,
+   "blankPage": 0.74,
+   "edgesFirst": 16,
+   "overflow": false,
+   "height": 6358,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 390 dark": {
+   "words": 490,
+   "wordsFirst": 184,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    18,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 9,
+   "contrastMin": 1,
+   "contrastFails": 91,
+   "targets": 31,
+   "small24": 1,
+   "under32": 1,
+   "under44": 23,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.087,
+   "inkFirst": 0.466,
+   "blankPage": 0.21,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 2658,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 390 dark": {
+   "words": 292,
+   "wordsFirst": 132,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    15,
+    15.5,
+    17,
+    18,
+    28
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 1,
+   "contrastFails": 42,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 4,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.094,
+   "inkFirst": 0.377,
+   "blankPage": 0.1,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1998,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new?kind=invest 390 dark": {
+   "words": 791,
+   "wordsFirst": 72,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    16,
+    17,
+    18,
+    20,
+    28,
+    38
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 111,
+   "targets": 26,
+   "small24": 1,
+   "under32": 1,
+   "under44": 5,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.107,
+   "inkFirst": 0.509,
+   "blankPage": 0.14,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 3635,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m825m0jwvv2np5qp26 390 dark": {
+   "words": 790,
+   "wordsFirst": 158,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    14.5,
+    15,
+    17,
+    18,
+    19,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    660,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 1,
+   "contrastFails": 147,
+   "targets": 14,
+   "small24": 1,
+   "under32": 1,
+   "under44": 8,
+   "smallest": "a \"QED\" 66x18",
+   "smallList": [
+    "a \"QED\" 66x18"
+   ],
+   "blankFirst": 0.061,
+   "inkFirst": 0.488,
+   "blankPage": 0.16,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 4285,
+   "axe": {},
+   "fault": false
+  }
+ }
+}

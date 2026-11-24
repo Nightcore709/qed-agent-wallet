@@ -1,0 +1,43 @@
+{
+ "width": 390,
+ "seconds": 20,
+ "at": "2026-11-22T19:08:38.228Z",
+ "report": [
+  {
+   "table": "table 0",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 54
+  },
+  {
+   "table": "Digital asset prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 31
+  },
+  {
+   "table": "Fund NAVs; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 24
+  },
+  {
+   "table": "Reference prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 34
+  },
+  {
+   "table": "Holdings rows",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 9
+  },
+  {
+   "table": "Ticket quote",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 2
+  }
+ ]
+}

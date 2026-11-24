@@ -1,0 +1,714 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "run.run_1m823q2x10myx16hp19",
+ "kind": "standing-run",
+ "title": "Invest ₹500 in Bitcoin in rupees: run refused",
+ "outcome": "refused",
+ "venue": "paper",
+ "workspace": "usr_1m823h9ax3v64dv82zt",
+ "assembledAt": "2026-11-22T17:10:08.134Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "Invest ₹500 in Bitcoin in rupees",
+    "source": "the instruction the owner wrote",
+    "at": "2026-11-22T17:08:19.238Z"
+   },
+   "instruments": [
+    {
+     "kind": "standing-instruction",
+     "id": "prg_1m823nt56bvhs0b5reh@v1",
+     "title": "Invest ₹500 in Bitcoin in rupees",
+     "signedAt": "2026-11-22T17:08:19.263Z",
+     "venue": "paper-crypto",
+     "state": "revoked",
+     "limits": [
+      {
+       "name": "maxPerRun",
+       "value": 50000,
+       "text": "₹500 a run"
+      },
+      {
+       "name": "maxPerDay",
+       "value": null,
+       "text": "no separate daily limit"
+      },
+      {
+       "name": "maxPerMonth",
+       "value": 100000,
+       "text": "₹1,000 a month"
+      },
+      {
+       "name": "maxRuns",
+       "value": 1,
+       "text": "1 runs in all"
+      },
+      {
+       "name": "maxSlippageBps",
+       "value": 100,
+       "text": "at most 1% from the best quote"
+      },
+      {
+       "name": "runMode",
+       "value": "auto",
+       "text": "runs on its own, without asking"
+      }
+     ],
+     "expiresAt": "2026-11-23T17:08:19.236Z",
+     "params": {
+      "instrumentId": "coindcx:BTCINR",
+      "amount": 50000,
+      "schedule": {
+       "type": "every",
+       "minutes": 1
+      }
+     },
+     "document": {
+      "text": "{\"accepted\":[\"The schedule asks for about ₹2,16,00,000 a month and the monthly limit is ₹1,000: runs beyond the limit in a month will be refused, not postponed.\"],\"authority\":{\"expiresAt\":1795453699236,\"maxPerDay\":null,\"maxPerMonth\":100000,\"maxPerRun\":50000,\"maxRuns\":1,\"maxSlippageBps\":100,\"noticeSec\":0,\"runMode\":\"auto\"},\"basis\":[\"Bitcoin in rupees: ask 5210583.66 from synthetic; source time 2026-11-22T17:08:01.828Z; received 2026-11-22T17:08:01.828Z.\",\"Figures computed 2026-11-22T17:08:19.249Z from your recorded balances. All execution is on paper: no real money moves.\"],\"ceiling\":\"Taken together, the limits let it move at most ₹500 before 23 Nov 2026, 22:38 IST.\",\"ceilingPaise\":50000,\"conditions\":[\"Only if the money is free in your bank account at that moment: what is left must still cover everything due before your income is certain to arrive.\",\"Only if your worst case stays at or above your floor after the purchase.\",\"Only at prices no more than 1.00% above the best price on the book, with price data no older than 15 seconds that agrees with an independent source.\"],\"consequences\":[\"Leaves your bank each month: ₹1,000 (The schedule asks for ₹2,16,00,000 a month: every 1 minute, about 43,200 runs. The monthly limit stops it at ₹1,000)\",\"Spare each month before this: ₹8,000 (Income ₹1,20,000 less counted outflows ₹82,000 and instalments ₹30,000)\",\"Largest monthly limit that keeps every due payment covered: ₹6,22,500 (Even if every run takes its full amount, allowing for income up to 5 days late and one salary not arriving. Worked out on what is due in the next 150 days as recorded today, and again each time it is shown)\",\"At risk per run: ₹250 (50% limit on Bitcoin in rupees (illustrative, not calibrated))\",\"Cost per purchase: ₹2.95 + 0.10% spread (Taker fee 0.59% (unverified); spread from the current book)\",\"First run: 22 Nov 2026, 22:39 IST\"],\"ends\":\"This authority ends on 23 Nov 2026, 22:38 IST. Nothing runs after that unless you sign again.\",\"kind\":\"invest\",\"limits\":[\"At most ₹500 in one run.\",\"At most ₹1,000 in one calendar month.\",\"At most 1 run in total.\"],\"may\":[\"Buy Bitcoin in rupees with ₹500 from your bank account, every 1 minute.\"],\"mode\":\"It runs on its own, without asking you each time.\",\"never\":[\"Buy anything else, or sell anything.\",\"Act after the end date, or while paused or revoked.\",\"Exceed any limit above, whatever the reason.\",\"Move money to anyone or anything not named here.\"],\"notLimited\":[\"The price or NAV at which an order executes.\",\"Venue fees, stamp duty and tax, which come out of the amounts above rather than on top of them, except a loan prepayment charge where one is named.\"],\"params\":{\"amount\":50000,\"instrumentId\":\"coindcx:BTCINR\",\"schedule\":{\"minutes\":1,\"type\":\"every\"}},\"stop\":\"You can pause or revoke this at any time. Revoking takes effect at once for anything not yet sent to a venue or a rail.\",\"title\":\"Invest ₹500 in Bitcoin in rupees\",\"v\":1}",
+      "sha256": "811f074a633444c76530c7641ee4f67fb297967016ff50d0754105c23848decc"
+     },
+     "documentAsSigned": {
+      "may": [
+       "Buy Bitcoin in rupees with ₹500 from your bank account, every 1 minute."
+      ],
+      "limits": [
+       "At most ₹500 in one run.",
+       "At most ₹1,000 in one calendar month.",
+       "At most 1 run in total."
+      ],
+      "ceiling": "Taken together, the limits let it move at most ₹500 before 23 Nov 2026, 22:38 IST.",
+      "conditions": [
+       "Only if the money is free in your bank account at that moment: what is left must still cover everything due before your income is certain to arrive.",
+       "Only if your worst case stays at or above your floor after the purchase.",
+       "Only at prices no more than 1.00% above the best price on the book, with price data no older than 15 seconds that agrees with an independent source."
+      ],
+      "never": [
+       "Buy anything else, or sell anything.",
+       "Act after the end date, or while paused or revoked.",
+       "Exceed any limit above, whatever the reason.",
+       "Move money to anyone or anything not named here."
+      ],
+      "mode": "It runs on its own, without asking you each time.",
+      "ends": "This authority ends on 23 Nov 2026, 22:38 IST. Nothing runs after that unless you sign again.",
+      "accepted": [
+       "The schedule asks for about ₹2,16,00,000 a month and the monthly limit is ₹1,000: runs beyond the limit in a month will be refused, not postponed."
+      ],
+      "drafted": null
+     },
+     "approval": {
+      "id": "apr_1m823nt5h407h4g606a",
+      "purpose": "program-version",
+      "subject": "program:prg_1m823nt56bvhs0b5reh@1",
+      "docHash": "811f074a633444c76530c7641ee4f67fb297967016ff50d0754105c23848decc",
+      "method": "passkey",
+      "askedAt": "2026-11-22T17:08:19.249Z",
+      "expiresAt": "2026-11-22T17:18:19.249Z",
+      "confirmedAt": "2026-11-22T17:08:19.261Z",
+      "usedAt": "2026-11-22T17:08:19.263Z",
+      "cancelledAt": null,
+      "signaturesRequired": 1,
+      "signaturesGiven": 1
+     },
+     "signatures": [
+      {
+       "type": "webauthn-es256",
+       "credential": "sha256:ba3e92bddda1fda0",
+       "publicKey": {
+        "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+        "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+       },
+       "challenge": "0xae53d192db71ac3bf0e0865364488d917d02883312e3bc53e37a14b7cbe592f6",
+       "challengeIs": "approval challenge: SHA-256(\"qed/approval/v1\\n\" + approval id + \"\\n\" + document hash)",
+       "authenticatorData": "SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAABw",
+       "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"rlPRkttxrDvw4IZTZEiNkX0CiDMS47xT43oUt8vlkvY\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+       "signature": "MEUCIQDPCfCP2SyrQMlcu6_dYqAqj5NA_79rYO1DsSQ2wVa7uQIgBQ-NBjo1eJV7pK14rsniojlASDPPmKKtsXQfI94ZiQw",
+       "rpId": "localhost"
+      }
+     ]
+    }
+   ]
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": false,
+   "isModel": false,
+   "label": "none",
+   "statement": "No model took part: the owner wrote this instruction.",
+   "information": [],
+   "constraints": []
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "refused",
+   "statement": "Every action passes the engine's checks immediately before it is sent to a venue. They read only recorded state: the signed authority, the ledger, prices and their age. No model output is an input.",
+   "checks": [
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "program-active",
+     "pass": true,
+     "detail": "The instruction is active.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "version-live",
+     "pass": true,
+     "detail": "Run belongs to version 1; live version is 1.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "authority-in-date",
+     "pass": true,
+     "detail": "Its authority ends 23 Nov 2026, 22:38 IST.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "within-run-limit",
+     "pass": true,
+     "detail": "₹500.00 against ₹500.00 per run.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "within-month-limit",
+     "pass": true,
+     "detail": "₹0.00 used this month plus ₹500.00 against ₹1,000.00.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "within-run-count",
+     "pass": true,
+     "detail": "0 other runs of this instruction are done or in progress, against 1 in all.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "instrument-in-scope",
+     "pass": true,
+     "detail": "Bitcoin in rupees is named in the signed instruction.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "not-stopped",
+     "pass": true,
+     "detail": "No emergency stop is in force.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "instrument-tradable",
+     "pass": true,
+     "detail": "Bitcoin in rupees is traded on the paper exchange.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "price-fresh",
+     "pass": false,
+     "detail": "The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old.",
+     "transient": true,
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "price-agrees-with-independent-source",
+     "pass": false,
+     "detail": "This instrument has no fresh two-sided price.",
+     "transient": true,
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "funds-available",
+     "pass": true,
+     "detail": "₹500.00 needed; ₹7,99,056.04 available in the bank account.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "floor-can-be-evaluated",
+     "pass": false,
+     "detail": "The worst case cannot be relied on: Bitcoin in rupees: the price is stale, so its limit no longer bounds the fall.",
+     "transient": true,
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "worst-case-stays-above-floor",
+     "pass": true,
+     "detail": "Worst case ₹6,37,524.52, floor ₹5,00,000.00; buying ₹500.00 of Bitcoin in rupees puts ₹250.00 at risk under its limit; after: ₹6,37,274.52. Limits are illustrative, not calibrated.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "stays-liquid",
+     "pass": true,
+     "detail": "₹7,99,056.04 is available in the bank and this takes ₹500, leaving ₹7,98,556.04; ₹1,76,548.65 must stay for what is due by 6 Jan 2027, allowing for income up to 5 days late and one salary not arriving.",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    },
+    {
+     "by": "engine (server/policy.ts decide)",
+     "name": "started-in-time",
+     "pass": true,
+     "detail": "Started 45 s after it was asked for (limit 150 s).",
+     "source": {
+      "receipt": "rcp_1m823rewv7r7tnsf3xx"
+     }
+    }
+   ],
+   "run": {
+    "id": "run_1m823q2x10myx16hp19",
+    "occurrence": "2026-11-22T17:09:00.000Z",
+    "state": "blocked",
+    "reason": "The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old.",
+    "planned": [
+     "Buy ₹500 of Bitcoin in rupees"
+    ]
+   },
+   "reconciliation": [
+    {
+     "action": "act_1m823q2x3ny5zvvrk5n",
+     "state": "not_applicable",
+     "breaks": []
+    }
+   ]
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": false,
+   "ranUnder": [
+    {
+     "kind": "standing-instruction",
+     "id": "prg_1m823nt56bvhs0b5reh@v1",
+     "signedAt": "2026-11-22T17:08:19.263Z",
+     "approvalId": "apr_1m823nt5h407h4g606a",
+     "runMode": "auto"
+    }
+   ],
+   "requestedBy": {
+    "who": "the engine's scheduler",
+    "evidence": "run run_1m823q2x10myx16hp19 claimed for occurrence 2026-11-22T17:09:00.000Z at 2026-11-22T17:09:00.961Z, due 2026-11-22T17:09:00.000Z; started 2026-11-22T17:09:00.963Z",
+    "at": "2026-11-22T17:09:00.961Z"
+   },
+   "signaturesUsed": [
+    {
+     "approvalId": "apr_1m823nt5h407h4g606a",
+     "when": "2026-11-22T17:08:19.261Z",
+     "what": "the instruction's exact document, once, before any run"
+    }
+   ],
+   "statement": "The engine ran this under the instruction the owner signed earlier. No one signed anything for this run.",
+   "neededASignature": [
+    "the instruction itself, and any change to it",
+    "raising a limit or extending its end"
+   ]
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": false,
+   "moved": [],
+   "balances": [],
+   "entries": [],
+   "costs": null,
+   "receipts": [
+    {
+     "id": "rcp_1m823rewv7r7tnsf3xx",
+     "hash": "09a17c7f2840d9690e2c49d3e2d19c6cdc4bdf5cdfc80621246711245a1a5a8b",
+     "seq": 3
+    }
+   ],
+   "consequence": "Refused before anything was sent: The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old.",
+   "units": "Amounts are integers in the asset's smallest unit (paise for INR). Ledger balances are the sum of postings, debit positive."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "97eae284effe86bcca5cb1f5d754d5783f09a544",
+    "uncommittedChanges": true,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "paper",
+    "names": [
+     "paper-crypto"
+    ],
+    "note": "A paper venue run by this installation, with its own books: no order reached an exchange."
+   },
+   "transactions": [],
+   "ids": {
+    "run": "run_1m823q2x10myx16hp19",
+    "program": "prg_1m823nt56bvhs0b5reh",
+    "version": 1,
+    "contentHash": "811f074a633444c76530c7641ee4f67fb297967016ff50d0754105c23848decc",
+    "approval": "apr_1m823nt5h407h4g606a",
+    "proposal": null,
+    "aiCall": null,
+    "actions": [
+     {
+      "id": "act_1m823q2x3ny5zvvrk5n",
+      "economicId": "prg_1m823nt56bvhs0b5reh#2026-11-22T17:09:00.000Z#0",
+      "venue": "paper-crypto"
+     }
+    ],
+    "receipts": [
+     "rcp_1m823rewv7r7tnsf3xx"
+    ]
+   },
+   "times": [
+    {
+     "action": "act_1m823q2x3ny5zvvrk5n",
+     "asked": "2026-11-22T17:09:00.963Z",
+     "created": "2026-11-22T17:09:00.963Z",
+     "decided": "2026-11-22T17:09:46.009Z",
+     "reconciled": "2026-11-22T17:09:46.011Z"
+    }
+   ],
+   "prices": "as recorded in each fill's evidence"
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [],
+   "probes": [
+    {
+     "question": "The same action, now?",
+     "input": {},
+     "answer": {
+      "allowed": false,
+      "failed": [
+       {
+        "name": "program-active",
+        "detail": "The instruction is revoked."
+       }
+      ]
+     },
+     "by": "server/policy.ts decide, the check every action passes before it is sent",
+     "evaluatedAt": "2026-11-22T17:10:08.134Z"
+    },
+    {
+     "question": "The same action for ₹1 more than the signed limit of ₹500 a run?",
+     "input": {
+      "amount": "50100"
+     },
+     "answer": {
+      "allowed": false,
+      "failed": [
+       {
+        "name": "program-active",
+        "detail": "The instruction is revoked."
+       },
+       {
+        "name": "within-run-limit",
+        "detail": "₹501.00 against ₹500.00 per run."
+       }
+      ]
+     },
+     "by": "server/policy.ts decide, the check every action passes before it is sent",
+     "evaluatedAt": "2026-11-22T17:10:08.134Z"
+    }
+   ],
+   "note": "Recorded: other runs of the same signed instruction. Probes: the engine's own checks (server/policy.ts decide) run now on a changed copy of this action, without storing or sending anything."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [
+    {
+     "check": "price-fresh",
+     "by": "engine (server/policy.ts decide)",
+     "detail": "The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old."
+    },
+    {
+     "check": "price-agrees-with-independent-source",
+     "by": "engine (server/policy.ts decide)",
+     "detail": "This instrument has no fresh two-sided price."
+    },
+    {
+     "check": "floor-can-be-evaluated",
+     "by": "engine (server/policy.ts decide)",
+     "detail": "The worst case cannot be relied on: Bitcoin in rupees: the price is stale, so its limit no longer bounds the fall."
+    }
+   ],
+   "related": []
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "54e4700388159d3924902a302f6bfcc32d83403cf57dab5f30714e7cdd86000c",
+   "server": {
+    "ok": true,
+    "count": 3,
+    "brokenAt": null,
+    "head": "09a17c7f2840d9690e2c49d3e2d19c6cdc4bdf5cdfc80621246711245a1a5a8b",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [
+    {
+     "seq": 1,
+     "id": "rcp_1m823kdm6vrr382m5py",
+     "kind": "order",
+     "subject": "act_1m823kdkpy66jr3dej5",
+     "ts": 1795367220870,
+     "prevHash": "54e4700388159d3924902a302f6bfcc32d83403cf57dab5f30714e7cdd86000c",
+     "hash": "4b0044a4d9d7519e5eed460573f868f9fcab0809941feb40679baec034a6358a"
+    },
+    {
+     "seq": 2,
+     "id": "rcp_1m823n88yxm832zy5rk",
+     "kind": "order",
+     "subject": "act_1m823n88ezg3vesfntg",
+     "ts": 1795367280926,
+     "prevHash": "4b0044a4d9d7519e5eed460573f868f9fcab0809941feb40679baec034a6358a",
+     "hash": "523aa3ef45f9357096436c2c59b14c7ebf99ded2c9ba76efbe3ad9d43207c008"
+    },
+    {
+     "seq": 3,
+     "id": "rcp_1m823rewv7r7tnsf3xx",
+     "kind": "refusal",
+     "subject": "act_1m823q2x3ny5zvvrk5n",
+     "ts": 1795367386011,
+     "prevHash": "523aa3ef45f9357096436c2c59b14c7ebf99ded2c9ba76efbe3ad9d43207c008",
+     "hash": "09a17c7f2840d9690e2c49d3e2d19c6cdc4bdf5cdfc80621246711245a1a5a8b",
+     "body": {
+      "what": "Buy ₹500 of Bitcoin in rupees",
+      "outcome": "blocked",
+      "reason": "The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old.",
+      "origin": "program",
+      "program": {
+       "id": "prg_1m823nt56bvhs0b5reh",
+       "title": "Invest ₹500 in Bitcoin in rupees",
+       "kind": "invest",
+       "version": 1,
+       "contentHash": "811f074a633444c76530c7641ee4f67fb297967016ff50d0754105c23848decc",
+       "occurrence": "2026-11-22T17:09:00.000Z",
+       "runId": "run_1m823q2x10myx16hp19"
+      },
+      "approval": null,
+      "decision": {
+       "decidedAt": 1795367386003,
+       "checks": [
+        {
+         "name": "program-active",
+         "ok": true,
+         "detail": "The instruction is active."
+        },
+        {
+         "name": "version-live",
+         "ok": true,
+         "detail": "Run belongs to version 1; live version is 1."
+        },
+        {
+         "name": "authority-in-date",
+         "ok": true,
+         "detail": "Its authority ends 23 Nov 2026, 22:38 IST."
+        },
+        {
+         "name": "within-run-limit",
+         "ok": true,
+         "detail": "₹500.00 against ₹500.00 per run."
+        },
+        {
+         "name": "within-month-limit",
+         "ok": true,
+         "detail": "₹0.00 used this month plus ₹500.00 against ₹1,000.00."
+        },
+        {
+         "name": "within-run-count",
+         "ok": true,
+         "detail": "0 other runs of this instruction are done or in progress, against 1 in all."
+        },
+        {
+         "name": "instrument-in-scope",
+         "ok": true,
+         "detail": "Bitcoin in rupees is named in the signed instruction."
+        },
+        {
+         "name": "not-stopped",
+         "ok": true,
+         "detail": "No emergency stop is in force."
+        },
+        {
+         "name": "instrument-tradable",
+         "ok": true,
+         "detail": "Bitcoin in rupees is traded on the paper exchange."
+        },
+        {
+         "name": "price-fresh",
+         "ok": false,
+         "detail": "The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old.",
+         "transient": true
+        },
+        {
+         "name": "price-agrees-with-independent-source",
+         "ok": false,
+         "detail": "This instrument has no fresh two-sided price.",
+         "transient": true
+        },
+        {
+         "name": "funds-available",
+         "ok": true,
+         "detail": "₹500.00 needed; ₹7,99,056.04 available in the bank account."
+        },
+        {
+         "name": "floor-can-be-evaluated",
+         "ok": false,
+         "detail": "The worst case cannot be relied on: Bitcoin in rupees: the price is stale, so its limit no longer bounds the fall.",
+         "transient": true
+        },
+        {
+         "name": "worst-case-stays-above-floor",
+         "ok": true,
+         "detail": "Worst case ₹6,37,524.52, floor ₹5,00,000.00; buying ₹500.00 of Bitcoin in rupees puts ₹250.00 at risk under its limit; after: ₹6,37,274.52. Limits are illustrative, not calibrated."
+        },
+        {
+         "name": "stays-liquid",
+         "ok": true,
+         "detail": "₹7,99,056.04 is available in the bank and this takes ₹500, leaving ₹7,98,556.04; ₹1,76,548.65 must stay for what is due by 6 Jan 2027, allowing for income up to 5 days late and one salary not arriving."
+        },
+        {
+         "name": "started-in-time",
+         "ok": true,
+         "detail": "Started 45 s after it was asked for (limit 150 s)."
+        }
+       ]
+      },
+      "instrument": {
+       "id": "coindcx:BTCINR",
+       "name": "Bitcoin in rupees",
+       "unit": "BTC",
+       "scale": 8
+      },
+      "venue": {
+       "name": "paper-crypto",
+       "state": "not submitted"
+      },
+      "ledgerEntries": [],
+      "reconciliation": {
+       "state": "not_applicable",
+       "breaks": [],
+       "checkedAt": 1795367386011
+      },
+      "times": {
+       "created": 1795367340963,
+       "decided": 1795367386009,
+       "reconciled": 1795367386011
+      },
+      "economicId": "prg_1m823nt56bvhs0b5reh#2026-11-22T17:09:00.000Z#0",
+      "params": {
+       "instrumentId": "coindcx:BTCINR",
+       "side": "buy",
+       "type": "market",
+       "amount": "50000",
+       "maxSlippageBps": 100,
+       "purpose": "invest"
+      },
+      "receipt": {
+       "id": "rcp_1m823rewv7r7tnsf3xx",
+       "seq": 3,
+       "kind": "refusal",
+       "subject": "act_1m823q2x3ny5zvvrk5n",
+       "issuedAt": 1795367386011,
+       "execution": "paper: no real money moved"
+      }
+     }
+    }
+   ],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled",
+   "note": "server/ledger.ts verifyLedger over the whole workspace: entries balance, cached balances equal their postings, nothing negative that may not be."
+  }
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "Bodies of receipts of other actions",
+   "how": "withheld; their numbers, links and hashes are kept",
+   "why": "The chain stays checkable without disclosing the household's other activity."
+  }
+ ],
+ "cannotProve": [
+  "Execution was on a paper venue run by this installation: no order reached an exchange and no money moved.",
+  "The passkey's make is not attested (its AAGUID is all zeros): a signature proves possession of the key, not which device or software held it.",
+  "Probes are evaluated when the case is assembled, against the records then; they are not records of past decisions.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "7e3d1cab102a36077ced2386a11302237133fddbd1419567d30699978843bdea",
+   "2": "295295f9bab3e5c36e30c4e7c3577aa6337d9250ea31b513e569c695615a6ca7",
+   "3": "79526b33eaf8bece23a75b7bdc339c961958c391d6539f1620c6146d9fe05eb8",
+   "4": "1564cf50e90ffb6b97d5b8ef0d0aa9574c102ad5ed994f1768ec62feb2ab413d",
+   "5": "29a3febe0681d87fdfd58b63637f85f880bd705ff2ef86ec6b39120a22439459",
+   "6": "99ace577497100ace1ad02c48deef1b059e825a59cbac9212375152537efdfbf",
+   "7": "4b4700ca706e891e03a99648d6dfee4db90e40d38e53acff8b617ded0b0e4ef6",
+   "8": "0cee7eb6570b999711b004f2ea8f127c6346af3f42909655084e345fb42a1e2a"
+  },
+  "verification": "c76b5567dbe1d4287ab3693bf24e1094ed08848078cfba4613a402b7dd386b0f",
+  "redactions": "4406d2c8add44b71aeb3555dff4db785c43eea74830c38fbe6cee8e91a5f60f4",
+  "cannotProve": "037775c242a021a5908bc26bbfc899c89be9190b66da5700dcc98d7244f4a103",
+  "root": "984378d0d7c6f56a45694162ab42b0a42582bb0542a8095763b341e3f972454f"
+ }
+}

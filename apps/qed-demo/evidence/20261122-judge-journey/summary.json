@@ -1,0 +1,931 @@
+{
+ "what": "FinTechathon Topic F judge journey: one scenario through QED's HTTP API on an isolated stack, then every evidence case of that household as the API assembled it, verified offline and against the stack's chain",
+ "producedAt": "2026-11-22 17:25:08.620 IST",
+ "durationSeconds": 254,
+ "howToReproduce": "cd apps/qed-demo && node scripts/judge-journey.ts (QED_BROWSER_PORT=5491 by default; needs Foundry's anvil in ~/.foundry/bin). A real model: QED_AI_PROVIDER=claude-cli node scripts/judge-journey.ts --real-model, with the owner's approval.",
+ "stack": {
+  "api": "http://localhost:5491",
+  "vaultService": "http://127.0.0.1:5492",
+  "chainRpc": "http://127.0.0.1:8792",
+  "chainId": 31337,
+  "database": "a scratch directory, deleted with the stack",
+  "presentationMode": true,
+  "prices": "synthetic: no market provider was contacted"
+ },
+ "proposer": {
+  "provider": "scripted",
+  "model": "scripted-test-double",
+  "note": "NOT a model: fixed replies from scripted-double-replies.json.",
+  "repliesFile": "scripted-double-replies.json",
+  "repliesSha256": "311b1908f804b28c63598dd903523615f2ce3d8096dbe590adc1655a90c2506d"
+ },
+ "passkey": "A software authenticator (server/softauthn.ts): a P-256 key in memory answering as a platform authenticator would. Not a hardware or platform passkey.",
+ "passed": 35,
+ "failed": 0,
+ "steps": [
+  {
+   "n": 1,
+   "name": "a fresh account with a passkey, and a paper household",
+   "expected": "signed in with the passkey; household set up; presentation mode; the model provider as configured",
+   "observed": "engine running true; auth passkey; set up true; presentation true; provider scripted (scripted-test-double)",
+   "pass": true,
+   "at": "2026-11-22 17:20:56.742 IST"
+  },
+  {
+   "n": 2,
+   "name": "the vault: an owner account whose one signer is this passkey, accepted with its signature",
+   "expected": "a passkey account; threshold 1; accepted; the opening grant of 1,00,000.00 tINR in the treasury",
+   "observed": "owner passkey-account 0x85F693C6cB…; threshold 1; accept done: executed; treasury 100000.00 tINR",
+   "pass": true,
+   "at": "2026-11-22 17:20:57.400 IST"
+  },
+  {
+   "n": 3,
+   "name": "bounded authority, signed once: a mandate",
+   "expected": "executed with one passkey signature through the owner account (ERC-1271); 250 a conversion, 600 a day, 2,000 in all",
+   "observed": "done: executed; 1 digest signed; 250.00 / 600.00 / 2000.00 tINR until 1795953057",
+   "pass": true,
+   "at": "2026-11-22 17:20:57.947 IST"
+  },
+  {
+   "n": 4,
+   "name": "N-009: Ask proposes a standing policy for the on-chain vault, and QED checks it against the vault's own figures",
+   "expected": "recorded as the scripted test double (NOT a model, so it does not count for N-009); a valid wallet-policy: keep 10 tUSD free; checks: vault available, parameters, mandate active",
+   "observed": "engine scripted / scripted-test-double; wallet-policy new {\"targetFree\":\"10\"}; checks vault-available pass, parameters pass, mandate-active pass",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.000 IST"
+  },
+  {
+   "n": 5,
+   "name": "the proposal becomes the vault's exact terms, and the owner signs them once with the passkey",
+   "expected": "terms prepared from the proposal, the approval document saying who proposed them; one passkey signature over the owner account's digest; executed",
+   "observed": "vault proposal 20a01e50…: Standing policy: keep ≥ 10.00 tUSD free in the dollar reserve; tranches 200.00–2,000.00 tINR; ≤ 1.5% execution; the document says: \"A scripted test double, not a model, proposed these terms from the owner's question (recorded as provider \"scr\"; 1 digest signed; done: executed",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.525 IST"
+  },
+  {
+   "n": 6,
+   "name": "the standing policy is in force: bounded authority, signed once",
+   "expected": "keep at least 10 tUSD free in the reserve; tranches 200 to 2,000 tINR; at most 1.5% execution cost; within the mandate",
+   "observed": "policy active, target 10 tUSD, tranches 200.00 to 2000.00, reserve free 0",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.533 IST"
+  },
+  {
+   "n": 7,
+   "name": "Ask: a proposal from the model provider",
+   "expected": "recorded as the scripted test double (provider \"scripted\", model \"scripted-test-double\"); one valid proposal to invest",
+   "observed": "engine scripted / scripted-test-double; 1 proposal(s): invest new",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.573 IST"
+  },
+  {
+   "n": 8,
+   "name": "QED holds the draft until the owner accepts its contradiction point by point",
+   "expected": "the approval is refused until the owner accepts that runs beyond the monthly limit are refused, not postponed",
+   "observed": "409 contradiction_unresolved: schedule-over-limit: The schedule asks for about ₹2,16,00,000 a month and the monthly limit is ₹1,000: runs beyond the limit in a month will be refused, not postponed.",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.583 IST"
+  },
+  {
+   "n": 9,
+   "name": "the owner signs the proposal as a standing instruction, once, with the passkey",
+   "expected": "drafted from the proposal, signed over its exact document, active; at most ₹500 a run, ₹1,000 a month, 2 runs; runs on its own",
+   "observed": "program prg_1m81hgqreev2… active; document ae6cd94094dc…; limits ₹500 a run, ₹1000 a month, 2 runs, mode auto",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.589 IST"
+  },
+  {
+   "n": 10,
+   "name": "an instruction injected into bill text that the owner pastes into Ask",
+   "expected": "the double follows the injection; QED's own code marks the payment to an address that is not a payee invalid; the raised cap stays a draft that does nothing unless signed",
+   "observed": "2 proposal(s): Pay refunds-desk@paper automatically: invalid (Some values need attention. (\"refunds-desk@paper\" is not one of your payees.)); Pay the rent bill automatically, up to ₹4,50,000: new",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.601 IST"
+  },
+  {
+   "n": 11,
+   "name": "N-009: a payee outside the vault's book is refused before any terms exist",
+   "expected": "the double names \"Dave\"; QED marks the proposal invalid: not a payee of the vault's book; the vault is not asked",
+   "observed": "wallet-pay invalid: \"Dave\" is not a payee of the vault's book: it has 1 payee, given to the model as tokens. A payment or a promise can go only to one of them.",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.619 IST"
+  },
+  {
+   "n": 12,
+   "name": "N-009: an amount above the mandate is refused by the vault's own limit check, each rule named",
+   "expected": "the double asks for 300 tINR; the vault's check refuses it, naming the per-payment limit of 250 and the authority budget (C12)",
+   "observed": "wallet-pay invalid: The vault's own limit check refuses 300 tINR: Per-payment limit in the owner's signed mandate (the same limit as per conversion) (250.00 tINR left); Authority budget (co-signer check C12, R7 decision D7): what leaves the",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.632 IST"
+  },
+  {
+   "n": 13,
+   "name": "N-009: an instruction injected into bill text asks for a transfer elsewhere, and nothing is transferred",
+   "expected": "the injected text is in what the model was sent (the payee named by its token); the double follows it; QED refuses the address; the treasury unchanged",
+   "observed": "wallet-pay invalid: \"0x000000000000000000000000000000000000dEaD\" is not a payee of the vault's book: it has 1 payee, given to the model as tokens. A payment or ; treasury 100000.00 → 100000.00 tINR",
+   "pass": true,
+   "at": "2026-11-22 17:20:58.652 IST"
+  },
+  {
+   "n": 14,
+   "name": "N-009: a payment the model proposes within the limits runs on the chain after the owner signs its exact terms",
+   "expected": "valid; terms prepared; a fresh passkey signature (a payment is not standing authority); executed: 3 tINR leaves the treasury for CloudCo",
+   "observed": "new → done: executed; tx 0x7c833c65be0d…; treasury 100000.00 → 99997.00 tINR",
+   "pass": true,
+   "at": "2026-11-22 17:20:59.215 IST"
+  },
+  {
+   "n": 15,
+   "name": "the engine runs the signed instruction by itself, with no fresh signature",
+   "expected": "two runs, each started by the engine, executed on the paper venue, reconciled and receipted; no approval asked for either",
+   "observed": "run 2026-11-22T11:51:00.000Z: done; Buy ₹500 of Bitcoin in rupees done recon reconciled approval none | run 2026-11-22T11:52:00.000Z: done; Buy ₹500 of Bitcoin in rupees done recon reconciled approval none",
+   "pass": true,
+   "at": "2026-11-22 17:22:02.469 IST"
+  },
+  {
+   "n": 16,
+   "name": "a stale price: with the synthetic feed paused (test mode), a run due is refused by the engine's own price check, and nothing is sent",
+   "expected": "the feed reports test mode; after waiting at most 45 s for fresh data the action is refused with price-fresh failing and its figures recorded; nothing filled",
+   "observed": "feed degraded: Test mode (isolated test stack only): the synthetic feed is paused by ; run blocked; price-fresh: The price sellers ask was received 1 min 44 s ago; it may be at most 15 s old. | price-agrees-with-independent-source: This instrument has no fresh two-sided price. | floor-can-be-evaluated: The worst case cannot be relied on: Bitcoin in rupees: the price is stale, so its limit no",
+   "pass": true,
+   "at": "2026-11-22 17:23:46.859 IST"
+  },
+  {
+   "n": 17,
+   "name": "the engine ticks the standing policy by itself: a conversion on the local chain with no fresh signature",
+   "expected": "within one five-minute slot of signing, a tick nothing but the engine asked for converts a tranche limited by the mandate (250 tINR), mined on the local chain",
+   "observed": "after 243 s: tick 1 done: executed; convert 250.00 tINR, limited by impact (candidates: need none, impact 250.00, policyCap 2000.00, mandateCap 250.00, freeFunds 9997.00); tx 0x6491fa6c4cdf… block 60",
+   "pass": true,
+   "at": "2026-11-22 17:25:02.022 IST"
+  },
+  {
+   "n": 18,
+   "name": "N-009 variant: a tick beyond the authority budget (D7) is refused by the co-signer, naming C12",
+   "expected": "the owner pays all but 0.50 tINR of the budget (signed); the next tick under the model-proposed policy, asked with no signature, is refused by the co-signer with C12 named; no transaction",
+   "observed": "pay done: executed (5.07 tINR; budget 5.57 → 0.50 tINR); tick done: refused; co-signer: Refused: C12 Authority budget (R7 D7): this conversion's cost against the reference fits in what the owner granted and the workspace earned: 250.00 tINR into tUSD for 0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6, an accoun",
+   "pass": true,
+   "at": "2026-11-22 17:25:03.099 IST"
+  },
+  {
+   "n": 19,
+   "name": "the owner grants 20 tINR more authority with the passkey, so the policy can act again",
+   "expected": "executed with one passkey signature; no money moves",
+   "observed": "done: executed; 1 digest signed",
+   "pass": true,
+   "at": "2026-11-22 17:25:03.625 IST"
+  },
+  {
+   "n": 20,
+   "name": "changed input, a different legitimate decision, then a refusal: ticks under the same authority until the mandate's daily limit stops one",
+   "expected": "asked by the owner's session with no signature; one more tranche of 250 converts (500 of 600 used today); the next is refused naming the daily limit; nothing sent for it",
+   "observed": "done: executed; tick 3 convert executed, tick 4 convert refused; stop: a tick was refused",
+   "pass": true,
+   "at": "2026-11-22 17:25:04.131 IST"
+  },
+  {
+   "n": 21,
+   "name": "a violation: a conversion above the signed per-conversion limit, even with the owner's signature",
+   "expected": "refused before anything is signed for the chain; the failing rule named; no transaction",
+   "observed": "done: refused; proposal allowed false; failing rule Per-conversion limit in the owner's signed mandate; tx none",
+   "pass": true,
+   "at": "2026-11-22 17:25:04.653 IST"
+  },
+  {
+   "n": 22,
+   "name": "insufficient funds: a withdrawal larger than the free balance",
+   "expected": "refused before sending, with both figures; nothing sent",
+   "observed": "done: refused; Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,491.93 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation w",
+   "pass": true,
+   "at": "2026-11-22 17:25:05.172 IST"
+  },
+  {
+   "n": 23,
+   "name": "invalid pricing: a \"forged proof\" whose prices make a worse route look best",
+   "expected": "mined as a revert (NotBestExecution) on a throwaway chain of its own; this vault unchanged",
+   "observed": "done: reverted; reverted NotBestExecution; “Forged proof”: prices chosen to make the direct route look optimal → reverted on-chain with NotBestExecution (on an ephemeral chain of its ",
+   "pass": true,
+   "at": "2026-11-22 17:25:05.701 IST"
+  },
+  {
+   "n": 24,
+   "name": "insufficient funds under standing authority: with about 100 tINR free, the agent waits rather than convert",
+   "expected": "the owner moves most of the money to the owner account (signed); the next tick, asked with no signature, waits; its recorded free-funds candidate is below the 200 tINR minimum tranche; no transaction",
+   "observed": "withdraw done: executed (99391.93 tINR); tick done: no-action; decision wait: wait: the market is too thin: any tranche ≥ 20000 would pay more than 150 bps; candidates: need none, impact 0.00, policyCap 2000.00, mandateCap 250.00, freeFunds 95.00",
+   "pass": true,
+   "at": "2026-11-22 17:25:06.747 IST"
+  },
+  {
+   "n": 25,
+   "name": "a revoked instruction: after the owner ends the standing policy, a tick is refused",
+   "expected": "the revocation is signed by the passkey; the next tick fails with \"no standing policy\" and nothing is mined",
+   "observed": "revoke done: executed; tick failed (No standing policy yet: the owner must sign one first.); Nothing was mined for this operation. No money moved.",
+   "pass": true,
+   "at": "2026-11-22 17:25:07.780 IST"
+  },
+  {
+   "n": 26,
+   "name": "another household cannot read or export this household's cases",
+   "expected": "its own list holds none of them; each of them, asked for by id, is not found (404)",
+   "observed": "its list: 0 case(s), 0 of ours; asked by id: 404/404, 404/404, 404/404, 404/404, 404/404, 404/404",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.042 IST"
+  },
+  {
+   "n": 27,
+   "name": "the API lists the cases of this household",
+   "expected": "run cases (paper engine), model-call cases and vault cases; the vault service readable",
+   "observed": "26 cases: 3 standing-run, 7 model-call, 16 vault-job; vault readable",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.042 IST"
+  },
+  {
+   "n": 28,
+   "name": "every case verifies offline, and every transaction re-reads from the chain",
+   "expected": "section hashes, root, receipt chain, decision records, documents, terms, passkey signatures, figures; each transaction's status, block, addresses, gas and event figures on the chain",
+   "observed": "26 cases; offline 26 ok; on chain 16 ok of 16",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.428 IST"
+  },
+  {
+   "n": 29,
+   "name": "the engine's tick as a case: no fresh signature, asked for by the engine, a transaction with its block, the policy's proposer named",
+   "expected": "section 4: no fresh signature, requested by the engine's scheduler; section 6: chain 31337, the transaction and its block; section 2: who proposed the policy, as recorded",
+   "observed": "section 2: scripted-test-double (isModel false); fresh signature false; requested by the engine's scheduler, by itself; chain 31337; tx 0x6491fa6c4cdf… block 60",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.428 IST"
+  },
+  {
+   "n": 30,
+   "name": "N-009 in the evidence: the engine's tick names the model call behind its policy, and the call points to the policy's job",
+   "expected": "section 2 of the tick: the scripted double, isModel false, what was sent (with the snapshot) and returned, the rationale; the call's case links forward to the policy job",
+   "observed": "tick section 2: scripted-test-double (isModel false), proposal prp_1m81hgq6efy6p4…, snapshot shown, rationale \"A standing policy that keeps the reserve topped up from the …\"; the call's case links to vault.3a5fed0f-87e0-44ec-8176-432b39fcea0a",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.428 IST"
+  },
+  {
+   "n": 31,
+   "name": "the model-proposed run as a case: the provider as recorded, labelled; no fresh signature",
+   "expected": "section 2: \"scripted-test-double\", NOT a model; what was sent (tokens) and returned; section 4: no fresh signature",
+   "observed": "label scripted-test-double (isModel false): A scripted test double, NOT a model: it answers from a fixed file, and QED honours it only on an isolated test stack. Re; fresh signature false",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.428 IST"
+  },
+  {
+   "n": 32,
+   "name": "a case downloads as a JSON file that verifies on its own",
+   "expected": "each export answers 200 with Content-Disposition: attachment, and verifies offline",
+   "observed": "run.run_1m81hgsr3y…: 200 attachment; filename=\"qed-evidence-run.run_1m81hgsr3yphd056gyp.json\"; verifies true | vault.142b6161-49c…: 200 attachment; filename=\"qed-evidence-vault.142b6161-49c2-4773-8812-5f551628c9dd.json\"; verifies true | ask.aic_1m81hgqrye…: 200 attachment; filename=\"qed-evidence-ask.aic_1m81hgqryemag256b9a.json\"; verifies true",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.464 IST"
+  },
+  {
+   "n": 33,
+   "name": "scripts/verify-evidence.ts re-verifies the tick offline and on the chain",
+   "expected": "exit code 0; VERIFIED",
+   "observed": "exit 0; VERIFIED: 23 offline checks, 2 against http://127.0.0.1:8792",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.543 IST"
+  },
+  {
+   "n": 34,
+   "name": "tampering is caught: an amount, a refusal, a hash, the order of steps",
+   "expected": "every change fails verification by its section hash; and, after a forger recomputes every hash, by the figures, the refusals, the transactions or the order",
+   "observed": "changeAmount on engine tick: caught; swapHash on engine tick: caught; reorderSteps on engine tick: caught; dropRefusal on daily-limit refusal: caught; changeAmount on model-proposed run: caught; swapHash on model-proposed run: caught",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.557 IST"
+  },
+  {
+   "n": 35,
+   "name": "scripts/evidence-proposal.ts traces the instruction from the question to its receipts on this stack",
+   "expected": "exit 0; the model call, the proposal, the signed version, the runs and their receipts",
+   "observed": "exit 0; [evidence] evidence/20261122-judge-journey/evidence-proposal-prg_1m81hgqreev2z3m0535.json: scripted-test-double in 1 ms; proposal drafted; 2 runs; receipts 2",
+   "pass": true,
+   "at": "2026-11-22 17:25:08.619 IST"
+  }
+ ],
+ "main": {
+  "modelRun": "run.run_1m81hgsr3yphd056gyp",
+  "engineTick": "vault.142b6161-49c2-4773-8812-5f551628c9dd",
+  "injection": "ask.aic_1m81hgqryemag256b9a",
+  "n009": {
+   "policyCall": "ask.aic_1m81hgq4xx2ffzbkk24",
+   "policySigned": "vault.3a5fed0f-87e0-44ec-8176-432b39fcea0a",
+   "engineTick": "vault.142b6161-49c2-4773-8812-5f551628c9dd",
+   "modelPayment": "vault.bed5e574-e0b5-42e2-aafa-1761e3f71650",
+   "outsideBook": "ask.aic_1m81hgqsgd8d57dc0vq",
+   "overMandate": "ask.aic_1m81hgqsvd4vxzkmvcg",
+   "injectedTransfer": "ask.aic_1m81hgqt95tgq5e1zp1",
+   "beyondBudget": "vault.1b0e2fef-228e-4953-b3ac-a62ae6f61eeb"
+  },
+  "variants": {
+   "stalePrice": "run.run_1m81hmf4z9aa491d446",
+   "dailyLimit": "vault.49cb4d81-20fa-4535-b6ef-423b147e9f75",
+   "overLimit": "vault.bc805342-3694-4aa1-85c9-74571c483759",
+   "insufficientFunds": "vault.384293bc-3565-41a6-b079-2a7e269f6859",
+   "insufficientUnderPolicy": "vault.c0484f68-0a3d-4f60-aa5f-54a9399be979",
+   "invalidPricing": "vault.c05930d6-8027-4cdd-bbdb-3be8d40a25b9",
+   "revoked": "vault.5e5dc0f0-846a-4bde-8602-b1ddd4ec7b7d"
+  },
+  "exports": [
+   {
+    "id": "run.run_1m81hgsr3yphd056gyp",
+    "status": 200,
+    "contentDisposition": "attachment; filename=\"qed-evidence-run.run_1m81hgsr3yphd056gyp.json\"",
+    "verifies": true,
+    "root": "6915cff96a76afa63ca7c434ab0e653d8297cdecbbacdf0a2344c4307dad9f75",
+    "note": "The same case assembled again at download: its assembledAt, and so its root, differ from the copy in cases/."
+   },
+   {
+    "id": "vault.142b6161-49c2-4773-8812-5f551628c9dd",
+    "status": 200,
+    "contentDisposition": "attachment; filename=\"qed-evidence-vault.142b6161-49c2-4773-8812-5f551628c9dd.json\"",
+    "verifies": true,
+    "root": "56b9328f458470fb1b354cce634502628ceb3ba8094ae53a2362e228506dbe90",
+    "note": "The same case assembled again at download: its assembledAt, and so its root, differ from the copy in cases/."
+   },
+   {
+    "id": "ask.aic_1m81hgqryemag256b9a",
+    "status": 200,
+    "contentDisposition": "attachment; filename=\"qed-evidence-ask.aic_1m81hgqryemag256b9a.json\"",
+    "verifies": true,
+    "root": "14665e83837edf4b2264406bdacd825afcb82635eb50e46c67c6b86844898a1c",
+    "note": "The same case assembled again at download: its assembledAt, and so its root, differ from the copy in cases/."
+   }
+  ],
+  "proposalTrace": {
+   "file": "evidence-proposal-prg_1m81hgqreev2z3m0535.json",
+   "exit": 0,
+   "output": "[evidence] evidence/20261122-judge-journey/evidence-proposal-prg_1m81hgqreev2z3m0535.json: scripted-test-double in 1 ms; proposal drafted; 2 runs; receipts 2"
+  }
+ },
+ "cases": [
+  {
+   "id": "vault.5e5dc0f0-846a-4bde-8602-b1ddd4ec7b7d",
+   "kind": "vault-job",
+   "title": "policy-tick failed",
+   "outcome": "failed",
+   "venue": "local-chain",
+   "root": "e3ebd4b28ea9ec8ca2f08b9efb498c93c56461bd133cc6a1aed506b0944193f8",
+   "file": "cases/vault.5e5dc0f0-846a-4bde-8602-b1ddd4ec7b7d.json",
+   "offline": {
+    "ok": true,
+    "checks": 21,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.c6fd01d9-ab4f-4062-8196-e9a73699785f",
+   "kind": "vault-job",
+   "title": "Owner ended the standing policy; the agent no longer converts on its own",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "efc5f372201ef5070d4d432730b472c8f2bac6b1a8e9aa1e8eae59f44e1035e7",
+   "file": "cases/vault.c6fd01d9-ab4f-4062-8196-e9a73699785f.json",
+   "offline": {
+    "ok": true,
+    "checks": 21,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.c0484f68-0a3d-4f60-aa5f-54a9399be979",
+   "kind": "vault-job",
+   "title": "Tick 5: the agent waits (the market is too thin: any tranche ≥ 20000 would pay more than 150 bps).",
+   "outcome": "no-action",
+   "venue": "local-chain",
+   "root": "a372c78c5c832d40219c4ce87f689e03273f8ed039a999eab9e29c1c463db7dc",
+   "file": "cases/vault.c0484f68-0a3d-4f60-aa5f-54a9399be979.json",
+   "offline": {
+    "ok": true,
+    "checks": 22,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.46333b05-ae45-4e14-a2b1-8e01085fd28c",
+   "kind": "vault-job",
+   "title": "Owner withdrew 99,391.93 tINR; treasury now 100.00 tINR (100.00 free).",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "b05cf1dfe229eed0d7fcfba9dd629f880f6ed8e59c674627d57eb4e23cdd505b",
+   "file": "cases/vault.46333b05-ae45-4e14-a2b1-8e01085fd28c.json",
+   "offline": {
+    "ok": true,
+    "checks": 19,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.c05930d6-8027-4cdd-bbdb-3be8d40a25b9",
+   "kind": "vault-job",
+   "title": "“Forged proof”: prices chosen to make the direct route look optimal → reverted on-chain with NotBestExecution (on an ephemeral chain of its own).",
+   "outcome": "reverted",
+   "venue": "ephemeral-chain",
+   "root": "e0975fbe2506e8895c41a1c7b90532167abd59b59378d597502aefe4f6106f4b",
+   "file": "cases/vault.c05930d6-8027-4cdd-bbdb-3be8d40a25b9.json",
+   "offline": {
+    "ok": true,
+    "checks": 18,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.384293bc-3565-41a6-b079-2a7e269f6859",
+   "kind": "vault-job",
+   "title": "Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,491.93 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation w",
+   "outcome": "refused",
+   "venue": "local-chain",
+   "root": "2f18f5f668383f869b0ea4f666f197c427116056da89f1499e167ab0a5872d15",
+   "file": "cases/vault.384293bc-3565-41a6-b079-2a7e269f6859.json",
+   "offline": {
+    "ok": true,
+    "checks": 16,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.bc805342-3694-4aa1-85c9-74571c483759",
+   "kind": "vault-job",
+   "title": "Refused before signing: 300.00 tINR breaks the signed limits. No transaction was sent.",
+   "outcome": "refused",
+   "venue": "local-chain",
+   "root": "f6b67d2de54620f2755edf1284edbb0d38460cdc570ff348f28143b9672af686",
+   "file": "cases/vault.bc805342-3694-4aa1-85c9-74571c483759.json",
+   "offline": {
+    "ok": true,
+    "checks": 21,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.49cb4d81-20fa-4535-b6ef-423b147e9f75",
+   "kind": "vault-job",
+   "title": "Ran 2 ticks (1 conversion); stopped because a tick was refused. Reserve free 5.947045 tUSD of the 10.00 target.",
+   "outcome": "executed, then refused",
+   "venue": "local-chain",
+   "root": "b3168c7d452e5dfdb8e608dc3cef50245274fa0258ab203176d64608eed50349",
+   "file": "cases/vault.49cb4d81-20fa-4535-b6ef-423b147e9f75.json",
+   "offline": {
+    "ok": true,
+    "checks": 23,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.7964d3dd-55cc-476f-bb4c-492f72ac393a",
+   "kind": "vault-job",
+   "title": "Owner granted the agent 20.00 tINR more authority (granted, not earned); owner grants now total 20.00 tINR. No money moved.",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "e61677dfec79f078ab0fe8154976f6a1a9c99ac509098d3f2d7550af5a7e7ed7",
+   "file": "cases/vault.7964d3dd-55cc-476f-bb4c-492f72ac393a.json",
+   "offline": {
+    "ok": true,
+    "checks": 18,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.1b0e2fef-228e-4953-b3ac-a62ae6f61eeb",
+   "kind": "vault-job",
+   "title": "Co-signer refused: C12 Authority budget (R7 D7): this conversion's cost against the reference fits in what the owner granted and the workspace earned: 250.00 tINR into tUSD for 0xd8F790188Bb5977227D02",
+   "outcome": "refused",
+   "venue": "local-chain",
+   "root": "3bba3e7d57da2695feae2044c6c33a4fe39ea7e44494234cb0c662df28a0a62a",
+   "file": "cases/vault.1b0e2fef-228e-4953-b3ac-a62ae6f61eeb.json",
+   "offline": {
+    "ok": true,
+    "checks": 22,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.dbc68825-a5a2-4a01-a409-1bad2924f198",
+   "kind": "vault-job",
+   "title": "Paid 5.07 tINR to CloudCo; treasury now 99,741.93 tINR.",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "002a518a242589a098d883ad0560fb5e75319d38d1c926adff0e4526cb6d0e88",
+   "file": "cases/vault.dbc68825-a5a2-4a01-a409-1bad2924f198.json",
+   "offline": {
+    "ok": true,
+    "checks": 22,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.142b6161-49c2-4773-8812-5f551628c9dd",
+   "kind": "vault-job",
+   "title": "Tick 1: converted 250.00 tINR → 2.974112 tUSD (limited by impact); reserve free 2.974112 tUSD.",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "b152c20cd9d8d961a644ea48088c6ec28abab6f0d504b0351ffbdeeb5a850a3b",
+   "file": "cases/vault.142b6161-49c2-4773-8812-5f551628c9dd.json",
+   "offline": {
+    "ok": true,
+    "checks": 23,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  },
+  {
+   "id": "run.run_1m81hmf4z9aa491d446",
+   "kind": "standing-run",
+   "title": "Invest ₹500 in Bitcoin in rupees: run refused",
+   "outcome": "refused",
+   "venue": "paper",
+   "root": "b1a2182afa99c44b7dab9b4cb84a7092a9f357c935de96f92b01f8cdeff9ff3e",
+   "file": "cases/run.run_1m81hmf4z9aa491d446.json",
+   "offline": {
+    "ok": true,
+    "checks": 15,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "run.run_1m81hjmejd07fk58wmd",
+   "kind": "standing-run",
+   "title": "Invest ₹500 in Bitcoin in rupees: run executed",
+   "outcome": "executed",
+   "venue": "paper",
+   "root": "b85fe0d0351a0a5e56848c80b721df0d403e87c59fb384d94affa5870db43ce6",
+   "file": "cases/run.run_1m81hjmejd07fk58wmd.json",
+   "offline": {
+    "ok": true,
+    "checks": 17,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "run.run_1m81hgsr3yphd056gyp",
+   "kind": "standing-run",
+   "title": "Invest ₹500 in Bitcoin in rupees: run executed",
+   "outcome": "executed",
+   "venue": "paper",
+   "root": "c65e00ac183be8cf5aefd582882f121c748e12c3ab95d4851575b928f83613c0",
+   "file": "cases/run.run_1m81hgsr3yphd056gyp.json",
+   "offline": {
+    "ok": true,
+    "checks": 17,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "vault.bed5e574-e0b5-42e2-aafa-1761e3f71650",
+   "kind": "vault-job",
+   "title": "Paid 3.00 tINR to CloudCo; treasury now 99,997.00 tINR.",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "fa07dd2089a942ecb6b0b522c7e65a411b159156a86702436b97dc319eb54542",
+   "file": "cases/vault.bed5e574-e0b5-42e2-aafa-1761e3f71650.json",
+   "offline": {
+    "ok": true,
+    "checks": 23,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  },
+  {
+   "id": "ask.aic_1m81hgqtwdmh6wpdhjc",
+   "kind": "model-call",
+   "title": "Model call: 1 proposal (drafted)",
+   "outcome": "proposed",
+   "venue": "none",
+   "root": "757a638f24726e0ccae035256da894fab10404235f7498c9251a783b1c1b55c9",
+   "file": "cases/ask.aic_1m81hgqtwdmh6wpdhjc.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "ask.aic_1m81hgqt95tgq5e1zp1",
+   "kind": "model-call",
+   "title": "Model call: 1 proposal (invalid)",
+   "outcome": "invalid",
+   "venue": "none",
+   "root": "cd9b6b10689bdf4cbf9665cbca9cac37f18ce4ea9c34fb35c6ecc4eece6aec20",
+   "file": "cases/ask.aic_1m81hgqt95tgq5e1zp1.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "ask.aic_1m81hgqsvd4vxzkmvcg",
+   "kind": "model-call",
+   "title": "Model call: 1 proposal (invalid)",
+   "outcome": "invalid",
+   "venue": "none",
+   "root": "55d17450ef8e452287889449148449bd8765e7439bb1081c86a0b7160548847c",
+   "file": "cases/ask.aic_1m81hgqsvd4vxzkmvcg.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "ask.aic_1m81hgqsgd8d57dc0vq",
+   "kind": "model-call",
+   "title": "Model call: 1 proposal (invalid)",
+   "outcome": "invalid",
+   "venue": "none",
+   "root": "701da1c0f1129862bc9f3c3c4ba58767824698308c18169bf796f7bbcafd4228",
+   "file": "cases/ask.aic_1m81hgqsgd8d57dc0vq.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "ask.aic_1m81hgqryemag256b9a",
+   "kind": "model-call",
+   "title": "Model call: 2 proposals (invalid, new)",
+   "outcome": "proposed",
+   "venue": "none",
+   "root": "8d888d776216604b32da5c9a8a6a66fd04c120b6b4df0c180c88051dd0b314fe",
+   "file": "cases/ask.aic_1m81hgqryemag256b9a.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "ask.aic_1m81hgqqahm3xzzpefh",
+   "kind": "model-call",
+   "title": "Model call: 1 proposal (drafted)",
+   "outcome": "proposed",
+   "venue": "none",
+   "root": "9f457404cf8aad20b3ff8d6a9a7cf39dcc9ac833767d68207784bf46bb0f1b84",
+   "file": "cases/ask.aic_1m81hgqqahm3xzzpefh.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "vault.3a5fed0f-87e0-44ec-8176-432b39fcea0a",
+   "kind": "vault-job",
+   "title": "Owner signed a standing policy: keep ≥ 10.00 tUSD free in the dollar reserve; tranches 200–2,000 tINR; ≤ 1.5% execution cost",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "be30cfb9c48c46d4606134e4cd13edaee1e1b108f377239dbd27345df60fa5b5",
+   "file": "cases/vault.3a5fed0f-87e0-44ec-8176-432b39fcea0a.json",
+   "offline": {
+    "ok": true,
+    "checks": 19,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "ask.aic_1m81hgq4xx2ffzbkk24",
+   "kind": "model-call",
+   "title": "Model call: 1 proposal (drafted)",
+   "outcome": "proposed",
+   "venue": "none",
+   "root": "1be8487261b09102c64f12d7843073943583c3c1f4e29fd55a6620e40537173e",
+   "file": "cases/ask.aic_1m81hgq4xx2ffzbkk24.json",
+   "offline": {
+    "ok": true,
+    "checks": 14,
+    "failures": []
+   },
+   "onChain": null
+  },
+  {
+   "id": "vault.3d3baca4-51d0-445d-9cd4-ae9e4d9205f3",
+   "kind": "vault-job",
+   "title": "Owner signed mandate v1: ≤ 250.00 tINR per conversion, ≤ 600.00 a day, payees unchanged",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "d154ea5e18d35f294c42ded371e6f060c9ba662c4ae80f14f9f390e2d6887637",
+   "file": "cases/vault.3d3baca4-51d0-445d-9cd4-ae9e4d9205f3.json",
+   "offline": {
+    "ok": true,
+    "checks": 15,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 1,
+    "failures": []
+   }
+  },
+  {
+   "id": "vault.e18b9864-5981-4b58-9c87-c02250b6ed1f",
+   "kind": "vault-job",
+   "title": "The owner account accepted ownership of the treasury and reserve vaults; the opening grant of 100,000.00 test tINR arrived in the vault. No mandate is signed yet.",
+   "outcome": "executed",
+   "venue": "local-chain",
+   "root": "f93ea8b245079b8d42903c42252036d4163a8480d8ac3c76f6fb3bfb617eb50d",
+   "file": "cases/vault.e18b9864-5981-4b58-9c87-c02250b6ed1f.json",
+   "offline": {
+    "ok": true,
+    "checks": 18,
+    "failures": []
+   },
+   "onChain": {
+    "ok": true,
+    "checks": 2,
+    "failures": []
+   }
+  }
+ ],
+ "tamper": [
+  {
+   "case": "engine tick (vault.142b6161-49c2-4773-8812-5f551628c9dd)",
+   "tamper": "changeAmount",
+   "changed": "section 5: \"tINR converted from the treasury (step 4)\" raised by one unit to 25001",
+   "naive": "section 5 (Balances, costs and consequence) hash mismatch: stated 93f8d535fd…, computed 9aab15d47d…",
+   "resealed": "section 5: tINR converted from the treasury (step 4) is 25001, but the BestExecution event of transaction 0x6491fa6c… records amountIn = 25000",
+   "caught": true
+  },
+  {
+   "case": "engine tick (vault.142b6161-49c2-4773-8812-5f551628c9dd)",
+   "tamper": "swapHash",
+   "changed": "section 6: transaction 0x6491fa6c… replaced by 0xabababab…",
+   "naive": "section 6 (Technical record) hash mismatch: stated bc839e0e0b…, computed ed41436cd3…",
+   "resealed": "a transaction 0x6491fa6c… recorded in sections 3 or 5 is not in section 6's transactions",
+   "caught": true
+  },
+  {
+   "case": "engine tick (vault.142b6161-49c2-4773-8812-5f551628c9dd)",
+   "tamper": "reorderSteps",
+   "changed": "section 3: steps \"cosigner\" and \"plan\" swapped",
+   "naive": "section 3 (The independent enforcement decision) hash mismatch: stated e241d0e0d8…, computed 4f783d5b53…",
+   "resealed": "section 3: step \"plan\" has seq 2 after seq 0 (steps missing or reordered)",
+   "caught": true
+  },
+  {
+   "case": "daily-limit refusal (vault.49cb4d81-20fa-4535-b6ef-423b147e9f75)",
+   "tamper": "dropRefusal",
+   "changed": "section 8: dropped this case's refusal \"mandate\"",
+   "naive": "section 8 (Refusals that prevented execution) hash mismatch: stated 72225447f5…, computed b0b8646580…",
+   "resealed": "section 8 lists 1 refusal for this case (limit: mandate-period), but section 3 records 2 failed checks (limit: mandate-period, mandate)",
+   "caught": true
+  },
+  {
+   "case": "model-proposed run (run.run_1m81hgsr3yphd056gyp)",
+   "tamper": "changeAmount",
+   "changed": "section 5: \"paid for Bitcoin in rupees, fee included\" raised by one unit to 47213",
+   "naive": "section 5 (Balances, costs and consequence) hash mismatch: stated 016a7d7cda…, computed b7a87cf39c…",
+   "resealed": "section 5: paid for Bitcoin in rupees, fee included is 47213, but ledger entry #2 move -47212 in bank",
+   "caught": true
+  },
+  {
+   "case": "model-proposed run (run.run_1m81hgsr3yphd056gyp)",
+   "tamper": "swapHash",
+   "changed": "section 5: receipt rcp_1m81hgsrh45dbgms4et hash 8878a0bc02… replaced",
+   "naive": "section 5 (Balances, costs and consequence) hash mismatch: stated 016a7d7cda…, computed 700a0a40da…",
+   "resealed": "section 5 cites receipt rcp_1m81hgsrh45dbgms4et as #1 with hash ababababab…, but the chain has #1 with hash 8878a0bc02…",
+   "caught": true
+  }
+ ],
+ "verifyEvidenceCli": {
+  "command": "node scripts/verify-evidence.ts evidence/20261122-judge-journey/cases/vault.142b6161-49c2-4773-8812-5f551628c9dd.json --rpc http://127.0.0.1:8792",
+  "exit": 0,
+  "output": [
+   "vault.142b6161-49c2-4773-8812-5f551628c9dd: Tick 1: converted 250.00 tINR → 2.974112 tUSD (limited by impact); reserve free 2.974112 tUSD.",
+   "root b152c20cd9d8d961a644ea48088c6ec28abab6f0d504b0351ffbdeeb5a850a3b",
+   "  ok    hash of section 1",
+   "  ok    hash of section 2",
+   "  ok    hash of section 3",
+   "  ok    hash of section 4",
+   "  ok    hash of section 5",
+   "  ok    hash of section 6",
+   "  ok    hash of section 7",
+   "  ok    hash of section 8",
+   "  ok    hash of verification",
+   "  ok    hash of redactions",
+   "  ok    hash of cannotProve",
+   "  ok    root hash",
+   "  ok    receipt chain",
+   "  ok    snapshot sent to the model",
+   "  ok    document of mandate mandate v1 0xfc82de8d73…",
+   "  ok    terms of mandate mandate v1 0xfc82de8d73…",
+   "  ok    passkey signature 1 on mandate mandate v1 0xfc82de8d73…",
+   "  ok    document of standing-policy rail-policy-48652160-1",
+   "  ok    terms of standing-policy rail-policy-48652160-1",
+   "  ok    passkey signature 1 on standing-policy rail-policy-48652160-1",
+   "  ok    vault decision records",
+   "  ok    step order",
+   "  ok    figures",
+   "  ok    on chain: chain id: chain 31337",
+   "  ok    on chain: transaction 0x6491fa6c…: success in block 60; from, to and gas agree; 35 event figures found in its logs",
+   "VERIFIED: 23 offline checks, 2 against http://127.0.0.1:8792"
+  ]
+ },
+ "n009": {
+  "requirement": "N-009: a real model's proposal leads to an on-chain execution under standing authority without a fresh owner signature, or to a recorded refusal; the evidence shows the model's redacted input, output and rationale beside the enforcement decision and the transaction.",
+  "shownHere": "The mechanism end to end, with the scripted test double as the proposer. This does NOT meet N-009, which needs a real model's proposal (provider and model recorded).",
+  "realModelRun": "QED_AI_PROVIDER=claude-cli node scripts/judge-journey.ts --real-model --out evidence/<date>-judge-journey-real-model (needs the owner's approval: it uses the signed-in Claude account's allowance; Q-051, EXT-01)",
+  "cases": {
+   "policyCall": "ask.aic_1m81hgq4xx2ffzbkk24",
+   "policySigned": "vault.3a5fed0f-87e0-44ec-8176-432b39fcea0a",
+   "engineTick": "vault.142b6161-49c2-4773-8812-5f551628c9dd",
+   "modelPayment": "vault.bed5e574-e0b5-42e2-aafa-1761e3f71650",
+   "outsideBook": "ask.aic_1m81hgqsgd8d57dc0vq",
+   "overMandate": "ask.aic_1m81hgqsvd4vxzkmvcg",
+   "injectedTransfer": "ask.aic_1m81hgqt95tgq5e1zp1",
+   "beyondBudget": "vault.1b0e2fef-228e-4953-b3ac-a62ae6f61eeb"
+  }
+ },
+ "notProduced": [],
+ "findings": [
+  "Fixed: the signed document of an instruction drafted from the scripted test double used to say \"A model (scripted-test-double) drafted this instruction\"; it now says \"A scripted test double, not a model\" (server/programs.ts draftedBy).",
+  "Open, in the vendored release: when the free funds are below the smallest tranche, the tranche rule (chain/vendor roles/treasury.ts) records the impact candidate as 0 and gives the reason \"the market is too thin\"; the free-funds candidate it records is the binding one. The case shows all five candidates and names those below the minimum."
+ ],
+ "cannotProve": [
+  "The proposals came from a scripted test double, not a model. The cases show what QED's controls do with a proposal, including one that follows an injected instruction; they are no evidence of model-directed autonomy or of how a real model resists injection.",
+  "A model proposes what the vault does (a standing policy, a payment, money set aside) and nothing else: the owner's passkey signs the exact terms, and every tranche of a policy is decided by the release's fixed code and checked by the co-signer and the contract, not chosen by the model.",
+  "The chain is a local Anvil chain (31337) started for this run with valueless test tokens; its transaction hashes are not publicly verifiable and the chain is gone when the stack stops. The case files keep the records; --rpc re-verification needs that chain running.",
+  "The passkey was a software authenticator; a signature proves possession of the key, not which device held it.",
+  "Paper venues and synthetic prices: no order reached an exchange, no money moved.",
+  "A forger who rewrites a case and recomputes every hash makes a file consistent in itself. Changing an amount, a transaction hash, the order of steps, or a case's own refusal is still caught (see tamper); dropping a refusal that a case only lists as related is caught only against an anchor: the root this summary records for each case (verify-evidence.ts --root), once the summary is kept where the forger cannot change it.",
+  "No one outside this work has reviewed the code or reproduced this run."
+ ]
+}

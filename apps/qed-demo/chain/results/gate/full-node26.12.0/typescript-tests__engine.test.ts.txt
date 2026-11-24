@@ -1,0 +1,16 @@
+(node:62574) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ certifying solver: honest certificate passes with zero stationarity residual (2.092209ms)
+✔ solver matches brute-force grid search on the simplex (independent oracle) (30.11175ms)
+✔ lazy 1/N forgery fails ONLY on complementary slackness, and the gap bounds its suboptimality (0.940792ms)
+✔ a 0.01% nudge of the optimum is rejected (0.401708ms)
+✔ covariance round-trips through fixed point (0.149208ms)
+✔ economics: price = cost × 2.5 rounded up; unsettled revenue never counts as capital (0.36375ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 674.402792

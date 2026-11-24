@@ -1,0 +1,199 @@
+{
+ "about": "Limits calibrated by experiment X9 on each instrument's own history, imported by scripts/import-limits.ts. Only entries whose walk-forward validation was not rejected and whose tail was identifiable are here (rule set by the orchestrator on 22 Nov 2026; X9 DEVIATIONS.md D2). Each is the fall not exceeded in 99.99% of the stated windows of its history; none is a worst case, and the stress episodes that exceeded it are named in its source.",
+ "source": "experiments/r7/X9-calibration/limits.json",
+ "sourceSha256": "3d9e4a6b335c638f8bcbdfeef534193a1662a0dedc6402e4e6247d1e3d4aeec0",
+ "computedAt": "2026-11-22T05:59:30Z",
+ "preregistration": "093b532f5bdd70e6139ab6684bfd9f82a6f2712851a36e18409ac3bcef37541d  PREREGISTRATION.md  frozen_utc=2026-11-20T16:45:05Z",
+ "notLoaded": [
+  "coindcx:USDTINR",
+  "amfi:120716",
+  "amfi:118701",
+  "amfi:119110",
+  "nyfed:SOFR",
+  "nyfed:EFFR"
+ ],
+ "terms": [
+  {
+   "id": "limit.coindcx:BTCINR",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: coindcx:BTCINR",
+   "value": {
+    "fall": "0.4536",
+    "window": "2018-10-19 to 2026-11-19",
+    "horizon": "24 hours",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on CoinDCX I-BTC_INR (cleaned, D1) history to 2026-11-19, 99.99% per 24 hours; not a worst case; exceeded in: Covid crash: 46.7% against the stored 45.4%. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.coindcx:ETHINR",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: coindcx:ETHINR",
+   "value": {
+    "fall": "0.4621",
+    "window": "2018-10-24 to 2026-11-19",
+    "horizon": "24 hours",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on CoinDCX I-ETH_INR (cleaned, D1) history to 2026-11-19, 99.99% per 24 hours; not a worst case; no named stress episode exceeded it. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.binance:BTCUSDT",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: binance:BTCUSDT",
+   "value": {
+    "fall": "0.4708",
+    "window": "2017-08-17 to 2026-11-19",
+    "horizon": "24 hours",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on Binance Vision BTCUSDT history to 2026-11-19, 99.99% per 24 hours; not a worst case; exceeded in: Covid crash: 50.6% against the stored 47.1%; Covid crash: 50.6% against 33.1% in force at its start (walk-forward). X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.binance:ETHUSDT",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: binance:ETHUSDT",
+   "value": {
+    "fall": "0.5666",
+    "window": "2017-08-17 to 2026-11-19",
+    "horizon": "24 hours",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on Binance Vision ETHUSDT history to 2026-11-19, 99.99% per 24 hours; not a worst case; no named stress episode exceeded it. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.binance:PAXGUSDT",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: binance:PAXGUSDT",
+   "value": {
+    "fall": "0.1668",
+    "window": "2020-08-28 to 2026-11-19",
+    "horizon": "24 hours",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on Binance Vision PAXGUSDT history to 2026-11-19, 99.99% per 24 hours; not a worst case; no named stress episode exceeded it. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.coinbase:BTCUSD",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: coinbase:BTCUSD",
+   "value": {
+    "fall": "0.4435",
+    "window": "2015-07-20 to 2026-11-19",
+    "horizon": "24 hours",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on Coinbase BTC-USD history to 2026-11-19, 99.99% per 24 hours; not a worst case; exceeded in: Covid crash: 49.6% against the stored 44.3%; Covid crash: 49.6% against 34.0% in force at its start (walk-forward). X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.amfi:120684",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: amfi:120684",
+   "value": {
+    "fall": "0.1511",
+    "window": "2013-01-02 to 2026-11-19",
+    "horizon": "2 published NAVs",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on AMFI NAV (scheme 120684) history to 2026-11-19, 99.99% per 2 published NAVs; not a worst case; no named stress episode exceeded it. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.amfi:122639",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: amfi:122639",
+   "value": {
+    "fall": "0.1156",
+    "window": "2013-05-28 to 2026-11-19",
+    "horizon": "2 published NAVs",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on AMFI NAV (scheme 122639) history to 2026-11-19, 99.99% per 2 published NAVs; not a worst case; exceeded in: Covid crash: 8.8% against 7.8% in force at its start (walk-forward); China devaluation: 5.4% against 3.1% in force at its start (walk-forward). X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.amfi:148381",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: amfi:148381",
+   "value": {
+    "fall": "0.1059",
+    "window": "2020-04-29 to 2026-11-19",
+    "horizon": "2 published NAVs",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on AMFI NAV (scheme 148381) history to 2026-11-19, 99.99% per 2 published NAVs; not a worst case; exceeded in: Celsius and 3AC: 6.4% against 5.9% in force at its start (walk-forward); Covid crash (proxy): 14.1% against the stored 10.6%; GFC (proxy): 11.4% against the stored 10.6%. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.amfi:119788",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: amfi:119788",
+   "value": {
+    "fall": "0.1629",
+    "window": "2013-01-02 to 2026-11-19",
+    "horizon": "2 published NAVs",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on AMFI NAV (scheme 119788) history to 2026-11-19, 99.99% per 2 published NAVs; not a worst case; no named stress episode exceeded it. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.amfi:119771",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: amfi:119771",
+   "value": {
+    "fall": "0.0062",
+    "window": "2013-01-07 to 2026-11-19",
+    "horizon": "2 published NAVs",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on AMFI NAV (scheme 119771) history to 2026-11-19, 99.99% per 2 published NAVs; not a worst case; exceeded in: Covid crash: 0.4% against 0.3% in force at its start (walk-forward). X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.ecb:USDINR",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: ecb:USDINR",
+   "value": {
+    "fall": "0.0430",
+    "window": "2000-01-13 to 2026-11-20",
+    "horizon": "2 ECB fixings",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on ECB reference rate (USD/INR cross) history to 2026-11-20, 99.99% per 2 ECB fixings; not a worst case; exceeded in: GFC: 3.6% against 3.2% in force at its start (walk-forward); INR taper tantrum (cross-check): 4.5% against the stored 4.3%; GFC (cross-check): 4.4% against the stored 4.3%. X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  },
+  {
+   "id": "limit.ecb:EURINR",
+   "kind": "limit",
+   "name": "Largest fall allowed for between checks: ecb:EURINR",
+   "value": {
+    "fall": "0.0507",
+    "window": "2000-01-13 to 2026-11-20",
+    "horizon": "2 ECB fixings",
+    "confidence": "0.9999"
+   },
+   "source": "calibrated on ECB reference rate (EUR/INR) history to 2026-11-20, 99.99% per 2 ECB fixings; not a worst case; exceeded in: GFC: 4.0% against 3.2% in force at its start (walk-forward). X9, experiments/r7/X9-calibration/limits.json",
+   "asOf": "2026-11-22",
+   "status": "calibrated"
+  }
+ ]
+}

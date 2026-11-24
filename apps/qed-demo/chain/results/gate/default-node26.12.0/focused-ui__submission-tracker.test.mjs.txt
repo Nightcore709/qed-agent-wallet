@@ -1,0 +1,12 @@
+✔ a lost POST response can recover the original job without scheduling another (1.461208ms)
+✔ a reused request reference cannot authorize a different transaction (0.078834ms)
+✔ one visitor cannot resolve another visitor’s private job reference (0.073583ms)
+✔ legacy scripted callers work but malformed references are refused (0.057ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35.043375

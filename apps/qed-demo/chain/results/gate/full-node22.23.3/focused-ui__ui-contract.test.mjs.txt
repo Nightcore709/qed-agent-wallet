@@ -1,0 +1,106 @@
+TAP version 13
+# Subtest: frontend inline JavaScript is syntactically valid
+ok 1 - frontend inline JavaScript is syntactically valid
+  ---
+  duration_ms: 1.671417
+  type: 'test'
+  ...
+# Subtest: all seven first-class views have navigation links and accessible headings
+ok 2 - all seven first-class views have navigation links and accessible headings
+  ---
+  duration_ms: 0.669208
+  type: 'test'
+  ...
+# Subtest: there are no duplicate declared element identifiers
+ok 3 - there are no duplicate declared element identifiers
+  ---
+  duration_ms: 0.15325
+  type: 'test'
+  ...
+# Subtest: guest history remains tab-scoped and has explicit clear-history control
+ok 4 - guest history remains tab-scoped and has explicit clear-history control
+  ---
+  duration_ms: 0.2285
+  type: 'test'
+  ...
+# Subtest: transaction job IDs are retained for refresh recovery and never automatically resubmitted
+ok 5 - transaction job IDs are retained for refresh recovery and never automatically resubmitted
+  ---
+  duration_ms: 0.113083
+  type: 'test'
+  ...
+# Subtest: user and diagnostic strings are escaped in generated result markup
+ok 6 - user and diagnostic strings are escaped in generated result markup
+  ---
+  duration_ms: 0.088583
+  type: 'test'
+  ...
+# Subtest: broadcast is only emitted after sendTransaction returns a hash
+ok 7 - broadcast is only emitted after sendTransaction returns a hash
+  ---
+  duration_ms: 0.760541
+  type: 'test'
+  ...
+# Subtest: the idle reset must not run while a job is executing
+ok 8 - the idle reset must not run while a job is executing
+  ---
+  duration_ms: 0.106042
+  type: 'test'
+  ...
+# Subtest: historical evidence remains labeled separately from local Anvil execution
+ok 9 - historical evidence remains labeled separately from local Anvil execution
+  ---
+  duration_ms: 0.312416
+  type: 'test'
+  ...
+# Subtest: accepted sandbox actions use idempotency keys and lookup rather than retransmission
+ok 10 - accepted sandbox actions use idempotency keys and lookup rather than retransmission
+  ---
+  duration_ms: 0.386375
+  type: 'test'
+  ...
+# Subtest: a changed sandbox epoch warns about historic guest receipts without erasing chain activity
+ok 11 - a changed sandbox epoch warns about historic guest receipts without erasing chain activity
+  ---
+  duration_ms: 0.186625
+  type: 'test'
+  ...
+# Subtest: chat confirmation never claims server acceptance before an acknowledged job
+ok 12 - chat confirmation never claims server acceptance before an acknowledged job
+  ---
+  duration_ms: 0.085
+  type: 'test'
+  ...
+# Subtest: financial results use exact BigInt formatting and certificate reverts have readable guidance
+ok 13 - financial results use exact BigInt formatting and certificate reverts have readable guidance
+  ---
+  duration_ms: 0.120334
+  type: 'test'
+  ...
+# Subtest: the periodic state refresh never replaces interactive controls whose markup is unchanged
+ok 14 - the periodic state refresh never replaces interactive controls whose markup is unchanged
+  ---
+  duration_ms: 0.388708
+  type: 'test'
+  ...
+# Subtest: an unreachable server is reported plainly and never treated as a refused submission
+ok 15 - an unreachable server is reported plainly and never treated as a refused submission
+  ---
+  duration_ms: 0.1065
+  type: 'test'
+  ...
+# Subtest: a starting public server (health 503 with readiness) is shown as starting, not as an outage
+ok 16 - a starting public server (health 503 with readiness) is shown as starting, not as an outage
+  ---
+  duration_ms: 0.091208
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 100.659833

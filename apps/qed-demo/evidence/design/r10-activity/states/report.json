@@ -1,0 +1,98 @@
+{
+ "/activity 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8495z077ekygxpk8w 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m84888ywterdjjfgz7 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8488evycsc9cfwk5h 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence/run.run_1m8495z05cyn7ekshnf 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/activity 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8495z077ekygxpk8w 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m84888ywterdjjfgz7 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8488evycsc9cfwk5h 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence/run.run_1m8495z05cyn7ekshnf 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/activity 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8495z077ekygxpk8w 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m84888ywterdjjfgz7 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8488evycsc9cfwk5h 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence/run.run_1m8495z05cyn7ekshnf 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/activity 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8495z077ekygxpk8w 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m84888ywterdjjfgz7 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/record/act_1m8488evycsc9cfwk5h 390 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/evidence/run.run_1m8495z05cyn7ekshnf 390 dark": {
+  "errors": [],
+  "fault": false
+ }
+}

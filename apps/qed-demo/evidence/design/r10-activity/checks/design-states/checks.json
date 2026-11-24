@@ -1,0 +1,43 @@
+{
+ "what": "Design regression checks from the owner's rejection of the five directions (D-069)",
+ "at": "2026-11-23T14:07:45.093Z",
+ "screens": 30,
+ "findings": [
+  {
+   "route": "/",
+   "width": 1440,
+   "check": "one-sum",
+   "detail": "₹23,857, beside ₹23,857.12; ₹1,62,215 beside ₹1,62,215.31"
+  },
+  {
+   "route": "/",
+   "width": 390,
+   "check": "one-sum",
+   "detail": "₹23,857, beside ₹23,857.12; ₹1,62,215 beside ₹1,62,215.31"
+  },
+  {
+   "route": "/save",
+   "width": 390,
+   "check": "label-fit",
+   "detail": "\"₹1.5 lakh\" runs 3px past its chart"
+  },
+  {
+   "route": "/save",
+   "width": 390,
+   "check": "label-fit",
+   "detail": "\"₹2.5 lakh\" runs 3px past its chart"
+  },
+  {
+   "route": "/safeguards",
+   "width": 390,
+   "check": "label-fit",
+   "detail": "\"₹1.5 lakh\" runs 3px past its chart"
+  },
+  {
+   "route": "/safeguards",
+   "width": 390,
+   "check": "label-fit",
+   "detail": "\"₹2.5 lakh\" runs 3px past its chart"
+  }
+ ]
+}

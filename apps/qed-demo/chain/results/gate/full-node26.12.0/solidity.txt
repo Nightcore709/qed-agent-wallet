@@ -1,0 +1,382 @@
+Compiling 72 files with Solc 0.8.26
+Solc 0.8.26 finished in 84.85s
+Compiler run successful!
+
+Ran 13 tests for contracts/test/ProofEscrow.t.sol:ProofEscrowTest
+[PASS] test_CheckIsAPureDryRun() (gas: 657488)
+[PASS] test_Lifecycle_QuoteOpenDeliverSettle_IntoAgentVault() (gas: 720869)
+[PASS] test_ProviderMayRefundEarly() (gas: 330221)
+[PASS] test_RefundAfterDeadline_ByAnyone_ToClientOnly() (gas: 526818)
+[PASS] test_Revert_AlmostOptimalIsNotOptimal() (gas: 489646)
+[PASS] test_Revert_ClientTampersPayeeVerifierSpecOrDeadline() (gas: 112316)
+[PASS] test_Revert_ClientTampersPrice() (gas: 56279)
+[PASS] test_Revert_FakeConvexityWitness() (gas: 516423)
+[PASS] test_Revert_LazyEqualWeightPortfolio() (gas: 523381)
+[PASS] test_Revert_OnlyProviderDelivers_AndOnlyOnce() (gas: 723963)
+[PASS] test_Revert_QuoteReplayAndWrongClientAndExpiry() (gas: 437382)
+[PASS] test_Revert_QuoteSignedByImpostor() (gas: 50878)
+[PASS] test_Revert_SolvedADifferentProblem() (gas: 436289)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 21.71ms (8.14ms CPU time)
+
+Ran 11 tests for contracts/test/PrivateMinVarianceVerifier.t.sol:PrivateMinVarianceVerifierTest
+[PASS] testFuzz_AnyCorruptedProofCoordinateIsRejected(uint8,uint256) (runs: 2000, μ: 1024176004, ~: 1024176035)
+[PASS] test_AttestationDoesNotTransferAcrossChains() (gas: 59969)
+[PASS] test_CertifiedVarianceIsTheTrueOptimum() (gas: 6105)
+[PASS] test_EscrowPaysOnlyForThePrivateProof() (gas: 3222361)
+[PASS] test_GasOfPrivateVerification() (gas: 275107)
+[PASS] test_RejectsDataNotAttestedByTheVendor() (gas: 356351)
+[PASS] test_RejectsNonCanonicalFieldElement() (gas: 57991)
+[PASS] test_RejectsSwappedPortfolioCommitment() (gas: 270771)
+[PASS] test_RejectsUnderstatedVariance() (gas: 270466)
+[PASS] test_StolenProofIsUselessToAnotherProvider() (gas: 543410)
+[PASS] test_ValidProofAccepted() (gas: 567504)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 1.57s (1.58s CPU time)
+
+Ran 13 tests for contracts/test/QEDTreasuryPolicy.t.sol:QEDTreasuryPolicyTest
+[PASS] testFuzz_everyAcceptedTrancheSatisfiesThePolicy(uint256,uint16,uint16) (runs: 2000, μ: 575775, ~: 739966)
+[PASS] test_agentCannotBypassThePolicy() (gas: 251282)
+[PASS] test_executionCostAboveTheLimit_isRefused() (gas: 714661)
+[PASS] test_honestTranche_underThePolicy_isAccepted() (gas: 736548)
+[PASS] test_lapsedOrRevokedPolicy_isRefused() (gas: 333974)
+[PASS] test_midPriceReference_isTheDirectVenuesDepthWeightedMid() (gas: 78677)
+[PASS] test_noShortfall_noTrade() (gas: 259264)
+[PASS] test_onlyTheOwnerSetsThePolicy() (gas: 55026)
+[PASS] test_orderMustPayTheReserve() (gas: 236870)
+[PASS] test_overConversion_isRefused() (gas: 699093)
+[PASS] test_ringFencingCreatesTheShortfall() (gas: 1368551)
+[PASS] test_trancheOutsideTheOwnersBounds_isRefused() (gas: 257400)
+[PASS] test_trancheThatExactlyCoversTheNeed_isAccepted() (gas: 700970)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 2.52s (2.53s CPU time)
+
+Ran 36 tests for contracts/test/QEDVault.t.sol:QEDVaultTest
+[PASS] testFuzz_BlastRadiusIsAnUpperBound(uint8,uint256) (runs: 2000, μ: 447871, ~: 452372)
+[PASS] test_AgentKeyHasNoAdminPowers() (gas: 56604)
+[PASS] test_AgentPaysUnderOwnerMandateAndCosignerCertificate() (gas: 272736)
+[PASS] test_BlastRadius() (gas: 371770)
+[PASS] test_CreditorRelease() (gas: 31511)
+[PASS] test_ForwardPaymentCreatesRingFencedPromise() (gas: 376800)
+[PASS] test_GuardianPausesButCannotUnpause_CreditorsStillPaid() (gas: 339953)
+[PASS] test_MandateWithoutCosignLetsAgentActAloneWithinScope() (gas: 267325)
+[PASS] test_NonAgentCannotExecute() (gas: 80178)
+[PASS] test_OnlyCreditorCanReleaseOrAssign() (gas: 90349)
+[PASS] test_OwnerCannotWithdrawRingFencedFunds() (gas: 76063)
+[PASS] test_Revert_CertificateExpired() (gas: 106079)
+[PASS] test_Revert_CertificateExpired_ButValidAtExpiresAt() (gas: 299777)
+[PASS] test_Revert_CertificateNotYetActive_ThenValidAtNotBefore() (gas: 299583)
+[PASS] test_Revert_EpochBumpRevokesEverything() (gas: 93616)
+[PASS] test_Revert_ForgedCosignerSignature() (gas: 104782)
+[PASS] test_Revert_GlobalDailyCapAcrossMandates() (gas: 417897)
+[PASS] test_Revert_KeyRotationInvalidatesOldAgentAndOldMandates() (gas: 104944)
+[PASS] test_Revert_MandateExpiredOrNotYetValid() (gas: 106975)
+[PASS] test_Revert_MandateForAnotherVault() (gas: 2088513)
+[PASS] test_Revert_MandatePeriodCap_ThenResetsNextPeriod() (gas: 451979)
+[PASS] test_Revert_MandateSignedByAttacker() (gas: 73549)
+[PASS] test_Revert_MandateTotalCap() (gas: 321735)
+[PASS] test_Revert_PayeeNotInMandate_EvenIfCosignerCompromised() (gas: 108348)
+[PASS] test_Revert_PerPaymentCap() (gas: 107951)
+[PASS] test_Revert_PromiseCannotOverCommit() (gas: 150200)
+[PASS] test_Revert_Replay() (gas: 278578)
+[PASS] test_Revert_RevokedMandate() (gas: 118089)
+[PASS] test_Revert_SolvencyViolation_EvenWithBothKeysCompromised() (gas: 406965)
+[PASS] test_Revert_TamperedAmount() (gas: 103720)
+[PASS] test_Revert_TamperedDueDateOrEvidence() (gas: 142898)
+[PASS] test_Revert_TamperedMandateScope() (gas: 101677)
+[PASS] test_Revert_TamperedRecipient() (gas: 162731)
+[PASS] test_SettleOnlyWhenDue_ByAnyone() (gas: 84883)
+[PASS] test_SmartAccountOwner_ERC1271() (gas: 2430652)
+[PASS] test_TwoStepOwnership() (gas: 39526)
+Suite result: ok. 36 passed; 0 failed; 0 skipped; finished in 12.81s (12.81s CPU time)
+
+Ran 28 tests for contracts/test/QEDExecution.t.sol:QEDExecutionTest
+[PASS] testFuzz_boundIsNeverBeaten(uint256) (runs: 2000, μ: 234010, ~: 226731)
+[PASS] testFuzz_bounty_neverPays(uint256) (runs: 2000, μ: 1034733, ~: 1005628)
+[PASS] testFuzz_nearOptimalRoutesNeverBeatTheBound(uint256) (runs: 2000, μ: 307232, ~: 307232)
+[PASS] test_badNormalization() (gas: 127661)
+[PASS] test_bounty_cannotOverspend() (gas: 1027424)
+[PASS] test_bounty_cannotUseThePoolsOwnHoldings() (gas: 1434658)
+[PASS] test_bounty_forgedPricesOnlyLoosenTheBound() (gas: 1143929)
+[PASS] test_bounty_paysAgainstAnUnsoundBound() (gas: 1407460)
+[PASS] test_bounty_theOptimalRouteCannotClaim() (gas: 1145112)
+[PASS] test_declaredFeeMustMatchThePool() (gas: 82323)
+[PASS] test_directOnlyRoute_passesSlippage_butIsRejected() (gas: 515066)
+[PASS] test_frontRun_isStoppedByTheCosignedFloor() (gas: 643165)
+[PASS] test_honestBoundIsTight() (gas: 3352)
+[PASS] test_honestRoute_isAccepted_andMatchesTheSolverBitForBit() (gas: 571661)
+[PASS] test_leftoverIntermediate_isRejected() (gas: 554598)
+[PASS] test_noPriceVectorRescuesABadRoute() (gas: 801906)
+[PASS] test_onlyOperatorTrades_onlyVaultOwnerConfigures() (gas: 131571)
+[PASS] test_payPassesThrough_butNotWithATradeCertificate() (gas: 298223)
+[PASS] test_perPaymentCapStillApplies() (gas: 267224)
+[PASS] test_quoteBound_equalsTypeScript() (gas: 156594)
+[PASS] test_recipientMustBeInTheOwnerMandate() (gas: 120792)
+[PASS] test_singleVenue_failsTheSlippageFloorFirst() (gas: 437907)
+[PASS] test_skimOf0_6bps_isRejected() (gas: 554640)
+[PASS] test_tamperedOrder_isRejected() (gas: 167940)
+[PASS] test_toleranceIsCapped() (gas: 118250)
+[PASS] test_unknownVenue_isRejected() (gas: 393684)
+[PASS] test_vaultLimitsReplayAndPauseStillApply() (gas: 748735)
+[PASS] test_venueChangeInvalidatesOutstandingOrders() (gas: 170696)
+Suite result: ok. 28 passed; 0 failed; 0 skipped; finished in 23.25s (2.94s CPU time)
+
+Ran 12 tests for contracts/test/MinVarianceVerifier.t.sol:MinVarianceVerifierTest
+[PASS] testFuzz_AcceptedImpliesEpsilonOptimal(uint256,uint256,uint256) (runs: 2000, μ: 295092, ~: 315888)
+[PASS] testFuzz_MaterialReallocationIsRejected(uint256,uint256,uint256) (runs: 2000, μ: 245717, ~: 252609)
+[PASS] testFuzz_RandomPortfolioWithBestMultipliersIsRejected(uint256[6]) (runs: 2000, μ: 502680, ~: 504285)
+[PASS] test_GasCostOfCertification() (gas: 298767)
+[PASS] test_HonestCertificatePasses_AndReturnsVariance() (gas: 298944)
+[PASS] test_Revert_AsymmetricCovariance() (gas: 203300)
+[PASS] test_Revert_BudgetViolated() (gas: 219035)
+[PASS] test_Revert_DimensionMismatch() (gas: 174262)
+[PASS] test_Revert_NegativeMultiplier() (gas: 233943)
+[PASS] test_Revert_NegativeWeight_ShortSelling() (gas: 238150)
+[PASS] test_Revert_OverflowGames() (gas: 192749)
+[PASS] test_Revert_ToleranceGames() (gas: 206682)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 28.29s (19.42s CPU time)
+
+Ran 8 tests for contracts/test/Invariants.t.sol:InvariantsTest
+[PASS] invariant_AgentKeyHasNoAdminPower() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_CreditorsPaidExactly() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_DailyCapRespected() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_NoAgentOutflowWhilePaused() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_ProtectedEqualsSumOfOpenLiabilities() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_VaultAlwaysCoversRingFencedLiabilities() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] invariant_ZeroLossToUnapprovedAddresses() (runs: 512, calls: 49152, reverts: 0)
+
+╭-------------------------+-----------------+-------+---------+----------╮
+| Contract                | Selector        | Calls | Reverts | Discards |
++========================================================================+
+| CompromisedAgentHandler | agentPay        | 4156  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | agentTriesAdmin | 4137  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | creditorRelease | 4075  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | deposit         | 4120  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | guardianPause   | 4189  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerRingFence  | 4090  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerSetCap     | 4074  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerUnpause    | 4155  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | ownerWithdraw   | 3991  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | settle          | 4084  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | strangerRelease | 3938  | 0       | 0        |
+|-------------------------+-----------------+-------+---------+----------|
+| CompromisedAgentHandler | warp            | 4143  | 0       | 0        |
+╰-------------------------+-----------------+-------+---------+----------╯
+
+[PASS] test_HandlerIsNotVacuous() (gas: 2508788)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 28.29s (86.22s CPU time)
+
+Ran 15 tests for contracts/test/QEDClearing.t.sol:QEDClearingTest
+[PASS] testFuzz_AnyCirculationAroundTheOptimumIsRejected(uint256,int256) (runs: 2000, μ: 28679414, ~: 28664188)
+[PASS] test_GridlockThenSettlementWithExactCash() (gas: 31116885)
+[PASS] test_OpenObligationsView() (gas: 140516)
+[PASS] test_OptimalNettingExecutes_PositionsUnchanged() (gas: 28928667)
+[PASS] test_Revert_CancellingMoreThanOwed() (gas: 26685652)
+[PASS] test_Revert_ForgedDualCertificate() (gas: 26693226)
+[PASS] test_Revert_GreedyNettingIsNotProvablyMaximal() (gas: 28735474)
+[PASS] test_Revert_HidingAnObligation() (gas: 26675378)
+[PASS] test_Revert_IdsNotIncreasing() (gas: 26683390)
+[PASS] test_Revert_MembershipAndDebtRules() (gas: 57308)
+[PASS] test_Revert_NothingToNet() (gas: 26786754)
+[PASS] test_Revert_PotentialOverflowGames() (gas: 26666320)
+[PASS] test_Revert_ShiftingValueBetweenMembers() (gas: 26794936)
+[PASS] test_Revert_StaleAmounts_AndReplayAfterNetting() (gas: 38674401)
+[PASS] test_SixtyRandomEconomies() (gas: 163682025)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 28.29s (28.59s CPU time)
+
+Ran 11 tests for contracts/test/Bounties.t.sol:BountiesTest
+[PASS] testFuzz_Maximality_NoCirculationBeatsTheCertificate(uint256) (runs: 2000, μ: 34631604, ~: 34631610)
+[PASS] testFuzz_Optimality_NoFeasiblePortfolioRefutesTheTheorem(uint64[6]) (runs: 2000, μ: 376322, ~: 376322)
+[PASS] test_Maximality_AgreesWithQEDClearingOnSixtyEconomies() (gas: 170653032)
+[PASS] test_Maximality_DemoEconomyAcceptedAt169() (gas: 34422438)
+[PASS] test_Maximality_GreedyNettingCannotRefute() (gas: 36399123)
+[PASS] test_Maximality_PaysOutAgainstAnUnsoundRule() (gas: 40905882)
+[PASS] test_Optimality_ChallengerMustBeFeasible() (gas: 477634)
+[PASS] test_Optimality_EqualWeightPortfolioCannotRefute() (gas: 383500)
+[PASS] test_Optimality_ForgedCertificateCannotEvenEnter() (gas: 1092046)
+[PASS] test_Optimality_PaysOutAgainstAnUnsoundVerifier() (gas: 852778)
+[PASS] test_Optimality_TheCertifiedPortfolioItselfHasZeroAdvantage() (gas: 383371)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 28.29s (48.34s CPU time)
+
+Ran 9 test suites in 28.29s (153.33s CPU time): 147 tests passed, 0 failed, 0 skipped (147 total tests)

@@ -1,0 +1,65 @@
+{
+  "owner": "0xb7Ed1049456550Cbd8e1C6578A8cF1DD495797f7",
+  "vendor": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+  "creditor": "0x2d3e8af597fcA9F4ecDc41C69F2956EDd6f1CB78",
+  "denylist": [
+    "0x3BDB7Ed120ff19453EA5A1e59A60AB72D7f2Dc7e"
+  ],
+  "mandate": {
+    "vault": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6",
+    "agent": "0x2A101d90D3E502bDBd4a06c6712cA7D240A9d0Bb",
+    "payees": [
+      "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+      "0x2d3e8af597fcA9F4ecDc41C69F2956EDd6f1CB78"
+    ],
+    "maxPerPayment": {
+      "$big": "40000000"
+    },
+    "maxPerPeriod": {
+      "$big": "40000000"
+    },
+    "period": {
+      "$big": "86400"
+    },
+    "maxTotal": {
+      "$big": "120000000"
+    },
+    "validFrom": {
+      "$big": "1792418660"
+    },
+    "validUntil": {
+      "$big": "1793023520"
+    },
+    "epoch": {
+      "$big": "0"
+    },
+    "requireCosign": true,
+    "purpose": "0x0f6e9c3b8d0c257aa628f9b416f59ae19a46c39a6ad8d39ab27fbd22f2c9c720",
+    "salt": "0x4a390975483f27afa1c034093a8dfcc8a0807a020f7dd238376a970202c72d03"
+  },
+  "ownerSig": "0x3ac555ace35922d36646fc6226b76d9047f0be1779f0357efb9a2db5141ad5af724ce1eb681206e45f829a12118586c2dd6f9303123fd746b7c90e348c328bee1c",
+  "payees": [
+    {
+      "label": "Helix Data",
+      "aliases": [
+        "helix",
+        "vendor",
+        "data vendor",
+        "data"
+      ],
+      "address": "0x6Bb74076b522a9d38c62EC7dF914274e121fFAb8",
+      "approved": true
+    },
+    {
+      "label": "CloudCo",
+      "aliases": [
+        "cloudco",
+        "cloud",
+        "compute"
+      ],
+      "address": "0x2d3e8af597fcA9F4ecDc41C69F2956EDd6f1CB78",
+      "approved": true
+    }
+  ],
+  "mandateHash": "0xc4cd1e885a556e94ce33075fad32a8fb3a3d38b2adc468cd555857a61256c427"
+}

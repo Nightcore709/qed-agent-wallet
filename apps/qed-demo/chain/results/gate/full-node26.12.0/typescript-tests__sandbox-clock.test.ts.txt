@@ -1,0 +1,14 @@
+(node:62628) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ local Anvil certificate windows use fresh time after long inactivity (0.706625ms)
+✔ Anvil never issues timestamps older than a time-travelled chain (0.13625ms)
+✔ public chain certificate validity ignores the server wall clock (0.081791ms)
+✔ invalid timestamps are rejected (0.310541ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 145.751834

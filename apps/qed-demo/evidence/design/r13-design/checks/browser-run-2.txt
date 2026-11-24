@@ -1,0 +1,33 @@
+Running 22 tests using 1 worker
+  ✓   1 browser/tests/chart.spec.ts:15:1 › the price chart states its question, answers it with exact values, gives a table and its source, and reads a point under a finger on a phone (5.9s)
+  ✓   2 browser/tests/goals.spec.ts:44:1 › a goal: QED's monthly figure, signed with the passkey; behind when a contribution lapses; a remedy applied with the passkey (13.4s)
+  ✓   3 browser/tests/keyboard.spec.ts:47:1 › by keyboard alone: create an account with a passkey, open the household, pause QED and resume (4.0s)
+  ✓   4 browser/tests/keyboard.spec.ts:70:1 › by keyboard alone: set up the on-chain vault, accept it, sign a mandate and pay, each signed by the passkey (14.2s)
+  ✓   5 browser/tests/notifications.spec.ts:24:1 › a passkey added to the account is told on Home at once, acknowledged there, and listed as acknowledged (5.2s)
+  ✓   6 browser/tests/passkeys.spec.ts:34:1 › a fresh account is created with a passkey and no password, shows ten recovery codes once, and the database agrees (3.2s)
+  ✓   7 browser/tests/passkeys.spec.ts:52:1 › signs out and back in with the passkey; a sign-in without user verification is refused (2.7s)
+  ✘   8 browser/tests/passkeys.spec.ts:112:1 › a saved code and a contact’s code start a recovery that the signed-in owner sees and cancels; it can then not be completed (14.8s)
+  ✘   9 browser/tests/passkeys.spec.ts:151:1 › a recovery left alone completes after the delay with a new passkey, and shows a new set of saved codes once; the old ones stop working (24.2s)
+  ✓  10 browser/tests/passkeys.spec.ts:182:1 › a stolen passkey is suspended at once from another: its session ends and it can no longer sign in (9.0s)
+  ✓  11 browser/tests/recovery.spec.ts:141:1 › forgot password: a link from the outbox sets a new password, ends every session, signs nobody in, and works once (27.5s)
+  ✓  12 browser/tests/recovery.spec.ts:206:1 › an expired link says so plainly and leads to a new one (16.6s)
+  ✓  13 browser/tests/recovery.spec.ts:236:1 › a lost passkey: an email link and a saved code start a recovery that waits; a new link finishes it, and the new passkey signs in (26.1s)
+  ✓  14 browser/tests/recovery.spec.ts:267:1 › the recovered passkey is refused an approval, by the sheet and by the server, until its separate delayed restoration completes (36.8s)
+  ✓  15 browser/tests/recovery.spec.ts:340:1 › a recovery is cancelled from a signed-in device, and again by a recovery contact; each time the account hears of it and nothing completes (29.6s)
+  ✓  16 browser/tests/recovery.spec.ts:417:1 › suspected compromise: every session ends from "If something is wrong", and a stolen passkey is suspended (6.8s)
+  ✓  17 browser/tests/security-no-wallet.spec.ts:12:1 › an account without an on-chain wallet loads Security with no failed request and no console error, is told how to set the wallet up, and sees its signers once it is (5.2s)
+  ✓  18 browser/tests/statement-period.spec.ts:244:5 › at 390 px › the Statement for last month: its start, its end, its file, and the next period from its end (5.7s)
+  ✓  19 browser/tests/statement-period.spec.ts:245:5 › at 390 px › Activity: a misspelt name, amount and direction filters, nothing found named, and the file's period (14.4s)
+  ✓  20 browser/tests/statement-period.spec.ts:244:5 › at 1440 px › the Statement for last month: its start, its end, its file, and the next period from its end (5.3s)
+  ✓  21 browser/tests/statement-period.spec.ts:245:5 › at 1440 px › Activity: a misspelt name, amount and direction filters, nothing found named, and the file's period (17.5s)
+  ✓  22 browser/tests/vault-signers.spec.ts:51:1 › a second passkey becomes a wallet signer, its removal is scheduled and cancelled by the other passkey, a recovery key is set up in the browser without the code leaving it, and a recovery started with that 
+    browser/results/output/passkeys-a-saved-code-and--03ca5-t-can-then-not-be-completed/test-failed-1.png
+    browser/results/output/passkeys-a-saved-code-and--03ca5-t-can-then-not-be-completed/test-failed-3.png
+    browser/results/output/passkeys-a-saved-code-and--03ca5-t-can-then-not-be-completed/test-failed-2.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-1.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-2.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-3.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-4.png
+  2 failed
+  20 passed (5.5m)
+exit 1

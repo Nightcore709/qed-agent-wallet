@@ -1,0 +1,72 @@
+/* Horizon (src/ui/horizon.tsx): the balance at worst as true steps on a lit line, the kept region hatched, the lowest
+   point marked; a reading line and a glass label follow the pointer, the finger or the arrow keys. */
+.horizon { display: grid; gap: var(--s4); }
+.hz-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s5); flex-wrap: wrap; }
+.hz-title h2 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; }
+.hz-title p { margin-top: 4px; font-size: var(--t-small); color: var(--ink-3); max-width: 58ch; }
+.hz-tools { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.hz-tools .seg button { min-height: 30px; padding: 0 12px; }
+/* the axis column in rem, so its labels fit at any text size the browser is set to (R13, as Save's chart) */
+.hz-frame { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 3.5rem; gap: var(--s2); }
+.hz-axis { position: relative; order: 2; font-size: var(--t-micro); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.hz-axis span { position: absolute; left: 0; transform: translateY(-50%); white-space: nowrap; }
+.hz-plot { position: relative; min-width: 0; cursor: crosshair; touch-action: pan-y; border-radius: var(--r-sm); }
+.hz-plot:focus-visible { outline-offset: 6px; }
+.hz-svg { display: block; overflow: visible; }
+.hz-svg text { font: 560 var(--t-micro)/1 var(--font); fill: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.hz-grid { stroke: var(--rule); stroke-dasharray: 2 6; }
+.hz-month { stroke: var(--rule-2); stroke-dasharray: 1 4; }
+.hz-zero { stroke: var(--loss); stroke-width: 1; stroke-dasharray: 4 4; }
+.hz-fill-top { stop-color: var(--c2); stop-opacity: .26; } .hz-fill-bottom { stop-color: var(--c2); stop-opacity: 0; }
+.hz-hatch { stroke: var(--part-kept); stroke-width: 1.2; }
+.hz-kept { opacity: .55; }
+.hz-glow { fill: none; stroke: var(--c2); stroke-width: 6; opacity: .55; }
+.hz-line { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.hz-mark { stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; }
+.hz-mark.in { stroke: var(--gain); }
+.hz-svg .hz-mark-text { fill: var(--ink-2); font-weight: 600; paint-order: stroke; stroke: var(--ground); stroke-width: 5px; stroke-linejoin: round; }
+.hz-svg .hz-mark-text.in { fill: var(--gain); }
+.hz-svg .hz-kept-text { fill: var(--ink-2); font-weight: 700; paint-order: stroke; stroke: var(--ground); stroke-width: 6px; stroke-linejoin: round; }
+.hz-low-line { stroke: var(--due); stroke-width: 1; stroke-dasharray: 2 4; opacity: .8; }
+.hz-low-halo { fill: color-mix(in oklab, var(--due-mark) 26%, transparent); animation: halo 2.6s var(--ease-move) infinite; transform-box: fill-box; transform-origin: center; }
+.hz-low-dot { fill: var(--due-mark); stroke: var(--sheet); stroke-width: 2.5; }
+@keyframes halo { 50% { transform: scale(1.35); opacity: .4; } }
+.hz-svg .hz-today { fill: var(--brand); font-weight: 700; }
+.hz-cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
+.hz-dot { fill: var(--sheet); stroke: var(--ink); stroke-width: 2.5; }
+/* the line draws from today to the right as the chart arrives; every value is there from the first frame */
+.hz-reveal { animation: hz-draw 1100ms var(--ease-out) both; }
+@keyframes hz-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.hz-tip { position: absolute; z-index: 4; pointer-events: none; transform: translate(-50%, -100%); min-width: 176px; max-width: 280px; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
+  background: var(--pane-3); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); font-size: var(--t-small); line-height: 1.35; display: grid; gap: 2px; }
+.hz-tip-day { font-size: var(--t-micro); color: var(--ink-3); font-weight: 600; }
+.hz-tip b { font-size: var(--t-lead); font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; }
+.hz-tip-sub { font-size: var(--t-micro); color: var(--ink-3); }
+.hz-tip ul { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--rule); display: grid; gap: 2px; }
+.hz-tip li { display: flex; justify-content: space-between; gap: var(--s3); font-size: var(--t-micro); }
+.hz-tip li span:last-child { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hz-tip li .in { color: var(--gain); }
+.hz-key { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-micro); color: var(--ink-3); }
+.hz-key span { display: inline-flex; align-items: center; gap: 6px; }
+.hz-key b { color: var(--ink-2); font-weight: 650; }
+.hz-key i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
+.hz-key .k-line { height: 2px; background: var(--ink); box-shadow: 0 0 6px var(--c2); }
+.hz-key .k-kept { background: repeating-linear-gradient(135deg, var(--part-kept) 0 1.5px, transparent 1.5px 5px); box-shadow: inset 0 0 0 1px var(--part-kept); }
+.hz-key .k-low { width: 10px; border-radius: 50%; background: var(--due-mark); }
+.hz-foot { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-small); padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.hz-foot a { display: inline-flex; align-items: center; gap: 2px; }
+.hz-foot svg { width: 15px; height: 15px; }
+.hz-table { max-height: 380px; overflow: auto; border-radius: var(--r-md); }
+.hz-table tr.lowest td { color: var(--due); font-weight: 650; }
+@media (max-width: 759px) { .hz-frame { grid-template-columns: minmax(0, 1fr) 2.875rem; } .hz-tools { width: 100%; } }
+
+/* Text enlarged to 200% on a 320 px screen (R13 leftovers, checked with the root size at 200%): what grows with the text gives way to the width. */
+@media (max-width: 479px) {
+  .horizon, .hz-head > *, .hz-title, .hz-key > * { min-width: 0; }
+  .horizon { grid-template-columns: minmax(0, 1fr); }
+  .hz-tools .seg button { padding: 0 10px; }
+  /* the axis labels are placed by their value, so they cannot wrap; they grow to 14 px and the column is wide enough for that */
+  .hz-axis { font-size: min(var(--t-micro), 14px); }
+  /* the lowest-point item is text with a figure in it, not a row of flex items */
+  .hz-key span span { display: block; }
+}

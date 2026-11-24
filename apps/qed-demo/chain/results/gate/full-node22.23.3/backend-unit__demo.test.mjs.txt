@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: job errors keep the revert reason but not the internal RPC request dump
+ok 1 - job errors keep the revert reason but not the internal RPC request dump
+  ---
+  duration_ms: 0.632
+  type: 'test'
+  ...
+# Subtest: different amounts within the actual signed mandate are accepted
+ok 2 - different amounts within the actual signed mandate are accepted
+  ---
+  duration_ms: 1.2755
+  type: 'test'
+  ...
+# Subtest: larger than mandate cap is refused with an intelligible security reason
+ok 3 - larger than mandate cap is refused with an intelligible security reason
+  ---
+  duration_ms: 0.2595
+  type: 'test'
+  ...
+# Subtest: duplicate, missing, or ambiguous amounts never reach a signer
+ok 4 - duplicate, missing, or ambiguous amounts never reach a signer
+  ---
+  duration_ms: 0.15725
+  type: 'test'
+  ...
+# Subtest: privilege escalation is refused
+ok 5 - privilege escalation is refused
+  ---
+  duration_ms: 0.09175
+  type: 'test'
+  ...
+# Subtest: arbitrary scripts or scenario names are refused
+ok 6 - arbitrary scripts or scenario names are refused
+  ---
+  duration_ms: 0.049958
+  type: 'test'
+  ...
+# Subtest: only explicit policy impact configurations are allowed
+ok 7 - only explicit policy impact configurations are allowed
+  ---
+  duration_ms: 0.112041
+  type: 'test'
+  ...
+# Subtest: request type and instruction length are enforced
+ok 8 - request type and instruction length are enforced
+  ---
+  duration_ms: 0.067458
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 483.595834

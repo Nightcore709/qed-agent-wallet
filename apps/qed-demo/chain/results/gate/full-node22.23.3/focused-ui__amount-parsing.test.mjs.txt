@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: ordinary positive amounts still parse to exact micro-token integers
+ok 1 - ordinary positive amounts still parse to exact micro-token integers
+  ---
+  duration_ms: 2.636084
+  type: 'test'
+  ...
+# Subtest: explicit negative and signed numeric amounts are not converted into positive proposals
+ok 2 - explicit negative and signed numeric amounts are not converted into positive proposals
+  ---
+  duration_ms: 0.802334
+  type: 'test'
+  ...
+# Subtest: the direct sandbox execution path checks the same malformed signed-amount case
+ok 3 - the direct sandbox execution path checks the same malformed signed-amount case
+  ---
+  duration_ms: 0.325792
+  type: 'test'
+  ...
+# Subtest: a negative conversion never reaches the AI interpreter or creates a proposal
+ok 4 - a negative conversion never reaches the AI interpreter or creates a proposal
+  ---
+  duration_ms: 0.528667
+  type: 'test'
+  ...
+# Subtest: malformed monetary formats never yield a different positive amount
+ok 5 - malformed monetary formats never yield a different positive amount
+  ---
+  duration_ms: 0.177625
+  type: 'test'
+  ...
+# Subtest: decimal micro-units and legitimate separators retain their exact values
+ok 6 - decimal micro-units and legitimate separators retain their exact values
+  ---
+  duration_ms: 0.0665
+  type: 'test'
+  ...
+# Subtest: an invalid financial amount is rejected before AI interpretation
+ok 7 - an invalid financial amount is rejected before AI interpretation
+  ---
+  duration_ms: 0.282125
+  type: 'test'
+  ...
+# Subtest: all three execution entrypoints use the same strict numeric parser
+ok 8 - all three execution entrypoints use the same strict numeric parser
+  ---
+  duration_ms: 0.897167
+  type: 'test'
+  ...
+# Subtest: a wallet address does not become a second financial amount
+ok 9 - a wallet address does not become a second financial amount
+  ---
+  duration_ms: 0.622083
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90.325042

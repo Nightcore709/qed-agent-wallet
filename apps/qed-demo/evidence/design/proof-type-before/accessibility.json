@@ -1,0 +1,388 @@
+{
+ "what": "Automated accessibility and layout pass over the running interface",
+ "at": "2026-11-23T09:05:02.074Z",
+ "interface": "http://localhost:5821",
+ "vaultServiceRunning": true,
+ "screens": [
+  {
+   "screen": "Home",
+   "route": "/"
+  },
+  {
+   "screen": "Spend",
+   "route": "/pay"
+  },
+  {
+   "screen": "Save",
+   "route": "/save"
+  },
+  {
+   "screen": "Grow",
+   "route": "/holdings"
+  },
+  {
+   "screen": "Protect",
+   "route": "/protect"
+  },
+  {
+   "screen": "Activity",
+   "route": "/activity"
+  },
+  {
+   "screen": "Statement",
+   "route": "/passbook"
+  },
+  {
+   "screen": "Instructions",
+   "route": "/instructions"
+  },
+  {
+   "screen": "Choose a kind of instruction",
+   "route": "/instructions/new"
+  },
+  {
+   "screen": "Write an instruction",
+   "route": "/instructions/new?kind=invest"
+  },
+  {
+   "screen": "An instruction in force",
+   "route": "/instructions/prg_…"
+  },
+  {
+   "screen": "A protective instruction",
+   "route": "/instructions/prg_…"
+  },
+  {
+   "screen": "A draft instruction",
+   "route": "/instructions/prg_…"
+  },
+  {
+   "screen": "Earn",
+   "route": "/earn"
+  },
+  {
+   "screen": "On-chain wallet",
+   "route": "/vault"
+  },
+  {
+   "screen": "Wallet: pay and set aside",
+   "route": "/vault/treasury"
+  },
+  {
+   "screen": "Wallet: convert",
+   "route": "/vault/convert"
+  },
+  {
+   "screen": "Wallet: automatic conversions",
+   "route": "/vault/policy"
+  },
+  {
+   "screen": "Wallet: attack tests",
+   "route": "/vault/lab"
+  },
+  {
+   "screen": "Wallet: scenarios",
+   "route": "/vault/runs"
+  },
+  {
+   "screen": "Wallet: records",
+   "route": "/vault/records"
+  },
+  {
+   "screen": "Wallet: an operation, executed",
+   "route": "/vault/job/…"
+  },
+  {
+   "screen": "Wallet: an operation, refused",
+   "route": "/vault/job/…"
+  },
+  {
+   "screen": "Safeguards",
+   "route": "/safeguards"
+  },
+  {
+   "screen": "Security",
+   "route": "/security"
+  },
+  {
+   "screen": "Workspace",
+   "route": "/workspace"
+  },
+  {
+   "screen": "Readiness",
+   "route": "/readiness"
+  },
+  {
+   "screen": "Ask",
+   "route": "/ask"
+  },
+  {
+   "screen": "More (phone menu)",
+   "route": "/more"
+  },
+  {
+   "screen": "A record, done",
+   "route": "/record/act_…"
+  },
+  {
+   "screen": "A receipt",
+   "route": "/receipts/rcp_…"
+  }
+ ],
+ "axe": {
+  "rules": "WCAG 2.0, 2.1 and 2.2, levels A and AA",
+  "runs": 124,
+  "combinations": "light and dark, at 1440 and 390 px",
+  "violations": [],
+  "detail": []
+ },
+ "structure": {
+  "oneH1Everywhere": true,
+  "headingsInOrderEverywhere": true,
+  "perScreen": [
+   {
+    "screen": "Home",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Spend",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Save",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Grow",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Protect",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Activity",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Statement",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Instructions",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Choose a kind of instruction",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Write an instruction",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "An instruction in force",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "A protective instruction",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "A draft instruction",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Earn",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "On-chain wallet",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: pay and set aside",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: convert",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: automatic conversions",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: attack tests",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: scenarios",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: records",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: an operation, executed",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Wallet: an operation, refused",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Safeguards",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Security",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Workspace",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Readiness",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "Ask",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "More (phone menu)",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "A record, done",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   },
+   {
+    "screen": "A receipt",
+    "h1": 1,
+    "headingOrder": "in order",
+    "title": "QED"
+   }
+  ]
+ },
+ "overflow": {
+  "widthsChecked": [
+   320,
+   360,
+   390,
+   640,
+   768,
+   1024,
+   1440
+  ],
+  "screensThatOverflow": []
+ },
+ "keyboard": {
+  "firstTabStop": {
+   "text": "Skip to the page",
+   "href": "#content"
+  },
+  "stopsChecked": 40,
+  "stopsWithoutAVisibleOutline": [],
+  "approvalSheet": {
+   "opened": true,
+   "focusInsideOnOpen": true,
+   "labelled": true,
+   "stopsChecked": 12,
+   "stopsOutside": 0,
+   "closedByEscape": true,
+   "focusReturnedTo": "Deposit"
+  }
+ },
+ "focusNotHidden": {
+  "what": "Every screen walked with Tab and back with Shift+Tab (70 presses each way): a control that takes focus is not wholly under a bar pinned to the window, nor outside the window (WCAG 2.2, 2.4.11)",
+  "sizes": [
+   "1280 by 720",
+   "390 by 844",
+   "640 by 360 (a 1280 by 720 window at 200%)"
+  ],
+  "screens": 31,
+  "focusStopsChecked": 8859,
+  "whollyHidden": [],
+  "halfOrMoreHidden": 10
+ },
+ "motion": {
+  "what": "The approval sheet's entrance, the one animation in the interface",
+  "seconds": 0.2,
+  "secondsWhenLessMotionIsAskedFor": 0.00001,
+  "longestTransitionWhenLessMotionIsAskedFor": 0.00001
+ },
+ "pageErrors": [],
+ "screensThatFailedToDraw": [],
+ "consoleErrors": [],
+ "notCovered": [
+  "Reading with a screen reader",
+  "A keyboard walk of every journey to its end (the approval sheet is opened, tabbed through and closed with the keyboard, not approved)",
+  "Text enlarged by the browser's text-only setting (layout is checked at 640 and 320 px, which is a 1280 px window zoomed to 200% and 400%)",
+  "Windows high-contrast mode",
+  "Whether the words themselves are understood"
+ ]
+}

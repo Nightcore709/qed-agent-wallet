@@ -1,0 +1,54 @@
+/* Getting back in (R12, src/app/Access.tsx): the reset and recovery journeys, the pages a message's link opens, the
+ * step after a recovery, the email step at sign-up, and the developer outbox. Tokens only; the sign-in card's own
+ * composition (shell.css .access, .access-act) is left as agreed. */
+
+.access-help { display: grid; gap: var(--s1); }
+.access-solo { width: min(520px, 100%); }
+.access-solo .access-title { outline: none; }
+
+/* a short sequence of what happens, each step with its state: done, now, or to come */
+.ax-steps { display: grid; gap: var(--s3); margin: 0; padding: 0; list-style: none; }
+.ax-steps li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s3); align-items: start; color: var(--ink-2); font-size: var(--t-small); line-height: 1.5; }
+.ax-steps li > svg { width: 18px; height: 18px; margin-top: 1px; color: var(--ink-3); }
+.ax-steps li.done > svg { color: var(--gain); }
+.ax-steps li.now { color: var(--ink); font-weight: 560; }
+.ax-steps li.now > svg { color: var(--qed); }
+
+/* the other ways in, below the first one, set apart by a rule */
+.ax-other { display: grid; gap: var(--s2); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+
+/* a recovery's finishing key, kept by this browser and shown on request for finishing on another device */
+.ax-key { display: grid; gap: var(--s3); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.ax-key > summary { font-size: var(--t-small); font-weight: 560; color: var(--ink-2); }
+.ax-key[open] > summary { color: var(--ink); }
+.ax-key > .btn { justify-self: start; }
+
+/* the sign-up step: an email address first, the saved codes as the backup */
+.ax-h2 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); font-size: var(--t-h3); font-weight: 650; }
+.ax-rec { padding: 2px 8px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 650; background: var(--gain-bg); color: var(--gain); }
+.ax-email, .ax-codes { padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.ax-email-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3); align-items: end; }
+@media (max-width: 560px) { .ax-email-row { grid-template-columns: minmax(0, 1fr); } .ax-email-row > .btn { justify-self: start; } }
+
+/* the developer page of the local test outbox: every message drawn as a draft that was never sent */
+.outbox { display: grid; gap: var(--s6); width: min(880px, calc(100% - 32px)); margin: 0 auto; padding: var(--s6) 0 var(--s16); }
+.outbox-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.outbox-intro { display: grid; gap: var(--s4); padding: var(--s6); border-radius: var(--r-xl); border: 1px solid var(--rim); box-shadow: var(--lift-2);
+  background: linear-gradient(160deg, var(--gloss), transparent 30%), var(--pane-3); backdrop-filter: blur(var(--blur)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat)); }
+.outbox-intro h1 { font-size: var(--t-h1); font-weight: 650; letter-spacing: var(--track-h); }
+.outbox-intro .row { align-items: end; }
+.outbox-intro .field { flex: 1 1 240px; }
+.outbox-banner { padding: var(--s4) var(--s5); border-radius: var(--r-md); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 30%, transparent); color: var(--ink); line-height: 1.55; }
+.outbox-banner b { color: var(--due); }
+.outbox-list { display: grid; gap: var(--s4); margin: 0; padding: 0; list-style: none; }
+.outbox-msg { display: grid; gap: var(--s3); min-width: 0; padding: var(--s5) var(--s6); border-radius: var(--r-lg); border: 1px dashed var(--edge); background: color-mix(in oklab, var(--pane-2) 88%, transparent); }
+.outbox-tag { display: flex; flex-wrap: wrap; gap: var(--s2); margin: 0; }
+.outbox-tag span { padding: 2px 10px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 700; letter-spacing: var(--track-label); background: var(--due-bg); color: var(--due); }
+.outbox-msg h2 { font-size: var(--t-h3); font-weight: 650; overflow-wrap: anywhere; }
+.outbox-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--t-small); line-height: 1.6; color: var(--ink-2); }
+.outbox-body a { color: var(--brand); text-underline-offset: .2em; }
+@media (max-width: 560px) { .outbox-intro, .outbox-msg { padding: var(--s4); } }
+/* a lost or stolen device: pause QED with a saved code (Access.tsx PauseWithCode), folded so recovery stays the page's first task */
+.ax-pause { border: 1px solid var(--rim); border-radius: var(--r-md); padding: var(--s3) var(--s4); background: color-mix(in oklab, var(--pane-2) 70%, transparent); }
+.ax-pause > summary { min-height: 32px; padding-block: 6px; font-size: var(--t-small); font-weight: 620; color: var(--ink); cursor: pointer; }
+.ax-pause[open] > summary { margin-bottom: var(--s3); }
