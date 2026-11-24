@@ -1,0 +1,1264 @@
+{
+ "what": "QED active security checks, R13 second pass, AFTER the fixes, on branch claude/r13-security2 at 503da11 (merged with claude/r11-meridian 6466442); QED_SECURITY_PORT=11550; the interface built first (S52)",
+ "producedAt": "2026-11-24 21:44:19.388 IST",
+ "target": "http://127.0.0.1:11550 on a scratch database (deleted with the temporary directory by the operating system)",
+ "howToReproduce": "node scripts/security.ts <report.json>",
+ "stack": {
+  "recoveryDelaySec": 8,
+  "protectionDelaySec": 8,
+  "relyingParty": "localhost",
+  "origin": "http://localhost:11550",
+  "authenticator": "server/softauthn.ts (software, ES256)"
+ },
+ "harnessWrites": [
+  "the address's recovery allowance cleared once, after showing it spent (instead of waiting an hour)",
+  "one approval's expiry set in the past (instead of waiting ten minutes)",
+  "session re-authentication time cleared (instead of waiting five minutes)",
+  "two legacy password accounts created with server/auth.ts hashPassword",
+  "one session pointed at a workspace its person does not belong to (N34)",
+  "one membership ended (N40; no route removes a member yet)",
+  "R13 second pass: one model call of a business owner with two proposals, as server/ai.ts stores them (R22, R23; the stack has no model)",
+  "one business notice of a vault recovery, as rail-signers.ts writes it (R25; no vault service on this stack)",
+  "one run of a protective instruction put in the waiting state, as the engine leaves it when a price crosses (R15)"
+ ],
+ "ids": {
+  "continuedFromPreR7": 54,
+  "newInR7": 52,
+  "r13Review": 26,
+  "note": "S01-S54 continue the 54 pre-R7 checks in order; `was` gives the earlier wording where it changed"
+ },
+ "passed": 132,
+ "failed": 0,
+ "checks": [
+  {
+   "id": "S01",
+   "area": "session",
+   "name": "every owner route refuses a request with no session",
+   "asvs": "V8.2.1 function-level access",
+   "expected": "401 from all 21 read routes",
+   "observed": "401 from all 21",
+   "pass": true
+  },
+  {
+   "id": "S02",
+   "area": "session",
+   "name": "every state-changing route refuses a request with no session, the passkey ceremony and workspace routes included",
+   "asvs": "V8.2.1 function-level access",
+   "expected": "401 from all 22 write routes",
+   "observed": "401 from all 22",
+   "pass": true
+  },
+  {
+   "id": "S03",
+   "area": "session",
+   "name": "the public session route gives nothing about any owner when signed out",
+   "asvs": "V14.2.6 minimum sensitive data",
+   "expected": "authenticated false and no user, csrf, sessions or workspaces",
+   "observed": "[\"authenticated\",\"presentation\",\"delivery\",\"delays\",\"ai\",\"defaults\"]",
+   "pass": true
+  },
+  {
+   "id": "S04",
+   "area": "csrf",
+   "name": "a state change with the cookie but no CSRF token is refused",
+   "asvs": "V3.5.1 cross-site request forgery",
+   "expected": "403 csrf",
+   "observed": "403 csrf",
+   "pass": true
+  },
+  {
+   "id": "S05",
+   "area": "csrf",
+   "name": "another owner's CSRF token does not work with this owner's cookie",
+   "asvs": "V3.5.1 cross-site request forgery",
+   "expected": "403 csrf",
+   "observed": "403 csrf",
+   "pass": true
+  },
+  {
+   "id": "S06",
+   "area": "csrf",
+   "name": "a request carrying a foreign Origin is refused even with a valid cookie and token",
+   "asvs": "V3.5.1 cross-site request forgery",
+   "expected": "403 cross_site",
+   "observed": "403 cross_site",
+   "pass": true
+  },
+  {
+   "id": "S07",
+   "area": "csrf",
+   "name": "a cross-site read is refused (Sec-Fetch-Site)",
+   "asvs": "V3.5.8 Sec-Fetch validation",
+   "expected": "403 cross_site",
+   "observed": "403 cross_site",
+   "pass": true
+  },
+  {
+   "id": "S08",
+   "area": "csrf",
+   "name": "a request for any other Host is refused (DNS rebinding)",
+   "asvs": "V3.5.1 (Host allowlist against DNS rebinding)",
+   "expected": "421 wrong_host",
+   "observed": "421 wrong_host",
+   "pass": true
+  },
+  {
+   "id": "S09",
+   "area": "csrf",
+   "name": "sign-up, sign-in, recovery and legacy password sign-in without the interface's own header are refused (plain form post)",
+   "asvs": "V3.5.1 cross-site request forgery",
+   "expected": "403 csrf from all 7 routes that work without a session",
+   "observed": "pause-with-code 403 csrf; passkey/signup/begin 403 csrf; passkey/login/begin 403 csrf; passkey/login/finish 403 csrf; recovery/start 403 csrf; recovery/passkey/begin 403 csrf; login 403 csrf",
+   "pass": true,
+   "was": "sign-in without the interface's own header is refused (plain form post)"
+  },
+  {
+   "id": "S10",
+   "area": "csrf",
+   "name": "none of the refused requests changed anything",
+   "asvs": "V3.5.1 cross-site request forgery",
+   "expected": "no owner stopped; no recovery started; no sign-up begun for the form post",
+   "observed": "0 stopped; 0 recoveries; 0 sign-up challenges for it",
+   "pass": true
+  },
+  {
+   "id": "S11",
+   "area": "session",
+   "name": "the session cookie a passkey sign-in sets is HttpOnly, SameSite=Strict and scoped to the site",
+   "asvs": "V3.3.4 HttpOnly; V3.3.2 SameSite",
+   "expected": "HttpOnly; SameSite=Strict; Path=/",
+   "observed": "200; qed_session=\u2026; Path=/; HttpOnly; SameSite=Strict; Max-Age=604800",
+   "pass": true,
+   "was": "the session cookie is HttpOnly, SameSite=Strict and scoped to the site"
+  },
+  {
+   "id": "S12",
+   "area": "session",
+   "name": "the session token is never returned in a response body",
+   "asvs": "V3.3.4 token only in Set-Cookie",
+   "expected": "token only in the cookie",
+   "observed": "not in the body",
+   "pass": true
+  },
+  {
+   "id": "S13",
+   "area": "session",
+   "name": "the database stores only a hash of the session token",
+   "asvs": "V7.2.1 tokens verified at the backend (stored only as SHA-256)",
+   "expected": "no row keyed by the raw token; one keyed by its SHA-256",
+   "observed": "0 rows keyed by the raw token; 1 by its hash",
+   "pass": true
+  },
+  {
+   "id": "S14",
+   "area": "headers",
+   "name": "every response carries a restrictive Content-Security-Policy",
+   "asvs": "V3.4.3 CSP; V3.4.6 frame-ancestors",
+   "expected": "default-src 'self', no unsafe-inline scripts, frame-ancestors 'none'",
+   "observed": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base",
+   "pass": true
+  },
+  {
+   "id": "S15",
+   "area": "headers",
+   "name": "nosniff, no framing, no referrer, no caching of API replies",
+   "asvs": "V3.4.4 nosniff; V3.4.5 referrer; V14.3.2 no-store",
+   "expected": "nosniff; DENY; no-referrer; no-store",
+   "observed": "nosniff; DENY; no-referrer; no-store",
+   "pass": true
+  },
+  {
+   "id": "S39",
+   "area": "account",
+   "name": "an account cannot be created without a verified passkey: a wrong challenge, a wrong origin, a wrong relying party, no user verification and a non-ES256 key are all refused",
+   "asvs": "V6.3.3 phishing-resistant authenticator; V6.7.2 challenge; V11.6.1 approved algorithm",
+   "expected": "all five refused; no account and no session created",
+   "observed": "an answer to a different challenge: 401 passkey_failed; made on another site (https://evil.example): 401 passkey_failed; scoped to another relying party (evil.example): 401 passkey_failed; without user verification: 401 passkey_failed; an Ed25519 key, not ES256: 401 passkey_failed; accounts created 0; cookies set 0",
+   "pass": true,
+   "was": "short, common and handle-derived passwords are refused at registration"
+  },
+  {
+   "id": "N01",
+   "area": "account",
+   "name": "a new account has no password: it holds one ES256 passkey (with its P-256 coordinates on record) and its session was opened by that passkey",
+   "asvs": "V6.3.3 phishing-resistant authenticator",
+   "expected": "password hash \"!\"; one credential equal to the authenticator's key; session method passkey",
+   "observed": "password hash \"!\" (none); 1 credential(s), the authenticator's own key; session passkey, hasPasskey true",
+   "pass": true
+  },
+  {
+   "id": "N02",
+   "area": "account",
+   "name": "recovery codes: ten, each 16 symbols of a 32-symbol alphabet (80 bits), all different, salted, and none stored in clear",
+   "asvs": "V6.5.4 entropy; V6.5.3 random generation; V6.5.2 (see observed)",
+   "expected": "ten distinct codes of the form; ten stored rows, each with a salt of at least 32 bits; no code in any stored row",
+   "observed": "10 codes, 10 of the form, 10 distinct; 10 rows, salts of at least 128 bits (1 distinct: one per batch); 0 found in clear; stored as scrypt (V6.5.2 met)",
+   "pass": true
+  },
+  {
+   "id": "N03",
+   "area": "limits",
+   "name": "account creation from one address is limited: the 21st sign-up in an hour is refused",
+   "asvs": "V2.4.1 anti-automation",
+   "expected": "20 sign-ups begun, then 429 too_many",
+   "observed": "20 begun, then 429 too_many",
+   "pass": true
+  },
+  {
+   "id": "N04",
+   "area": "account",
+   "name": "a passkey sign-in needs user verification, this site's origin and relying party, and an assertion (not a registration); the same passkey answering properly signs in",
+   "asvs": "V6.3.3 phishing-resistant authenticator",
+   "expected": "four refusals with no cookie; then 200",
+   "observed": "without user verification: 401 passkey_failed; made on another site: 401 passkey_failed; for another relying party: 401 passkey_failed; typed as a registration: 401 passkey_failed; proper answer 200",
+   "pass": true
+  },
+  {
+   "id": "N05",
+   "area": "account",
+   "name": "a passkey this site has never seen and a known passkey with a wrong signature get the same answer",
+   "asvs": "V6.3.8 no enumeration",
+   "expected": "same status, code and message",
+   "observed": "unknown: 401 passkey_failed \"That passkey could not be verified. Try again and choose a passkey saved for this account; if none of yours works, use \u201cRecover your account\u201d on the sign-in page.\"; wrong signature: 401 passkey_failed \"That passkey could not be verified. Try again and choose a passkey saved for this account; if none of yours works, use \u201cRecover your account\u201d on the sign-in page.\"",
+   "pass": true
+  },
+  {
+   "id": "S16",
+   "area": "access",
+   "name": "an owner cannot read, sign, confirm, use or change another owner's instruction, approval, bill or payee",
+   "asvs": "V8.2.2 object-level access (IDOR)",
+   "expected": "no 200 among 11 attempts",
+   "observed": "read the instruction: 404 not_found; read the approval: 404 not_found; ask for the approval's passkey challenge: 404 not_found; confirm the approval with the attacker's own passkey: 404 not_found; cancel the approval: 404 not_found; use the approval: 404 not_found; request signing of the instruction: 404 not_found; revoke the instruction: 404 not_found; discard the draft: 404 not_found; remove the bill: 409 bill_not_due; pay with the victim's payee: 400 invalid",
+   "pass": true,
+   "was": "an owner cannot read, confirm, use or change another owner's instruction, approval, bill or payee"
+  },
+  {
+   "id": "S17",
+   "area": "access",
+   "name": "after those attempts the victim's approval, bill and draft are unchanged",
+   "asvs": "V8.2.2 object-level access (IDOR)",
+   "expected": "approval open with no signature, bill due, draft present",
+   "observed": "all unchanged",
+   "pass": true
+  },
+  {
+   "id": "S18",
+   "area": "access",
+   "name": "an owner cannot read, cancel or dispute another owner's payment",
+   "asvs": "V8.2.2 object-level access (IDOR)",
+   "expected": "the victim's passkey approves and sends it; no 200 among 3 attempts by the attacker",
+   "observed": "200 passkey approval by the victim, 200 sent; read the action: 404 not_found; cancel the action: 404 not_found; dispute the payment: 404 not_found",
+   "pass": true
+  },
+  {
+   "id": "S19",
+   "area": "access",
+   "name": "an owner cannot read another owner's receipt",
+   "asvs": "V8.2.2 object-level access (IDOR)",
+   "expected": "404",
+   "observed": "404 not_found for a real receipt",
+   "pass": true
+  },
+  {
+   "id": "S20",
+   "area": "access",
+   "name": "the attacker's ledger, activity, receipts, payees, bills and instructions contain nothing of the victim's",
+   "asvs": "V8.4.1 cross-tenant isolation",
+   "expected": "no victim name or id in 6 views",
+   "observed": "none of 6 views (200)",
+   "pass": true,
+   "was": "the attacker's ledger, activity and receipts contain nothing of the victim's"
+  },
+  {
+   "id": "S21",
+   "area": "approval",
+   "name": "a used approval cannot be used again",
+   "asvs": "V2.3.4 single use (no double booking)",
+   "expected": "refused, and still one action",
+   "observed": "409 approval_used; 1 action(s) for that approval",
+   "pass": true
+  },
+  {
+   "id": "S22",
+   "area": "approval",
+   "name": "a valid passkey signature with a different document fingerprint echoed is refused",
+   "asvs": "V4.1.5 signature bound to the exact terms",
+   "expected": "409 approval_mismatch; the approval stays unconfirmed",
+   "observed": "409 approval_mismatch; confirmed no",
+   "pass": true,
+   "was": "confirming with a different document fingerprint is refused"
+  },
+  {
+   "id": "S23",
+   "area": "approval",
+   "name": "an approval that was never confirmed cannot be used",
+   "asvs": "V2.3.1 steps in order",
+   "expected": "refused",
+   "observed": "409 approval_missing",
+   "pass": true
+  },
+  {
+   "id": "S24",
+   "area": "approval",
+   "name": "25 simultaneous uses of one approval create exactly one payment",
+   "asvs": "V15.4.2 atomic check-and-use; V2.3.4",
+   "expected": "one action",
+   "observed": "1 action(s); 25 of 25 requests answered 200 (all returning the same action)",
+   "pass": true
+  },
+  {
+   "id": "S25",
+   "area": "approval",
+   "name": "what runs is built from the approved document: parameters sent with the request are ignored",
+   "asvs": "V15.3.3 mass assignment",
+   "expected": "amount 70000 paise, as approved",
+   "observed": "amount 70000 paise",
+   "pass": true
+  },
+  {
+   "id": "S26",
+   "area": "approval",
+   "name": "an approval for one instruction cannot put another in force",
+   "asvs": "V4.1.5 signature bound to one subject",
+   "expected": "refused",
+   "observed": "409 approval_mismatch",
+   "pass": true
+  },
+  {
+   "id": "S27",
+   "area": "approval",
+   "name": "a draft changed after it was signed with a passkey cannot be put in force with that signature",
+   "asvs": "V4.1.5 signature bound to the exact terms",
+   "expected": "signed 200; then refused, instruction not in force",
+   "observed": "signed 200; activation 409 approval_mismatch; in force: 0",
+   "pass": true,
+   "was": "a draft changed after it was signed cannot be put in force with the old signature"
+  },
+  {
+   "id": "N06",
+   "area": "approval",
+   "name": "the challenge an approval's passkey signs is derived from the approval's id and the hash of its exact document",
+   "asvs": "V4.1.5 per-message signature",
+   "expected": "challenge = SHA-256(\"qed/approval/v1\\n\" + id + \"\\n\" + docHash); docHash = SHA-256(document)",
+   "observed": "challenge equals the independent computation; document hash matches",
+   "pass": true
+  },
+  {
+   "id": "N07",
+   "area": "approval",
+   "name": "an approval signed with another person's passkey is refused, even over the right challenge",
+   "asvs": "V4.1.5 per-message signature",
+   "expected": "401 passkey_failed; the approval stays unconfirmed",
+   "observed": "401 passkey_failed; confirmed no",
+   "pass": true
+  },
+  {
+   "id": "N08",
+   "area": "approval",
+   "name": "a passkey signature altered after signing is refused: one bit of the signature, the client data's challenge, or the authenticator data",
+   "asvs": "V4.1.5 per-message signature",
+   "expected": "all three 401; the approval stays unconfirmed",
+   "observed": "signature: 401 passkey_failed; clientData: 401 passkey_failed; authData: 401 passkey_failed; confirmed no",
+   "pass": true
+  },
+  {
+   "id": "N09",
+   "area": "approval",
+   "name": "a valid signature made for one approval cannot confirm another: neither with its own challenge nor under the other's",
+   "asvs": "V4.1.5 per-message signature",
+   "expected": "409 approval_mismatch, then 401; both approvals unconfirmed",
+   "observed": "signature for A sent to B: 409 approval_mismatch; A's signature under B's challenge: 401 passkey_failed; confirmed A no, B no",
+   "pass": true
+  },
+  {
+   "id": "N10",
+   "area": "approval",
+   "name": "a confirmation with no passkey signature is refused, with or without a password in the body",
+   "asvs": "V7.5.3 further authentication; V4.1.5",
+   "expected": "401 passkey_required twice; unconfirmed",
+   "observed": "401 passkey_required; 401 passkey_required; confirmed no",
+   "pass": true
+  },
+  {
+   "id": "N11",
+   "area": "approval",
+   "name": "the stored record of an approval carries a signature anyone can re-verify: by this script, from the database alone, with the passkey's public key",
+   "asvs": "V4.1.5 per-message signature",
+   "expected": "method passkey; document hash, challenge, origin, relying party, user verification and ES256 signature all check out",
+   "observed": "method ok, document ok, challenge ok, type ok, origin ok, rp ok, verified ok, signature ok",
+   "pass": true
+  },
+  {
+   "id": "N12",
+   "area": "approval",
+   "name": "every passkey answer works once: replaying a sign-up, a sign-in, a step-up or an approval signature is refused",
+   "asvs": "V6.7.2 challenge unique and single use",
+   "expected": "the first step-up 200; all four replays 401",
+   "observed": "step-up 200; a sign-up answer: 401 passkey_failed; a sign-in answer: 401 passkey_failed; a step-up answer: 401 passkey_failed; an approval signature: 401 passkey_failed",
+   "pass": true
+  },
+  {
+   "id": "N13",
+   "area": "approval",
+   "name": "a challenge issued for one purpose cannot be used for another (sign-in, step-up, approval)",
+   "asvs": "V6.7.2 challenge bound to its request",
+   "expected": "all four 401; the approval stays unconfirmed",
+   "observed": "a sign-in challenge used to step up: 401 passkey_failed; a step-up challenge used to approve: 401 passkey_failed; an approval challenge used to step up: 401 passkey_failed; an approval challenge used to sign in: 401 passkey_failed; confirmed no",
+   "pass": true
+  },
+  {
+   "id": "S29",
+   "area": "input",
+   "name": "a body over 64 KB is refused",
+   "asvs": "V5.2.1 size limit (request body)",
+   "expected": "413, or the connection closed",
+   "observed": "connection closed",
+   "pass": true
+  },
+  {
+   "id": "S30",
+   "area": "input",
+   "name": "a form-encoded body is refused: JSON only",
+   "asvs": "V3.5.2 no request that skips a preflight (JSON only)",
+   "expected": "415",
+   "observed": "415 json_only",
+   "pass": true
+  },
+  {
+   "id": "S31",
+   "area": "input",
+   "name": "malformed JSON is refused without a server error",
+   "asvs": "V2.2.1 input validation",
+   "expected": "400",
+   "observed": "400 invalid",
+   "pass": true
+  },
+  {
+   "id": "S32",
+   "area": "input",
+   "name": "a JSON body that is not an object is refused",
+   "asvs": "V2.2.1 input validation",
+   "expected": "400",
+   "observed": "400 invalid",
+   "pass": true
+  },
+  {
+   "id": "S33",
+   "area": "input",
+   "name": "an amount that is not a positive whole number of paise within range is refused",
+   "asvs": "V2.2.1 input validation",
+   "expected": "none of 9 bad amounts accepted",
+   "observed": "none accepted",
+   "pass": true
+  },
+  {
+   "id": "S34",
+   "area": "input",
+   "name": "SQL and path metacharacters in ids and query values cause no server error and reveal nothing",
+   "asvs": "V1.2.4 parameterised queries",
+   "expected": "no 500; users table intact; no stored password, recovery-code or session hash in any reply",
+   "observed": "statuses 404,200; 14 users (14 before); searched 2 password hashes and 134 other stored hashes",
+   "pass": true
+  },
+  {
+   "id": "S35",
+   "area": "input",
+   "name": "markup in a name is stored as text and served as JSON that a browser will not sniff as HTML",
+   "asvs": "V1.2.1 output encoding; V3.4.4",
+   "expected": "application/json with nosniff; the interface renders text nodes only",
+   "observed": "application/json; charset=utf-8; nosniff nosniff",
+   "pass": true
+  },
+  {
+   "id": "S36",
+   "area": "input",
+   "name": "prototype-pollution keys in a body do not pollute anything",
+   "asvs": "V15.3.6 prototype pollution",
+   "expected": "no polluted property on a fresh object",
+   "observed": "200; {}.admin is undefined",
+   "pass": true
+  },
+  {
+   "id": "S37",
+   "area": "input",
+   "name": "no path leaves the built interface's folder",
+   "asvs": "V5.3.2 file paths from trusted data",
+   "expected": "none of 9 traversal paths returns a file from outside it",
+   "observed": "statuses 308, no outside content",
+   "pass": true
+  },
+  {
+   "id": "S38",
+   "area": "input",
+   "name": "the static side accepts only GET and HEAD",
+   "asvs": "V4.1.4 unused methods blocked",
+   "expected": "405",
+   "observed": "405 method",
+   "pass": true
+  },
+  {
+   "id": "N14",
+   "area": "legacy",
+   "name": "a legacy password session cannot approve anything, before or after re-entering its password",
+   "asvs": "V7.5.3 further authentication; V6.3.4 consistent strength",
+   "expected": "challenge 409 passkey_needed, confirmations 401 passkey_needed, before and after a 200 password re-entry; unconfirmed",
+   "observed": "before: challenge 409 passkey_needed, confirm 401 passkey_needed, with the password in the body 401 passkey_needed; password re-entry 200; after: challenge 409 passkey_needed, confirm 401 passkey_needed; confirmed no",
+   "pass": true
+  },
+  {
+   "id": "N15",
+   "area": "legacy",
+   "name": "a legacy password re-entry unlocks only adding a first passkey and, on an account whose password is its only credential (RISK-076), renewing its own saved codes: every change that weakens a protection of money still needs a passkey",
+   "asvs": "V6.3.4 consistent strength across pathways",
+   "expected": "five refusals (401 stepup_required, or 409 passkey_needed for the passkey step-up); new saved codes 200 (the account's strongest credential, outside a reset hold); adding a passkey 200",
+   "observed": "lower the floor: 401 stepup_required; undo a stop: 401 stepup_required; sign out everywhere: 401 stepup_required; replace the recovery codes: 200; create a business: 401 stepup_required; step up with a passkey: 409 passkey_needed; add a first passkey: begin 200, finish 200",
+   "pass": true
+  },
+  {
+   "id": "N16",
+   "area": "legacy",
+   "name": "once the legacy account has a passkey, its password no longer unlocks adding another, and the new passkey approves",
+   "asvs": "V6.3.4 consistent strength across pathways",
+   "expected": "password re-entry 200; a second passkey 401 stepup_required; the approval signed with the new passkey 200",
+   "observed": "password 200; second passkey 401 stepup_required; approval 200",
+   "pass": true
+  },
+  {
+   "id": "S28",
+   "area": "legacy",
+   "name": "guessing a legacy account's password at re-entry is cut off after eight wrong tries, and then even the right one waits",
+   "asvs": "V6.3.1 brute force",
+   "expected": "8 rejected, then 429 including for the right password",
+   "observed": "8 rejected, 2 limited, right password afterwards: 429 too_many",
+   "pass": true,
+   "was": "guessing the signing password is cut off after eight wrong tries, and then even the right one waits"
+  },
+  {
+   "id": "S40",
+   "area": "legacy",
+   "name": "a wrong password and an unknown handle get the same answer, and both cost a password hash",
+   "asvs": "V6.3.8 no enumeration",
+   "expected": "same status and message; both take the time of a hash",
+   "observed": "unknown 401 bad_credentials \"That handle and password do not match.\" in 926/648/432 ms; wrong password 401 bad_credentials in 789/660/637 ms (3 rounds)",
+   "pass": true,
+   "was": "a wrong password and an unknown handle get the same answer, and both cost a password hash"
+  },
+  {
+   "id": "N17",
+   "area": "legacy",
+   "name": "password sign-in for a passkey-only account (every account since R7) answers like an unknown handle, in the same time",
+   "asvs": "V6.3.8 no enumeration (response times)",
+   "expected": "same status and message; the passkey account's median within half of the unknown handle's",
+   "observed": "unknown 926/648/432 ms; passkey-only 401 bad_credentials \"That handle and password do not match.\" in 1084/633/456 ms (3 rounds)",
+   "pass": true
+  },
+  {
+   "id": "S41",
+   "area": "legacy",
+   "name": "after repeated wrong passwords a legacy account is locked, and the right password does not open it until the lock ends",
+   "asvs": "V6.3.1 brute force (lockout)",
+   "expected": "locked: the right password is refused",
+   "observed": "2 of 5 further guesses rejected, 3 answered locked; right password then: 429 locked",
+   "pass": true,
+   "was": "after repeated wrong passwords the account is locked, and the right password does not open it until the lock ends"
+  },
+  {
+   "id": "N18",
+   "area": "legacy",
+   "name": "wrong passwords against a passkey-only account never lock it (they are answered as for an unknown handle), and its owner still signs in with the passkey",
+   "asvs": "V6.3.1 brute force (lockout without denial of service); V6.3.8",
+   "expected": "password path 401 bad_credentials after six guesses; passkey sign-in 200",
+   "observed": "password path 401 bad_credentials; passkey sign-in 200",
+   "pass": true
+  },
+  {
+   "id": "S42",
+   "area": "session",
+   "name": "after signing out, the old cookie is worthless",
+   "asvs": "V7.4.1 session termination",
+   "expected": "401",
+   "observed": "sign-out 200; old cookie then 401 signed_out",
+   "pass": true
+  },
+  {
+   "id": "S43",
+   "area": "limits",
+   "name": "one owner cannot hold more than six live connections",
+   "asvs": "V2.4.1 anti-automation",
+   "expected": "six accepted, the rest 429",
+   "observed": "6 accepted, 2 refused",
+   "pass": true
+  },
+  {
+   "id": "S44",
+   "area": "protection",
+   "name": "asking the bank reserve to withstand less needs a fresh passkey confirmation; asking it to withstand more does not",
+   "asvs": "V7.5.3 further authentication",
+   "expected": "401 stepup_required, then 200 for the stronger setting, then 200 once confirmed with the passkey",
+   "observed": "401 stepup_required; 200; step-up 200; 200",
+   "pass": true,
+   "was": "asking the bank reserve to withstand less needs the password again; asking it to withstand more does not"
+  },
+  {
+   "id": "S45",
+   "area": "protection",
+   "name": "lowering the everyday spending figure lowers what must stay in the bank, so it needs a fresh passkey confirmation; raising it does not",
+   "asvs": "V7.5.3 further authentication",
+   "expected": "401 stepup_required naming both figures; 200 for the higher figure",
+   "observed": "401 stepup_required \"This lowers what must stay in your bank account from \u20b91,59,881.97 to \u20b960,000, which frees \"; 200",
+   "pass": true,
+   "was": "lowering the everyday spending figure lowers what must stay in the bank, so it needs the password; raising it does not"
+  },
+  {
+   "id": "S46",
+   "area": "protection",
+   "name": "lowering the floor needs a fresh passkey confirmation; raising it does not",
+   "asvs": "V7.5.3 further authentication",
+   "expected": "401 stepup_required, then 200",
+   "observed": "401 stepup_required; 200",
+   "pass": true,
+   "was": "lowering the floor needs the password; raising it does not"
+  },
+  {
+   "id": "S47",
+   "area": "protection",
+   "name": "removing a bill that is counted in what must stay needs a fresh passkey confirmation",
+   "asvs": "V7.5.3 further authentication",
+   "expected": "401 stepup_required, then 200 once confirmed with the passkey",
+   "observed": "added 200, 200; remove 401 stepup_required; step-up 200; then 200",
+   "pass": true,
+   "was": "removing a bill that is counted in what must stay needs the password"
+  },
+  {
+   "id": "S48",
+   "area": "protection",
+   "name": "anyone with the session can stop everything; undoing the stop, and signing out everywhere, need a fresh passkey confirmation",
+   "asvs": "V7.5.3 further authentication",
+   "expected": "200 to stop; 401 stepup_required to undo it and to sign out everywhere",
+   "observed": "stop 200; undo 401 stepup_required; sign out everywhere 401 stepup_required",
+   "pass": true,
+   "was": "anyone with the session can stop everything; undoing the stop, and signing out everywhere, need the password"
+  },
+  {
+   "id": "N19",
+   "area": "protection",
+   "name": "a plain stop holds protective selling too; keeping it running is a choice the owner states, and the record says which",
+   "asvs": "V2.3.2 business-logic limits as documented",
+   "expected": "plain stop: stop_protective 0, shown as not continuing; with keepProtective: 1, shown as continuing",
+   "observed": "plain: 0, shown false; cleared 200; with keepProtective 200: 1, shown true",
+   "pass": true
+  },
+  {
+   "id": "S49",
+   "area": "protection",
+   "name": "a session alone cannot approve any amount, however it is split: two payments of \u20b96,000 prepared together are refused without a passkey signature, and each is accepted with one",
+   "asvs": "V7.5.3 further authentication; V4.1.5",
+   "expected": "both 401 passkey_required without a signature (even on a session with no recent re-authentication, the signature is the confirmation); both 200 with the passkey",
+   "observed": "without: 401 passkey_required, 401 passkey_required; with the passkey: 200, 200",
+   "pass": true,
+   "was": "without the password a session cannot approve \u20b910,000 in a day by splitting it: two payments of \u20b96,000 prepared together, the second is refused at confirmation"
+  },
+  {
+   "id": "S50",
+   "area": "input",
+   "name": "reserve assumptions outside their range are refused with a message per field",
+   "asvs": "V2.2.1 input validation",
+   "expected": "400 naming both fields",
+   "observed": "400 invalid lateDays,lostSalaries",
+   "pass": true
+  },
+  {
+   "id": "S51",
+   "area": "input",
+   "name": "the absence summary clamps its time to the life of the account and never reaches another owner",
+   "asvs": "V2.2.1 input validation; V8.2.2",
+   "expected": "200 with nothing done for a new account, whatever time is asked for",
+   "observed": "200 done=0; 200 done=0",
+   "pass": true
+  },
+  {
+   "id": "S52",
+   "area": "interface",
+   "name": "a nested route of the built interface serves the page with absolute asset paths, and a missing file is 404, not the page",
+   "asvs": "V14.2.5 a missing file is 404, not another file",
+   "expected": "the page with /assets/ paths; 404 for the missing file",
+   "observed": "200, script absolute; missing file 404",
+   "pass": true
+  },
+  {
+   "id": "N20",
+   "area": "passkeys",
+   "name": "removing a passkey needs a fresh passkey confirmation, and the last passkey cannot be removed",
+   "asvs": "V7.5.1 re-authentication before changing authentication",
+   "expected": "401 stepup_required; then 409 last_passkey",
+   "observed": "without confirmation 401 stepup_required; the only passkey 409 last_passkey",
+   "pass": true
+  },
+  {
+   "id": "N21",
+   "area": "passkeys",
+   "name": "removing a passkey waits out the delay, the passkey keeps working meanwhile, and a cancelled removal never takes effect",
+   "asvs": "V6.5.6 factor revocation; V7.5.1",
+   "expected": "scheduled for about 8 s later; sign-in with it 200 meanwhile; cancel 200; after the delay still active and signing in",
+   "observed": "scheduled 200 for +8 s; sign-in meanwhile 200; cancel 200; after the delay removed no, sign-in 200",
+   "pass": true
+  },
+  {
+   "id": "N22",
+   "area": "passkeys",
+   "name": "when the delay ends the passkey is removed: it no longer signs in, and the sessions it opened end",
+   "asvs": "V6.5.6 factor revocation; V7.4.3 sessions end with the factor",
+   "expected": "removed; sign-in 401; its session 401",
+   "observed": "scheduled 200; removed yes; sign-in 401 passkey_failed; its session 401 signed_out",
+   "pass": true
+  },
+  {
+   "id": "N46",
+   "area": "passkeys",
+   "name": "suspending a passkey needs a fresh passkey confirmation, and is refused for the passkey that opened the asking session and for the last usable passkey",
+   "asvs": "V7.5.1 re-authentication; V6.5.6 factor revocation",
+   "expected": "401 stepup_required; 409 own_passkey; 409 last_passkey (a legacy account whose one passkey is asked from its password session)",
+   "observed": "without confirmation 401 stepup_required; this session's own passkey 409 own_passkey; the last usable one 409 last_passkey",
+   "pass": true
+  },
+  {
+   "id": "N47",
+   "area": "passkeys",
+   "name": "a suspended passkey is refused at once: it cannot sign in, step up or sign an approval, the sessions it opened end, and the removal it had asked for is cancelled",
+   "asvs": "V6.5.6 factor revocation",
+   "expected": "suspend 200; sign-in 401; its session 401; step-up 401; approval 401; the removal it asked for cancelled (requester-suspended)",
+   "observed": "removal asked by it 200; suspend 200; sign-in 401 passkey_failed; its session 401 signed_out; step-up 401 passkey_failed; approval 401 passkey_failed; that removal cancelled (requester-suspended)",
+   "pass": true
+  },
+  {
+   "id": "N48",
+   "area": "passkeys",
+   "name": "allowing a suspended passkey again waits out the delay: refused meanwhile, usable after",
+   "asvs": "V7.5.1 re-authentication before changing authentication",
+   "expected": "scheduled about 8 s ahead; sign-in 401 meanwhile; 200 after the delay",
+   "observed": "unsuspend 200; sign-in meanwhile 401 passkey_failed; after the delay 200",
+   "pass": true
+  },
+  {
+   "id": "N23",
+   "area": "passkeys",
+   "name": "replacing the recovery codes needs a fresh passkey confirmation, and the earlier codes stop working",
+   "asvs": "V7.5.1 re-authentication before changing authentication; V6.5.1",
+   "expected": "401 stepup_required; then 200 with ten new codes; the ten earlier ones marked replaced",
+   "observed": "without confirmation 401 stepup_required; with 200 (10 codes); 10 active, 10 replaced",
+   "pass": true
+  },
+  {
+   "id": "N44",
+   "area": "recovery",
+   "name": "naming a recovery contact needs a fresh passkey confirmation, and the contact can issue a code only after accepting and after the delay",
+   "asvs": "V7.5.1 re-authentication; V6.4.3 secure recovery",
+   "expected": "401 stepup_required without the confirmation; named 200 effective about 8 s later; accepted 200; a code before then 409 contact_inactive, after it 200",
+   "observed": "without confirmation 401 stepup_required; named 200 effective +8 s; accepted 200; a code before the delay 409 contact_inactive; after it 200",
+   "pass": true
+  },
+  {
+   "id": "N24",
+   "area": "recovery",
+   "name": "a wrong saved code and an unknown handle get identical answers, at the start and when the recovery is followed up",
+   "asvs": "V6.3.8 no enumeration",
+   "expected": "the same status, fields and delay, no cookie; the follow-up the same refusal; nothing on record",
+   "observed": "wrong code: 200 availableAt,reference,requestId delay 8 s, follow-up 409 recovery_unavailable; unknown handle: 200 availableAt,reference,requestId delay 8 s, follow-up 409 recovery_unavailable; requests on record 0",
+   "pass": true
+  },
+  {
+   "id": "N42",
+   "area": "recovery",
+   "name": "one saved code alone starts nothing, and for a passkey account no password stands in for the second code; the answer is the same as any other",
+   "asvs": "V6.4.3 recovery does not bypass the second factor (NIST SP 800-63B-4 \u00a74.2.2.2)",
+   "expected": "the same answer; no request on record; no saved code used up",
+   "observed": "200 availableAt,reference,requestId delay 8 s; requests 0; saved codes used 0",
+   "pass": true
+  },
+  {
+   "id": "N43",
+   "area": "recovery",
+   "name": "a wrong contact code, or one replaced by a newer one, starts nothing and does not use up the saved code",
+   "asvs": "V6.5.1 single use; V6.4.3",
+   "expected": "the same answer twice; no request; no saved code used; the earlier contact code marked replaced",
+   "observed": "new contact code 200; wrong contact code: 200 availableAt,reference,requestId delay 8 s; replaced contact code: 200 availableAt,reference,requestId delay 8 s; requests 0; saved codes used 0; contact codes replaced 1",
+   "pass": true
+  },
+  {
+   "id": "N28",
+   "area": "recovery",
+   "name": "a saved code works once: using it again with a valid contact code starts nothing, says nothing, and leaves the contact code usable",
+   "asvs": "V6.5.1 single use",
+   "expected": "the same answer as any start; still one request on record; one usable contact code",
+   "observed": "200 availableAt,reference,requestId delay 8 s; requests 1; usable contact codes 1",
+   "pass": true
+  },
+  {
+   "id": "N26",
+   "area": "recovery",
+   "name": "while a recovery waits the owner is told in every signed-in session, and the recovery contact is told too",
+   "asvs": "V6.3.7 notification of changes to authentication",
+   "expected": "one open recovery reported; owner events for both starts and the cancellation; the contact told of both starts",
+   "observed": "open recoveries 1; owner events recovery-contact-named, recovery-contact-accepted, recovery-started, recovery-started, recovery-cancelled, recovery-codes-replaced; contact events contact-recovery-started, contact-recovery-started, contact-recovery-cancelled",
+   "pass": true
+  },
+  {
+   "id": "N45",
+   "area": "recovery",
+   "name": "for an account made before passkeys its password stands in for the contact's code: a saved code and the password start a recovery, which still waits",
+   "asvs": "V6.4.3 secure recovery",
+   "expected": "codes 200; the start answers like any other; one request, method saved+password; the follow-up 409 recovery_waiting",
+   "observed": "codes 200; start 200 availableAt,reference,requestId delay 8 s; requests saved+password; follow-up 409 recovery_waiting",
+   "pass": true
+  },
+  {
+   "id": "N25",
+   "area": "recovery",
+   "name": "a saved code and a contact's code together grant nothing until the delay ends; then a new passkey can be created, it signs the person in, and every older saved code is replaced by a new set",
+   "asvs": "V6.4.3 secure recovery; V6.4.4",
+   "expected": "the start answers like any other; 409 recovery_waiting before the delay; after 8 s a new passkey, a session for that person and ten new codes, the only usable ones",
+   "observed": "start 200 availableAt,reference,requestId delay 8 s; before the delay 409 recovery_waiting; after: begin 200, finish 200, signed in as recoverme by passkey; 10 new codes, 10 usable, 0 old ones among them",
+   "pass": true
+  },
+  {
+   "id": "N27",
+   "area": "recovery",
+   "name": "a signed-in owner cancels a recovery after one fresh confirmation (a stale session is asked to confirm first), and a cancelled recovery can never be completed",
+   "asvs": "V6.4.3 secure recovery",
+   "expected": "cancel from a stale session 401 stepup_required; after a fresh confirmation 200; after the delay 409 recovery_unavailable",
+   "observed": "stale 401 stepup_required; fresh 200; after the delay 409 recovery_unavailable",
+   "pass": true
+  },
+  {
+   "id": "N29",
+   "area": "recovery",
+   "name": "recovery attempts from one address are cut off after ten in an hour, whatever the handle",
+   "asvs": "V6.3.1 brute force; V2.4.1",
+   "expected": "10 starts, then 429 too_many, also for a real handle",
+   "observed": "10 starts, then 429 too_many; a real handle then 429 too_many",
+   "pass": true
+  },
+  {
+   "id": "N30",
+   "area": "business",
+   "name": "creating a business, adding a member and changing who must sign each need a fresh passkey confirmation",
+   "asvs": "V7.5.3 further authentication",
+   "expected": "all three 401 stepup_required from a session with no recent confirmation; then done",
+   "observed": "create 401 stepup_required; add a member 401 stepup_required; change the policy 401 stepup_required; after confirming: maker-checker applied true",
+   "pass": true
+  },
+  {
+   "id": "N36",
+   "area": "business",
+   "name": "a viewer can look but cannot change anything, nor sign",
+   "asvs": "V8.2.1 function-level access",
+   "expected": "16 changes 403 not_permitted; signing 403 not_permitted; reading 200; nothing added",
+   "observed": "16 of 16 refused 403; signing 403 not_permitted; home 200, role viewer; programs 0 and payees 0 added",
+   "pass": true
+  },
+  {
+   "id": "N35",
+   "area": "business",
+   "name": "an operator can prepare a request but cannot sign one, its own or another member's; an approver's signature then completes it",
+   "asvs": "V8.2.1 function-level access",
+   "expected": "prepared 200; the operator's valid passkey signature 403 not_permitted on its own request and on the owner's; the approver's 200; one signature on each, the approver's",
+   "observed": "prepared 200; operator signs its own 403 not_permitted, the owner's 403 not_permitted; approver signs 200; signatures on the operator's approver, on the owner's approver",
+   "pass": true
+  },
+  {
+   "id": "N37",
+   "area": "business",
+   "name": "with maker-checker, whoever prepared a request cannot sign it, even as owner; another member who may sign completes it",
+   "asvs": "V2.3.5 multi-user approval",
+   "expected": "the owner's own signature 403 maker_cannot_sign; the approver's 200; one signature on record, the approver's",
+   "observed": "owner (maker) signs 403 maker_cannot_sign; approver signs 200 complete true; signatures approver",
+   "pass": true
+  },
+  {
+   "id": "N31",
+   "area": "business",
+   "name": "a member of one business cannot read another business's instructions, approvals, payees or books, and a member's personal workspace shows none of the business's",
+   "asvs": "V8.4.1 cross-tenant isolation",
+   "expected": "four direct reads 404; no other business's id or name in 9 lists",
+   "observed": "Rival's instruction: 404 not_found; Rival's approval: 404 not_found; Acme's instruction, from Rival: 404 not_found; Acme's approval, from Rival: 404 not_found; 0 lists with the other workspace's records (200)",
+   "pass": true
+  },
+  {
+   "id": "N32",
+   "area": "business",
+   "name": "a member who may sign in one business cannot begin or complete a signature on another business's approval",
+   "asvs": "V8.4.1 cross-tenant isolation",
+   "expected": "all 404; Rival's approval unsigned",
+   "observed": "ask for Rival's approval challenge: 404 not_found; confirm Rival's approval with Acme's owner's passkey: 404 not_found; ask for Acme's approval challenge, from Rival: 404 not_found; Rival's approval signatures 0, confirmed no",
+   "pass": true
+  },
+  {
+   "id": "N33",
+   "area": "business",
+   "name": "switching to a workspace the person is not a member of is refused: another business, or another person's own",
+   "asvs": "V8.4.1 cross-tenant isolation; V8.2.2",
+   "expected": "both 404; the session still acts in Acme",
+   "observed": "another business 404 not_found; another person's 404 not_found; acting in Acme",
+   "pass": true
+  },
+  {
+   "id": "N34",
+   "area": "business",
+   "name": "a session pointed at a workspace its person does not belong to acts only in the person's own: membership is checked on every request",
+   "asvs": "V8.3.1 authorization at a trusted layer",
+   "expected": "the workspace is the person's own; Rival's approval 404; no Rival payee listed",
+   "observed": "acting in the person's own workspace as owner; Rival's approval 404 not_found; Rival payee listed no",
+   "pass": true
+  },
+  {
+   "id": "N38",
+   "area": "business",
+   "name": "lowering who must sign (maker-checker off) does not take effect at once: it is scheduled for after the delay",
+   "asvs": "V2.3.5 multi-user approval; V7.5.3",
+   "expected": "applied false with a time; maker-checker still on",
+   "observed": "200 applied false, effective +8 s; maker-checker now true",
+   "pass": true
+  },
+  {
+   "id": "N39",
+   "area": "business",
+   "name": "every member who may sign can see a scheduled lowering of the policy and cancel it (as the workspace screen and server/workspaces.ts say)",
+   "asvs": "V2.3.5 multi-user approval",
+   "expected": "the approver's security view or workspace lists the change with its id; the approver's cancel 200",
+   "observed": "requester sees it yes; approver sees it yes; approver's events: \"policy-lowering-scheduled\" with workspaceId, changeId, effectiveAt (no change id); approver's cancel with the id taken from the database: 200",
+   "pass": true
+  },
+  {
+   "id": "N40",
+   "area": "business",
+   "name": "a member whose membership ends loses access at once, in the middle of a session",
+   "asvs": "V8.3.2 authorization changes apply immediately",
+   "expected": "the session acts in the person's own workspace; Acme's approval 404; switching back 404",
+   "observed": "acting in their own workspace; Acme's approval 404 not_found; switch back 404 not_found",
+   "pass": true
+  },
+  {
+   "id": "N49",
+   "area": "emergency",
+   "name": "a saved code pauses QED from the signed-out page: all but protective selling, no session opened, the code not spent; a wrong code or an unknown handle changes nothing; the same answer each way, never sooner than the floor",
+   "asvs": "V6.4.3 recovery with a saved code; V2.4 anti-automation; V6.3.8 no account enumeration",
+   "expected": "with the shared allowance spent, 429; then the same 200 answer three times, each at least 440 ms; paused only by the right code, protective selling kept; no new session; no code spent",
+   "observed": "with the address's allowance spent 429 too_many; then 200, 200, 200; same body true; fastest 452 ms; paused by the wrong code 0; after the right one stop_at true protective 1; sessions 0 new; codes spent 0",
+   "pass": true
+  },
+  {
+   "id": "N50",
+   "area": "emergency",
+   "name": "signing out every other session ends the person's other sessions only: the one asking stays signed in and nobody else's session ends",
+   "asvs": "V7.4.3 terminate other sessions; V8.2.2 data-specific access",
+   "expected": "200, one ended; the first session signed out; the asking session and a bystander's still signed in",
+   "observed": "200 ended 1; first false, asking true, bystander true",
+   "pass": true
+  },
+  {
+   "id": "N51",
+   "area": "emergency",
+   "name": "keeping a request open gives the same document a fresh request for its own household only; the first is withdrawn and its signature covers nothing; a lapsed request cannot be revived",
+   "asvs": "V8.2.2 data-specific access; V2.3.4 single use",
+   "expected": "another household 404; renewal 200 with the same document hash; the first refused at confirmation, the fresh one confirmed; a lapsed one 409 approval_expired",
+   "observed": "other 404 not_found; renew 200 same hash true; first 409 approval_withdrawn; fresh 200; lapsed 409 approval_expired",
+   "pass": true
+  },
+  {
+   "id": "N52",
+   "area": "emergency",
+   "name": "a recovery contact pauses QED for the person who trusts them only with their own fresh passkey, keeping protective selling; a stranger cannot",
+   "asvs": "V8.2.2 data-specific access; V6.3 recovery contacts",
+   "expected": "stranger 404; contact without a fresh confirmation 401 stepup_required; with it 200, the person paused with protective selling kept",
+   "observed": "stranger 404 not_found; unconfirmed 401 stepup_required; confirmed 200; their stop true protective 1",
+   "pass": true
+  },
+  {
+   "id": "R02",
+   "area": "r13",
+   "name": "ten wrong passwords sent together lock the account as five sent one by one do",
+   "asvs": "V6.3.1 brute force; V2.4.1 anti-automation",
+   "expected": "the right password afterwards 429 locked",
+   "observed": "burst 401 bad_credentials, 429 locked; then the right password 429 locked",
+   "pass": true
+  },
+  {
+   "id": "R03",
+   "area": "r13",
+   "name": "a password session cannot end a session opened with a passkey that can approve; that passkey session can end the password session",
+   "asvs": "V7.4.3; V6.3.4 consistent strength across pathways",
+   "expected": "end-others 200 leaving both passkey sessions signed in; ending one of them 401 stepup_required; from the passkey session, the password session ends",
+   "observed": "end-others 200 ended 0; end one 401 stepup_required; passkey sessions true, true; from a passkey session 200 ended 2, password session now false",
+   "pass": true
+  },
+  {
+   "id": "R04",
+   "area": "r13",
+   "name": "challenges that expired long ago are removed, so signed-out requests cannot grow the database without bound",
+   "asvs": "V2.4.1 anti-automation; V15.2.2 resource limits",
+   "expected": "the two-hour-old challenge gone after the next begin",
+   "observed": "0 row left",
+   "pass": true
+  },
+  {
+   "id": "R05",
+   "area": "r13",
+   "name": "removing an address stops the reset link already sent to it",
+   "asvs": "V6.4.1 recovery secrets; V6.4.3 reset not usable by a former channel",
+   "expected": "the link works before; removal 200; then the link 410 and the reset refused",
+   "observed": "before 200; removal 200; after 410 link_replaced; reset 410 link_replaced",
+   "pass": true
+  },
+  {
+   "id": "R06",
+   "area": "r13",
+   "name": "an instruction that can move more than the business's large-amount threshold needs the large-amount number of signatures",
+   "asvs": "V8.2.1 function-level access; V2.3.5 multi-party approval",
+   "expected": "the first signature 200 with complete false and 2 required",
+   "observed": "200 complete false, required 2",
+   "pass": true
+  },
+  {
+   "id": "R11",
+   "area": "r13",
+   "name": "an operator cannot resume an instruction the owner paused, nor revoke a protective one",
+   "asvs": "V8.2.1 function-level access; V8.2.3 field-level access",
+   "expected": "both 403 not_permitted; the instruction still paused and the floor still active",
+   "observed": "resume 403 not_permitted; revoke the floor 403 not_permitted; now paused and active",
+   "pass": true
+  },
+  {
+   "id": "R07",
+   "area": "r13",
+   "name": "a lowering of the signing policy that falls due does not undo a raise made while it waited",
+   "asvs": "V8.1.4 business rules; V2.3.2 workflow integrity",
+   "expected": "lowering scheduled, raise applied; after the delay 2 signers still required",
+   "observed": "lowering 200 applied false; raise 200 applied true; now {\"signers\":2,\"makerChecker\":false,\"largePaise\":1000000,\"largeSigners\":2,\"bands\":[],\"limits\":{}}",
+   "pass": true
+  },
+  {
+   "id": "R01",
+   "area": "r13",
+   "name": "signing out everywhere from a session that acts in a business workspace ends every session of the person",
+   "asvs": "V7.4.3 terminate all sessions",
+   "expected": "200 with at least 2 ended; the other session and this one signed out",
+   "observed": "200 ended 3; other false, this false",
+   "pass": true
+  },
+  {
+   "id": "R08",
+   "area": "r13",
+   "name": "a revoked instruction stays revoked: an amendment signed before the revocation cannot put it back in force",
+   "asvs": "V2.3.2 workflow integrity; V2.3.1 steps in order",
+   "expected": "amendment signed 200; revoke 200; activation 409; still revoked",
+   "observed": "signed 200; revoke 200; activation 409 program_ended; state revoked",
+   "pass": true
+  },
+  {
+   "id": "R09",
+   "area": "r13",
+   "name": "a payment is refunded at most once: after a refund it cannot be disputed again",
+   "asvs": "V2.3.4 business-logic limits; V15.4.2",
+   "expected": "first dispute 200 and refunded once; a second dispute 409",
+   "observed": "first 200; second 409 already_refunded; refunds 1",
+   "pass": true
+  },
+  {
+   "id": "R10",
+   "area": "r13",
+   "name": "a bills instruction naming 50 of 120 payees is checked for look-alikes in under 0.5 s without holding up others; one naming all 120 is refused at once",
+   "asvs": "V15.2.2 resource limits; V2.4.1",
+   "expected": "50: 200 within 500 ms, health within 500 ms; 120: 400 within 500 ms",
+   "observed": "50: 200 in 195 ms, health waited 92 ms; 120: 400 invalid in 102 ms, health waited 0 ms",
+   "pass": true
+  },
+  {
+   "id": "R13",
+   "area": "r13",
+   "name": "a certificate check cannot hold the API's thread for seconds: the largest bootstrap is refused at once, the usual size still runs",
+   "asvs": "V15.2.2 resource limits; V2.4.1",
+   "expected": "largest 400 within 500 ms, health within 500 ms; usual size 200",
+   "observed": "largest 400 invalid in 52 ms, health waited 0 ms; usual 200",
+   "pass": true
+  },
+  {
+   "id": "R12",
+   "area": "r13",
+   "name": "a malformed path on the static side is a 400, with nothing on the error output",
+   "asvs": "V16.5.3 fails securely; V4.1.1",
+   "expected": "400 and no new server error",
+   "observed": "400; 0 new server error line(s)",
+   "pass": true
+  },
+  {
+   "id": "R22",
+   "area": "r13",
+   "name": "a member below admin reads another member's question to Ask only as hashes: no model-written title or refusal reason in any section of the case",
+   "asvs": "V8.2.2 data-specific access; V14.2.6 sensitive data",
+   "expected": "the case 200 without the title or the reason; the asker reads both",
+   "observed": "operator 200, 0 of 2 found; asker 200 reads the title",
+   "pass": true
+  },
+  {
+   "id": "R23",
+   "area": "r13",
+   "name": "a model's proposal is its asker's: another member below admin can neither dismiss it nor start an instruction from it",
+   "asvs": "V8.2.2 object-level access (API1)",
+   "expected": "dismiss 404; instruction from it 404; the proposal still new",
+   "observed": "dismiss 404 not_found; instruction 404 not_found; now new",
+   "pass": true
+  },
+  {
+   "id": "R24",
+   "area": "r13",
+   "name": "an instruction's actions, a tenant's bills and a tenant's instructions are found through an index; an instruction cannot carry an arbitrary proposal id",
+   "asvs": "V15.2.2 resource limits; V2.2.1 input validation",
+   "expected": "three SEARCH ... USING INDEX plans; the 60,000-character id 404 and nothing stored",
+   "observed": "SEARCH actions USING INDEX actions_program (program_id=?) | SEARCH bills USING INDEX bills_user (user_id=?) | SEARCH programs USING INDEX programs_user (user_id=?); long id 404 not_found, 0 stored",
+   "pass": true
+  },
+  {
+   "id": "R25",
+   "area": "r13",
+   "name": "in a business, only an owner or admin other than the member who made the change clears a notice of a change to who can act",
+   "asvs": "V8.2.1 function-level access; V16.3.2 security events",
+   "expected": "operator 403; the starter 403; still open; the owner 200 and it is cleared",
+   "observed": "operator 403 not_permitted; starter 403 not_permitted; open after both 1; owner 200; cleared 1",
+   "pass": true
+  },
+  {
+   "id": "R15",
+   "area": "r13",
+   "name": "a password session can neither ask again for a protective run's approval (withdrawing the request waiting) nor withdraw it; the owner's passkey then confirms it",
+   "asvs": "V8.2.1 function-level access; V6.3.4 consistent strength across pathways",
+   "expected": "ask again 401 stepup_required; withdraw 401 stepup_required; the owner's confirmation 200",
+   "observed": "ask again 401 stepup_required; withdraw 401 stepup_required; confirmation 200",
+   "pass": true
+  },
+  {
+   "id": "R16",
+   "area": "r13",
+   "name": "one person cannot spend the vault service's host-wide budgets through many workspaces: four vault set-ups a day, and 480 requests an hour over all their workspaces",
+   "asvs": "V15.2.2 resource limits (API4); V2.4.1",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R17",
+   "area": "r13",
+   "name": "after the deadline, a release request the provider keeps waiting does not hold off the client's refund",
+   "asvs": "V2.3.2 workflow integrity; V2.3.4 business-logic limits (API6)",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R18",
+   "area": "r13",
+   "name": "in a business, a vault request needs the workspace's own number of signatures when it is larger than the chain's threshold; a request that only stops something needs no more than the chain asks",
+   "asvs": "V2.3.5 multi-party approval; V8.2.1",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R19",
+   "area": "r13",
+   "name": "the provider does not read what the client's vault service said about the client's refused funding (it names the client vault's free balance)",
+   "asvs": "V8.2.3 field-level access (API3)",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R20",
+   "area": "r13",
+   "name": "questions from many workspaces are bounded together: at most QED_ASK_CONCURRENT model calls at once (the next is refused, not queued), and at most QED_ASK_ALL_HOURLY in an hour",
+   "asvs": "V15.2.2 resource limits (API4)",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R21",
+   "area": "r13",
+   "name": "each workspace's tick, or its pause, is recorded as that workspace's own event, naming only its own vault",
+   "asvs": "V8.2.2 data-specific access; V16.2.5 sensitive data in logs",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R26",
+   "area": "r13",
+   "name": "with a recovery started by email under way, a backup one may start too, and the email one is still shown and finished with its own link and key",
+   "asvs": "V6.4.1 recovery; V2.3.2 workflow integrity",
+   "expected": "its test passes",
+   "observed": "passed",
+   "pass": true
+  },
+  {
+   "id": "R14",
+   "area": "r13",
+   "name": "no web page can use the wallet service's chain: a WebSocket from another local origin and a request after DNS rebinding reach nothing on any port it listens on, and its clock does not move (F-14)",
+   "asvs": "V4.4.1 WebSocket origin; V3.4.5 rebinding (Host); V13.4.1 attack surface",
+   "expected": "every attempt refused; the clock moved under an hour (the chain listens on 6665)",
+   "observed": "ws://127.0.0.1:6665 refused; ws://localhost:6665 refused; rebind.evil.example:6665 refused (TypeError: Failed to fetch); clock moved 2 s",
+   "pass": true
+  },
+  {
+   "id": "N41",
+   "area": "integrity",
+   "name": "every passkey challenge issued in this run had at least 64 bits; the random ones never repeated; each approval's was derived from its own id and terms, and no two approvals shared one",
+   "asvs": "V6.7.2 challenge size and uniqueness",
+   "expected": ">= 64 bits; random ones distinct; every approval challenge derived; one distinct challenge per approval",
+   "observed": "119 challenges, at least 256 bits; 86 distinct of 86 random; 33 of 33 approval challenges derived (repeated requests for one approval get the same challenge by design); 21 distinct for 21 approvals",
+   "pass": true
+  },
+  {
+   "id": "S53",
+   "area": "integrity",
+   "name": "after every attack the ledger still balances and the rail holds one payment for each action",
+   "asvs": "V2.3.3 all or nothing; V15.4.2",
+   "expected": "no unbalanced entry; payments on the rail equal actions sent",
+   "observed": "0 unbalanced entries; 3 rail payments for 3 actions",
+   "pass": true
+  },
+  {
+   "id": "S54",
+   "area": "integrity",
+   "name": "no request produced an unhandled server error",
+   "asvs": "V16.5.3 fails securely; V16.5.4 last-resort handler",
+   "expected": "nothing on the services' error output",
+   "observed": "nothing",
+   "pass": true
+  }
+ ],
+ "measurements": [
+  {
+   "lead": "L-14",
+   "what": "home (/api/home), as an ordinary household; answered 200",
+   "millisecondsMedian": 4,
+   "samples": [
+    7,
+    4,
+    4,
+    4,
+    4
+   ]
+  },
+  {
+   "lead": "L-14",
+   "what": "market history, 336 hours (/api/market/history?hours=336), as an ordinary household; answered 200",
+   "millisecondsMedian": 1,
+   "samples": [
+    0,
+    1,
+    1,
+    1,
+    1
+   ]
+  }
+ ]
+}

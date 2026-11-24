@@ -1,0 +1,283 @@
+{
+ "what": "figure#chart on /holdings, design fixture 6201, Bitcoin in rupees, 24 hours; the same record as the before set (a 255 s stretch with nothing recorded, engine paused 18:03:18 to 18:07:18 IST)",
+ "measuredAt": "2026-11-23T13:17:08.314Z",
+ "source": "getBoundingClientRect and getComputedStyle in Chrome (Playwright), deviceScaleFactor 2; boxes relative to the chart svg",
+ "views": {
+  "1440-light": {
+   "svg": [
+    672,
+    300
+   ],
+   "filledShapes": [
+    {
+     "element": "circle.tc-last",
+     "box": [
+      569,
+      165,
+      7,
+      7
+     ],
+     "fill": "lab(18.7144 0.245914 -5.22553)",
+     "opacity": "1"
+    },
+    {
+     "element": "rect.",
+     "box": [
+      576,
+      158,
+      94,
+      20
+     ],
+     "fill": "lab(8.26931 0.330456 -5.18978)",
+     "opacity": "1"
+    }
+   ],
+   "gapMarks": [
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      62,
+      26,
+      0,
+      246
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(41.9315 0.130013 -4.51847)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      112,
+      26,
+      0,
+      246
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(41.9315 0.130013 -4.51847)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-span",
+     "box": [
+      62,
+      273,
+      50,
+      0
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(41.9315 0.130013 -4.51847)",
+     "dash": "none"
+    }
+   ],
+   "title": "The price buyers offered, as recorded by this engine for Bitcoin in rupees, in ₹ per BTC. Between ₹64,24,000.0 and ₹64,69,369.2 over the period; the latest value is ₹64,42,428.2, 23 Nov, 18:46. 1 stretch with nothing recorded, 4 min in all, where the line stops."
+  },
+  "390-light": {
+   "svg": [
+    326,
+    240
+   ],
+   "filledShapes": [
+    {
+     "element": "circle.tc-last",
+     "box": [
+      223,
+      130,
+      7,
+      7
+     ],
+     "fill": "lab(18.7144 0.245914 -5.22553)",
+     "opacity": "1"
+    },
+    {
+     "element": "rect.",
+     "box": [
+      230,
+      124,
+      94,
+      20
+     ],
+     "fill": "lab(8.26931 0.330456 -5.18978)",
+     "opacity": "1"
+    }
+   ],
+   "gapMarks": [
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      24,
+      26,
+      0,
+      186
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(41.9315 0.130013 -4.51847)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      44,
+      26,
+      0,
+      186
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(41.9315 0.130013 -4.51847)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-span",
+     "box": [
+      24,
+      213,
+      20,
+      0
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(41.9315 0.130013 -4.51847)",
+     "dash": "none"
+    }
+   ],
+   "title": "The price buyers offered, as recorded by this engine for Bitcoin in rupees, in ₹ per BTC. Between ₹64,24,000.0 and ₹64,69,369.2 over the period; the latest value is ₹64,42,428.2, 23 Nov, 18:46. 1 stretch with nothing recorded, 4 min in all, where the line stops."
+  },
+  "1440-dark": {
+   "svg": [
+    672,
+    300
+   ],
+   "filledShapes": [
+    {
+     "element": "circle.tc-last",
+     "box": [
+      569,
+      165,
+      7,
+      7
+     ],
+     "fill": "lab(90.675 0.385582 -2.23876)",
+     "opacity": "1"
+    },
+    {
+     "element": "rect.",
+     "box": [
+      576,
+      158,
+      94,
+      20
+     ],
+     "fill": "lab(94.7501 0.254661 -1.49404)",
+     "opacity": "1"
+    }
+   ],
+   "gapMarks": [
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      62,
+      26,
+      0,
+      246
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(63.9714 0.593632 -3.34876)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      112,
+      26,
+      0,
+      246
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(63.9714 0.593632 -3.34876)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-span",
+     "box": [
+      62,
+      273,
+      50,
+      0
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(63.9714 0.593632 -3.34876)",
+     "dash": "none"
+    }
+   ],
+   "title": "The price buyers offered, as recorded by this engine for Bitcoin in rupees, in ₹ per BTC. Between ₹64,24,000.0 and ₹64,69,369.2 over the period; the latest value is ₹64,42,428.2, 23 Nov, 18:46. 1 stretch with nothing recorded, 4 min in all, where the line stops."
+  },
+  "390-dark": {
+   "svg": [
+    326,
+    240
+   ],
+   "filledShapes": [
+    {
+     "element": "circle.tc-last",
+     "box": [
+      223,
+      130,
+      7,
+      7
+     ],
+     "fill": "lab(90.675 0.385582 -2.23876)",
+     "opacity": "1"
+    },
+    {
+     "element": "rect.",
+     "box": [
+      230,
+      124,
+      94,
+      20
+     ],
+     "fill": "lab(94.7501 0.254661 -1.49404)",
+     "opacity": "1"
+    }
+   ],
+   "gapMarks": [
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      24,
+      26,
+      0,
+      186
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(63.9714 0.593632 -3.34876)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-edge",
+     "box": [
+      44,
+      26,
+      0,
+      186
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(63.9714 0.593632 -3.34876)",
+     "dash": "3px, 3px"
+    },
+    {
+     "element": "line.tc-gap-span",
+     "box": [
+      24,
+      213,
+      20,
+      0
+     ],
+     "fill": "rgb(0, 0, 0)",
+     "stroke": "lab(63.9714 0.593632 -3.34876)",
+     "dash": "none"
+    }
+   ],
+   "title": "The price buyers offered, as recorded by this engine for Bitcoin in rupees, in ₹ per BTC. Between ₹64,24,000.0 and ₹64,69,369.2 over the period; the latest value is ₹64,42,428.2, 23 Nov, 18:46. 1 stretch with nothing recorded, 4 min in all, where the line stops."
+  }
+ }
+}

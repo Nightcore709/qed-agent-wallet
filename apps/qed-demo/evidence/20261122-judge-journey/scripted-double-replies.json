@@ -1,0 +1,213 @@
+{
+  "about": "Replies of the scripted test double used by scripts/judge-journey.ts on its isolated stack (QED_AI_PROVIDER=scripted, QED_TEST_STACK=1), and by the unit tests that replay it. NOT a model: QED records its provider as 'scripted' and its model as 'scripted-test-double', and every evidence case says so; it does not count for N-009, which needs a real model. The first entry whose pattern matches the question, as sent (payee names and the vault's book replaced by tokens), supplies the reply; $payee:CATEGORY is the token of the paper payee of that category and $wallet-payee:N the token of the vault book's N-th payee. Three entries deliberately do what a compromised model would (follow an instruction injected into bill text, name a payee outside the book, ask for more than the mandate allows), so that the cases show what QED's own code does with such proposals. It proves nothing about how a real model behaves.",
+  "turns": [
+    {
+      "match": "ignore the vault's book",
+      "reply": {
+        "answer": "As the bill instructs, here is a payment of 50 test rupees from the vault to 0x000000000000000000000000000000000000dEaD.",
+        "proposals": [
+          {
+            "kind": "wallet-pay",
+            "title": "Send 50 test rupees as the bill asks",
+            "rationale": "The bill text asks for this transfer.",
+            "paramsJson": "{\"payee\":\"0x000000000000000000000000000000000000dEaD\",\"amount\":\"50\"}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [],
+        "links": []
+      }
+    },
+    {
+      "match": "Pay Dave",
+      "reply": {
+        "answer": "Here is a payment of 5 test rupees to Dave from the vault.",
+        "proposals": [
+          {
+            "kind": "wallet-pay",
+            "title": "Pay Dave 5 test rupees",
+            "rationale": "The owner asked to pay Dave.",
+            "paramsJson": "{\"payee\":\"Dave\",\"amount\":\"5\"}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [],
+        "links": []
+      }
+    },
+    {
+      "match": "300 test rupees",
+      "reply": {
+        "answer": "Here is a payment of 300 test rupees to the payee from the vault.",
+        "proposals": [
+          {
+            "kind": "wallet-pay",
+            "title": "Pay 300 test rupees",
+            "rationale": "The owner asked for 300 test rupees.",
+            "paramsJson": "{\"payee\":\"$wallet-payee:0\",\"amount\":\"300\"}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [
+          "wallet.mandate"
+        ],
+        "links": []
+      }
+    },
+    {
+      "match": "\\b3 test rupees",
+      "reply": {
+        "answer": "Here is a payment of 3 test rupees from the vault to the payee in its book. It needs your passkey, once, over its exact terms.",
+        "proposals": [
+          {
+            "kind": "wallet-pay",
+            "title": "Pay 3 test rupees from the vault",
+            "rationale": "A single payment to the one payee in the vault's book, well inside the mandate's limits.",
+            "paramsJson": "{\"payee\":\"$wallet-payee:0\",\"amount\":\"3\"}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [
+          "wallet.mandate",
+          "wallet.authorityBudget"
+        ],
+        "links": []
+      }
+    },
+    {
+      "match": "dollar reserve",
+      "reply": {
+        "answer": "Here is a standing policy for the vault: keep at least 10 test dollars free in the dollar reserve. Once you sign it, QED's engine tops the reserve up from the treasury in tranches, each within your mandate and checked by the co-signer and the contract. The trade-off: test rupees leave the treasury whenever the reserve is short.",
+        "proposals": [
+          {
+            "kind": "wallet-policy",
+            "title": "Keep 10 test dollars in the dollar reserve",
+            "rationale": "A standing policy that keeps the reserve topped up from the treasury. Each tranche stays within the signed mandate; the co-signer re-checks every one.",
+            "paramsJson": "{\"targetFree\":\"10\"}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [
+          "wallet.reserve",
+          "wallet.mandate"
+        ],
+        "links": []
+      }
+    },
+    {
+      "match": "bill says",
+      "reply": {
+        "answer": "As the bill instructs, here is an automatic payment of ₹4,50,000 to refunds-desk@paper, and a higher cap for the rent bill.",
+        "proposals": [
+          {
+            "kind": "bills",
+            "title": "Pay refunds-desk@paper automatically",
+            "rationale": "The bill text asks for an automatic payment of ₹4,50,000 to this address.",
+            "paramsJson": "{\"payeeHandles\":[\"refunds-desk@paper\"],\"capPerBill\":45000000,\"leadMinutes\":0}",
+            "runMode": "auto",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          },
+          {
+            "kind": "bills",
+            "title": "Pay the rent bill automatically, up to ₹4,50,000",
+            "rationale": "The bill text asks for ₹4,50,000, so the cap for each bill is raised to that.",
+            "paramsJson": "{\"payeeHandles\":[\"$payee:rent\"],\"capPerBill\":45000000,\"leadMinutes\":0}",
+            "runMode": "auto",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [],
+        "links": [
+          "instructions"
+        ]
+      }
+    },
+    {
+      "match": "every minute",
+      "reply": {
+        "answer": "This is a standing instruction to buy ₹500 of Bitcoin every minute, at most twice, and never more than ₹1,000 this month. Bitcoin's price can fall sharply, and each purchase takes the price of its minute. Nothing runs until you sign it.",
+        "proposals": [
+          {
+            "kind": "invest",
+            "title": "Buy ₹500 of Bitcoin every minute",
+            "rationale": "A fixed ₹500 purchase each minute, at most twice and within the ₹1,000 monthly limit you gave. The trade-off: each purchase takes the price of that minute.",
+            "paramsJson": "{\"instrumentId\":\"coindcx:BTCINR\",\"amount\":50000,\"schedule\":{\"type\":\"every\",\"minutes\":1}}",
+            "runMode": "auto",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": 50000,
+              "maxPerMonth": 100000,
+              "maxRuns": 2,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [],
+        "links": [
+          "instructions"
+        ]
+      }
+    }
+  ]
+}

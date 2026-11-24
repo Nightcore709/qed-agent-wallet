@@ -1,0 +1,13 @@
+{
+  "input": "And put another 20 tUSD into the euro reserve.",
+  "engine": "anthropic:claude-sonnet-5-5",
+  "output": "{\"intent\":\"pay\",\"reply\":\"Proposed: pay 20 tUSD to Euro reserve, an approved payee. That fits within your free balance of 60 tUSD and the daily cap. The guard and co-signer will re-check it before anything executes. Reply \\\"confirm\\\" to proceed or \\\"cancel\\\" to drop it.\",\"proposal\":{\"kind\":\"pay\",\"payeeLabel\":\"Euro reserve\",\"amountUsd\":20,\"dueInDays\":null,\"memo\":\"Additional 20 tUSD transfer to Euro reserve\"},\"clarify\":null,\"flags\":[],\"confidence\":0.9}",
+  "guarded": {
+    "intent": "pay",
+    "payee": "0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53",
+    "amount": "20000000",
+    "flags": [],
+    "needsConfirmation": true,
+    "reply": "Proposed: pay 20.00 tUSD to Euro reserve. After this, free balance would be 40.00 tUSD and 0.00 tUSD stays ring-fenced. This moves money, so I need your explicit confirmation — reply \"confirm\" or \"cancel\"."
+  }
+}

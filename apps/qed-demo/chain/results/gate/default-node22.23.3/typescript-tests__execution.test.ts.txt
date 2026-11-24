@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: isqrt is the exact floor square root on 2,000 random inputs up to 2^250
+ok 1 - isqrt is the exact floor square root on 2,000 random inputs up to 2^250
+  ---
+  duration_ms: 2.535958
+  type: 'test'
+  ...
+# Subtest: path deficiency: repeated swaps on one pool never beat a single swap (3,000 random cases)
+ok 2 - path deficiency: repeated swaps on one pool never beat a single swap (3,000 random cases)
+  ---
+  duration_ms: 1.638083
+  type: 'test'
+  ...
+# Subtest: weak duality: no route, at any prices, beats the bound (400 markets × 10 routes × 3 price vectors)
+ok 3 - weak duality: no route, at any prices, beats the bound (400 markets × 10 routes × 3 price vectors)
+  ---
+  duration_ms: 940.396917
+  type: 'test'
+  ...
+# Subtest: strong duality in practice: the solver's route is within 1 ppm of its bound, or within one raw unit per hop, on 300 random markets
+ok 4 - strong duality in practice: the solver's route is within 1 ppm of its bound, or within one raw unit per hop, on 300 random markets
+  ---
+  duration_ms: 656.694375
+  type: 'test'
+  ...
+# Subtest: the certified route beats every baseline policy on 200 random markets
+ok 5 - the certified route beats every baseline policy on 200 random markets
+  ---
+  duration_ms: 216.7155
+  type: 'test'
+  ...
+# Subtest: the committed Solidity fixture is the engine's current output (no drift)
+ok 6 - the committed Solidity fixture is the engine's current output (no drift)
+  ---
+  duration_ms: 4.763792
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1904.373083

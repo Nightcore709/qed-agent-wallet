@@ -1,0 +1,130 @@
+# QED demo (apps/qed-demo): typecheck, unit suite, build, SBOM, the release-folder check where that folder exists, the
+# security script, the chain's Forge tests and the owner-account hash check; the browser suite as a separate job.
+# Prepared locally and NEVER RUN on GitHub (apps/qed-demo/docs/DEPLOY.md, section 10): the first push is its first run.
+#
+# Supply chain: every action is pinned to a full commit SHA, with its version beside it (read from each project's GitHub
+# release page on 24 Nov 2026; verify a pin with `git ls-remote https://github.com/<owner>/<repo> <tag>`). Dependabot
+# (.github/dependabot.yml) proposes new SHAs weekly. No secret is used anywhere; GITHUB_TOKEN is read-only.
+name: qed-demo
+on:
+  push:
+    paths: ["apps/qed-demo/**", ".github/workflows/qed-demo.yml", ".dockerignore", "docs/shared/RISK_REGISTER.md"]
+  pull_request:
+    paths: ["apps/qed-demo/**", ".github/workflows/qed-demo.yml", ".dockerignore", "docs/shared/RISK_REGISTER.md"]
+  workflow_dispatch:
+# Nothing is granted beyond reading the repository; each job restates it, so a later job cannot inherit more by accident.
+permissions: {}
+# One run per branch or pull request; a newer push cancels an older run, except on main, where every push is kept.
+concurrency:
+  group: qed-demo-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+defaults:
+  run:
+    shell: bash
+    working-directory: apps/qed-demo
+env:
+  NPM_CONFIG_FUND: "false"
+  NPM_CONFIG_AUDIT: "false"
+  NPM_CONFIG_UPDATE_NOTIFIER: "false"
+  FORCE_COLOR: "0"
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    steps:
+      - name: Check out (no credentials kept)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: Node from .nvmrc (26.13.1) with the npm cache
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: apps/qed-demo/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            apps/qed-demo/package-lock.json
+            apps/qed-demo/chain/package-lock.json
+      - name: Foundry v1.7.1 (the version the owner-account artifact was built with)
+        uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
+        with: { version: v1.7.1 }
+      - name: Install (lockfiles only, no install scripts)
+        run: |
+          node --version
+          npm ci
+          npm ci --omit=dev --prefix chain
+      - run: npm run typecheck
+      - run: npx vitest run --maxWorkers=4
+      - run: npm run build
+      - name: SBOM and dependency-audit records (CycloneDX, from the lockfiles)
+        run: npm run sbom
+      - name: Approved-release check (runs only where the release folder exists)
+        env:
+          QED_RELEASE_DIR: ${{ vars.QED_RELEASE_DIR }}
+        run: |
+          if [ -n "${QED_RELEASE_DIR:-}" ] && [ -d "$QED_RELEASE_DIR" ]; then
+            npm run release:check
+          else
+            echo "::notice title=release:check skipped::the approved-release folder is not on this runner (set the repository variable QED_RELEASE_DIR on a self-hosted runner that has it)"
+          fi
+      - name: Security script (active checks on a scratch stack, loopback only)
+        run: node scripts/security.ts security-report.json
+      # The Forge gate. A whole-project build can change the owner-account artifact's bytes (build-owner-account.sh explains
+      # why), so the hash check comes after it and rebuilds that artifact the declared way if needed (locally the artifact
+      # still matched after forge test).
+      - name: Chain Forge gate (chain/accounts, solc 0.8.38)
+        working-directory: apps/qed-demo/chain/accounts
+        env:
+          SOLC_VERSION: "0.8.38"
+        run: forge test
+      - name: Owner-account hash check (artifact SHA-256 equals READY.json)
+        run: scripts/deploy/build-owner-account.sh
+      - name: Upload SBOMs, audit records and the security report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qed-demo-checks
+          path: |
+            apps/qed-demo/sbom/*.json
+            apps/qed-demo/security-report.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: Check out (no credentials kept)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: Node from .nvmrc (26.13.1) with the npm cache
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: apps/qed-demo/.nvmrc
+          cache: npm
+          cache-dependency-path: |
+            apps/qed-demo/package-lock.json
+            apps/qed-demo/chain/package-lock.json
+      - name: Foundry v1.7.1
+        uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
+        with: { version: v1.7.1 }
+      - name: Install (lockfiles only, no install scripts)
+        run: |
+          npm ci
+          npm ci --omit=dev --prefix chain
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Owner-account hash check (artifact SHA-256 equals READY.json)
+        run: scripts/deploy/build-owner-account.sh
+      - run: npx playwright test -c browser/playwright.config.ts
+      - name: Upload the browser results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qed-demo-browser-results
+          path: apps/qed-demo/browser/results
+          if-no-files-found: ignore
+          retention-days: 14

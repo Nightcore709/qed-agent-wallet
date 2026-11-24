@@ -1,0 +1,38 @@
+{
+  "jobId": "1",
+  "weights": [
+    {
+      "asset": "Global Equities",
+      "weight": 0.16318330373047862
+    },
+    {
+      "asset": "US Treasuries 7-10y",
+      "weight": 0.8080865744026343
+    },
+    {
+      "asset": "Gold",
+      "weight": 0.02873012186688706
+    },
+    {
+      "asset": "Bitcoin",
+      "weight": 0
+    },
+    {
+      "asset": "IG Corporate Credit",
+      "weight": 0
+    },
+    {
+      "asset": "Global REITs",
+      "weight": 0
+    }
+  ],
+  "variance": 0.00266044249888746,
+  "volatility": 0.051579477497231976,
+  "certificate": {
+    "ok": true,
+    "maxStationarityResidual": "0",
+    "dualityGap": "0",
+    "maxPsdResidual": "63",
+    "optimalityBound": 1.500266044249889e-8
+  }
+}

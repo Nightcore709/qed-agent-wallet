@@ -1,0 +1,42 @@
+# node --test --test-concurrency=1 test-ts/
+# recorded 2026-11-24T20:40:44Z; forge Version: 1.7.1; src/QEDOwnerAccount.sol sha256 81730fdf44f2563474a148029245826db8227c5177659a7e33a0df36e4025f2e
+
+▶ chain A (osaka): the release vault owned by a passkey account
+  ✔ the vault set deployed is the release bytecode, and our build of the vendored sources is identical (1.6605ms)
+  ✔ the guard list is on chain as constructed (3.691041ms)
+  ✔ client challenges equal the contract views (2.822666ms)
+  ✔ ownership moves to the account: transferOwnership by the EOA, acceptOwnership through execute with a passkey (26.905875ms)
+  ✔ (a) the old EOA can no longer call any onlyOwner function (27.506292ms)
+  ✔ (b) a mandate signed through ERC-1271 by the account is accepted by the vault for a payment (28.684208ms)
+  ✔ (c) a mandate signature made for another account is refused (25.291167ms)
+  ✔ an assertion made on another local origin is refused on chain (3.29ms)
+  ✔ replaying an executed batch is refused (nonce) (0.785792ms)
+  ✔ guarded calls: refused on the immediate path; the delayed path runs one after the delay; one is cancelled (113.003791ms)
+  ✔ a scheduled removal is cancelled with one Member assertion (10.493667ms)
+  ✔ recovery: a recovery-code key starts it, the delay runs, anyone finishes it, the new passkey can act (76.401125ms)
+✔ chain A (osaka): the release vault owned by a passkey account (483.495625ms)
+▶ chain B (osaka, chain id 31338): the same account address on another chain
+  ✔ signatures and batches from chain A are refused (130.4725ms)
+✔ chain B (osaka, chain id 31338): the same account address on another chain (130.596709ms)
+▶ chain C (prague: no P-256 precompile)
+  ✔ the account refuses to be deployed where it could never verify a passkey (105.78225ms)
+✔ chain C (prague: no P-256 precompile) (105.895709ms)
+✔ keccak-256 and sha-256 from node:crypto match known vectors (22.10175ms)
+✔ function selectors match cast sig (12.073083ms)
+✔ ABI encoding of execute calldata matches cast calldata (5.317083ms)
+✔ ABI encoding of constructor arguments and of the vault Mandate matches cast abi-encode (22.635666ms)
+✔ strict DER parsing (1.40225ms)
+✔ s normalisation: about half of real DER signatures are high-s; normalised ones stay valid (23.187084ms)
+✔ toContractAssertion enforces every on-chain rule before anything is sent (0.538083ms)
+✔ recovery codes: 130 bits, normalised input, deterministic key, raw ECDSA/SHA-256 signature (136.11725ms)
+✔ EIP-712 digests agree with viem hashTypedData (independent implementation, test-only) (131.412333ms)
+✔ release guard list: selectors match cast sig, reasons match the Solidity helper word for word (73.274334ms)
+ℹ tests 24
+ℹ suites 3
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1360.549834
+# exit status: 0

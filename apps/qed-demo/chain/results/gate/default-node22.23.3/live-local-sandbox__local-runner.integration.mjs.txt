@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: the runner refuses a port that already has a chain instead of reusing it
+ok 1 - the runner refuses a port that already has a chain instead of reusing it
+  ---
+  duration_ms: 247.028625
+  type: 'test'
+  ...
+# Subtest: stopping the runner also stops its Anvil chain and its scenario process
+ok 2 - stopping the runner also stops its Anvil chain and its scenario process
+  ---
+  duration_ms: 720.331667
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1070.2535

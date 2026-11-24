@@ -1,0 +1,5 @@
+# Foundry build output (this folder only; the vendored tree is never built in place). out/ and cache/ are ignored by
+# chain/.gitignore already; the seeded profile writes to its own folders.
+out-seeded/
+cache-seeded/
+broadcast/

@@ -1,0 +1,147 @@
+{
+ "what": "figure#chart on /holdings, design fixture 6201, Bitcoin in rupees, 24 hours; record with one 255 s stretch with nothing recorded (engine paused 18:03:18 to 18:07:18 IST)",
+ "measuredAt": "2026-11-23T12:40:12.989Z",
+ "source": "getBoundingClientRect and getComputedStyle in Chrome (Playwright), deviceScaleFactor 2",
+ "elements": {
+  "1440-light": [
+   {
+    "element": "svg.chart",
+    "box": [
+     144,
+     401,
+     667,
+     300
+    ],
+    "fill": "rgb(0, 0, 0)",
+    "opacity": "1"
+   },
+   {
+    "element": "rect.gap",
+    "box": [
+     402,
+     411,
+     208,
+     264
+    ],
+    "fill": "lab(94.8636 0.0339448 -2.27669)",
+    "opacity": "1"
+   },
+   {
+    "element": "path.line",
+    "box": [
+     144,
+     433,
+     567,
+     220
+    ],
+    "fill": "none",
+    "opacity": "1"
+   }
+  ],
+  "390-light": [
+   {
+    "element": "svg.chart",
+    "box": [
+     40,
+     458,
+     310,
+     240
+    ],
+    "fill": "rgb(0, 0, 0)",
+    "opacity": "1"
+   },
+   {
+    "element": "rect.gap",
+    "box": [
+     136,
+     468,
+     77,
+     204
+    ],
+    "fill": "lab(94.8636 0.0339448 -2.27669)",
+    "opacity": "1"
+   },
+   {
+    "element": "path.line",
+    "box": [
+     40,
+     485,
+     210,
+     170
+    ],
+    "fill": "none",
+    "opacity": "1"
+   }
+  ],
+  "1440-dark": [
+   {
+    "element": "svg.chart",
+    "box": [
+     144,
+     401,
+     667,
+     300
+    ],
+    "fill": "rgb(0, 0, 0)",
+    "opacity": "1"
+   },
+   {
+    "element": "rect.gap",
+    "box": [
+     402,
+     411,
+     208,
+     264
+    ],
+    "fill": "lab(2.76866 0.401936 -2.03275)",
+    "opacity": "1"
+   },
+   {
+    "element": "path.line",
+    "box": [
+     144,
+     433,
+     567,
+     220
+    ],
+    "fill": "none",
+    "opacity": "1"
+   }
+  ],
+  "390-dark": [
+   {
+    "element": "svg.chart",
+    "box": [
+     40,
+     458,
+     310,
+     240
+    ],
+    "fill": "rgb(0, 0, 0)",
+    "opacity": "1"
+   },
+   {
+    "element": "rect.gap",
+    "box": [
+     136,
+     468,
+     77,
+     204
+    ],
+    "fill": "lab(2.76866 0.401936 -2.03275)",
+    "opacity": "1"
+   },
+   {
+    "element": "path.line",
+    "box": [
+     40,
+     485,
+     210,
+     170
+    ],
+    "fill": "none",
+    "opacity": "1"
+   }
+  ]
+ }
+}

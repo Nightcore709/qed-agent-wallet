@@ -1,0 +1,213 @@
+{
+ "what": "One model-proposed instruction, from the owner's question to a receipt",
+ "producedAt": "2026-11-22 16:50:07.336 IST",
+ "howToReproduce": "node scripts/evidence-proposal.ts prg_1m81ffqv96wz72f7k1k",
+ "1 question and model call": {
+  "callId": "aic_1m81ffqtd17dmcrmam9",
+  "at": "2026-11-22 16:45:28.717 IST",
+  "provider": "scripted",
+  "model": "scripted-test-double",
+  "latencyMs": 1,
+  "ok": true,
+  "question": "Buy ₹500 of Bitcoin for me every minute, at most 2 times, and never more than ₹1,000 this month.",
+  "contextFingerprint": "6f0d4e610c6a8176cbe3c51e1eec5180071385451b3b4063ca5e9bf7136e152c",
+  "replyCharacters": 236,
+  "proposalsReturned": 1,
+  "usage": {
+   "responseId": null
+  }
+ },
+ "2 proposal as stored after validation": {
+  "id": "prp_1m81ffqtzf7pyvv7chk",
+  "origin": "model",
+  "kind": "invest",
+  "title": "Buy ₹500 of Bitcoin every minute",
+  "state": "drafted",
+  "invalidReason": null,
+  "params": {
+   "instrumentId": "coindcx:BTCINR",
+   "amount": 50000,
+   "schedule": {
+    "type": "every",
+    "minutes": 1
+   }
+  },
+  "runMode": "auto",
+  "authority": {
+   "maxPerRun": 50000,
+   "maxPerMonth": 100000,
+   "maxRuns": 2
+  },
+  "warnings": [
+   "The schedule needs about ₹2,16,00,000 a month but the monthly limit is ₹1,000: later runs in a month will be refused.",
+   "Gains on digital assets are taxed at 30% in India and losses cannot be set off; 1% is deducted at source when you sell."
+  ]
+ },
+ "3 instruction and signed versions": {
+  "id": "prg_1m81ffqv96wz72f7k1k",
+  "kind": "invest",
+  "title": "Invest ₹500 in Bitcoin in rupees",
+  "state": "completed",
+  "origin": "proposal:prp_1m81ffqtzf7pyvv7chk",
+  "versions": [
+   {
+    "version": 1,
+    "state": "live",
+    "documentHash": "3e0bce0040f1d0c32aaed3b2ea06fc4729d35f5874c0ea042bd1bd8435c865ee",
+    "signed": "2026-11-22 16:45:28.761 IST",
+    "authority": {
+     "maxPerRun": 50000,
+     "maxPerDay": null,
+     "maxPerMonth": 100000,
+     "expiresAt": 1803122128745,
+     "runMode": "auto",
+     "noticeSec": 0,
+     "maxSlippageBps": 100,
+     "maxRuns": 2
+    },
+    "params": {
+     "instrumentId": "coindcx:BTCINR",
+     "amount": 50000,
+     "schedule": {
+      "type": "every",
+      "minutes": 1
+     }
+    },
+    "approval": {
+     "id": "apr_1m81ffqvkd2d7skmce8",
+     "purpose": "program-version",
+     "subject": "program:prg_1m81ffqv96wz72f7k1k@1",
+     "documentHash": "3e0bce0040f1d0c32aaed3b2ea06fc4729d35f5874c0ea042bd1bd8435c865ee",
+     "method": "passkey",
+     "passwordRequired": true,
+     "asked": "2026-11-22 16:45:28.755 IST",
+     "confirmed": "2026-11-22 16:45:28.760 IST",
+     "used": "2026-11-22 16:45:28.761 IST"
+    }
+   }
+  ]
+ },
+ "4 runs": [
+  {
+   "id": "run_1m81fgq9ekm27nsa4z4",
+   "due": "2026-11-22 16:46:00.000 IST",
+   "claimed": "2026-11-22 16:46:00.942 IST",
+   "started": "2026-11-22 16:46:00.944 IST",
+   "finished": "2026-11-22 16:46:00.953 IST",
+   "outcome": "done",
+   "reason": null,
+   "approval": null,
+   "actions": [
+    {
+     "id": "act_1m81fgq9gc48vpdhh07",
+     "outcome": "done",
+     "reference": "prg_1m81ffqv96wz72f7k1k#2026-11-22T11:16:00.000Z#0",
+     "venue": "paper-crypto",
+     "checks": {
+      "passed": 15,
+      "failed": []
+     },
+     "times": {
+      "asked": "2026-11-22 16:46:00.944 IST",
+      "decided": "2026-11-22 16:46:00.949 IST",
+      "submitted": "2026-11-22 16:46:00.949 IST",
+      "executed": "2026-11-22 16:46:00.951 IST",
+      "finished": "2026-11-22 16:46:00.951 IST",
+      "reconciled": "2026-11-22 16:46:00.952 IST"
+     },
+     "latencyMs": {
+      "askedToDecided": 5,
+      "decidedToSubmitted": 0,
+      "submittedToExecuted": 2,
+      "askedToReconciled": 8
+     },
+     "result": {
+      "filledQuantityAtoms": "9000",
+      "movedPaise": "47219",
+      "feesPaise": "277",
+      "taxesPaise": "0",
+      "venueState": "filled"
+     },
+     "ledgerEntries": [
+      {
+       "seq": 2,
+       "kind": "buy",
+       "memo": "Bought 0.00009 BTC at ₹52,15,756.18"
+      }
+     ],
+     "comparedWithVenue": "reconciled",
+     "receipt": {
+      "id": "rcp_1m81fgq9rd2qbjxvsa1",
+      "number": 1,
+      "issued": "2026-11-22 16:46:00.952 IST",
+      "fingerprint": "06ee128d6306b4c00f3a5114e888516d68687f2facd5f5244dee6182996ba5ea",
+      "follows": "310d67fb4e1ea87e551575e835c5473c280360a1fbe65c5f691c7684e77a29a5"
+     }
+    }
+   ]
+  },
+  {
+   "id": "run_1m81fjh0hf6p1gsx8en",
+   "due": "2026-11-22 16:47:00.000 IST",
+   "claimed": "2026-11-22 16:47:00.049 IST",
+   "started": "2026-11-22 16:47:00.050 IST",
+   "finished": "2026-11-22 16:47:00.054 IST",
+   "outcome": "done",
+   "reason": null,
+   "approval": null,
+   "actions": [
+    {
+     "id": "act_1m81fjh0jd5vte15kx3",
+     "outcome": "done",
+     "reference": "prg_1m81ffqv96wz72f7k1k#2026-11-22T11:17:00.000Z#0",
+     "venue": "paper-crypto",
+     "checks": {
+      "passed": 15,
+      "failed": []
+     },
+     "times": {
+      "asked": "2026-11-22 16:47:00.050 IST",
+      "decided": "2026-11-22 16:47:00.052 IST",
+      "submitted": "2026-11-22 16:47:00.052 IST",
+      "executed": "2026-11-22 16:47:00.053 IST",
+      "finished": "2026-11-22 16:47:00.053 IST",
+      "reconciled": "2026-11-22 16:47:00.053 IST"
+     },
+     "latencyMs": {
+      "askedToDecided": 2,
+      "decidedToSubmitted": 0,
+      "submittedToExecuted": 1,
+      "askedToReconciled": 3
+     },
+     "result": {
+      "filledQuantityAtoms": "9000",
+      "movedPaise": "47181",
+      "feesPaise": "277",
+      "taxesPaise": "0",
+      "venueState": "filled"
+     },
+     "ledgerEntries": [
+      {
+       "seq": 3,
+       "kind": "buy",
+       "memo": "Bought 0.00009 BTC at ₹52,11,468.26"
+      }
+     ],
+     "comparedWithVenue": "reconciled",
+     "receipt": {
+      "id": "rcp_1m81fjh0n4rjafjsdw9",
+      "number": 2,
+      "issued": "2026-11-22 16:47:00.053 IST",
+      "fingerprint": "ca441aa1f28ec207e14a0790c56ea43a85a9ee506ea5fe31c05da7acb98eb7e6",
+      "follows": "06ee128d6306b4c00f3a5114e888516d68687f2facd5f5244dee6182996ba5ea"
+     }
+    }
+   ]
+  }
+ ],
+ "5 receipt chain for this owner": {
+  "intact": true,
+  "receipts": 2,
+  "brokenAt": null
+ }
+}

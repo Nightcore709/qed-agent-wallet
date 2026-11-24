@@ -1,0 +1,63 @@
+# QEDOwnerAccount: passkey owner account for the release's QEDVault (R7, D3).
+# Local research build. Nothing here is deployed anywhere but an ephemeral local Anvil.
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+cache_path = "cache"
+libs = ["lib"]
+auto_detect_remappings = false
+# Osaka is required: it activates the P-256 verification precompile at 0x100 (EIP-7951) in the test EVM.
+# Files pinned to solc 0.8.26 (the release's QEDVault and its OpenZeppelin 5.1.0 imports) are compiled with
+# the newest EVM version 0.8.26 supports (cancun), which is what the release itself used.
+evm_version = "osaka"
+optimizer = true
+optimizer_runs = 200
+# The release builds QEDVault with via_ir; keeping the same settings lets the tests compare our build of the
+# vendored source with the release's recorded creation bytecode.
+via_ir = true
+bytecode_hash = "none"
+cbor_metadata = false
+# Read-only access to the release's vendored sources (QEDVault, TestUSD, OpenZeppelin 5.1.0, forge-std 1.9.7).
+allow_paths = ["../vendor"]
+fs_permissions = [
+  { access = "read", path = "./out" },
+  { access = "read", path = "../vendor/agent/src/abi" },
+  { access = "read-write", path = "./evidence" },
+]
+remappings = [
+  "forge-std/=../vendor/lib/forge-std/src/",
+  "@openzeppelin/contracts/=../vendor/lib/openzeppelin-contracts/contracts/",
+  "@oz-5.6.1/=lib/openzeppelin-contracts-5.6.1/",
+  "qed-release/=../vendor/contracts/src/",
+]
+gas_reports = ["QEDOwnerAccount"]
+# Only the read-only forge-std 1.9.7 triggers these under solc 0.8.38 (6335: `error` will become a keyword;
+# 8506: deprecated `pragma experimental ABIEncoderV2`; 2424: deprecated memory-safe NatSpec comment; 4591: solc's
+# "more than 256 warnings" notice about them). Foundry's ignored_warnings_from does not match paths outside the
+# project root, so the codes are filtered instead. Check: FOUNDRY_IGNORED_ERROR_CODES='[]' forge build --force
+# reports warnings only under ../vendor/lib/forge-std.
+ignored_error_codes = [6335, 8506, 2424, 4591]
+
+[profile.seeded]
+# The seeded-bug twin (expected to FAIL): FOUNDRY_PROFILE=seeded forge test
+test = "seeded"
+
+[fuzz]
+runs = 1000
+seed = "0x7e5a"
+
+[invariant]
+runs = 256
+depth = 48
+fail_on_revert = false
+
+[profile.deep.fuzz]
+runs = 10000
+
+[profile.deep.invariant]
+runs = 1024
+depth = 64
+
+[lint]
+lint_on_build = false

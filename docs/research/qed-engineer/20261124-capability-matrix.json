@@ -1,0 +1,241 @@
+{
+ "meta": {
+  "agent": "qed-engineer",
+  "tool": "claude",
+  "date": "2026-11-24",
+  "audit_item": "GL7 (R10-002)",
+  "joins": "docs/research/qed-fin-infra-compliance/20261123-jurisdiction-matrix.json (capabilities C1 to C11; its eligibility columns are not repeated here)",
+  "from": "docs/research/qed-systems-architect/20261123-capability-matrix.md (journeys J-*, column definitions) and apps/qed-demo/CAPABILITIES.md",
+  "real_integrations": "none: no real account, payment provider, broker, exchange, public chain or money is integrated (apps/qed-demo/README.md; D-070)",
+  "columns": {
+   "architecture": "whether the mechanism works for any currency, instrument and region: G generic, G* generic with rupee, test-token or India-time constants inside, L local by construction, \"Not built\"",
+   "integration": "what the capability is connected to in this build; every entry is paper, the local chain, a scripted economy or read-only observation",
+   "execution": "what actually ran, as its status in CAPABILITIES.md or REGISTER.md and its evidence; \"none\" when nothing ran",
+   "dependencies": "what must exist before the row is real"
+  },
+  "status": "Verified against the files named; the claims are about this build only and are not legal advice"
+ },
+ "capabilities": [
+  {
+   "id": "C1",
+   "journeys": [
+    "J-S1",
+    "J-S2",
+    "J-S4"
+   ],
+   "architecture": "G*: INR household payments on a paper rail and tINR vault payments under the D7 mandate; INR and India-time constants inside.",
+   "integration": [
+    "paper rail with UPI, IMPS and NEFT rules (server/venues.ts)",
+    "chain vault payment (valueless test tokens)"
+   ],
+   "evidence": [
+    "server/execute.test.ts",
+    "server/programs.test.ts",
+    "evidence/20261122-vault-journey.json"
+   ],
+   "execution": "F-030 Verified, R7-030 Partly (CAPABILITIES.md; REGISTER.md). On the paper rail and the local chain only.",
+   "dependencies": [
+    "a real payment provider (N-008)",
+    "payee account schemes",
+    "money-model stages S4 and S5"
+   ]
+  },
+  {
+   "id": "C2",
+   "journeys": [
+    "J-P1",
+    "J-G4"
+   ],
+   "architecture": "G*: authority is a signed, bounded document; the vault mandate uses a tINR numeraire with a fixed band (D7).",
+   "integration": [
+    "signed instructions run by the household engine on paper",
+    "vault mandate and co-signer on the local chain"
+   ],
+   "evidence": [
+    "server/programs.test.ts",
+    "evidence/20261122-security-final.json"
+   ],
+   "execution": "R7-070 Met (I) and F-007 Verified: an approval binds one exact document, once. No institution-recognised agent channel exists to test against.",
+   "dependencies": [
+    "an institution-recognised delegation channel (none is integrated)",
+    "Q-049"
+   ]
+  },
+  {
+   "id": "C3",
+   "journeys": [],
+   "architecture": "Not built: no account-data access of any kind; the paper bank is QED's own record.",
+   "integration": [
+    "none"
+   ],
+   "evidence": [],
+   "execution": "none",
+   "dependencies": [
+    "an Account Aggregator or open-banking partner (outside this workspace)"
+   ]
+  },
+  {
+   "id": "C4",
+   "journeys": [
+    "J-S5",
+    "J-V5"
+   ],
+   "architecture": "L: not built. No second currency in the books, no executable FX quote, no second rail.",
+   "integration": [
+    "none"
+   ],
+   "evidence": [],
+   "execution": "none",
+   "dependencies": [
+    "executable FX quotes",
+    "rail registry with sourced limits",
+    "money-model stages S4 and S7"
+   ]
+  },
+  {
+   "id": "C5",
+   "journeys": [
+    "J-S3",
+    "J-S6",
+    "J-V2"
+   ],
+   "architecture": "G: any vault asset; G* in use (pair fixed to tINR and tUSD).",
+   "integration": [
+    "chain vault holding test tokens",
+    "paper bank ledger"
+   ],
+   "evidence": [
+    "evidence/20261122-vault-journey.json",
+    "server/chain-books.test.ts"
+   ],
+   "execution": "F-021, F-022 Verified; F-026 Partly (vault-journey evidence). Test tokens only; nothing is held for anyone.",
+   "dependencies": [
+    "custodial-claim instruments (S2)",
+    "a safeguarding arrangement (outside)"
+   ]
+  },
+  {
+   "id": "C6",
+   "journeys": [
+    "J-S6",
+    "J-V2",
+    "J-G8"
+   ],
+   "architecture": "G on the chain side (any ERC-20-style asset); G* in the books (tINR, tUSD fixed).",
+   "integration": [
+    "local Anvil chain with the release's contracts, valueless tokens",
+    "paper crypto orders priced from observed markets (CoinDCX, Binance, Coinbase, read only)"
+   ],
+   "evidence": [
+    "evidence/20261122-vault-journey.json",
+    "server/programs.test.ts"
+   ],
+   "execution": "F-043 Verified (standing policy ticks by itself, on the local chain). No public chain, no real exchange.",
+   "dependencies": [
+    "an exchange integration",
+    "tax rows per jurisdiction",
+    "S2"
+   ]
+  },
+  {
+   "id": "C7",
+   "journeys": [
+    "J-G1",
+    "J-G2",
+    "J-G3",
+    "J-G4"
+   ],
+   "architecture": "L for funds (AMFI scheme codes, IST cut-offs, INR); equities and ETFs not built.",
+   "integration": [
+    "paper crypto and fund venues (server/venues.ts)",
+    "AMFI NAV observed, read only"
+   ],
+   "evidence": [
+    "server/execute.test.ts",
+    "server/venues.test.ts"
+   ],
+   "execution": "Paper orders verified: funds allot only at the published NAV (server/venues.test.ts). Equities and ETFs: none.",
+   "dependencies": [
+    "a fund platform and a broker (outside)",
+    "ISIN identities (S2)",
+    "S6"
+   ]
+  },
+  {
+   "id": "C8",
+   "journeys": [
+    "J-P6",
+    "J-G9"
+   ],
+   "architecture": "G* : adviser review is a registered-adviser setting (D-088); optimisation mathematics is asset-generic.",
+   "integration": [
+    "adviser review on the server (server/adviser.ts), paper only",
+    "certified min-variance on the chain side"
+   ],
+   "evidence": [
+    "server/adviser.test.ts"
+   ],
+   "execution": "R7-043 Partly (P); R7-052 Partly (E). QED holds no advice licence and says so.",
+   "dependencies": [
+    "adviser roles per jurisdiction",
+    "F-054 owner decision"
+   ]
+  },
+  {
+   "id": "C9",
+   "journeys": [
+    "J-V3"
+   ],
+   "architecture": "L: the Indian fixed-deposit break rule (D-036, D-046).",
+   "integration": [
+    "paper fixed deposits"
+   ],
+   "evidence": [],
+   "execution": "none found by test title (J-V3, 23 Nov)",
+   "dependencies": [
+    "parameter rows per product",
+    "S2 and S7"
+   ]
+  },
+  {
+   "id": "C10",
+   "journeys": [
+    "J-E1",
+    "J-E4",
+    "J-E6"
+   ],
+   "architecture": "G*: escrow in the vault asset (tINR) on the chain; paper jobs in INR.",
+   "integration": [
+    "chain proof escrow (server/earn-chain.ts)",
+    "paper escrow and milestones (server/escrow.ts)"
+   ],
+   "evidence": [
+    "server/escrow.test.ts",
+    "server/earn-chain.test.ts",
+    "browser/tests/earn-chain.spec.ts"
+   ],
+   "execution": "R7-054 Met (P) on the local chain; paper escrow tests. The chain escrow has no acceptance or dispute step (audit E3).",
+   "dependencies": [
+    "safeguarding and escrow licensing (outside)",
+    "S5"
+   ]
+  },
+  {
+   "id": "C11",
+   "journeys": [
+    "J-E8"
+   ],
+   "architecture": "G*: D7 qualifying earnings in tINR; salary on paper.",
+   "integration": [
+    "salary on the paper bank",
+    "earnings recorded from chain settlements"
+   ],
+   "evidence": [],
+   "execution": "none for income verification as such; only the chain side of earnings has evidence (EV-051)",
+   "dependencies": [
+    "an income-verification partner (outside)",
+    "Q-047"
+   ]
+  }
+ ]
+}

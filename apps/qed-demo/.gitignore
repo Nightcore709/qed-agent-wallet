@@ -1,0 +1,19 @@
+# Browser-test artefacts (screenshots, traces, raw axe and contrast JSON, HTML report): large and regenerated on
+# every run. Tracked instead: e2e/results/summary.json and e2e/results/contrast.md.
+e2e/results/artifacts/
+e2e/results/screenshots/
+test-results/
+playwright-report/
+
+# Local database, logs and runtime state: never committed.
+data/
+*.db
+*.db-wal
+*.db-shm
+.env.local
+
+# R7 browser suite output (screenshots, traces); the report is regenerated each run
+browser/results/
+
+# Intermediate design iterations (scripts/design-shots.ts): kept locally, not committed
+evidence/design/wip-*/

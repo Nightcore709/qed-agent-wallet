@@ -1,0 +1,173 @@
+/* Test an idea and the idea's record (/holdings/idea, /holdings/idea/:id; src/screens/Idea.tsx, R13): Grow's central
+   journey. Design system "Meridian", DESIGN.md M4 and M6: the idea and its questions first; then five answers kept
+   apart, each with its own colour only beside its words; the idea against doing nothing on one scale; what it does to
+   the money beside the case against it; the decision; what followed. Every class is the page's own (ix-); shared ones
+   are only scoped under .ix-page. Loaded with the screen's code. Tokens only. */
+
+.ix-page { display: grid; gap: var(--s5); min-width: 0; }
+.ix-page > * { min-width: 0; }
+.ix-head { margin-bottom: 0; }
+.ix-head h1 { max-width: 22ch; }
+/* a record's title is the idea in figures: a statement, not the section's display line */
+.ix-rec-head h1 { font-size: var(--t-statement-sm); max-width: 28ch; }
+.ix-head h1 .dim { color: var(--ink-3); font-weight: 560; }
+.ix-head p { max-width: 62ch; }
+.ix-h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: var(--track-h); margin-bottom: var(--s3); }
+.ix-h3 { margin-top: var(--s5); margin-bottom: var(--s2); font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+.ix-lede { color: var(--ink-2); max-width: 74ch; line-height: 1.5; }
+.ix-fine { font-size: var(--t-small); color: var(--ink-2); max-width: 82ch; line-height: 1.5; }
+.ix-quote { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin-top: var(--s2); }
+.ix-quote > span:first-child { font-size: var(--t-lead); color: var(--ink); font-weight: 560; }
+.ix-fp { font-size: var(--t-micro); font-weight: 500; color: var(--ink-2); }
+.ix-hash { font-family: var(--mono); font-size: var(--t-micro); padding: 2px 6px; border-radius: var(--r-xs); background: color-mix(in oklab, var(--well) 70%, transparent); color: var(--ink); overflow-wrap: anywhere; }
+.ix-page .panel-head h2 { display: inline-flex; align-items: center; gap: 8px; }
+.ix-page .panel-head h2 svg { width: 18px; height: 18px; color: var(--ink-2); }
+
+/* the idea, written or picked, and its questions */
+.ix-ask { display: grid; gap: var(--s4); background: radial-gradient(90% 80% at 0% 0%, color-mix(in oklab, var(--glow-a) 26%, transparent), transparent 64%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.ix-ask-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3); align-items: end; }
+.ix-ask-form .field { margin: 0; }
+.ix-text { font-size: var(--t-lead); }
+.ix-ask-go .btn { min-height: 48px; }
+.ix-picks { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.ix-picks-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); margin-right: var(--s1); }
+.ix-pick { min-height: 44px; padding: 8px 14px; border-radius: var(--r-pill); border: 1px solid var(--rule-2); background: color-mix(in oklab, var(--pane-2) 80%, transparent); color: var(--ink); font: inherit; font-size: var(--t-small); font-weight: 600; text-align: left; cursor: pointer; box-shadow: var(--lift-1); transition: transform var(--d1) var(--ease-out), border-color var(--d1) var(--ease-out); }
+.ix-pick:hover { border-color: var(--brand-line); }
+.ix-pick:active { transform: translateY(1px) scale(.99); }
+.ix-pick[aria-pressed="true"] { border-color: var(--ink); background: color-mix(in oklab, var(--brand-bg) 70%, var(--pane-2)); }
+.ix-read { display: grid; gap: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.ix-heard { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+.ix-heard-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.ix-chip { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: var(--r-pill); background: var(--qed-bg); border: 1px solid var(--qed-line); color: var(--ink); font-size: var(--t-small); font-weight: 600; }
+.ix-q { display: grid; gap: var(--s3); border: 0; padding: 0; margin: 0; min-width: 0; }
+.ix-q legend { font-size: var(--t-lead); font-weight: 650; color: var(--ink); margin-bottom: var(--s2); padding: 0; }
+.ix-q-choices { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.ix-q-amount { display: grid; gap: var(--s3); }
+.ix-q-row { display: grid; grid-template-columns: minmax(0, 18rem) auto; gap: var(--s3); align-items: center; }
+.ix-test { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+
+/* recent ideas */
+.ix-recent-list { display: grid; gap: var(--s2); }
+.ix-recent-row { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 60%, transparent); color: inherit; text-decoration: none; }
+.ix-recent-row:hover { border-color: var(--brand-line); }
+.ix-recent-t { display: grid; gap: 2px; min-width: 0; }
+.ix-recent-t strong { overflow-wrap: anywhere; }
+
+/* five answers, kept apart */
+.ix-judge-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--s3); }
+.ix-jcard { position: relative; display: grid; align-content: start; gap: var(--s2); padding: var(--s4); padding-top: calc(var(--s4) + 4px); border-radius: var(--r-lg); background: var(--pane); box-shadow: var(--lift-1); border: 1px solid var(--rim); overflow: hidden; }
+.ix-jcard::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--ink-4); }
+.ix-jcard.yes::before { background: var(--gain); }
+.ix-jcard.no::before { background: var(--loss); }
+.ix-jcard.caution::before { background: var(--due-mark); }
+/* what the record shows is support, never a guarantee: QED's own colour, not the colour of a pass */
+.ix-jcard.supported.yes::before { background: var(--qed); }
+.ix-jcard h3 { font-size: var(--t-body); font-weight: 650; color: var(--ink); padding-right: 28px; }
+.ix-jcard p { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+.ix-jcard .stamp { justify-self: start; }
+.ix-jcard-i { position: absolute; top: calc(var(--s4) + 2px); right: var(--s4); width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; color: var(--ink-3); background: color-mix(in oklab, var(--well) 60%, transparent); }
+.ix-jcard-i svg { width: 14px; height: 14px; }
+.ix-jcard.yes .ix-jcard-i { color: var(--gain); background: var(--gain-bg); }
+.ix-jcard.no .ix-jcard-i { color: var(--loss); background: var(--loss-bg); }
+.ix-jcard.caution .ix-jcard-i { color: var(--due); background: var(--due-bg); }
+.ix-jcard.supported.yes .ix-jcard-i { color: var(--qed); background: var(--qed-bg); }
+
+/* the idea against doing nothing and the alternatives, one scale */
+.ix-basis { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 620; border: 1px solid var(--rule-2); color: var(--ink); white-space: nowrap; }
+.ix-basis.synthetic { border-style: dashed; }
+.ix-basis.none { border-style: dotted; }
+.ix-alt-list { display: grid; margin-top: var(--s4); border-top: 1px solid var(--rule); }
+.ix-alt { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.45fr) minmax(0, 1fr); gap: var(--s3) var(--s5); align-items: center; padding: var(--s4) 0; border-bottom: 1px solid var(--rule); }
+.ix-alt-what { display: grid; gap: 2px; min-width: 0; }
+.ix-alt-what strong { font-weight: 650; color: var(--ink); }
+.ix-alt-what span { font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.ix-alt.idea .ix-alt-what strong::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--brand); vertical-align: 1px; }
+.ix-alt-none { grid-column: 2 / -1; font-size: var(--t-small); color: var(--ink-2); }
+.ix-alt-figs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); }
+/* a label that wraps never lifts its figure off the row's line: every figure sits at the foot of its cell */
+.ix-alt-figs > div { display: grid; align-content: space-between; gap: 2px; }
+.ix-alt-figs dt { font-size: var(--t-micro); color: var(--ink-2); line-height: 1.3; }
+.ix-alt-figs dd { font-size: var(--t-body); font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.ix-range { position: relative; display: block; height: 14px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--well) 75%, transparent); box-shadow: inset 0 0 0 1px var(--rule); }
+.ix-range-band { position: absolute; top: 3px; bottom: 3px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--c2) 55%, transparent); }
+.ix-alt.idea .ix-range-band { background: color-mix(in oklab, var(--brand) 60%, transparent); }
+.ix-range-mid { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--pane-3); }
+.ix-range-put { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--edge); }
+.ix-key { display: flex; flex-wrap: wrap; gap: 6px var(--s4); margin-top: var(--s3); font-size: var(--t-micro); color: var(--ink-2); }
+.ix-key span { display: inline-flex; align-items: center; gap: 6px; }
+.ix-k-range { display: inline-block; width: 18px; height: 8px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--c2) 55%, transparent); }
+.ix-k-put { display: inline-block; width: 2px; height: 12px; background: var(--edge); }
+.ix-k-mid { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.ix-key-note { margin-top: 4px; }
+.ix-says { display: grid; gap: 6px; margin-top: var(--s4); padding-left: 1.1em; font-size: var(--t-small); color: var(--ink-2); max-width: 86ch; line-height: 1.5; }
+.ix-says li { list-style: disc; }
+
+/* what it does to the money, beside the case against */
+.ix-two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
+.ix-rows { display: grid; }
+/* every row the same at every width: the label (and its line) takes what the figure leaves, the figure stays on the
+   label's baseline at the right */
+.ix-rows > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--s4); padding: var(--s3) 0; border-bottom: 1px solid var(--rule); }
+.ix-rows > div:last-child { border-bottom: 0; }
+.ix-rows dt { display: grid; gap: 2px; font-weight: 600; color: var(--ink); min-width: 0; }
+.ix-rows dt span { font-size: var(--t-small); font-weight: 430; color: var(--ink-2); }
+.ix-rows dd { font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; text-align: right; white-space: nowrap; }
+.ix-costs dd { white-space: normal; max-width: 22ch; font-weight: 600; font-size: var(--t-small); }
+.ix-to { font-weight: 430; color: var(--ink-3); font-size: var(--t-small); }
+.ix-bad { color: var(--loss); }
+.ix-caution { display: flex; gap: var(--s2); align-items: flex-start; margin-top: var(--s3); padding: var(--s3); border-radius: var(--r-md); background: var(--due-bg); color: var(--ink); font-size: var(--t-small); }
+.ix-caution svg { width: 16px; height: 16px; flex: none; color: var(--due); margin-top: 2px; }
+.ix-case-list { display: grid; gap: var(--s3); }
+.ix-case-list li { position: relative; padding-left: var(--s5); line-height: 1.5; color: var(--ink); }
+.ix-case-list li::before { content: ""; position: absolute; left: 2px; top: .6em; width: 8px; height: 8px; border-radius: 2px; }
+.ix-case-list.against li::before { background: var(--loss); }
+.ix-case-list.for li::before { background: var(--gain); border-radius: 50%; }
+
+/* the decision */
+.ix-choices { display: grid; gap: var(--s2); border: 0; padding: 0; margin: 0 0 var(--s4); min-width: 0; }
+.ix-choice { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s3); align-items: start; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rule-2); background: color-mix(in oklab, var(--pane-2) 60%, transparent); cursor: pointer; transition: border-color var(--d1) var(--ease-out), background var(--d1) var(--ease-out); }
+.ix-choice input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--act); }
+.ix-choice.on { border-color: var(--ink); background: color-mix(in oklab, var(--brand-bg) 60%, var(--pane-2)); }
+.ix-choice.off { cursor: not-allowed; opacity: .78; }
+.ix-choice-t { display: grid; gap: 2px; }
+.ix-choice-t strong { font-weight: 650; color: var(--ink); }
+.ix-choice-t span { font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.ix-decide-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: var(--s4); }
+.ix-decide .note { margin-bottom: var(--s4); }
+
+/* what followed */
+.ix-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); margin-bottom: var(--s3); }
+.ix-tiles > div { display: grid; gap: 4px; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 60%, transparent); }
+.ix-tiles dt { font-size: var(--t-small); color: var(--ink-2); }
+.ix-tiles dd { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); font-variant-numeric: tabular-nums lining-nums; color: var(--ink); }
+.ix-checks { margin-top: var(--s3); }
+.ix-checks summary { cursor: pointer; font-weight: 600; color: var(--brand); }
+.ix-checks ul { display: grid; gap: 6px; margin-top: var(--s3); }
+.ix-checks li { display: flex; gap: var(--s2); align-items: flex-start; font-size: var(--t-small); color: var(--ink); }
+.ix-checks li svg { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+.ix-checks li.pass svg { color: var(--gain); }
+.ix-checks li.fail svg { color: var(--loss); }
+.ix-next { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s5); }
+.ix-events { display: grid; gap: var(--s2); font-size: var(--t-small); color: var(--ink); }
+.ix-method summary { display: flex; align-items: center; gap: var(--s2); cursor: pointer; font-weight: 650; color: var(--ink); }
+.ix-method summary svg { width: 18px; height: 18px; color: var(--ink-2); }
+
+@media (max-width: 1100px) {
+  .ix-alt { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); }
+  .ix-alt .ix-range { grid-column: 1 / -1; }
+  .ix-two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  .ix-ask-form { grid-template-columns: minmax(0, 1fr); }
+  .ix-ask-go .btn { width: 100%; }
+  .ix-q-row { grid-template-columns: minmax(0, 1fr); }
+  .ix-alt { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+  .ix-alt-none { grid-column: auto; }
+  .ix-alt-figs dd { font-size: var(--t-small); }
+  .ix-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ix-rows > div { gap: var(--s3); }
+  .ix-pick { width: 100%; }
+  .ix-recent-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .ix-recent-row .stamp { justify-self: start; }
+  .ix-picks-k { width: 100%; }
+}

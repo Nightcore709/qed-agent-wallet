@@ -1,0 +1,123 @@
+{
+ "drill": "restore",
+ "at": "2026-11-22T11:48:55.501Z",
+ "environment": {
+  "node": "v26.12.0",
+  "sqlite": "3.54.0",
+  "openssl": "3.5.9",
+  "platform": "darwin",
+  "arch": "arm64"
+ },
+ "scratch": "(removed)",
+ "fixture": {
+  "households": 6,
+  "entries": 9000,
+  "receipts": 9000,
+  "databaseBytes": 10268672,
+  "buildMs": 649.9
+ },
+ "backups": [
+  {
+   "id": "bk-20261122T114854Z-4efbe8",
+   "keyVersion": 1,
+   "plaintextBytes": 10027008,
+   "ciphertextBytes": 10027361,
+   "timings": {
+    "snapshotMs": 24.3,
+    "sealMs": 18,
+    "totalMs": 60
+   }
+  },
+  {
+   "id": "bk-20261122T114854Z-0ec368",
+   "keyVersion": 2,
+   "plaintextBytes": 10031104,
+   "ciphertextBytes": 10031457,
+   "timings": {
+    "snapshotMs": 17.5,
+    "sealMs": 17.5,
+    "totalMs": 51.9
+   }
+  }
+ ],
+ "restore": {
+  "inProcess": {
+   "checkMs": 4.4,
+   "decryptMs": 12.5,
+   "verifyMs": 62.6,
+   "totalMs": 79.7
+  },
+  "childProcessWallMs": 145.2,
+  "appVerifyWallMs": 198.9,
+  "recoveryTimeMs": 344.1,
+  "olderBackupMs": 80.1
+ },
+ "checks": [
+  {
+   "name": "backups run beside the open service",
+   "ok": true,
+   "detail": "backup 1 under version 1, backup 2 under version 2, both taken with the service's connection open"
+  },
+  {
+   "name": "host A is gone",
+   "ok": true,
+   "detail": "its database and key files are deleted before host B starts"
+  },
+  {
+   "name": "host B restores the newest backup in a separate process, key from the environment only",
+   "ok": true,
+   "detail": "verified: integrity ok, 6 ledgers with 0 breaks, 9001 receipts with 0 broken chains; 145.2 ms wall"
+  },
+  {
+   "name": "the application opens the restored database and \"npm run verify\" passes",
+   "ok": true,
+   "detail": "exit 0; 6 of 6 workspaces consistent and intact; 198.9 ms wall"
+  },
+  {
+   "name": "the restore holds what was written before the backup and not after it (RPO = time since the last backup)",
+   "ok": true,
+   "detail": "the write after backup 1 is present; the write after backup 2 (the newest) is lost, as the backup interval allows; 9001 receipts restored, 9001 expected"
+  },
+  {
+   "name": "backup 1, under the retired version, restores after rotation and re-wrapping",
+   "ok": true,
+   "detail": "verified in 80.1 ms; it predates both later writes"
+  },
+  {
+   "name": "the old key-encryption key no longer opens the keyring",
+   "ok": true,
+   "detail": "wrong_key"
+  },
+  {
+   "name": "a truncated backup fails closed",
+   "ok": true,
+   "detail": "backup_truncated"
+  },
+  {
+   "name": "an altered backup whose manifest was re-hashed to match fails authentication",
+   "ok": true,
+   "detail": "authentication_failed"
+  },
+  {
+   "name": "a restore over the live database without the flag is refused",
+   "ok": true,
+   "detail": "would_overwrite_live"
+  },
+  {
+   "name": "a missing key fails closed",
+   "ok": true,
+   "detail": "key_missing"
+  },
+  {
+   "name": "no sensitive value or key in the backups, manifests, keyring copy or any output",
+   "ok": true,
+   "detail": "5 files searched, 0 with a sensitive value; output searched for 9 values and both keys"
+  },
+  {
+   "name": "positive control: the restored database does hold the sensitive values",
+   "ok": true,
+   "detail": "9 of 9 found in the restored file"
+  }
+ ],
+ "ok": true
+}

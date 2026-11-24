@@ -1,0 +1,125 @@
+{
+ "measuredAt": "2026-11-23T14:49:18.693Z",
+ "base": "http://localhost:5901",
+ "watchMs": 15000,
+ "note": "Lab measures on this computer (headless Chrome, 1440x900, no throttling); not field data.",
+ "results": {
+  "/": {
+   "lcpMs": 136,
+   "cls": 0.0109,
+   "shifts": [
+    {
+     "value": 0.0108,
+     "sources": [
+      "section.hm-needs",
+      "section.instrument-panel.hm-position",
+      "nav.hm-acts",
+      "a.btn",
+      "a.btn.fill"
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/pay": {
+   "lcpMs": 124,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/save": {
+   "lcpMs": 120,
+   "cls": 0.0001,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/holdings": {
+   "lcpMs": 140,
+   "cls": 0.0002,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/earn": {
+   "lcpMs": 120,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/protect": {
+   "lcpMs": 144,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/activity": {
+   "lcpMs": 112,
+   "cls": 0.052,
+   "shifts": [
+    {
+     "value": 0.009,
+     "sources": [
+      "div.act-filter.act-filter-who",
+      "div.act-filter.act-filter-kind",
+      "div.act-filter.act-filter-state"
+     ]
+    },
+    {
+     "value": 0.043,
+     "sources": [
+      "div.panel.act-book",
+      "div.act-filters"
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/ask": {
+   "lcpMs": 112,
+   "cls": 0.0353,
+   "shifts": [
+    {
+     "value": 0.035,
+     "sources": [
+      "ul.starters",
+      "details.rules",
+      "h3.starters-h"
+     ]
+    }
+   ],
+   "interactionMs": null,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/vault": {
+   "lcpMs": 128,
+   "cls": 0.0001,
+   "shifts": [],
+   "interactionMs": 56,
+   "jsKB": 1020,
+   "cssKB": 265,
+   "pass": true
+  }
+ }
+}

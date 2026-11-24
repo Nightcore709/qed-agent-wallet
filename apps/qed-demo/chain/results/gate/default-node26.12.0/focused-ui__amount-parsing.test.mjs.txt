@@ -1,0 +1,17 @@
+✔ ordinary positive amounts still parse to exact micro-token integers (0.957209ms)
+✔ explicit negative and signed numeric amounts are not converted into positive proposals (0.521ms)
+✔ the direct sandbox execution path checks the same malformed signed-amount case (0.196584ms)
+✔ a negative conversion never reaches the AI interpreter or creates a proposal (0.346666ms)
+✔ malformed monetary formats never yield a different positive amount (0.114958ms)
+✔ decimal micro-units and legitimate separators retain their exact values (0.064167ms)
+✔ an invalid financial amount is rejected before AI interpretation (0.168166ms)
+✔ all three execution entrypoints use the same strict numeric parser (0.371417ms)
+✔ a wallet address does not become a second financial amount (0.077541ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 36.825375

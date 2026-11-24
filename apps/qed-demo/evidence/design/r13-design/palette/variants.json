@@ -1,0 +1,81 @@
+{
+ "base": "http://127.0.0.1:9960",
+ "fixture": "(the design fixture account; session not recorded)",
+ "out": "evidence/design/r13-design/palette",
+ "variants": {
+  "A": "",
+  "B": ":root{--part-pay:oklch(56% .08 55)} :root:not([data-theme=light]){} @media (prefers-color-scheme: dark){:root:not([data-theme=light]){--part-pay:oklch(62% .075 58);--part-reach:oklch(74% .055 220)}} :root{} @media (prefers-color-scheme: light){:root{--part-reach:oklch(47% .075 228)}} .meter{height:6px} .hm-tiles .tile.qed,.tile.vt-qed,.vt-fit.qed,.pr-may{border-color:var(--rim)} .tile.vt-lim.binds{border-color:var(--rim);box-shadow:var(--lift-1)}",
+  "C": ":root{--part-pay:oklch(60% .03 64)} @media (prefers-color-scheme: dark){:root:not([data-theme=light]){--part-pay:oklch(66% .028 70);--part-reach:oklch(72% .045 225)}} @media (prefers-color-scheme: light){:root{--part-reach:oklch(46% .06 232)}} .meter{height:5px;box-shadow:none} .meter i{opacity:1} .hm-tiles .tile.qed,.tile.vt-qed,.vt-fit.qed,.pr-may{border-color:var(--rim)} .tile.vt-lim.binds{border-color:var(--rim);box-shadow:var(--lift-1)}"
+ },
+ "shots": [
+  {
+   "name": "home-pos-1440-dark",
+   "route": "/",
+   "sel": ".hm-position",
+   "w": 1440,
+   "theme": "dark"
+  },
+  {
+   "name": "home-lanes-1440-dark",
+   "route": "/",
+   "sel": ".hm-authority",
+   "w": 1440,
+   "theme": "dark"
+  },
+  {
+   "name": "save-goals-1440-dark",
+   "route": "/save",
+   "sel": ".sv-goals",
+   "w": 1440,
+   "theme": "dark"
+  },
+  {
+   "name": "save-goals-390-light",
+   "route": "/save",
+   "sel": ".sv-goals",
+   "w": 390,
+   "theme": "light"
+  },
+  {
+   "name": "vault-lims-1440-dark",
+   "route": "/vault",
+   "sel": ".vt-lims",
+   "w": 1440,
+   "theme": "dark"
+  },
+  {
+   "name": "home-pos-390-light",
+   "route": "/",
+   "sel": ".hm-position",
+   "w": 390,
+   "theme": "light"
+  },
+  {
+   "name": "pay-bar-1440-dark",
+   "route": "/pay",
+   "sel": ".pay-free",
+   "w": 1440,
+   "theme": "dark",
+   "fill": [
+    [
+     ".pay-amount input",
+     "300000"
+    ]
+   ]
+  },
+  {
+   "name": "pay-bar-390-light",
+   "route": "/pay",
+   "sel": ".pay-free",
+   "w": 390,
+   "theme": "light",
+   "fill": [
+    [
+     ".pay-amount input",
+     "300000"
+    ]
+   ]
+  }
+ ],
+ "note": "A as the app was at 99dd3e4; B and C laid over it as CSS (the app unchanged while comparing). B was chosen and is now in tokens.css, components.css, home.css, protect.css, vault.css and shell.css."
+}

@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: non-monetary pitch-deck numbers never become financial proposals
+ok 1 - non-monetary pitch-deck numbers never become financial proposals
+  ---
+  duration_ms: 5.14825
+  type: 'test'
+  ...
+# Subtest: pitch-deck mechanisms are explained honestly and link to real product pages
+ok 2 - pitch-deck mechanisms are explained honestly and link to real product pages
+  ---
+  duration_ms: 1.069958
+  type: 'test'
+  ...
+# Subtest: convert maximum permitted canonicalizes exact on-chain spendable amount
+ok 3 - convert maximum permitted canonicalizes exact on-chain spendable amount
+  ---
+  duration_ms: 1.82775
+  type: 'test'
+  ...
+# Subtest: maximum amount question does not propose or broadcast
+ok 4 - maximum amount question does not propose or broadcast
+  ---
+  duration_ms: 0.3315
+  type: 'test'
+  ...
+# Subtest: unsupported financial instructions cannot acquire a new execution tool
+ok 5 - unsupported financial instructions cannot acquire a new execution tool
+  ---
+  duration_ms: 0.201167
+  type: 'test'
+  ...
+# Subtest: questions about historic financial amounts never create proposals
+ok 6 - questions about historic financial amounts never create proposals
+  ---
+  duration_ms: 0.422958
+  type: 'test'
+  ...
+# Subtest: large authorized-format amounts stay exact and are refused by live limits
+ok 7 - large authorized-format amounts stay exact and are refused by live limits
+  ---
+  duration_ms: 1.459417
+  type: 'test'
+  ...
+# Subtest: maximum spend respects the independent reserve-buffer limit
+ok 8 - maximum spend respects the independent reserve-buffer limit
+  ---
+  duration_ms: 0.434916
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 77.906625

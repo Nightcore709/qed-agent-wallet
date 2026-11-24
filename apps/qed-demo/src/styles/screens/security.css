@@ -1,0 +1,351 @@
+/* Security and recovery, and Workspace (Meridian, DESIGN.md M12). Every rule is scoped to the page's root (.security,
+   .workspace), so these pages are styled here whatever the Protect pages' stylesheet does with the shared pg- and sy-
+   names. The account's state first, as four tiles; then each part as a glass panel, in two independent columns. */
+
+/* ================================================================================================ the base layer, moved here from
+   protect.css in R11 (it carried these pages' rules unchanged): Security (sy-), Workspace (wk-), the page head they
+   share (pg-) and the status mark Security borrows from Protect.tsx (mark-p). The scoped rules below refine it. */
+
+/* ------------------------------------------------------------------------------------------------ the pages' shared parts */
+.security, .workspace { display: grid; gap: var(--s8); min-width: 0; }
+.pg-head h1 { letter-spacing: -.025em; }
+.pg-head p { color: var(--ink-2); margin-top: 6px; max-width: 72ch; }
+.pg-sec { display: grid; gap: var(--s3); min-width: 0; scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+.pg-sec-head { display: grid; gap: 4px; min-width: 0; }
+.pg-sec-t { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s1) var(--s4); }
+.pg-sec-t h2 { font-size: var(--t-h2); letter-spacing: -.01em; }
+.pg-sec-t h3 { font-size: var(--t-h3); }
+.pg-aside { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--t-small); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pg-note { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; max-width: 88ch; }
+.pg-sheet { background: var(--sheet); border-radius: var(--r-md); box-shadow: var(--lift-1); min-width: 0; }
+.mark-p { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; flex: none; background: var(--well); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--rule); }
+.mark-p svg { width: 13px; height: 13px; stroke-width: 2.4; }
+.mark-p.ok { background: var(--gain-bg); color: var(--gain); box-shadow: none; }
+.mark-p.wait { background: var(--due-bg); color: var(--due); box-shadow: none; }
+.mark-p.void { background: var(--loss-bg); color: var(--loss); box-shadow: none; }
+
+/* ------------------------------------------------------------------------------------------------ Security and recovery */
+.sy-test { display: flex; gap: var(--s3); align-items: flex-start; padding: 10px var(--s4); border-radius: var(--r-md); background: var(--due-bg); color: var(--ink-2); font-size: var(--t-small); line-height: 1.5; }
+.sy-test svg { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--due); }
+.sy-test b { color: var(--due); font-weight: 650; }
+.security > .sy-test { margin-top: calc(-1 * var(--s4)); }
+
+/* what needs the owner: full-width rows with a mark on their leading edge and their action on the right */
+.sy-needs { display: grid; gap: var(--s3); }
+.sy-need-list { display: grid; gap: var(--s2); }
+.sy-need { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3) var(--s5); align-items: start; padding: var(--s4) var(--s5) var(--s4) calc(var(--s5) + 3px); background: var(--sheet); border-radius: var(--r-md); box-shadow: var(--lift-1), inset 4px 0 0 var(--due-mark); }
+.sy-need.urgent { box-shadow: var(--lift-1), inset 4px 0 0 var(--loss); }
+.sy-need h3 { font-size: var(--t-body); font-weight: 650; line-height: 1.35; }
+.sy-need p { margin-top: 2px; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); max-width: 88ch; }
+.sy-by { font-size: var(--t-small); font-weight: 400; color: var(--ink-3); }
+.sy-need-acts { display: flex; flex-wrap: wrap; gap: var(--s2); justify-content: flex-end; align-self: center; }
+
+/* a part of a sheet, and the rows in it */
+.sy-part { display: grid; gap: var(--s3); padding: var(--s5) var(--s6); min-width: 0; scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+.sy-part + .sy-part { box-shadow: inset 0 1px 0 var(--rule-2); }
+.sy-part-head { display: grid; gap: 4px; }
+.sy-rows { display: grid; min-width: 0; }
+.sy-rows > li { display: flex; gap: var(--s3) var(--s4); align-items: flex-start; padding: var(--s3) 0; box-shadow: inset 0 1px 0 var(--rule); }
+.sy-keys > li:first-child { box-shadow: none; padding-top: 0; }
+.sy-rows > li:last-child { padding-bottom: 0; }
+.sy-main { flex: 1 1 0%; display: grid; gap: 2px; min-width: 0; }
+.sy-t { font-weight: 620; line-height: 1.4; overflow-wrap: anywhere; }
+.sy-d { font-size: var(--t-small); line-height: 1.45; font-weight: 400; color: var(--ink-3); max-width: 88ch; }
+.sy-s { margin-top: 2px; font-size: var(--t-small); line-height: 1.45; }
+.sy-acts { flex: none; display: flex; flex-wrap: wrap; gap: var(--s2); justify-content: flex-end; align-items: center; }
+.sy-glyph { flex: none; width: 32px; height: 32px; border-radius: 10px; display: inline-grid; place-items: center; background: var(--well); color: var(--ink-2); }
+.sy-glyph svg { width: 16px; height: 16px; stroke-width: 1.75; }
+.sy-glyph.muted { background: transparent; color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--rule-2); }
+.sy-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; margin-left: var(--s2); border-radius: var(--r-xs); background: var(--brand-bg); color: var(--brand); font-size: var(--t-micro); font-weight: 620; vertical-align: 1px; white-space: nowrap; }
+.sy-keys > li[data-state="suspended"] .sy-t, .sy-keys > li[data-state="removed"] .sy-t { color: var(--ink-3); }
+.sy-hint { font-size: var(--t-small); line-height: 1.5; color: var(--ink-3); max-width: 88ch; }
+.sy-add { display: grid; grid-template-columns: minmax(0, 460px) auto; justify-content: start; gap: var(--s2) var(--s4); align-items: end; }
+.sy-add .sy-hint { grid-column: 1 / -1; }
+.sy-contact, .sy-limits { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: flex-end; }
+.sy-contact .field { flex: 0 1 420px; }
+.sy-limits .field { flex: 0 1 240px; }
+.sy-sub { display: grid; gap: var(--s2); padding-top: var(--s4); box-shadow: inset 0 1px 0 var(--rule); min-width: 0; }
+.sy-sub h4 { font-size: var(--t-body); font-weight: 640; }
+.sy-confirm { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: var(--loss-bg); color: var(--ink); }
+.sy-code { white-space: normal; overflow-wrap: anywhere; }
+.sy-needs-for { display: grid; margin: var(--s2) 0; }
+.sy-needs-for > li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: var(--s3); padding: var(--s3) 0; box-shadow: inset 0 1px 0 var(--rule); }
+.sy-disclose { display: flex; flex-wrap: wrap; gap: 0 var(--s6); font-size: var(--t-small); }
+.sy-disclose details { flex: 1 1 100%; min-width: 0; }
+.sy-disclose summary { list-style: none; display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--ink-2); font-weight: 560; }
+.sy-disclose summary::-webkit-details-marker { display: none; }
+.sy-disclose summary::before { content: ""; flex: none; width: 7px; height: 7px; border-right: 1.75px solid currentColor; border-bottom: 1.75px solid currentColor; transform: rotate(-45deg); transition: transform var(--d1) var(--ease-out); }
+.sy-disclose details[open] > summary::before { transform: rotate(45deg); }
+.sy-disclose summary:hover { color: var(--ink); }
+.sy-bullets { display: grid; gap: 4px; margin-top: 6px; padding-left: 18px; list-style: disc; color: var(--ink-2); line-height: 1.5; }
+.sy-kv { margin-top: 6px; }
+
+/* the path a recovery takes: four steps along one line, each with where it stands */
+.sy-path { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s4); padding: var(--s2) 0 var(--s1); }
+.sy-path > li { position: relative; display: grid; gap: var(--s2); align-content: start; min-width: 0; }
+.sy-path > li::before { content: ""; position: absolute; top: 8px; left: 26px; right: calc(-1 * var(--s4) + 4px); height: 2px; border-radius: 1px; background: var(--rule-2); }
+.sy-path > li:last-child::before { display: none; }
+.sy-path .node { position: relative; z-index: 1; width: 18px; height: 18px; border-radius: 50%; background: var(--sheet); box-shadow: inset 0 0 0 2px var(--ink-4); }
+.sy-path li[data-tone="ok"] .node { background: var(--gain); box-shadow: 0 0 0 3px var(--gain-bg); }
+.sy-path li[data-tone="wait"] .node { background: var(--sheet); box-shadow: inset 0 0 0 2.5px var(--due), 0 0 0 3px var(--due-bg); }
+.sy-path li[data-tone="void"] .node { background: var(--loss); box-shadow: 0 0 0 3px var(--loss-bg); }
+.sy-path li[data-tone="end"] .node { background: var(--brand); border-radius: 5px; }
+.sy-path li[data-tone="wait"] .sy-t { color: var(--due); }
+
+/* approving payments: what approves, what a password may do, how many sign, what QED may do unasked */
+.sy-terms > div { display: grid; grid-template-columns: minmax(140px, 230px) minmax(0, 1fr); gap: var(--s1) var(--s6); padding: var(--s4) var(--s6); }
+.sy-terms > div + div { box-shadow: inset 0 1px 0 var(--rule); }
+.sy-terms dt { font-weight: 620; }
+.sy-terms dd { color: var(--ink-2); line-height: 1.5; max-width: 84ch; }
+.sy-terms dd a { font-weight: 600; white-space: nowrap; padding-block: 8px; margin-block: -8px; }
+
+/* what happened */
+.sy-history > li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4); padding: 10px var(--s6); font-size: var(--t-small); line-height: 1.45; }
+.sy-history > li + li { box-shadow: inset 0 1px 0 var(--rule); }
+.sy-history time { flex: none; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.sy-empty { padding: var(--s4) var(--s6); color: var(--ink-3); }
+
+@media (max-width: 1099px) {
+  .sy-path { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: var(--s5); }
+  .sy-path > li:nth-child(2)::before { display: none; }
+}
+@media (max-width: 759px) {
+  .security, .workspace, .readiness { gap: var(--s6); }
+  .sy-add { grid-template-columns: minmax(0, 1fr); }
+  .security > .sy-test { margin-top: 0; }
+  .sy-need { grid-template-columns: minmax(0, 1fr); padding-left: calc(var(--s4) + 3px); padding-right: var(--s4); }
+  .sy-need-acts { justify-content: flex-start; }
+  .sy-part { padding: var(--s4); }
+  .sy-rows > li { flex-wrap: wrap; }
+  .sy-rows > li > .sy-main { flex: 1 1 200px; }
+  .sy-acts { width: 100%; justify-content: flex-start; padding-left: 44px; }
+  .sy-path { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .sy-path > li { grid-template-columns: 18px minmax(0, 1fr); gap: var(--s3); padding-bottom: var(--s3); }
+  .sy-path > li::before, .sy-path > li:nth-child(2)::before { display: block; top: 22px; bottom: -2px; left: 8px; right: auto; width: 2px; height: auto; }
+  .sy-path > li:last-child::before { display: none; }
+  .sy-terms > div { grid-template-columns: minmax(0, 1fr); padding: var(--s3) var(--s4); }
+  .sy-history > li { padding: 10px var(--s4); }
+  .sy-empty { padding: var(--s4); }
+}
+
+/* ------------------------------------------------------------------------------------------------ Workspace */
+.wk-rows { display: grid; min-width: 0; }
+.wk-rows > li { display: flex; gap: var(--s3) var(--s4); align-items: flex-start; padding: var(--s3) var(--s6); }
+.wk-rows > li + li { box-shadow: inset 0 1px 0 var(--rule); }
+.wk-main { flex: 1 1 0%; display: grid; gap: 2px; min-width: 0; }
+.wk-t { font-weight: 620; line-height: 1.4; overflow-wrap: anywhere; }
+.wk-d { font-size: var(--t-small); line-height: 1.45; font-weight: 400; color: var(--ink-3); }
+.wk-acts { flex: none; display: flex; gap: var(--s2); align-items: center; }
+.wk-glyph { flex: none; width: 32px; height: 32px; border-radius: 10px; display: inline-grid; place-items: center; background: var(--well); color: var(--ink-2); }
+.wk-glyph svg { width: 16px; height: 16px; stroke-width: 1.75; }
+.wk-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; margin-left: var(--s2); border-radius: var(--r-xs); background: var(--brand-bg); color: var(--brand); font-size: var(--t-micro); font-weight: 620; vertical-align: 1px; white-space: nowrap; }
+.wk-count { flex: none; display: inline-flex; align-items: baseline; justify-content: center; gap: 1px; min-width: 44px; height: 32px; padding: 6px 8px 0; border-radius: 10px; background: var(--due-bg); color: var(--due); font-weight: 700; font-variant-numeric: tabular-nums; }
+.wk-count small { font-size: var(--t-micro); font-weight: 600; }
+.wk-need { box-shadow: inset 4px 0 0 var(--due-mark); }
+.wk-need + .wk-need { box-shadow: inset 0 1px 0 var(--rule), inset 4px 0 0 var(--due-mark); }
+.wk-empty { padding: var(--s4) var(--s6); color: var(--ink-3); font-size: var(--t-small); }
+.wk-rule { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--s2) var(--s5); padding: var(--s5) var(--s6) var(--s4); }
+.wk-n { font-size: var(--t-fig-l); line-height: 1; font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; color: var(--ink); min-width: 1ch; }
+.wk-rule .wk-d { color: var(--ink-2); margin-top: 2px; }
+.wk-terms > div { display: grid; grid-template-columns: minmax(140px, 200px) minmax(0, 1fr); gap: var(--s1) var(--s6); padding: var(--s3) var(--s6); box-shadow: inset 0 1px 0 var(--rule); }
+.wk-terms dt { font-size: var(--t-small); color: var(--ink-3); padding-top: 1px; }
+.wk-part { display: grid; gap: var(--s3); padding: var(--s4) var(--s6) var(--s5); box-shadow: inset 0 1px 0 var(--rule-2); }
+.wk-hint { font-size: var(--t-small); line-height: 1.5; color: var(--ink-3); max-width: 88ch; }
+.wk-form { display: grid; gap: var(--s3); }
+.wk-form h3 { font-size: var(--t-body); font-weight: 640; }
+.wk-roles { width: 100%; border-collapse: collapse; font-size: var(--t-body); }
+.wk-roles th, .wk-roles td { text-align: left; padding: 10px var(--s3); box-shadow: inset 0 -1px 0 var(--rule); vertical-align: top; }
+.wk-roles thead th { font-size: var(--t-small); font-weight: 560; color: var(--ink-3); box-shadow: inset 0 -1px 0 var(--rule-2); }
+.wk-roles tbody th { font-weight: 640; white-space: nowrap; }
+.wk-roles th:first-child, .wk-roles td:first-child { padding-left: var(--s6); }
+.wk-roles th:last-child, .wk-roles td:last-child { padding-right: var(--s6); }
+.wk-roles .c { width: 64px; text-align: center; }
+.wk-roles tbody tr:last-child th, .wk-roles tbody tr:last-child td { box-shadow: none; }
+.wk-roles tr.you th, .wk-roles tr.you td { background: color-mix(in oklab, var(--brand-bg) 55%, transparent); }
+.wk-yes, .wk-no { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; }
+.wk-yes { background: var(--gain-bg); color: var(--gain); }
+.wk-no { color: var(--ink-3); }
+.wk-yes svg, .wk-no svg { width: 13px; height: 13px; stroke-width: 2.5; }
+.wk-new { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; padding: var(--s4) var(--s6); }
+.wk-new .input { flex: 1 1 220px; max-width: 420px; }
+
+@media (max-width: 759px) {
+  .wk-rows > li { padding: var(--s3) var(--s4); flex-wrap: wrap; }
+  .wk-rows > li > .wk-main { flex: 1 1 200px; }
+  .wk-acts { width: 100%; padding-left: 48px; }
+  .wk-empty { padding: var(--s4); }
+  .wk-rule { padding: var(--s4); }
+  .wk-terms > div { grid-template-columns: minmax(0, 1fr); padding: var(--s3) var(--s4); }
+  .wk-part { padding: var(--s4); }
+  .wk-roles th:first-child, .wk-roles td:first-child { padding-left: var(--s4); }
+  .wk-roles th:last-child, .wk-roles td:last-child { padding-right: var(--s4); }
+  .wk-roles tbody th { white-space: normal; }
+  .wk-new { padding: var(--s4); }
+}
+
+/* ================================================================================================ Meridian: the refinements */
+#content .security, #content .workspace { display: grid; gap: var(--s6); }
+.security .sy-head, .workspace .pg-head { margin-bottom: 0; }
+.workspace .pg-head h1 { font-size: var(--t-display); line-height: 1; letter-spacing: var(--track-hero); font-weight: 650; }
+.workspace .pg-head p { color: var(--ink-2); max-width: 64ch; margin-top: var(--s3); font-size: var(--t-lead); line-height: 1.45; }
+
+/* the state, four tiles that open their part */
+.security .sy-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); }
+.security .sy-tile { display: grid; align-content: start; gap: 4px; min-height: 124px; padding: var(--s4) var(--s5); border-radius: var(--r-md); color: inherit; text-decoration: none; border: 1px solid var(--rim);
+  background: linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); box-shadow: var(--lift-1); transition: transform var(--d-spring) var(--ease-spring), border-color var(--d1) var(--ease-out); }
+.security .sy-tile:hover { transform: translateY(-2px); border-color: var(--edge); }
+.security .sy-tile.wait { background: linear-gradient(152deg, var(--due-bg), transparent 70%), var(--pane); border-color: color-mix(in oklab, var(--due) 30%, transparent); }
+.security .sy-tile.void { background: linear-gradient(152deg, var(--loss-bg), transparent 70%), var(--pane); border-color: color-mix(in oklab, var(--loss) 34%, transparent); }
+.security .sy-tile-k { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.security .sy-tile-k svg { width: 16px; height: 16px; color: var(--ink-3); }
+.security .sy-tile.wait .sy-tile-k svg { color: var(--due); } .security .sy-tile.void .sy-tile-k svg { color: var(--loss); } .security .sy-tile.ok .sy-tile-k svg { color: var(--gain); }
+.security .sy-tile-v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.15; font-variant-numeric: tabular-nums lining-nums; }
+.security .sy-tile-s { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+.security .sy-tile.wait .sy-tile-s { color: var(--due); } .security .sy-tile.void .sy-tile-s { color: var(--loss); }
+
+/* the parts: each a glass panel with its head inside */
+.security .sy-board.board, .workspace .board { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--s5); }
+.security .pg-sec, .workspace .pg-sec, .security .sy-needs { padding: var(--s6); border-radius: var(--r-lg); border: 1px solid var(--rim); box-shadow: var(--lift-1);
+  background: linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); display: grid; gap: var(--s4); align-content: start; }
+.security .sy-needs { background: linear-gradient(152deg, var(--due-bg), transparent 70%), var(--pane); border-color: color-mix(in oklab, var(--due) 30%, transparent); }
+.security .pg-sec-head, .workspace .pg-sec-head, .security .sy-part-head, .workspace .wk-part-head { display: grid; gap: 4px; }
+.security .pg-sec-t, .workspace .pg-sec-t { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.security .pg-sec-t h2, .workspace .pg-sec-t h2 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; }
+.security .pg-sec-t h3, .workspace .pg-sec-t h3 { font-size: var(--t-body); font-weight: 650; }
+.security .pg-aside, .workspace .pg-aside { font-size: var(--t-small); color: var(--ink-3); font-weight: 560; }
+.security .pg-note, .workspace .pg-note { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; max-width: 70ch; }
+.security .pg-sheet, .workspace .pg-sheet { display: grid; gap: var(--s4); background: none; border: 0; box-shadow: none; padding: 0; border-radius: 0; }
+.security .sy-part, .workspace .wk-part { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
+.security .sy-sub { display: grid; gap: var(--s2); padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.security .sy-sub h4 { font-size: var(--t-small); font-weight: 650; }
+
+/* rows: a device or a person, what it is, and what can be done to it */
+.security .sy-rows, .workspace .wk-rows { display: grid; }
+.security .sy-rows > li, .workspace .wk-rows > li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s2) var(--s3); align-items: start; padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.security .sy-rows > li:first-child, .workspace .wk-rows > li:first-child { border-top: 0; padding-top: 0; }
+.security .sy-rows > li[data-state="removed"] { opacity: .6; }
+.security .sy-glyph, .workspace .wk-glyph { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: var(--pane-2); border: 1px solid var(--rim); color: var(--ink-2); flex: none; }
+.security .sy-glyph svg, .workspace .wk-glyph svg { width: 17px; height: 17px; stroke-width: 1.8; }
+.security .sy-glyph.muted { color: var(--ink-4); }
+.security .sy-main, .workspace .wk-main { display: grid; gap: 2px; min-width: 0; }
+.security .sy-t, .workspace .wk-t { font-weight: 640; font-size: var(--t-body); display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.security .sy-d, .workspace .wk-d { font-size: var(--t-small); color: var(--ink-3); line-height: 1.45; font-weight: 430; }
+.security .sy-s { font-size: var(--t-small); line-height: 1.45; } .security .sy-s.void { color: var(--loss); } .security .sy-s.wait { color: var(--due); }
+.security .sy-tag, .workspace .wk-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 650; background: var(--qed-bg); color: var(--qed); border: 1px solid var(--qed-line); }
+.security .sy-acts, .workspace .wk-acts { display: flex; flex-wrap: wrap; gap: var(--s2); justify-content: flex-end; align-items: center; }
+.security .sy-rows > li > .sy-main:first-child { grid-column: 1 / 3; }
+.security .sy-hint, .workspace .wk-hint { font-size: var(--t-small); color: var(--ink-3); line-height: 1.5; }
+.security .sy-by { font-weight: 450; color: var(--ink-3); }
+.security .sy-empty { color: var(--ink-3); }
+
+/* what needs the owner */
+.security .sy-need-list { display: grid; gap: var(--s3); }
+.security .sy-need { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3); align-items: start; padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim); }
+.security .sy-need.urgent { background: var(--loss-bg); border-color: color-mix(in oklab, var(--loss) 34%, transparent); }
+.security .sy-need h3 { font-size: var(--t-body); font-weight: 650; }
+.security .sy-need p { font-size: var(--t-small); color: var(--ink-2); margin-top: 4px; }
+.security .sy-need-acts { display: flex; gap: var(--s2); }
+.security .sy-test { display: flex; gap: var(--s3); align-items: flex-start; padding: var(--s3) var(--s4); border-radius: var(--r-md); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 28%, transparent); font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+.security .sy-test svg { width: 16px; height: 16px; color: var(--due); flex: none; margin-top: 2px; }
+.security .sy-test b { color: var(--due); }
+.security .sy-confirm { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: var(--loss-bg); border: 1px solid color-mix(in oklab, var(--loss) 30%, transparent); }
+
+/* approving payments: terms as label and sentence */
+.security .sy-terms { display: grid; gap: 0; }
+.security .sy-terms > div { display: grid; grid-template-columns: minmax(130px, 34%) minmax(0, 1fr); gap: var(--s1) var(--s4); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.security .sy-terms > div:first-child { border-top: 0; padding-top: 0; }
+.security .sy-terms dt { font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.security .sy-terms dd { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+
+/* a recovery, as the steps it takes */
+.security .sy-path { display: grid; gap: var(--s3); position: relative; padding-left: 2px; }
+.security .sy-path::before { content: ""; position: absolute; left: 11px; top: 12px; bottom: 12px; width: 2px; background: linear-gradient(180deg, var(--rule-2), var(--rule)); }
+.security .sy-path > li { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.security .sy-path .node { width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; background: var(--sheet); border: 2px solid var(--ink-3); position: relative; z-index: 1; }
+.security .sy-path li[data-tone="ok"] .node { background: var(--gain); border-color: var(--gain); box-shadow: 0 0 12px color-mix(in oklab, var(--gain) 55%, transparent); }
+.security .sy-path li[data-tone="wait"] .node { border-color: var(--due); }
+.security .sy-path li[data-tone="void"] .node { border-color: var(--loss); }
+.security .sy-path li[data-tone="end"] .node { border-radius: 6px; border-color: var(--due-mark); background: var(--due-bg); }
+.security .sy-path .sy-t { font-size: var(--t-small); }
+.security .sy-path li[data-tone="wait"] .sy-t { color: var(--due); }
+.security .sy-contact, .security .sy-add, .security .sy-limits { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3); align-items: end; }
+.security .sy-add .sy-hint { grid-column: 1 / -1; }
+.security .sy-needs-for { display: grid; gap: var(--s3); margin: var(--s3) 0; }
+.security .sy-needs-for li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: var(--s2); }
+.security .sy-code { font-size: var(--t-h2); }
+.security .sy-history { display: grid; }
+.security .sy-history li { display: flex; justify-content: space-between; gap: var(--s4); padding: 9px 0; border-top: 1px solid var(--rule); font-size: var(--t-small); }
+.security .sy-history li:first-child { border-top: 0; }
+.security .sy-history time { color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.security .sy-disclose { display: grid; gap: var(--s2); font-size: var(--t-small); }
+.security .sy-disclose summary { min-height: 40px; display: inline-flex; align-items: center; font-weight: 600; color: var(--ink-2); }
+.security .sy-bullets { display: grid; gap: 4px; padding-left: var(--s4); list-style: disc; color: var(--ink-2); }
+.security .sy-kv { font-size: var(--t-small); }
+
+@media (max-width: 1099px) { .security .sy-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 759px) {
+  .security .pg-sec, .workspace .pg-sec, .security .sy-needs { padding: var(--s5) var(--s4); }
+  .security .sy-rows > li, .workspace .wk-rows > li { grid-template-columns: auto minmax(0, 1fr); }
+  .security .sy-rows .sy-acts, .workspace .wk-rows .wk-acts { grid-column: 2; justify-content: flex-start; }
+  .security .sy-terms > div { grid-template-columns: minmax(0, 1fr); }
+  .security .sy-contact, .security .sy-add, .security .sy-limits { grid-template-columns: minmax(0, 1fr); }
+  .security .sy-need { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 420px) { .security .sy-summary { grid-template-columns: minmax(0, 1fr); } .security .sy-tile { min-height: 0; } }
+
+/* Workspace: a form is its field and its button on one line */
+.workspace .wk-form { display: grid; grid-template-columns: minmax(0, 420px) auto; gap: var(--s3); align-items: end; justify-content: start; }
+.workspace .wk-form > .btn { width: auto; }
+@media (max-width: 759px) { .workspace .wk-form { grid-template-columns: minmax(0, 1fr); } }
+.workspace .wk-new { display: grid; grid-template-columns: minmax(0, 420px) auto; gap: var(--s3); align-items: center; justify-content: start; }
+@media (max-width: 759px) { .workspace .wk-new { grid-template-columns: minmax(0, 1fr); } }
+
+/* R13, the passkey group (and every part of this page on a phone). The name and its tag wrap as one line of words, the
+   tag with no indent of its own; what to do if a device is lost and why removing waits are two labelled lines under the
+   keys; adding one has its own small head. On a phone a part is a ruled section of its panel, not a card inside a card
+   inside the panel: three nested boxes left a passkey's details 150 px at 320 px wide. */
+.security .sy-tag { margin-left: 0; }
+.security .sy-t > span:first-child { overflow-wrap: anywhere; }
+.security .sy-pk-rules { display: grid; gap: 0; }
+.security .sy-pk-rules > div { display: grid; grid-template-columns: minmax(120px, 30%) minmax(0, 1fr); gap: var(--s1) var(--s4); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.security .sy-pk-rules > div:first-child { border-top: 0; padding-top: 0; }
+.security .sy-pk-rules > div:last-child { padding-bottom: 0; }
+.security .sy-pk-rules dt { font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.security .sy-pk-rules dd { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.security .sy-add-h { grid-column: 1 / -1; font-size: var(--t-body); font-weight: 650; letter-spacing: -.01em; }
+.security .sy-rows > li:last-child { padding-bottom: 0; }
+@media (max-width: 759px) {
+  .security .pg-sheet { gap: 0; }
+  .security .sy-part { padding: var(--s4) 0 0; margin-top: var(--s4); border: 0; border-top: 1px solid var(--rule-2); border-radius: 0; background: none; }
+  .security .pg-sheet > .sy-part:first-child { margin-top: var(--s1); }
+  .security .sy-pk-rules > div { grid-template-columns: minmax(0, 1fr); }
+  .sy-terms dd a { white-space: normal; }
+  .security .sy-add > .btn { justify-self: stretch; }
+}
+
+/* R12: a code typed beside an address that waits for confirmation */
+.sy-inline { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: end; margin-top: var(--s2); }
+.sy-inline .field { flex: 0 1 12rem; }
+
+/* R12: the recovery path has five steps (email, a second proof, the wait, a passkey that signs in only, approving again):
+   one vertical timeline at every width, as the Meridian rules above draw it, rather than a row of narrow columns that
+   wraps. The older row's connectors are not drawn; the timeline's own line is. */
+.security .sy-path { grid-template-columns: minmax(0, 1fr); }
+.security .sy-path > li::before { display: none; }
+.security .sy-path > li { padding-bottom: 0; }
+
+/* Amount bands and member limits (R13, I1) */
+.wk-bands { display: grid; gap: var(--s3); border: 0; padding: 0; min-width: 0; }
+.wk-bands legend { font-size: var(--t-body); font-weight: 640; padding: 0; margin-bottom: var(--s2); }
+.wk-band-row { align-items: end; }
+.wk-band-x { align-self: end; }
+
+/* The institutional desk (R13): it reuses the workspace page's rows, sheets and tables */
+#content .workspace.desk { gap: var(--s7, var(--s6)); }
+.desk .desk-h { font-size: var(--t-body); font-weight: 640; margin-top: var(--s5); }
+.desk .desk-table { font-variant-numeric: tabular-nums; }
+.desk .desk-note { display: block; font-weight: 400; max-width: 46ch; }
+.desk .desk-cycle { margin-top: var(--s3); }
+.desk .desk-acts { gap: var(--s3); flex-wrap: wrap; margin-top: var(--s3); }
+.desk .desk-report .wk-t svg, .desk .pg-sec-t h2 svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
+.desk .desk-rfq { display: grid; gap: var(--s4); margin-top: var(--s4); }

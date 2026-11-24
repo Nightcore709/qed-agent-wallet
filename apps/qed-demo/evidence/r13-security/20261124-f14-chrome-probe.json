@@ -1,0 +1,84 @@
+{
+ "what": "F-14 manual probe (24 Nov 2026), scratch script, before the fix was written: a page on another local origin (http://127.0.0.1:11500/11501) in Chrome, against a control Anvil started with the rail's pre-R13 flags on an ordinary port and a candidate Anvil on a port the Fetch standard blocks, with --ipc. DNS rebinding simulated with --host-resolver-rules and a Playwright-fulfilled document.",
+ "runs": [
+  {
+   "chromeFlags": "Local Network Access on (default)",
+   "controlPort": 11582,
+   "blockedPort": 6666,
+   "result": {
+    "chrome": "158.0.8127.38",
+    "wsControl": {
+     "opened": true,
+     "log": [
+      "open",
+      "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":31536000}",
+      "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":\"0x0\"}"
+     ]
+    },
+    "wsBlocked": {
+     "opened": false,
+     "log": [
+      "error"
+     ],
+     "closeCode": 1006
+    },
+    "rebindControl": {
+     "nav": "loaded",
+     "res": {
+      "error": "TypeError: Failed to fetch"
+     }
+    },
+    "rebindBlocked": {
+     "nav": "loaded",
+     "res": {
+      "error": "TypeError: Failed to fetch"
+     }
+    },
+    "clockMovedSeconds": {
+     "control": 31536002,
+     "blocked": 0
+    }
+   }
+  },
+  {
+   "chromeFlags": "Local Network Access off (as in browsers without it)",
+   "controlPort": 11583,
+   "blockedPort": 6667,
+   "result": {
+    "chrome": "158.0.8127.38",
+    "wsControl": {
+     "opened": true,
+     "log": [
+      "open",
+      "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":31536000}",
+      "{\"jsonrpc\":\"2.0\",\"id\":2,\"result\":\"0x0\"}"
+     ]
+    },
+    "wsBlocked": {
+     "opened": false,
+     "log": [
+      "error"
+     ],
+     "closeCode": 1006
+    },
+    "rebindControl": {
+     "nav": "loaded",
+     "res": {
+      "status": 200,
+      "body": "{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x7a69\"}"
+     }
+    },
+    "rebindBlocked": {
+     "nav": "loaded",
+     "res": {
+      "error": "TypeError: Failed to fetch"
+     }
+    },
+    "clockMovedSeconds": {
+     "control": 31536002,
+     "blocked": 0
+    }
+   }
+  }
+ ]
+}

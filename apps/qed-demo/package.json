@@ -1,0 +1,63 @@
+{
+  "name": "qed-demo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "QED research demonstration: a complete agent wallet (Spend, Save, Grow, Earn, Protect) on program-first autonomy. Simulated data and services only; no real money moves.",
+  "type": "module",
+  "scripts": {
+    "engine": "node server/main.ts engine",
+    "api": "node server/main.ts api",
+    "status": "node server/main.ts status",
+    "verify": "node server/main.ts verify",
+    "reset": "node server/main.ts reset",
+    "keys:init": "node scripts/backup.ts init-keys",
+    "keys:status": "node scripts/backup.ts status",
+    "backup": "node scripts/backup.ts create",
+    "backup:verify": "node scripts/backup.ts verify",
+    "backup:expire": "node scripts/backup.ts expire",
+    "backup:drill": "node scripts/backup.ts drill",
+    "restore": "node scripts/backup.ts restore",
+    "plaintext:scan": "node scripts/plaintext-copies.ts scan",
+    "plaintext:archive": "node scripts/plaintext-copies.ts archive",
+    "sbom": "sh scripts/sbom.sh",
+    "release:check": "node scripts/release-unchanged.ts",
+    "smoke": "node scripts/smoke.ts",
+    "away": "node scripts/away.ts",
+    "a11y": "node scripts/a11y.ts",
+    "capabilities": "node scripts/capabilities.ts",
+    "dev": "vite --port 5174 --strictPort",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --port 4174 --strictPort",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.5.0",
+    "@noble/curves": "1.9.1",
+    "@noble/hashes": "1.8.0",
+    "@simplewebauthn/browser": "14.0.0",
+    "@simplewebauthn/server": "14.1.0",
+    "lucide-react": "1.68.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.6",
+    "vitest": "5.1.0"
+  },
+  "engines": {
+    "node": ">=26.13.1 <27",
+    "npm": ">=11"
+  }
+}

@@ -1,0 +1,50 @@
+{
+ "route": "/holdings",
+ "width": 1440,
+ "seconds": 20,
+ "at": "2026-11-23T14:44:53.167Z",
+ "report": [
+  {
+   "table": "Your worst case, part by part",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 6
+  },
+  {
+   "table": "Your holdings: how much, the price with its source and age, the value now, the change since bought, the value if each fell by its limit, and the limit",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 20
+  },
+  {
+   "table": "Prices over time, and buying or selling by hand",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 48
+  },
+  {
+   "table": "Digital asset prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 47
+  },
+  {
+   "table": "Fund NAVs; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 24
+  },
+  {
+   "table": "Reference prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 83
+  },
+  {
+   "table": "Ticket quote",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 2
+  }
+ ]
+}

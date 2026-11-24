@@ -1,0 +1,23 @@
+# SCSVS section 4 claims, checked 24 Nov 2026 (forge 1.7.1, offline). QEDOwnerAccount: chain/accounts; existing tests, unmodified.
+# cd chain/accounts && forge build --offline && forge test --offline --match-test '<the eight tests below>'
+[PASS] test_one_approval_is_not_enough_under_threshold_two() (gas: 48273)
+[PASS] test_reused_nonce_rejected() (gas: 201315)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 2.95ms (1.97ms CPU time)
+[PASS] test_a_frozen_assertion_spoils_a_batch_even_beside_enough_others() (gas: 84551)
+[PASS] test_protect_refuses_every_call_outside_the_list() (gas: 193505)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 3.90ms (3.06ms CPU time)
+[PASS] test_a_frozen_passkey_moves_no_money_and_its_mandate_stops_paying() (gas: 15407475)
+[PASS] test_one_passkey_stops_the_agent_at_threshold_two_and_cannot_resume_or_spend() (gas: 15463563)
+[PASS] test_the_release_protective_list_holds_only_calls_that_move_no_money() (gas: 8815359)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 8.40ms (17.26ms CPU time)
+[PASS] test_threshold_member_cannot_make_any_guarded_call_immediately() (gas: 586266)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 9.72ms (4.68ms CPU time)
+Ran 4 test suites in 10.39ms (24.98ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
+
+# READY.json gate: SOLC_VERSION=0.8.38 FORGE_OFFLINE=1 sh scripts/deploy/build-owner-account.sh
+owner-account artifact built; SHA-256 156541539423c81362f3584f162a4820f7333eff3dab8a07950547db8c084417 matches READY.json
+
+# QEDBountyBoard: chain/bounties; cd chain/bounties && forge test --offline --match-test 'test_Judge_AJudgeThatKeepsThePoolMakesEveryRevealRevert|test_Judge_ARevealMayCallOnlyTheJudgesClaimFunction'
+[PASS] test_Judge_AJudgeThatKeepsThePoolMakesEveryRevealRevert() (gas: 572361)
+[PASS] test_Judge_ARevealMayCallOnlyTheJudgesClaimFunction() (gas: 132055)
+Ran 1 test suite in 10.40ms (8.25ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)

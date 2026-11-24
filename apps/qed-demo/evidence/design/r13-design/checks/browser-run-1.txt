@@ -1,0 +1,82 @@
+Running 71 tests using 1 worker
+  ✓   1 browser/tests/account-menu.spec.ts:23:1 › the account menu closes when focus leaves it by Tab or Shift+Tab (1.8s)
+  ✓   2 browser/tests/ask-contradiction.spec.ts:27:1 › two amounts in one question to Ask: the draft cannot be signed until the owner accepts the contradiction, and the acceptance is signed (6.0s)
+  ✓   3 browser/tests/ask-draft.spec.ts:22:1 › a proposal from Ask opened in the editor asks the owner each time, whatever run mode was proposed (2.8s)
+  ✓   4 browser/tests/ask-wallet.spec.ts:12:1 › Ask proposes a standing policy for the on-chain wallet; the owner signs its exact terms once and it runs on the chain (9.2s)
+  ✓   5 browser/tests/ask.spec.ts:28:1 › a conversation: two things asked become two drafts at once, a correction replaces a proposal, and "cancel that" withdraws without asking the model (5.7s)
+  ✓   6 browser/tests/bounties.spec.ts:103:1 › a household without a wallet: Earn links to the bounties; the statements exactly as served, the Sepolia record apart and historical, and a way to set the wallet up (11.0s)
+  ✓   7 browser/tests/bounties.spec.ts:146:1 › a finder checks, commits, reveals and settles a valid claim and its reserve vault receives exactly 1,000 tUSD; a copier of the revealed claim earns nothing; a claim the judge rejects is refused with the judge'
+  ✓   8 browser/tests/business-vault.spec.ts:40:1 › a shared vault needs two different members' passkeys: the owner's alone sends nothing, the second member's completes it, for acceptance, a mandate and a payment (26.4s)
+  ✓   9 browser/tests/business.spec.ts:28:1 › an instruction in a two-signature business takes effect only when a second member signs the same document (20.6s)
+  ✓  10 browser/tests/business.spec.ts:86:1 › a lowering of who must sign waits, every member who may sign sees it on the workspace page, and one of them cancels it (24.3s)
+  ✓  11 browser/tests/chart.spec.ts:15:1 › the price chart states its question, answers it with exact values, gives a table and its source, and reads a point under a finger on a phone (3.5s)
+  ✓  12 browser/tests/earn-chain.spec.ts:48:1 › an earning job between two fresh households through the screens: offered, funded from the client's wallet, delivered and verified on the chain, the provider paid, the authority it earned shown honestly, and a
+  ✓  13 browser/tests/earn-states.spec.ts:74:1 › Earn's states in the browser: a step waiting for your signature (and signing it later), one waiting for the other side's, an offer that lapsed and offered again, and the wallet's service not answering, each 
+  ✓  14 browser/tests/escrow-paper.spec.ts:57:1 › a paper job's review lapses: the escrow releases it to the earner by itself, with its ledger entry and receipt (18.2s)
+  ✓  15 browser/tests/escrow-paper.spec.ts:126:1 › the earner disputes the client taking the money back: decider, deadlines and outcomes named first; the client answers; the household, as the simulated mediator, splits it in exact paise (8.2s)
+  ✓  16 browser/tests/evidence.spec.ts:10:1 › a household reads the evidence for its own wallet operation, step by step, and its hashes check out in the browser; another household cannot open it (14.0s)
+  ✓  17 browser/tests/fund-states.spec.ts:62:1 › a fund purchase: the NAV day in words, each state with its day on the record and Home, then what it was bought at and why it changed (22.4s)
+  ✓  18 browser/tests/goals.spec.ts:44:1 › a goal: QED's monthly figure, signed with the passkey; behind when a contribution lapses; a remedy applied with the passkey (13.6s)
+  ✓  19 browser/tests/historical.spec.ts:26:1 › the recorded evidence of the approved release is readable without a wallet, labelled historical, counted as the manifests count it, and linked to the public explorer (2.1s)
+  ✓  20 browser/tests/instructions.spec.ts:24:1 › a schedule that asks for more than its monthly limit must be accepted point by point before signing, and the acceptance is signed (7.1s)
+  ✓  21 browser/tests/judge.spec.ts:46:1 › the whole flow: the objective and the signed authority, the decision, the checks, one signature, a tick with none, reconciliation, and the case checked in the browser (10.9s)
+  ✓  22 browser/tests/judge.spec.ts:114:1 › a refusal: an instruction hidden in a pasted bill is followed by the double and refused by QED; nothing is sent (599ms)
+  ✓  23 browser/tests/judge.spec.ts:130:1 › revocation and recovery: the policy ended with the passkey, a tick after it refused with nothing mined, then authority restored only by a new signature (6.5s)
+  ✓  24 browser/tests/keyboard.spec.ts:47:1 › by keyboard alone: create an account with a passkey, open the household, pause QED and resume (2.0s)
+  ✓  25 browser/tests/keyboard.spec.ts:70:1 › by keyboard alone: set up the on-chain vault, accept it, sign a mandate and pay, each signed by the passkey (7.3s)
+  ✓  26 browser/tests/lab.spec.ts:31:1 › the lab: the mix and its tax, what can be promised, a dollar hedge, and a proposal the owner signs; nothing trades on its own (21.5s)
+  ✓  27 browser/tests/lookalike.spec.ts:27:1 › a look-alike payee is named as one before it is added and before a payment to it is signed (5.1s)
+  ✓  28 browser/tests/notifications.spec.ts:24:1 › a passkey added to the account is told on Home at once, acknowledged there, and listed as acknowledged (6.6s)
+  ✓  29 browser/tests/outcomes.spec.ts:44:1 › a payment the rail never answers is shown as unanswered, not done or failed, with the money held; a declined one says so and that the money came back (11.7s)
+  ✓  30 browser/tests/passkey-autofill.spec.ts:12:1 › a passkey offered in the handle field signs in with a passkey session, and the explicit button still works (3.7s)
+  ✓  31 browser/tests/passkeys.spec.ts:34:1 › a fresh account is created with a passkey and no password, shows ten recovery codes once, and the database agrees (2.0s)
+  ✓  32 browser/tests/passkeys.spec.ts:52:1 › signs out and back in with the passkey; a sign-in without user verification is refused (3.1s)
+  ✘  33 browser/tests/passkeys.spec.ts:110:1 › a saved code and a contact’s code start a recovery that the signed-in owner sees and cancels; it can then not be completed (21.4s)
+  ✘  34 browser/tests/passkeys.spec.ts:149:1 › a recovery left alone completes after the delay with a new passkey, and shows a new set of saved codes once; the old ones stop working (21.4s)
+  ✓  35 browser/tests/passkeys.spec.ts:180:1 › a stolen passkey is suspended at once from another: its session ends and it can no longer sign in (5.6s)
+  ✓  36 browser/tests/password-change.spec.ts:26:1 › a password account changes its password, then removes it once it has a passkey and an active recovery contact (20.5s)
+  ✓  37 browser/tests/password-prepared.spec.ts:24:1 › a payee added in a password session is named as such on the approval sheet before the passkey is offered, in the signed document, and in Security (12.1s)
+  ✓  38 browser/tests/pause-wallet.spec.ts:10:1 › a paused QED refuses a wallet-policy tick asked for on the policy page and nothing on the vault changes; resumed, the tick runs (14.1s)
+  ✓  39 browser/tests/pause-wallet.spec.ts:45:1 › the pause sheet can pause the on-chain wallet too: once QED is paused the passkey signs the wallet's own pause, the chain records it, and resuming QED says the wallet stays paused (8.5s)
+  ✓  40 browser/tests/pay-bill.spec.ts:49:1 › on a phone, "Pay this bill" lands on the review with the bill chosen (2.1s)
+  ✓  41 browser/tests/pay-bill.spec.ts:73:1 › the signing sheet: a press let go too soon says how to finish; two minutes before it lapses it says so, and "Keep it open" keeps the same terms (2.8s)
+  ✓  42 browser/tests/presentation.spec.ts:19:1 › presentation mode: every screen says its values are synthetic, and nothing from a live provider is in the database or named as a source (5.7s)
+  ✓  43 browser/tests/presentation.spec.ts:47:1 › an order estimate says when and where it was priced, counts down, and cannot be signed once it has lapsed (R7-094) (10.5s)
+  ✓  44 browser/tests/presentation.spec.ts:74:1 › an order’s receipt states its reference price, spread, average, fee and what was delivered, and that the ledger moved exactly that (R7-096) (3.4s)
+  ✓  45 browser/tests/presentation.spec.ts:104:1 › an order larger than the book fills in part: the estimate says so first, the record says what filled and that the rest was cancelled, and the ledger moved only what filled (R7-101) (4.1s)
+  ✓  46 browser/tests/readiness.spec.ts:10:1 › the readiness view names the build and its release, and is never ready while a blocker remains (2.8s)
+  ✓  47 browser/tests/reconciliation.spec.ts:26:1 › a finished payment whose rail record differs is shown as needing attention wherever it appears, never as done (6.1s)
+  ✓  48 browser/tests/recovery.spec.ts:141:1 › forgot password: a link from the outbox sets a new password, ends every session, signs nobody in, and works once (20.2s)
+  ✓  49 browser/tests/recovery.spec.ts:206:1 › an expired link says so plainly and leads to a new one (15.1s)
+  ✓  50 browser/tests/recovery.spec.ts:236:1 › a lost passkey: an email link and a saved code start a recovery that waits; a new link finishes it, and the new passkey signs in (27.5s)
+  ✓  51 browser/tests/recovery.spec.ts:267:1 › the recovered passkey is refused an approval, by the sheet and by the server, until its separate delayed restoration completes (37.3s)
+  ✓  52 browser/tests/recovery.spec.ts:340:1 › a recovery is cancelled from a signed-in device, and again by a recovery contact; each time the account hears of it and nothing completes (32.2s)
+  ✓  53 browser/tests/recovery.spec.ts:417:1 › suspected compromise: every session ends from "If something is wrong", and a stolen passkey is suspended (12.0s)
+  ✓  54 browser/tests/security-no-wallet.spec.ts:12:1 › an account without an on-chain wallet loads Security with no failed request and no console error, is told how to set the wallet up, and sees its signers once it is (7.1s)
+  ✓  55 browser/tests/sessions.spec.ts:12:1 › one session ends another from the security screen: the other is signed out at once, this one stays (5.0s)
+  ✓  56 browser/tests/signup-password.spec.ts:16:1 › a password account sets up, signs in again, and can approve nothing until it adds a passkey (9.0s)
+  ✓  57 browser/tests/statement-period.spec.ts:244:5 › at 390 px › the Statement for last month: its start, its end, its file, and the next period from its end (4.5s)
+  ✓  58 browser/tests/statement-period.spec.ts:245:5 › at 390 px › Activity: a misspelt name, amount and direction filters, nothing found named, and the file's period (14.0s)
+  ✓  59 browser/tests/statement-period.spec.ts:244:5 › at 1440 px › the Statement for last month: its start, its end, its file, and the next period from its end (4.9s)
+  ✓  60 browser/tests/statement-period.spec.ts:245:5 › at 1440 px › Activity: a misspelt name, amount and direction filters, nothing found named, and the file's period (16.2s)
+  ✓  61 browser/tests/statement.spec.ts:31:1 › the bank statement downloads as a CSV that equals the ledger, and a formula-like name is written as text (7.1s)
+  ✓  62 browser/tests/stop.spec.ts:33:1 › a plain pause holds protective selling too; keeping it is a choice the sheet names and the record keeps (4.0s)
+  ✓  63 browser/tests/stop.spec.ts:71:1 › in an emergency one sheet does it: it names what will not happen and what happens anyway, signs out every other session, and Home then says QED may move nothing (5.1s)
+  ✓  64 browser/tests/stop.spec.ts:120:1 › a lost or stolen device: on the signed-out page a saved recovery code pauses QED, all but protective selling, opening no session; the owner's device then shows it paused (4.5s)
+  ✓  65 browser/tests/two-households.spec.ts:138:1 › two households side by side: each pays, converts, sets money aside and signs a policy; one earns from the other through the escrow; one paused, one drained, a scenario; neither reaches the other; after a
+  ✓  66 browser/tests/vault-restart.spec.ts:18:1 › two households keep their own vaults across a restart of every service; a paused vault stays paused and its passkey still signs (30.8s)
+  ✓  67 browser/tests/vault-signers.spec.ts:51:1 › a second passkey becomes a wallet signer, its removal is scheduled and cancelled by the other passkey, a recovery key is set up in the browser without the code leaving it, and a recovery started with that 
+  ✓  68 browser/tests/vault.spec.ts:12:1 › a fresh household sets up its own vault, owned by its passkey; accepting it, a mandate and a payment are each signed by the passkey and checked on the chain (25.3s)
+  ✓  69 browser/tests/vault.spec.ts:77:1 › two households: each has its own vault and owner account, and one pausing its vault leaves the other's untouched (12.0s)
+  ✓  70 browser/tests/wallet-in-place.spec.ts:17:1 › Spend, Save and Grow act on the on-chain wallet in place: each signed with the passkey over exact terms, followed on the page, and each change equal on the chain (21.0s)
+  ✓  71 browser/tests/wallet-receive.spec.ts:15:1 › the wallet gives an address to receive at, copies it whole, and checks an address you were given (16.8s)
+    browser/results/output/passkeys-a-saved-code-and--03ca5-t-can-then-not-be-completed/test-failed-2.png
+    browser/results/output/passkeys-a-saved-code-and--03ca5-t-can-then-not-be-completed/test-failed-1.png
+    browser/results/output/passkeys-a-saved-code-and--03ca5-t-can-then-not-be-completed/test-failed-3.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-1.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-2.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-3.png
+    browser/results/output/passkeys-a-recovery-left-a-aae4d-e-the-old-ones-stop-working/test-failed-4.png
+  2 failed
+  69 passed (19.8m)
+exit 1

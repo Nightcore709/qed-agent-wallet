@@ -1,0 +1,11 @@
+✔ all desktop Agent states derive height from content without delayed scrolling (0.4975ms)
+✔ the rail is out of document grid flow for welcome and active conversation immediately (0.209333ms)
+✔ mobile Agent uses natural height and accessible page scrolling (0.09325ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 34.231291

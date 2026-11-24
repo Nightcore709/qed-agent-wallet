@@ -1,0 +1,14 @@
+✔ first-use agent uses four real routes and an adaptive, non-centred command workspace (1.178416ms)
+✔ deeper Agent routes lead to actual configurable tool forms (0.366167ms)
+✔ financial parameters respect micro-token precision at the native form boundary (0.348459ms)
+✔ Claude connectivity is distinguished from merely configured credentials and offline mode (0.233916ms)
+✔ guest browser identifiers are cryptographically random even outside secure-context randomUUID (0.248917ms)
+✔ the final UI keeps every main destination and protects state-changing tool confirmation (1.511084ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 66.299208

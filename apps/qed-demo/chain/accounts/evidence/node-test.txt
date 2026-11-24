@@ -1,0 +1,38 @@
+▶ chain A (osaka): the release vault owned by a passkey account
+  ✔ the vault set deployed is the release bytecode, and our build of the vendored sources is identical (9.237083ms)
+  ✔ the guard list is on chain as constructed (13.658333ms)
+  ✔ client challenges equal the contract views (5.329916ms)
+  ✔ ownership moves to the account: transferOwnership by the EOA, acceptOwnership through execute with a passkey (24.491375ms)
+  ✔ (a) the old EOA can no longer call any onlyOwner function (29.867875ms)
+  ✔ (b) a mandate signed through ERC-1271 by the account is accepted by the vault for a payment (42.168917ms)
+  ✔ (c) a mandate signature made for another account is refused (15.382959ms)
+  ✔ an assertion made on another local origin is refused on chain (10.031292ms)
+  ✔ replaying an executed batch is refused (nonce) (5.291792ms)
+  ✔ guarded calls: refused on the immediate path; the delayed path runs one after the delay; one is cancelled (210.837292ms)
+  ✔ a scheduled removal is cancelled with one Member assertion (39.470791ms)
+  ✔ recovery: a recovery-code key starts it, the delay runs, anyone finishes it, the new passkey can act (119.161084ms)
+✔ chain A (osaka): the release vault owned by a passkey account (785.18425ms)
+▶ chain B (osaka, chain id 31338): the same account address on another chain
+  ✔ signatures and batches from chain A are refused (140.899541ms)
+✔ chain B (osaka, chain id 31338): the same account address on another chain (141.66925ms)
+▶ chain C (prague: no P-256 precompile)
+  ✔ the account refuses to be deployed where it could never verify a passkey (118.804542ms)
+✔ chain C (prague: no P-256 precompile) (119.159209ms)
+✔ keccak-256 and sha-256 from node:crypto match known vectors (46.650334ms)
+✔ function selectors match cast sig (85.248417ms)
+✔ ABI encoding of execute calldata matches cast calldata (19.756833ms)
+✔ ABI encoding of constructor arguments and of the vault Mandate matches cast abi-encode (67.173166ms)
+✔ strict DER parsing (5.319ms)
+✔ s normalisation: about half of real DER signatures are high-s; normalised ones stay valid (191.559541ms)
+✔ toContractAssertion enforces every on-chain rule before anything is sent (1.923583ms)
+✔ recovery codes: 130 bits, normalised input, deterministic key, raw ECDSA/SHA-256 signature (699.772333ms)
+✔ EIP-712 digests agree with viem hashTypedData (independent implementation, test-only) (347.390125ms)
+✔ release guard list: selectors match cast sig, reasons match the Solidity helper word for word (313.151625ms)
+ℹ tests 24
+ℹ suites 3
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3665.34

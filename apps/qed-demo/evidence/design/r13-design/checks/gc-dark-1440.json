@@ -1,0 +1,23 @@
+{
+  "routes": [
+    "/",
+    "/save",
+    "/protect",
+    "/activity",
+    "/vault",
+    "/vault/treasury",
+    "/vault/mandate",
+    "/vault/convert",
+    "/vault/policy",
+    "/vault/records",
+    "/security",
+    "/safeguards",
+    "/pay",
+    "/record/act_1m86t17w0nvrnr0a3qw",
+    "/instructions/prg_1m86t14ce03mc3mwzry"
+  ],
+  "scheme": "dark",
+  "width": 1440,
+  "checked": 3831,
+  "failures": []
+}

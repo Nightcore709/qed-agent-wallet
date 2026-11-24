@@ -1,0 +1,203 @@
+{
+ "base": "http://localhost:6601",
+ "at": "2026-11-23T13:51:23.606Z",
+ "routes": [
+  "/earn"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/earn 1440 light": {
+   "words": 472,
+   "wordsFirst": 255,
+   "sizes": [
+    12,
+    13,
+    15,
+    17,
+    19,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 1,
+   "under32": 1,
+   "under44": 21,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.138,
+   "inkFirst": 0.228,
+   "blankPage": 0.13,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1649,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 light": {
+   "words": 455,
+   "wordsFirst": 173,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    19,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QED\" 64x32",
+   "smallList": [],
+   "blankFirst": 0.084,
+   "inkFirst": 0.536,
+   "blankPage": 0.2,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 2250,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 1440 dark": {
+   "words": 472,
+   "wordsFirst": 255,
+   "sizes": [
+    12,
+    13,
+    15,
+    17,
+    19,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 9,
+   "contrastMin": 6.04,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 1,
+   "under32": 1,
+   "under44": 21,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.138,
+   "inkFirst": 0.228,
+   "blankPage": 0.13,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1649,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 dark": {
+   "words": 455,
+   "wordsFirst": 173,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    19,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 9,
+   "contrastMin": 6.04,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QED\" 64x32",
+   "smallList": [],
+   "blankFirst": 0.084,
+   "inkFirst": 0.536,
+   "blankPage": 0.2,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 2250,
+   "axe": {},
+   "fault": false
+  }
+ }
+}

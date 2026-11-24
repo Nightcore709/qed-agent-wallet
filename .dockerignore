@@ -1,19 +1,35 @@
-node_modules
-.git
-.github
-lib
-out
-cache
-broadcast
-dist
-.scratch
-*.log
-.keys.env*
-.env
-.env.*
-!.env.example
-*.pem
-evidence/demo-runs
-evidence/local*
-evidence/shadow*
-*.private.json
+# Build context of apps/qed-demo/Dockerfile, built from the repository root (apps/qed-demo/docs/DEPLOY.md). An allow
+# list: everything is left out except the app, the two research files its readiness page reads and the five QA files
+# its judge page reads (the live adversarial run and its re-run, their diagnoses and the call table). Data folders,
+# databases, keys, logs, environment files and dependency folders never reach the image.
+*
+!apps/qed-demo/
+!docs/shared/RISK_REGISTER.md
+!docs/research/qed-fin-infra-compliance/20261123-jurisdiction-matrix.json
+!docs/research/qed-qa-reliability/20261124-adversarial-ask-live-original30.json
+!docs/research/qed-qa-reliability/20261124-adversarial-ask-live-diagnosis.json
+!docs/research/qed-qa-reliability/runs/adversarial-live-calls.tsv
+!docs/research/qed-qa-reliability/20261124-adversarial-ask-live-rerun.json
+!docs/research/qed-qa-reliability/20261124-adversarial-ask-live-rerun-diagnosis.json
+apps/qed-demo/**/node_modules
+apps/qed-demo/data
+apps/qed-demo/dist
+apps/qed-demo/**/.env*
+apps/qed-demo/**/*.db
+apps/qed-demo/**/*.db-wal
+apps/qed-demo/**/*.db-shm
+apps/qed-demo/**/*.kek
+apps/qed-demo/**/*.log
+apps/qed-demo/evidence/**
+!apps/qed-demo/evidence/*.json
+!apps/qed-demo/evidence/*/summary.json
+apps/qed-demo/browser/results
+apps/qed-demo/e2e/results
+apps/qed-demo/test-results
+apps/qed-demo/playwright-report
+apps/qed-demo/chain/.build
+apps/qed-demo/chain/.runs
+apps/qed-demo/chain/accounts/out
+apps/qed-demo/chain/accounts/cache
+apps/qed-demo/chain/zk-optional/vendor
+apps/qed-demo/chain/zk-optional/.build

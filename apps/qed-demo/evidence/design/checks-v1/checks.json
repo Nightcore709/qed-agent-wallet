@@ -1,0 +1,13 @@
+{
+ "what": "Design regression checks from the owner's rejection of the five directions (D-069)",
+ "at": "2026-11-22T10:52:32.535Z",
+ "screens": 30,
+ "findings": [
+  {
+   "route": "/save",
+   "width": 1440,
+   "check": "empty-column",
+   "detail": "columns 1408px and 451px"
+  }
+ ]
+}

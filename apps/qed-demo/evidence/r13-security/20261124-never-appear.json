@@ -1,0 +1,22 @@
+{
+ "what": "published private keys that must never appear (scripts/never-appear.ts)",
+ "root": "../..",
+ "list": [
+  {
+   "name": "the honeypot vault's agent key (Ethereum Sepolia, published by the approved release, 20 Oct 2026)",
+   "address": "0x22f224dd5Db8344E6474c9d165DC273E96c173F5",
+   "source": "chain/vendor/evidence/ethereum-sepolia/manifest.json actors.hpAgent; AgentSet at step D5"
+  },
+  {
+   "name": "the honeypot vault's co-signer key (Ethereum Sepolia, published by the approved release, 20 Oct 2026)",
+   "address": "0x35b370861B06aA2a372f02BdF027f5E324153ab7",
+   "source": "chain/vendor/evidence/ethereum-sepolia/manifest.json actors.hpCosigner; CosignerSet at step D5"
+  }
+ ],
+ "filesScanned": 4991,
+ "filesSkipped": 1,
+ "candidates": 7450,
+ "hits": [],
+ "seconds": 2.8,
+ "notScanned": "ignored files (node_modules among them) and the git history"
+}

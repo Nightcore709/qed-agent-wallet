@@ -1,0 +1,3409 @@
+{
+ "base": "http://localhost:5711",
+ "at": "2026-11-22T12:18:44.288Z",
+ "routes": [
+  "/",
+  "/pay",
+  "/save",
+  "/holdings",
+  "/earn",
+  "/protect",
+  "/activity",
+  "/instructions",
+  "/instructions/new",
+  "/vault",
+  "/safeguards",
+  "/security",
+  "/workspace",
+  "/ask",
+  "/readiness",
+  "/more",
+  "/evidence",
+  "/instructions/prg_1m81jyta5mvjn2sc19z",
+  "/record/act_1m81jyt9d5y9q6d9caw"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/ 1440 light": {
+   "words": 422,
+   "wordsFirst": 235,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 9,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 26,
+   "small24": 8,
+   "under32": 8,
+   "under44": 18,
+   "smallest": "a \"How this is worked out\" 137x18",
+   "smallList": [
+    "a \"To Meera Nair: Rent for November\" 228x19",
+    "a \"Bought 0.0002 BTC at ₹65,05,451.9\" 245x19",
+    "a \"Bought 0.00025 BTC at ₹65,08,069.5\" 254x19",
+    "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 276x19",
+    "a \"City Power\" 72x19",
+    "a \"Fibre Broadband\" 112x19",
+    "a \"City Power\" 72x19",
+    "a \"How this is worked out\" 137x18"
+   ],
+   "blankFirst": 0.22,
+   "inkFirst": 0.312,
+   "blankPage": 0.34,
+   "edgesFirst": 31,
+   "overflow": false,
+   "height": 1608,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 1440 light": {
+   "words": 391,
+   "wordsFirst": 241,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 1,
+   "under44": 25,
+   "smallest": "summary \"Payees that test a failure\" 340x31",
+   "smallList": [
+    "summary \"Payees that test a failure\" 340x31"
+   ],
+   "blankFirst": 0.098,
+   "inkFirst": 0.412,
+   "blankPage": 0.13,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 1325,
+   "axe": {},
+   "fault": false
+  },
+  "/save 1440 light": {
+   "words": 41,
+   "wordsFirst": 41,
+   "sizes": [
+    11.5,
+    13,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 7,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.531,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 1440 light": {
+   "words": 677,
+   "wordsFirst": 208,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 49,
+   "small24": 22,
+   "under32": 23,
+   "under44": 41,
+   "smallest": "a \"Pay it down\" 70x18",
+   "smallList": [
+    "button \"Bitcoin in rupees\" 111x19",
+    "button \"Ether in rupees\" 101x19",
+    "button \"Tether in rupees\" 107x19",
+    "button \"HDFC Overnight Fund (Direct, Growth)\" 249x19",
+    "button \"ICICI Prudential Nifty Next 50 Index Fun\" 382x19",
+    "button \"Kotak Arbitrage Fund (Direct, Growth)\" 247x19",
+    "button \"Motilal Oswal S&P 500 Index Fund (Direct\" 333x19",
+    "button \"Nippon India Liquid Fund (Direct, Growth\" 273x19",
+    "button \"Parag Parikh Flexi Cap Fund (Direct, Gro\" 291x19",
+    "button \"SBI Gold Fund (Direct, Growth)\" 203x19",
+    "button \"UTI Nifty 50 Index Fund (Direct, Growth)\" 265x19",
+    "summary \"Reference prices that cannot be traded h\" 1140x31",
+    "button \"Bitcoin / USD (Coinbase)\" 161x19",
+    "button \"Bitcoin / USDT (Binance)\" 161x19",
+    "button \"Ether / USDT (Binance)\" 151x19"
+   ],
+   "blankFirst": 0.097,
+   "inkFirst": 0.4,
+   "blankPage": 0.22,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 2089,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 1440 light": {
+   "words": 289,
+   "wordsFirst": 273,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 0,
+   "under32": 0,
+   "under44": 16,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.148,
+   "inkFirst": 0.314,
+   "blankPage": 0.15,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1131,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 1440 light": {
+   "words": 41,
+   "wordsFirst": 41,
+   "sizes": [
+    11.5,
+    13,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 7,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.531,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 1440 light": {
+   "words": 170,
+   "wordsFirst": 170,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 3,
+   "under32": 3,
+   "under44": 13,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"Passbook\" 58x18",
+    "a \"See it\" 38x19",
+    "a \"See it\" 38x19"
+   ],
+   "blankFirst": 0.201,
+   "inkFirst": 0.301,
+   "blankPage": 0.09,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 1440 light": {
+   "words": 273,
+   "wordsFirst": 236,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 4,
+   "under32": 4,
+   "under44": 11,
+   "smallest": "a \"park idle cash\" 84x18",
+   "smallList": [
+    "a \"park idle cash\" 84x18",
+    "a \"pay down debt (no-regret check)\" 198x18",
+    "a \"keep a mix in balance\" 130x18",
+    "a \"split income when it arrives\" 166x18"
+   ],
+   "blankFirst": 0.335,
+   "inkFirst": 0.224,
+   "blankPage": 0.27,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1132,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 1440 light": {
+   "words": 253,
+   "wordsFirst": 227,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 23,
+   "small24": 1,
+   "under32": 1,
+   "under44": 15,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.222,
+   "inkFirst": 0.207,
+   "blankPage": 0.18,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 1050,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 1440 light": {
+   "words": 715,
+   "wordsFirst": 320,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    20,
+    21,
+    26,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 32,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.1,
+   "inkFirst": 0.405,
+   "blankPage": 0.22,
+   "edgesFirst": 24,
+   "overflow": false,
+   "height": 1874,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 1440 light": {
+   "words": 1914,
+   "wordsFirst": 364,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 39,
+   "small24": 2,
+   "under32": 4,
+   "under44": 25,
+   "smallest": "a \"Pay bills from 2 payees up to ₹3,000 eac\" 281x19",
+   "smallList": [
+    "summary \"What it does not count\" 738x28",
+    "a \"Pay bills from 2 payees up to ₹3,000 eac\" 281x19",
+    "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 276x19",
+    "summary \"Show all 16\" 772x31"
+   ],
+   "blankFirst": 0.147,
+   "inkFirst": 0.334,
+   "blankPage": 0.74,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 3400,
+   "axe": {},
+   "fault": false
+  },
+  "/security 1440 light": {
+   "words": 314,
+   "wordsFirst": 247,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.157,
+   "inkFirst": 0.249,
+   "blankPage": 0.21,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1448,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 1440 light": {
+   "words": 69,
+   "wordsFirst": 69,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 0,
+   "under32": 0,
+   "under44": 8,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.277,
+   "inkFirst": 0.256,
+   "blankPage": 0.08,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 1440 light": {
+   "words": 148,
+   "wordsFirst": 148,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 8,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.176,
+   "inkFirst": 0.294,
+   "blankPage": 0.11,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 1440 light": {
+   "words": 4238,
+   "wordsFirst": 363,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 3,
+   "under44": 9,
+   "smallest": "summary \"Open risks of lower severity (24); they \" 900x28",
+   "smallList": [
+    "summary \"Open risks of lower severity (24); they \" 900x28",
+    "summary \"Not met or blocked (36)\" 900x28",
+    "summary \"Met in part (61)\" 900x28"
+   ],
+   "blankFirst": 0.203,
+   "inkFirst": 0.345,
+   "blankPage": 1.46,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 3209,
+   "axe": {},
+   "fault": false
+  },
+  "/more 1440 light": {
+   "words": 99,
+   "wordsFirst": 99,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.601,
+   "inkFirst": 0.153,
+   "blankPage": 0.34,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 1440 light": {
+   "words": 41,
+   "wordsFirst": 41,
+   "sizes": [
+    11.5,
+    13,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 7,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.531,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m81jyta5mvjn2sc19z 1440 light": {
+   "words": 806,
+   "wordsFirst": 456,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    17,
+    20,
+    21,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 10,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.065,
+   "inkFirst": 0.454,
+   "blankPage": 0.19,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 2010,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m81jyt9d5y9q6d9caw 1440 light": {
+   "words": 386,
+   "wordsFirst": 310,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 1,
+   "under32": 1,
+   "under44": 8,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"Passbook\" 58x18"
+   ],
+   "blankFirst": 0.145,
+   "inkFirst": 0.305,
+   "blankPage": 0.18,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 1247,
+   "axe": {},
+   "fault": false
+  },
+  "/ 390 light": {
+   "words": 380,
+   "wordsFirst": 136,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 9,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 5,
+   "under32": 5,
+   "under44": 20,
+   "smallest": "a \"City Power\" 67x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"City Power\" 67x18",
+    "a \"Fibre Broadband\" 105x18",
+    "a \"City Power\" 67x18",
+    "a \"How this is worked out\" 137x18"
+   ],
+   "blankFirst": 0.093,
+   "inkFirst": 0.473,
+   "blankPage": 0.11,
+   "edgesFirst": 10,
+   "overflow": false,
+   "height": 2533,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 390 light": {
+   "words": 378,
+   "wordsFirst": 111,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 27,
+   "small24": 1,
+   "under32": 2,
+   "under44": 27,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"Payees that test a failure\" 362x31"
+   ],
+   "blankFirst": 0.058,
+   "inkFirst": 0.611,
+   "blankPage": 0.15,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 2296,
+   "axe": {},
+   "fault": false
+  },
+  "/save 390 light": {
+   "words": 28,
+   "wordsFirst": 28,
+   "sizes": [
+    12.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 9,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.786,
+   "inkFirst": 0.106,
+   "blankPage": 0.71,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 390 light": {
+   "words": 660,
+   "wordsFirst": 139,
+   "sizes": [
+    12,
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.58,
+   "contrastFails": 0,
+   "targets": 43,
+   "small24": 4,
+   "under32": 5,
+   "under44": 33,
+   "smallest": "a \"Pay it down\" 70x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"Reference prices that cannot be traded h\" 362x31",
+    "a \"Pay it down\" 70x18",
+    "a \"Prepay\" 42x18",
+    "a \"Add to it\" 51x18"
+   ],
+   "blankFirst": 0.072,
+   "inkFirst": 0.492,
+   "blankPage": 0.1,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 3020,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 light": {
+   "words": 276,
+   "wordsFirst": 161,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 18,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.084,
+   "inkFirst": 0.55,
+   "blankPage": 0.11,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 1755,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 390 light": {
+   "words": 28,
+   "wordsFirst": 28,
+   "sizes": [
+    12.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 9,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.786,
+   "inkFirst": 0.106,
+   "blankPage": 0.71,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 390 light": {
+   "words": 156,
+   "wordsFirst": 156,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.58,
+   "contrastFails": 0,
+   "targets": 13,
+   "small24": 2,
+   "under32": 2,
+   "under44": 12,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Passbook\" 58x18"
+   ],
+   "blankFirst": 0.053,
+   "inkFirst": 0.522,
+   "blankPage": 0.06,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 859,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 390 light": {
+   "words": 260,
+   "wordsFirst": 176,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 4,
+   "under32": 4,
+   "under44": 13,
+   "smallest": "a \"park idle cash\" 84x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"park idle cash\" 84x18",
+    "a \"keep a mix in balance\" 130x18",
+    "a \"split income when it arrives\" 166x18"
+   ],
+   "blankFirst": 0.058,
+   "inkFirst": 0.53,
+   "blankPage": 0.05,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 1344,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 390 light": {
+   "words": 240,
+   "wordsFirst": 184,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.083,
+   "inkFirst": 0.45,
+   "blankPage": 0.08,
+   "edgesFirst": 2,
+   "overflow": false,
+   "height": 1196,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 390 light": {
+   "words": 702,
+   "wordsFirst": 123,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    19,
+    20,
+    21,
+    24,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 26,
+   "small24": 1,
+   "under32": 1,
+   "under44": 26,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.124,
+   "inkFirst": 0.415,
+   "blankPage": 0.12,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 4046,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 390 light": {
+   "words": 1761,
+   "wordsFirst": 164,
+   "sizes": [
+    12,
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 5.58,
+   "contrastFails": 0,
+   "targets": 28,
+   "small24": 1,
+   "under32": 3,
+   "under44": 23,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"What it does not count\" 328x28",
+    "summary \"Show all 16\" 362x31"
+   ],
+   "blankFirst": 0.06,
+   "inkFirst": 0.495,
+   "blankPage": 0.1,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 5844,
+   "axe": {},
+   "fault": false
+  },
+  "/security 390 light": {
+   "words": 301,
+   "wordsFirst": 224,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 5.81,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 1,
+   "under32": 1,
+   "under44": 12,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.075,
+   "inkFirst": 0.566,
+   "blankPage": 0.19,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 1778,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 390 light": {
+   "words": 56,
+   "wordsFirst": 56,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 10,
+   "small24": 1,
+   "under32": 1,
+   "under44": 10,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.515,
+   "inkFirst": 0.243,
+   "blankPage": 0.47,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 390 light": {
+   "words": 135,
+   "wordsFirst": 114,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.81,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 1,
+   "under32": 1,
+   "under44": 11,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.146,
+   "inkFirst": 0.465,
+   "blankPage": 0.13,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 1053,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 390 light": {
+   "words": 4225,
+   "wordsFirst": 218,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 11,
+   "small24": 1,
+   "under32": 3,
+   "under44": 10,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"Not met or blocked (36)\" 362x28",
+    "summary \"Met in part (61)\" 362x28"
+   ],
+   "blankFirst": 0.06,
+   "inkFirst": 0.622,
+   "blankPage": 0.4,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 5592,
+   "axe": {},
+   "fault": false
+  },
+  "/more 390 light": {
+   "words": 86,
+   "wordsFirst": 86,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 1,
+   "under32": 1,
+   "under44": 15,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.175,
+   "inkFirst": 0.296,
+   "blankPage": 0.17,
+   "edgesFirst": 2,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 390 light": {
+   "words": 28,
+   "wordsFirst": 28,
+   "sizes": [
+    12.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 6.08,
+   "contrastFails": 0,
+   "targets": 9,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.786,
+   "inkFirst": 0.106,
+   "blankPage": 0.71,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m81jyta5mvjn2sc19z 390 light": {
+   "words": 793,
+   "wordsFirst": 159,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    17,
+    19,
+    20,
+    21,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 2,
+   "under32": 2,
+   "under44": 12,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.048,
+   "inkFirst": 0.564,
+   "blankPage": 0.08,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 3824,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m81jyt9d5y9q6d9caw 390 light": {
+   "words": 373,
+   "wordsFirst": 200,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 5.01,
+   "contrastFails": 0,
+   "targets": 10,
+   "small24": 2,
+   "under32": 2,
+   "under44": 10,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Passbook\" 58x18"
+   ],
+   "blankFirst": 0.061,
+   "inkFirst": 0.573,
+   "blankPage": 0.23,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 1939,
+   "axe": {},
+   "fault": false
+  },
+  "/ 1440 dark": {
+   "words": 422,
+   "wordsFirst": 235,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    34
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 10,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 26,
+   "small24": 8,
+   "under32": 8,
+   "under44": 18,
+   "smallest": "a \"How this is worked out\" 137x18",
+   "smallList": [
+    "a \"To Meera Nair: Rent for November\" 228x19",
+    "a \"Bought 0.0002 BTC at ₹65,05,451.9\" 245x19",
+    "a \"Bought 0.00025 BTC at ₹65,08,069.5\" 254x19",
+    "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 276x19",
+    "a \"City Power\" 72x19",
+    "a \"Fibre Broadband\" 112x19",
+    "a \"City Power\" 72x19",
+    "a \"How this is worked out\" 137x18"
+   ],
+   "blankFirst": 0.22,
+   "inkFirst": 0.312,
+   "blankPage": 0.34,
+   "edgesFirst": 31,
+   "overflow": false,
+   "height": 1608,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 1440 dark": {
+   "words": 391,
+   "wordsFirst": 241,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 33,
+   "small24": 0,
+   "under32": 1,
+   "under44": 25,
+   "smallest": "summary \"Payees that test a failure\" 340x31",
+   "smallList": [
+    "summary \"Payees that test a failure\" 340x31"
+   ],
+   "blankFirst": 0.098,
+   "inkFirst": 0.412,
+   "blankPage": 0.13,
+   "edgesFirst": 21,
+   "overflow": false,
+   "height": 1325,
+   "axe": {},
+   "fault": false
+  },
+  "/save 1440 dark": {
+   "words": 41,
+   "wordsFirst": 41,
+   "sizes": [
+    11.5,
+    13,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 7,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.531,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 1440 dark": {
+   "words": 677,
+   "wordsFirst": 208,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 49,
+   "small24": 22,
+   "under32": 23,
+   "under44": 41,
+   "smallest": "a \"Pay it down\" 70x18",
+   "smallList": [
+    "button \"Bitcoin in rupees\" 111x19",
+    "button \"Ether in rupees\" 101x19",
+    "button \"Tether in rupees\" 107x19",
+    "button \"HDFC Overnight Fund (Direct, Growth)\" 249x19",
+    "button \"ICICI Prudential Nifty Next 50 Index Fun\" 382x19",
+    "button \"Kotak Arbitrage Fund (Direct, Growth)\" 247x19",
+    "button \"Motilal Oswal S&P 500 Index Fund (Direct\" 333x19",
+    "button \"Nippon India Liquid Fund (Direct, Growth\" 273x19",
+    "button \"Parag Parikh Flexi Cap Fund (Direct, Gro\" 291x19",
+    "button \"SBI Gold Fund (Direct, Growth)\" 203x19",
+    "button \"UTI Nifty 50 Index Fund (Direct, Growth)\" 265x19",
+    "summary \"Reference prices that cannot be traded h\" 1140x31",
+    "button \"Bitcoin / USD (Coinbase)\" 161x19",
+    "button \"Bitcoin / USDT (Binance)\" 161x19",
+    "button \"Ether / USDT (Binance)\" 151x19"
+   ],
+   "blankFirst": 0.097,
+   "inkFirst": 0.4,
+   "blankPage": 0.22,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 2089,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 1440 dark": {
+   "words": 289,
+   "wordsFirst": 273,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 8,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 0,
+   "under32": 0,
+   "under44": 16,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.148,
+   "inkFirst": 0.314,
+   "blankPage": 0.15,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1131,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 1440 dark": {
+   "words": 41,
+   "wordsFirst": 41,
+   "sizes": [
+    11.5,
+    13,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 7,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.531,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 1440 dark": {
+   "words": 170,
+   "wordsFirst": 170,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 3,
+   "under32": 3,
+   "under44": 13,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"Passbook\" 58x18",
+    "a \"See it\" 38x19",
+    "a \"See it\" 38x19"
+   ],
+   "blankFirst": 0.201,
+   "inkFirst": 0.301,
+   "blankPage": 0.09,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 1440 dark": {
+   "words": 273,
+   "wordsFirst": 236,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 4,
+   "under32": 4,
+   "under44": 11,
+   "smallest": "a \"park idle cash\" 84x18",
+   "smallList": [
+    "a \"park idle cash\" 84x18",
+    "a \"pay down debt (no-regret check)\" 198x18",
+    "a \"keep a mix in balance\" 130x18",
+    "a \"split income when it arrives\" 166x18"
+   ],
+   "blankFirst": 0.335,
+   "inkFirst": 0.224,
+   "blankPage": 0.27,
+   "edgesFirst": 19,
+   "overflow": false,
+   "height": 1132,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 1440 dark": {
+   "words": 253,
+   "wordsFirst": 227,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 23,
+   "small24": 1,
+   "under32": 1,
+   "under44": 15,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.222,
+   "inkFirst": 0.207,
+   "blankPage": 0.18,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 1050,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 1440 dark": {
+   "words": 715,
+   "wordsFirst": 320,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    20,
+    21,
+    26,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 32,
+   "small24": 0,
+   "under32": 0,
+   "under44": 24,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.1,
+   "inkFirst": 0.405,
+   "blankPage": 0.22,
+   "edgesFirst": 24,
+   "overflow": false,
+   "height": 1874,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 1440 dark": {
+   "words": 1913,
+   "wordsFirst": 363,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 39,
+   "small24": 2,
+   "under32": 4,
+   "under44": 25,
+   "smallest": "a \"Pay bills from 2 payees up to ₹3,000 eac\" 281x19",
+   "smallList": [
+    "summary \"What it does not count\" 738x28",
+    "a \"Pay bills from 2 payees up to ₹3,000 eac\" 281x19",
+    "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 276x19",
+    "summary \"Show all 16\" 772x31"
+   ],
+   "blankFirst": 0.147,
+   "inkFirst": 0.335,
+   "blankPage": 0.74,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 3400,
+   "axe": {},
+   "fault": false
+  },
+  "/security 1440 dark": {
+   "words": 314,
+   "wordsFirst": 247,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.157,
+   "inkFirst": 0.249,
+   "blankPage": 0.21,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 1448,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 1440 dark": {
+   "words": 69,
+   "wordsFirst": 69,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 0,
+   "under32": 0,
+   "under44": 8,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.277,
+   "inkFirst": 0.256,
+   "blankPage": 0.08,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 1440 dark": {
+   "words": 148,
+   "wordsFirst": 148,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 0,
+   "under32": 0,
+   "under44": 8,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.176,
+   "inkFirst": 0.294,
+   "blankPage": 0.11,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 1440 dark": {
+   "words": 4238,
+   "wordsFirst": 363,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 3,
+   "under44": 9,
+   "smallest": "summary \"Open risks of lower severity (24); they \" 900x28",
+   "smallList": [
+    "summary \"Open risks of lower severity (24); they \" 900x28",
+    "summary \"Not met or blocked (36)\" 900x28",
+    "summary \"Met in part (61)\" 900x28"
+   ],
+   "blankFirst": 0.203,
+   "inkFirst": 0.345,
+   "blankPage": 1.46,
+   "edgesFirst": 15,
+   "overflow": false,
+   "height": 3209,
+   "axe": {},
+   "fault": false
+  },
+  "/more 1440 dark": {
+   "words": 99,
+   "wordsFirst": 99,
+   "sizes": [
+    11.5,
+    13,
+    13.5,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 22,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "button \"Stop everything\" 124x32",
+   "smallList": [],
+   "blankFirst": 0.601,
+   "inkFirst": 0.153,
+   "blankPage": 0.34,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 1440 dark": {
+   "words": 41,
+   "wordsFirst": 41,
+   "sizes": [
+    11.5,
+    13,
+    14,
+    15,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 1,
+   "under32": 1,
+   "under44": 7,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.531,
+   "inkFirst": 0.219,
+   "blankPage": 0.1,
+   "edgesFirst": 11,
+   "overflow": false,
+   "height": 900,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m81jyta5mvjn2sc19z 1440 dark": {
+   "words": 806,
+   "wordsFirst": 456,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    17,
+    20,
+    21,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 10,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.065,
+   "inkFirst": 0.454,
+   "blankPage": 0.19,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 2010,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m81jyt9d5y9q6d9caw 1440 dark": {
+   "words": 386,
+   "wordsFirst": 310,
+   "sizes": [
+    11.5,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 1,
+   "under32": 1,
+   "under44": 8,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"Passbook\" 58x18"
+   ],
+   "blankFirst": 0.145,
+   "inkFirst": 0.305,
+   "blankPage": 0.18,
+   "edgesFirst": 17,
+   "overflow": false,
+   "height": 1247,
+   "axe": {},
+   "fault": false
+  },
+  "/ 390 dark": {
+   "words": 380,
+   "wordsFirst": 136,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 10,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 5,
+   "under32": 5,
+   "under44": 20,
+   "smallest": "a \"City Power\" 67x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"City Power\" 67x18",
+    "a \"Fibre Broadband\" 105x18",
+    "a \"City Power\" 67x18",
+    "a \"How this is worked out\" 137x18"
+   ],
+   "blankFirst": 0.093,
+   "inkFirst": 0.473,
+   "blankPage": 0.11,
+   "edgesFirst": 10,
+   "overflow": false,
+   "height": 2533,
+   "axe": {},
+   "fault": false
+  },
+  "/pay 390 dark": {
+   "words": 378,
+   "wordsFirst": 111,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 27,
+   "small24": 1,
+   "under32": 2,
+   "under44": 27,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"Payees that test a failure\" 362x31"
+   ],
+   "blankFirst": 0.058,
+   "inkFirst": 0.611,
+   "blankPage": 0.15,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 2296,
+   "axe": {},
+   "fault": false
+  },
+  "/save 390 dark": {
+   "words": 28,
+   "wordsFirst": 28,
+   "sizes": [
+    12.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 9,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.786,
+   "inkFirst": 0.106,
+   "blankPage": 0.71,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/holdings 390 dark": {
+   "words": 660,
+   "wordsFirst": 139,
+   "sizes": [
+    12,
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 43,
+   "small24": 4,
+   "under32": 5,
+   "under44": 33,
+   "smallest": "a \"Pay it down\" 70x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"Reference prices that cannot be traded h\" 362x31",
+    "a \"Pay it down\" 70x18",
+    "a \"Prepay\" 42x18",
+    "a \"Add to it\" 51x18"
+   ],
+   "blankFirst": 0.072,
+   "inkFirst": 0.493,
+   "blankPage": 0.1,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 3020,
+   "axe": {},
+   "fault": false
+  },
+  "/earn 390 dark": {
+   "words": 276,
+   "wordsFirst": 161,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 7.06,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 1,
+   "under32": 1,
+   "under44": 18,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.084,
+   "inkFirst": 0.55,
+   "blankPage": 0.11,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 1755,
+   "axe": {},
+   "fault": false
+  },
+  "/protect 390 dark": {
+   "words": 28,
+   "wordsFirst": 28,
+   "sizes": [
+    12.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 9,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.786,
+   "inkFirst": 0.106,
+   "blankPage": 0.71,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/activity 390 dark": {
+   "words": 156,
+   "wordsFirst": 156,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 13,
+   "small24": 2,
+   "under32": 2,
+   "under44": 12,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Passbook\" 58x18"
+   ],
+   "blankFirst": 0.053,
+   "inkFirst": 0.522,
+   "blankPage": 0.06,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 859,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions 390 dark": {
+   "words": 260,
+   "wordsFirst": 176,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 18,
+   "small24": 4,
+   "under32": 4,
+   "under44": 13,
+   "smallest": "a \"park idle cash\" 84x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"park idle cash\" 84x18",
+    "a \"keep a mix in balance\" 130x18",
+    "a \"split income when it arrives\" 166x18"
+   ],
+   "blankFirst": 0.058,
+   "inkFirst": 0.53,
+   "blankPage": 0.05,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 1344,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/new 390 dark": {
+   "words": 240,
+   "wordsFirst": 184,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.083,
+   "inkFirst": 0.45,
+   "blankPage": 0.08,
+   "edgesFirst": 2,
+   "overflow": false,
+   "height": 1196,
+   "axe": {},
+   "fault": false
+  },
+  "/vault 390 dark": {
+   "words": 702,
+   "wordsFirst": 123,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    19,
+    20,
+    21,
+    24,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 26,
+   "small24": 1,
+   "under32": 1,
+   "under44": 26,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.124,
+   "inkFirst": 0.415,
+   "blankPage": 0.12,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 4046,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 390 dark": {
+   "words": 1760,
+   "wordsFirst": 164,
+   "sizes": [
+    12,
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    17,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 28,
+   "small24": 1,
+   "under32": 3,
+   "under44": 23,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"What it does not count\" 328x28",
+    "summary \"Show all 16\" 362x31"
+   ],
+   "blankFirst": 0.06,
+   "inkFirst": 0.495,
+   "blankPage": 0.1,
+   "edgesFirst": 6,
+   "overflow": false,
+   "height": 5844,
+   "axe": {},
+   "fault": false
+  },
+  "/security 390 dark": {
+   "words": 301,
+   "wordsFirst": 224,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 5,
+   "contrastMin": 7.03,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 1,
+   "under32": 1,
+   "under44": 12,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.075,
+   "inkFirst": 0.566,
+   "blankPage": 0.19,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 1778,
+   "axe": {},
+   "fault": false
+  },
+  "/workspace 390 dark": {
+   "words": 56,
+   "wordsFirst": 56,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 10,
+   "small24": 1,
+   "under32": 1,
+   "under44": 10,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.515,
+   "inkFirst": 0.243,
+   "blankPage": 0.47,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/ask 390 dark": {
+   "words": 135,
+   "wordsFirst": 114,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 7.03,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 1,
+   "under32": 1,
+   "under44": 11,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.146,
+   "inkFirst": 0.465,
+   "blankPage": 0.13,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 1053,
+   "axe": {},
+   "fault": false
+  },
+  "/readiness 390 dark": {
+   "words": 4225,
+   "wordsFirst": 218,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.06,
+   "contrastFails": 0,
+   "targets": 11,
+   "small24": 1,
+   "under32": 3,
+   "under44": 10,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "summary \"Not met or blocked (36)\" 362x28",
+    "summary \"Met in part (61)\" 362x28"
+   ],
+   "blankFirst": 0.06,
+   "inkFirst": 0.622,
+   "blankPage": 0.4,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 5592,
+   "axe": {},
+   "fault": false
+  },
+  "/more 390 dark": {
+   "words": 86,
+   "wordsFirst": 86,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 16,
+   "small24": 1,
+   "under32": 1,
+   "under44": 15,
+   "smallest": "a \"QEDTest assets, live prices\" 44x20",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20"
+   ],
+   "blankFirst": 0.175,
+   "inkFirst": 0.296,
+   "blankPage": 0.17,
+   "edgesFirst": 2,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/evidence 390 dark": {
+   "words": 28,
+   "wordsFirst": 28,
+   "sizes": [
+    12.5,
+    14,
+    15,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 4,
+   "contrastMin": 7.67,
+   "contrastFails": 0,
+   "targets": 9,
+   "small24": 2,
+   "under32": 2,
+   "under44": 9,
+   "smallest": "a \"Back to the passbook\" 144x19",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Back to the passbook\" 144x19"
+   ],
+   "blankFirst": 0.786,
+   "inkFirst": 0.106,
+   "blankPage": 0.71,
+   "edgesFirst": 1,
+   "overflow": false,
+   "height": 844,
+   "axe": {},
+   "fault": false
+  },
+  "/instructions/prg_1m81jyta5mvjn2sc19z 390 dark": {
+   "words": 793,
+   "wordsFirst": 159,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    13.5,
+    14,
+    15,
+    15.5,
+    16,
+    17,
+    19,
+    20,
+    21,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 12,
+   "small24": 2,
+   "under32": 2,
+   "under44": 12,
+   "smallest": "a \"Standing instructions\" 128x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Standing instructions\" 128x18"
+   ],
+   "blankFirst": 0.048,
+   "inkFirst": 0.564,
+   "blankPage": 0.08,
+   "edgesFirst": 5,
+   "overflow": false,
+   "height": 3824,
+   "axe": {},
+   "fault": false
+  },
+  "/record/act_1m81jyt9d5y9q6d9caw 390 dark": {
+   "words": 373,
+   "wordsFirst": 200,
+   "sizes": [
+    12.5,
+    13.5,
+    14,
+    15,
+    16,
+    20,
+    24
+   ],
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "families": [
+    "IBM Plex Sans Variable",
+    "IBM Plex Serif"
+   ],
+   "colours": 6,
+   "contrastMin": 6.55,
+   "contrastFails": 0,
+   "targets": 10,
+   "small24": 2,
+   "under32": 2,
+   "under44": 10,
+   "smallest": "a \"Passbook\" 58x18",
+   "smallList": [
+    "a \"QEDTest assets, live prices\" 44x20",
+    "a \"Passbook\" 58x18"
+   ],
+   "blankFirst": 0.061,
+   "inkFirst": 0.573,
+   "blankPage": 0.23,
+   "edgesFirst": 3,
+   "overflow": false,
+   "height": 1939,
+   "axe": {},
+   "fault": false
+  }
+ }
+}

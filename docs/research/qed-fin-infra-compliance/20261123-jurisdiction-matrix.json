@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "agent": "qed-fin-infra-compliance",
+    "tool": "claude",
+    "researched": "2026-11-23",
+    "twin_of": "docs/research/qed-fin-infra-compliance/20261123-jurisdiction-matrix.md",
+    "companion": "docs/research/qed-fin-infra-compliance/20261123-bank-agent-terms.md",
+    "reuses": ["docs/research/qed-fin-infra-compliance/20261121-r7-regulatory-requirements.md", "docs/research/qed-fin-infra-compliance/20261118-live-data-entitlements.md", "docs/research/qed-fin-infra-compliance/20261117-r4-market-access-and-enforcement.md"],
+    "status": "research summary, not legal advice; no cell means QED may act with real money",
+    "qed_today": "test tokens on a local chain in every jurisdiction (D4, D5); India first for any approved production (R7 D-a)",
+    "labels": ["Verified", "Hypothesis-R", "Hypothesis-S", "Hypothesis-NV", "Analysis", "Conflict"],
+    "verdict_codes": {
+      "P": "a licensed-partner route exists (QED as technology provider; counsel to confirm)",
+      "L": "QED would need its own licence or registration for the design as built",
+      "X": "not offered by QED's design",
+      "C": "classification unresolved; counsel needed",
+      "O": "owner-only display under the provider's terms"
+    },
+    "columns": {"IN": "India", "US": "United States", "UK": "United Kingdom", "EU": "European Union", "SG": "Singapore", "AE": "United Arab Emirates", "GL": "global architectural support (code built once; not a legal service)"},
+    "cell_fields": ["licence", "partner_model", "kyc_aml_sanctions", "data_residency", "market_data", "verdict", "labels", "sources"]
+  },
+  "capabilities": [
+    {
+      "id": "C1",
+      "name": "Domestic payments from the user's own account",
+      "cells": {
+        "IN": {"licence": "RBI authorisation to operate a payment system (PSS Act s.4); non-bank payment aggregator authorisation if collecting and settling for merchants (Rs 15 crore net worth at application, Rs 25 crore by FY3); payment gateway without funds out of scope (PA MD 10(g))", "partner_model": "bank, authorised PA or UPI PSP bank; QED initiates from the user's own account, never pools (R7 CUS-01)", "kyc_aml_sanctions": "partner CDD under KYC Directions 2025; UNSC, UAPA and WMD list screening; originator and beneficiary data at Rs 50,000 and above", "data_residency": "payment-system data only in India (RBI 2018)", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["R7:G01", "R7:G03", "R7:G09"]},
+        "US": {"licence": "money transmission (FinCEN MSB 31 CFR 1022.380; state licences) if QED receives and transmits funds; not if the user's bank or a licensed processor initiates and QED never holds funds (Analysis; legal review)", "partner_model": "originating bank under Nacha rules, or a processor", "kyc_aml_sanctions": "partner BSA/AML and customer identification; OFAC SDN with the 50% rule", "data_residency": "no general federal localisation; GLBA; state privacy laws", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-NV", "Hypothesis-S"], "sources": ["R7:4.1", "R4:S38"]},
+        "UK": {"licence": "payment institution or EMI authorisation (PSRs 2017, EMRs 2011), PIS registration, or agent of one", "partner_model": "FCA-authorised PI, EMI or TPP; banks may refuse a TPP on fraud risk", "kyc_aml_sanctions": "MLRs 2017; UK Sanctions List only since 28 Jan 2026; APP reimbursement on Faster Payments", "data_residency": "UK GDPR transfer rules; India not adequate", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["R7:G18", "B41", "B10"]},
+        "EU": {"licence": "PSD2 PI or EMI authorisation (passported) or PIS registration", "partner_model": "licensed PI, EMI or PISP", "kyc_aml_sanctions": "AMLD now, AMLR from 10 Jul 2027; EU consolidated list; payee name check under the PSR once in force", "data_residency": "GDPR Chapter V; no India adequacy decision", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["B50", "R7:4.1"]},
+        "SG": {"licence": "PSA 2019 services: domestic money transfer, account issuance, e-money issuance; standard or major payment institution licence by volume (classes and thresholds NV)", "partner_model": "licensed payment institution or bank", "kyc_aml_sanctions": "MAS Notice PSN01 (NV); MAS targeted financial sanctions (NV); E-Payments User Protection Guidelines from 16 Dec 2024", "data_residency": "PDPA transfer limitation; no general MAS localisation (NV)", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["J02", "J03"]},
+        "AE": {"licence": "CBUAE retail payment services licence (RPSCS Regulation 2021); Federal Decree-Law No. 6 of 2025 Art 62 reaches technology platforms facilitating licensed activities, reconciliation by about 16 Sep 2026; DIFC and ADGM separate", "partner_model": "CBUAE-licensed PSP or bank; whether QED falls under Art 62 needs counsel", "kyc_aml_sanctions": "federal AML/CFT law and goAML (NV); UN and local terrorist lists (NV)", "data_residency": "CBUAE payment and personal data localisation (S); PDPL (NV)", "market_data": "n/a", "verdict": "P,C", "labels": ["Hypothesis-S", "Hypothesis-NV"], "sources": ["J05", "J08"]},
+        "GL": {"licence": "none (code)", "partner_model": "partner of record per jurisdiction in the registry (proposed N-022)", "kyc_aml_sanctions": "sanctions-screening hook before payee creation and every payment; multi-regime list registry (R7 SAN-01, SAN-04)", "data_residency": "data-residency tag per record; region-pinned storage (R7 PRV-07)", "market_data": "n/a", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C2",
+      "name": "Agent-initiated payment delegation through an institution-recognised channel (credential-based agents excluded everywhere)",
+      "cells": {
+        "IN": {"licence": "mandate debits initiated by the payee's PSP; UPI Circle delegation only for NPCI-authorised software; NPCI agent protocol reported, unpublished", "partner_model": "e-mandate (UPI AutoPay, card, e-NACH) via regulated partner; caps fixed at mandate creation because debits ignore other customer limits (N-004)", "kyc_aml_sanctions": "partner KYC; liability under RBI directions; from 1 Jan 2027 customer negligence includes careless use of credentials", "data_residency": "payment-data localisation", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-S"], "sources": ["R7:G07", "B60", "R4:S11", "B64"]},
+        "US": {"licence": "no open-banking payment-initiation rule; ACH debit authorisation through an originating bank (Nacha, NV); card agent tokens via networks and issuers (S); credential-based agents carry the customer's risk under bank terms", "partner_model": "ACH originator partner or card agent-token programme", "kyc_aml_sanctions": "partner programme; OFAC", "data_residency": "none general", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-S", "Hypothesis-NV"], "sources": ["B02", "B03", "B04", "B06", "B07", "B71", "B72"]},
+        "UK": {"licence": "PIS through an authorised TPP; commercial VRP via UK Payments Initiative participants since 2 Jun 2026", "partner_model": "authorised TPP", "kyc_aml_sanctions": "MLRs; APP regime (coverage of agent-deceived payments unresolved)", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-S", "Hypothesis-NV", "Analysis"], "sources": ["B43", "B41", "B45", "B44"]},
+        "EU": {"licence": "PIS with strong customer authentication per payment; no commercial VRP standard found", "partner_model": "licensed PISP", "kyc_aml_sanctions": "AMLD/AMLR; payee name check under the PSR once in force", "data_residency": "GDPR", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-NV", "Verified"], "sources": ["B52", "B50"]},
+        "SG": {"licence": "no agent-payment channel found in sources read", "partner_model": "unresolved", "kyc_aml_sanctions": "MAS notices; EUPG (version Verified); Shared Responsibility Framework (S)", "data_residency": "PDPA", "market_data": "n/a", "verdict": "C", "labels": ["Hypothesis-NV", "Hypothesis-S"], "sources": ["J03"]},
+        "AE": {"licence": "CBUAE Open Finance Regulation: Service Initiation licence, or deemed for existing licensees", "partner_model": "licensed open-finance provider (S)", "kyc_aml_sanctions": "as C1", "data_residency": "as C1", "market_data": "n/a", "verdict": "P,C", "labels": ["Hypothesis-S"], "sources": ["J06"]},
+        "GL": {"licence": "none", "partner_model": "channel adapters derive mandate, VRP or token parameters from the signed instruction, never wider (N-016); revocation reaches every channel and records acknowledgements (N-017); agent identity (N-021)", "kyc_aml_sanctions": "exact-term passkey approval as an additional control (D3 layer 2)", "data_residency": "as C1", "market_data": "n/a", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C3",
+      "name": "Account-data access (open banking, Account Aggregator)",
+      "cells": {
+        "IN": {"licence": "AA data user (FIU) must be registered with and regulated by a financial sector regulator; AA may not support transactions", "partner_model": "regulated FIU partner; QED cannot be the FIU itself", "kyc_aml_sanctions": "via partner", "data_residency": "DPDP (core duties from about May 2027); payment-data localisation", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-R"], "sources": ["R7:G10", "R7:C-8", "B63"]},
+        "US": {"licence": "no licence for data access as such; section 1033 stayed (29 Oct 2025) and under reconsideration; FCRA if used for eligibility (NV)", "partner_model": "aggregator agreements on FDX consent grants (scope, expiry, acknowledged revocation)", "kyc_aml_sanctions": "n/a", "data_residency": "GLBA; state privacy laws", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["B29", "B30", "B31", "B34"]},
+        "UK": {"licence": "AISP registration (PSRs 2017)", "partner_model": "FCA-registered AISP", "kyc_aml_sanctions": "n/a", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-NV", "Verified"], "sources": ["B44", "B10"]},
+        "EU": {"licence": "AISP registration (PSD2); PSR permissions dashboard agreed, not in force", "partner_model": "registered AISP", "kyc_aml_sanctions": "n/a", "data_residency": "GDPR", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-NV", "Verified"], "sources": ["B52", "B50"]},
+        "SG": {"licence": "no mandatory open-banking regime found; voluntary bank APIs (NV)", "partner_model": "unresolved", "kyc_aml_sanctions": "n/a", "data_residency": "PDPA", "market_data": "n/a", "verdict": "C", "labels": ["Hypothesis-NV"], "sources": []},
+        "AE": {"licence": "Open Finance Regulation Data Sharing licence or deemed licensing", "partner_model": "licensed open-finance provider (S)", "kyc_aml_sanctions": "n/a", "data_residency": "as C1", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-S"], "sources": ["J06"]},
+        "GL": {"licence": "none", "partner_model": "consent-artefact store (purpose, scope, expiry, revocation history); deletion of QED-held data on revocation", "kyc_aml_sanctions": "n/a", "data_residency": "data-life enforcement", "market_data": "n/a", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C4",
+      "name": "Cross-border payments and foreign exchange",
+      "cells": {
+        "IN": {"licence": "authorised person for forex (FEMA s.3, NV); LRS USD 250,000 per FY, no margin; TCS; PA-CB for cross-border collection", "partner_model": "AD-bank partner; PA-CB partner for foreign payers", "kyc_aml_sanctions": "originator and beneficiary data; LRS declarations", "data_residency": "payment-data localisation", "market_data": "ECB reference rates free with citation, never executable (R5)", "verdict": "P", "labels": ["Verified", "Hypothesis-NV", "Hypothesis-S"], "sources": ["R5:FX-01", "R5:FX-02", "R7:G01", "R5:E41", "R5:E42"]},
+        "US": {"licence": "money transmitter licence or bank; remittance transfer rule (Reg E subpart B) for providers; retail forex under CFTC/NFA (NV)", "partner_model": "licensed transmitter or bank", "kyc_aml_sanctions": "BSA travel rule; OFAC", "data_residency": "none general", "market_data": "New York Fed reference rates with attribution (R5)", "verdict": "P", "labels": ["Hypothesis-NV", "Verified"], "sources": ["R5:E51"]},
+        "UK": {"licence": "PI or EMI authorisation (money remittance)", "partner_model": "authorised PI or EMI", "kyc_aml_sanctions": "MLRs; UK Sanctions List", "data_residency": "UK GDPR", "market_data": "ECB as above", "verdict": "P", "labels": ["Hypothesis-NV", "Verified"], "sources": ["R7:G18"]},
+        "EU": {"licence": "PI or EMI authorisation; Transfer of Funds Regulation for crypto", "partner_model": "licensed PI or EMI", "kyc_aml_sanctions": "AMLD/AMLR", "data_residency": "GDPR", "market_data": "ECB", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "cross-border money transfer service under the PSA; money-changing licence for notes", "partner_model": "licensed payment institution", "kyc_aml_sanctions": "MAS notices", "data_residency": "PDPA", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["J02"]},
+        "AE": {"licence": "CBUAE licence (retail payment services); exchange houses and banks", "partner_model": "licensed provider", "kyc_aml_sanctions": "AML/CFT law", "data_residency": "as C1", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-S", "Hypothesis-NV"], "sources": []},
+        "GL": {"licence": "none", "partner_model": "corridor registry with partner per corridor", "kyc_aml_sanctions": "travel-rule fields on payment records (R7 KYC-06)", "data_residency": "as C1", "market_data": "reference rates never labelled executable (R7 DAT-05)", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C5",
+      "name": "Holding client money (wallet balances, stored value, safeguarding)",
+      "cells": {
+        "IN": {"licence": "PPI authorisation (Rs 5 crore rising to Rs 15 crore; escrow at a scheduled commercial bank; full-KYC PPI Rs 2 lakh); PA escrow; BUDS Act bars unregulated deposits (NV)", "partner_model": "balances at a bank or PPI issuer, shown from reconciled statements", "kyc_aml_sanctions": "partner KYC; PPI KYC tiers", "data_residency": "payment-data localisation", "market_data": "n/a", "verdict": "X", "labels": ["Verified", "Hypothesis-NV"], "sources": ["R7:G05", "R7:G01"]},
+        "US": {"licence": "state money-transmitter licence or bank; FDIC pass-through rules for FBO accounts (NV)", "partner_model": "balances at a bank or licensed transmitter", "kyc_aml_sanctions": "BSA; OFAC", "data_residency": "none general", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "UK": {"licence": "EMI authorisation with safeguarding; CASS for investment money", "partner_model": "authorised EMI or bank", "kyc_aml_sanctions": "MLRs", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "EU": {"licence": "EMI authorisation with safeguarding", "partner_model": "authorised EMI or bank", "kyc_aml_sanctions": "AMLD/AMLR", "data_residency": "GDPR", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "account issuance or e-money issuance under the PSA; safeguarding for major payment institutions (NV)", "partner_model": "licensed payment institution or bank", "kyc_aml_sanctions": "MAS notices", "data_residency": "PDPA", "market_data": "n/a", "verdict": "X", "labels": ["Verified", "Hypothesis-NV"], "sources": ["J02"]},
+        "AE": {"licence": "Stored Value Facilities Regulation (CBUAE) (NV)", "partner_model": "licensed SVF or bank", "kyc_aml_sanctions": "AML/CFT law", "data_residency": "as C1", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "GL": {"licence": "none", "partner_model": "ledger shows partner-held balances with source and time; unreconciled difference refuses execution (R7 CUS-01)", "kyc_aml_sanctions": "n/a", "data_residency": "n/a", "market_data": "n/a", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C6",
+      "name": "Stablecoin or digital-asset custody, exchange and transfer",
+      "cells": {
+        "IN": {"licence": "PMLA reporting entity if exchanging, transferring, safekeeping or administering VDAs for others (S.O. 1072(E)); FIU-IND registration; 30% tax and 1% TDS", "partner_model": "FIU-registered exchange partner; counsel on whether a mandate-bounded agent key makes QED a reporting entity (R7 Q2)", "kyc_aml_sanctions": "FIU-IND 2026 guidelines: liveness, geolocation, travel rule, wallet screening", "data_residency": "CERT-In logs; VDA records five years", "market_data": "CoinDCX owner-only (V, R5); Coinbase owner-only (S); Binance terms unread (S)", "verdict": "L,C", "labels": ["Hypothesis-R", "Hypothesis-S", "Verified"], "sources": ["R7:G13", "R7:G14", "R5:E17", "R7:G50", "R7:G51"]},
+        "US": {"licence": "state money-transmitter licences or NY BitLicense (NV); bank or trust custody (NV); payment stablecoins only from GENIUS-permitted issuers once the OCC rule is effective 18 Jan 2027 (S)", "partner_model": "licensed exchange or custodian", "kyc_aml_sanctions": "FinCEN MSB duties; OFAC", "data_residency": "none general", "market_data": "Coinbase owner-only (S)", "verdict": "L,P", "labels": ["Hypothesis-NV", "Hypothesis-S"], "sources": ["R4:S40", "R7:G50"]},
+        "UK": {"licence": "FCA MLR registration now; FSMA cryptoasset regime from 25 Oct 2027 (gateway 30 Sep 2026 to 28 Feb 2027); financial promotions regime", "partner_model": "FCA-registered firm", "kyc_aml_sanctions": "MLR travel rule (NV); UK Sanctions List", "data_residency": "UK GDPR", "market_data": "as above", "verdict": "L", "labels": ["Hypothesis-S", "Verified"], "sources": ["R7:G46", "R7:G18"]},
+        "EU": {"licence": "MiCA CASP authorisation; transitional period ended 1 Jul 2026; e-money tokens only from credit institutions or EMIs (NV)", "partner_model": "authorised CASP; reverse solicitation read narrowly", "kyc_aml_sanctions": "Transfer of Funds Regulation travel rule (NV); AMLR", "data_residency": "GDPR", "market_data": "as above", "verdict": "L", "labels": ["Hypothesis-S", "Hypothesis-NV"], "sources": ["R7:G45"]},
+        "SG": {"licence": "DPT service licence under the PSA (dealing, exchange, transmission, custody); FSMA Part 9 from 30 Jun 2025 for services provided from Singapore abroad, MAS reportedly generally not licensing (S); MAS stablecoin framework (NV)", "partner_model": "MAS-licensed DPT provider", "kyc_aml_sanctions": "MAS Notice PSN02 (NV)", "data_residency": "PDPA", "market_data": "n/a", "verdict": "L", "labels": ["Verified", "Hypothesis-S", "Hypothesis-NV"], "sources": ["J02", "J04"]},
+        "AE": {"licence": "VARA (Dubai) or SCA (federal) virtual-asset licence; DFSA/FSRA in free zones (NV); Payment Token Services Regulation: dirham tokens licensed, foreign tokens registered and payable only for virtual assets (S)", "partner_model": "VARA, SCA or free-zone licensed provider", "kyc_aml_sanctions": "AML/CFT; travel rule (NV)", "data_residency": "payment-token provider data in the UAE unless approved (S)", "market_data": "n/a", "verdict": "L", "labels": ["Hypothesis-S", "Hypothesis-NV"], "sources": ["J07", "J08"]},
+        "GL": {"licence": "smart accounts on test chains only (chain id 31337, R7 CUS-05)", "partner_model": "venue registry with registration evidence (R7 VDA-02)", "kyc_aml_sanctions": "address-screening hook before signing (R7 SAN-03)", "data_residency": "chain allow-list", "market_data": "permitted-use class per observation (R7 DAT-01)", "verdict": "build", "labels": ["Analysis", "Verified"], "sources": []}
+      }
+    },
+    {
+      "id": "C7",
+      "name": "Brokerage of equities, ETFs and funds (execution, order transmission)",
+      "cells": {
+        "IN": {"licence": "SEBI-registered broker; MF via execution-only platform (category 1 or 2) or AMFI distributor on MFU, BSE StAR MF or NSE NMF II; retail algo framework for broker APIs; no pooling", "partner_model": "registered partner; exclude listed equities from v1 (R7 3.6)", "kyc_aml_sanctions": "PAN and KRA KYC; folio bank account", "data_residency": "SEBI cloud framework residency (NV)", "market_data": "AMFI NAV personal non-commercial only (V, R5); NSE/BSE data via licensed vendors (NV)", "verdict": "P", "labels": ["Hypothesis-S", "Verified", "Hypothesis-NV"], "sources": ["R7:G29", "R7:G30", "R4:S02", "R5:E22"]},
+        "US": {"licence": "broker-dealer registration (Exchange Act s.15(a)) or introduction to a clearing broker", "partner_model": "broker API partner (Alpaca paper verified in R5)", "kyc_aml_sanctions": "broker customer identification; OFAC", "data_residency": "none general", "market_data": "exchange and SIP data under vendor agreements; non-professional subscriber terms (NV)", "verdict": "P", "labels": ["Hypothesis-NV", "Verified"], "sources": ["R5:E38"]},
+        "UK": {"licence": "FCA Part 4A permissions (arranging, dealing) or appointed representative", "partner_model": "authorised broker", "kyc_aml_sanctions": "MLRs", "data_residency": "UK GDPR", "market_data": "exchange data licences (NV)", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "EU": {"licence": "MiFID II investment firm or tied agent", "partner_model": "authorised investment firm", "kyc_aml_sanctions": "AMLD/AMLR", "data_residency": "GDPR", "market_data": "venue licences; consolidated tape (NV)", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "capital markets services licence for dealing (SFA) or exempt", "partner_model": "licensed broker", "kyc_aml_sanctions": "MAS notices", "data_residency": "PDPA", "market_data": "SGX data licences (NV)", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "AE": {"licence": "SCA (onshore), DFSA or FSRA licence", "partner_model": "licensed broker", "kyc_aml_sanctions": "AML/CFT", "data_residency": "as C1", "market_data": "DFM and ADX data licences (NV)", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "GL": {"licence": "none", "partner_model": "order model with registered-route adapters; ISIN-named deterministic owner instructions (R7 INV-02, INV-03)", "kyc_aml_sanctions": "n/a", "data_residency": "n/a", "market_data": "presentation mode hides owner-only data (N-003)", "verdict": "build", "labels": ["Analysis", "Verified"], "sources": []}
+      }
+    },
+    {
+      "id": "C8",
+      "name": "Investment advice, suitability and discretionary management",
+      "cells": {
+        "IN": {"licence": "SEBI RIA for personalised advice, AI use disclosed, responsibility for AI output (reg. 16C), risk profiling and suitability; discretion needs PMS (Rs 50 lakh minimum; PRIM Rs 25 lakh from 1 Apr 2027)", "partner_model": "RIA partner reviewing model proposals (N-006 built; off in this build)", "kyc_aml_sanctions": "via RIA", "data_residency": "as C7", "market_data": "as C7", "verdict": "P", "labels": ["Hypothesis-S", "Verified"], "sources": ["R7:G24", "R7:G26", "R7:G27", "R7:G28", "R7:G56"]},
+        "US": {"licence": "investment adviser registration (SEC or state); internet adviser exemption amended 2024; Reg BI if a broker-dealer recommends", "partner_model": "registered adviser partner", "kyc_aml_sanctions": "n/a", "data_residency": "none general", "market_data": "n/a", "verdict": "L,P", "labels": ["Hypothesis-S", "Hypothesis-NV"], "sources": ["R4:S43"]},
+        "UK": {"licence": "FCA permission to advise or manage; COBS suitability", "partner_model": "authorised firm", "kyc_aml_sanctions": "n/a", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "L,P", "labels": ["Hypothesis-NV"], "sources": []},
+        "EU": {"licence": "MiFID II advice or portfolio management with suitability; AI Act Art 50 transparency", "partner_model": "authorised investment firm", "kyc_aml_sanctions": "n/a", "data_residency": "GDPR", "market_data": "n/a", "verdict": "L,P", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "financial adviser licence (FAA); MAS digital advisory guidelines (NV)", "partner_model": "licensed adviser", "kyc_aml_sanctions": "n/a", "data_residency": "PDPA", "market_data": "n/a", "verdict": "L,P", "labels": ["Hypothesis-NV"], "sources": []},
+        "AE": {"licence": "SCA, DFSA or FSRA advice licence (NV)", "partner_model": "licensed adviser", "kyc_aml_sanctions": "n/a", "data_residency": "as C1", "market_data": "n/a", "verdict": "L,P", "labels": ["Hypothesis-NV"], "sources": []},
+        "GL": {"licence": "none", "partner_model": "rule-only suggestions labelled apart from model proposals; adviser review queue (server/adviser.ts); model holds no authority (D9)", "kyc_aml_sanctions": "n/a", "data_residency": "redacted model inputs (N-005)", "market_data": "n/a", "verdict": "build", "labels": ["Verified", "Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C9",
+      "name": "Deposits and interest",
+      "cells": {
+        "IN": {"licence": "banking licence; BUDS Act bars unregulated deposit schemes", "partner_model": "show the owner's own bank products; QED pays no return (R7 CUS-04)", "kyc_aml_sanctions": "bank KYC", "data_residency": "localisation", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "US": {"licence": "bank charter; FDIC rules on representing deposit insurance (NV)", "partner_model": "partner bank sweep or deposit products", "kyc_aml_sanctions": "bank customer identification", "data_residency": "none general", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "UK": {"licence": "PRA deposit-taking authorisation; FSCS", "partner_model": "partner bank", "kyc_aml_sanctions": "MLRs", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "EU": {"licence": "credit institution authorisation (CRD)", "partner_model": "partner bank", "kyc_aml_sanctions": "AMLD/AMLR", "data_residency": "GDPR", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "Banking Act licence", "partner_model": "partner bank", "kyc_aml_sanctions": "MAS notices", "data_residency": "PDPA", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "AE": {"licence": "CBUAE bank licence", "partner_model": "partner bank", "kyc_aml_sanctions": "AML/CFT", "data_residency": "as C1", "market_data": "n/a", "verdict": "X", "labels": ["Hypothesis-NV"], "sources": []},
+        "GL": {"licence": "none", "partner_model": "display only", "kyc_aml_sanctions": "n/a", "data_residency": "n/a", "market_data": "n/a", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C10",
+      "name": "Escrow for work (Earn marketplace)",
+      "cells": {
+        "IN": {"licence": "settlement through an authorised PA's escrow; a PA may not carry out marketplace business (10(b)); sellers onboarded (13(f)); e-commerce rules; GST TCS 0.5%; operator TDS; Social Security Code aggregator contribution (Conflict)", "partner_model": "PA marketplace or split-settlement product", "kyc_aml_sanctions": "worker KYC by the PA before funding", "data_residency": "localisation", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-S", "Conflict"], "sources": ["R7:G01", "R7:G35", "R7:G36", "R7:G38", "R7:G40"]},
+        "US": {"licence": "state escrow licensing in some states, or marketplace or payment-facilitator model via a processor; money-transmission agent-of-payee exemptions (NV)", "partner_model": "processor; counsel on state escrow law", "kyc_aml_sanctions": "processor KYC and 1099 reporting (NV)", "data_residency": "none general", "market_data": "n/a", "verdict": "P,C", "labels": ["Hypothesis-NV"], "sources": []},
+        "UK": {"licence": "payment service unless the commercial-agent exclusion applies (narrow) (NV)", "partner_model": "authorised PI", "kyc_aml_sanctions": "MLRs", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "P,C", "labels": ["Hypothesis-NV"], "sources": []},
+        "EU": {"licence": "payment service under PSD2 (commercial-agent exclusion narrowed)", "partner_model": "licensed PI", "kyc_aml_sanctions": "AMLD/AMLR", "data_residency": "GDPR", "market_data": "n/a", "verdict": "P,C", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "possibly account issuance or domestic money transfer under the PSA if funds are held (Analysis)", "partner_model": "unresolved", "kyc_aml_sanctions": "MAS notices", "data_residency": "PDPA", "market_data": "n/a", "verdict": "C", "labels": ["Analysis", "Hypothesis-NV"], "sources": []},
+        "AE": {"licence": "not researched", "partner_model": "unresolved", "kyc_aml_sanctions": "AML/CFT", "data_residency": "as C1", "market_data": "n/a", "verdict": "C", "labels": ["Hypothesis-NV"], "sources": []},
+        "GL": {"licence": "proof escrow on the local chain for test tokens (F-049)", "partner_model": "escrow states mapped one-to-one to partner escrow or split-settlement calls (R7 CUS-02)", "kyc_aml_sanctions": "worker onboarding via partner", "data_residency": "n/a", "market_data": "n/a", "verdict": "build", "labels": ["Verified", "Analysis"], "sources": []}
+      }
+    },
+    {
+      "id": "C11",
+      "name": "Payroll and income verification",
+      "cells": {
+        "IN": {"licence": "income data via AA through a regulated FIU; credit information companies under the CIC Act (NV); employer payroll duties (EPF, TDS on salary; NV)", "partner_model": "regulated FIU partner; payroll through the employer's bank", "kyc_aml_sanctions": "via partner", "data_residency": "DPDP; localisation", "market_data": "n/a", "verdict": "P", "labels": ["Verified", "Hypothesis-NV"], "sources": ["R7:G10"]},
+        "US": {"licence": "FCRA duties if furnishing or using consumer reports for eligibility (NV); payroll processors may be MSBs unless exempt (NV)", "partner_model": "aggregator or payroll-data partner", "kyc_aml_sanctions": "n/a", "data_residency": "GLBA; state laws", "market_data": "n/a", "verdict": "P,C", "labels": ["Hypothesis-NV"], "sources": []},
+        "UK": {"licence": "AIS for income signals; HMRC RTI for payroll (NV)", "partner_model": "AISP", "kyc_aml_sanctions": "n/a", "data_residency": "UK GDPR", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "EU": {"licence": "AIS; GDPR Art 22 for automated decisions (NV)", "partner_model": "AISP", "kyc_aml_sanctions": "n/a", "data_residency": "GDPR", "market_data": "n/a", "verdict": "P", "labels": ["Hypothesis-NV"], "sources": []},
+        "SG": {"licence": "Myinfo and SGFinDex consented data (NV)", "partner_model": "unresolved", "kyc_aml_sanctions": "n/a", "data_residency": "PDPA", "market_data": "n/a", "verdict": "C", "labels": ["Hypothesis-NV"], "sources": []},
+        "AE": {"licence": "Wage Protection System payroll via approved agents (NV); open-finance data sharing (S)", "partner_model": "unresolved", "kyc_aml_sanctions": "AML/CFT", "data_residency": "as C1", "market_data": "n/a", "verdict": "C", "labels": ["Hypothesis-NV", "Hypothesis-S"], "sources": ["J06"]},
+        "GL": {"licence": "none", "partner_model": "read-only income signals from consented data; no credit or eligibility decisions", "kyc_aml_sanctions": "n/a", "data_residency": "consent artefact with data life", "market_data": "n/a", "verdict": "build", "labels": ["Analysis"], "sources": []}
+      }
+    }
+  ],
+  "cross_cutting": {
+    "IN": {"kyc_aml": "PMLA; RBI KYC Directions 2025 (updation 2/8/10 years; records 5 years); FIU-IND for VDA", "sanctions": "UNSC lists daily; UAPA and WMD orders", "data_residency": "RBI payment-data localisation; DPDP s.16 (no country notified); CERT-In logs 180 days in India", "unauthorised_transactions": "RBI 2017 circular until 31 Dec 2026; RBC Third Amendment Directions from 1 Jan 2027 (5 calendar days; 45-day resolution; burden on bank)", "labels": ["Verified", "Hypothesis-R", "Hypothesis-S"], "sources": ["R7:G03", "R7:G09", "B60", "B62"]},
+    "US": {"kyc_aml": "BSA/AML (31 CFR chapter X); CIP at banks and brokers; FinCEN MSB registration", "sanctions": "OFAC SDN with 50% rule", "data_residency": "none general; GLBA; state laws", "unauthorised_transactions": "Regulation E for consumer accounts (anti-waiver; furnished access device); UCC 4A for business wires", "labels": ["Verified", "Hypothesis-R", "Hypothesis-NV"], "sources": ["B20", "B21", "B22", "B23", "B24", "B26", "B28"]},
+    "UK": {"kyc_aml": "MLRs 2017", "sanctions": "UK Sanctions List only since 28 Jan 2026", "data_residency": "UK GDPR; Data (Use and Access) Act 2025", "unauthorised_transactions": "PSRs 2017 reg 77 (35 GBP cap, NV); APP reimbursement (85,000 GBP cap, V) moving to the FCA", "labels": ["Verified", "Hypothesis-NV"], "sources": ["R7:G18", "B41", "B42", "B44"]},
+    "EU": {"kyc_aml": "AMLD now; AMLR from 10 Jul 2027; AMLA", "sanctions": "EU consolidated list", "data_residency": "GDPR Chapter V", "unauthorised_transactions": "PSD2 Arts 73-74 (NV); PSD3/PSR agreed, not in force (V B50)", "labels": ["Verified", "Hypothesis-NV"], "sources": ["B50", "B52"]},
+    "SG": {"kyc_aml": "MAS Notices PSN01 and PSN02 (NV)", "sanctions": "MAS targeted financial sanctions (NV)", "data_residency": "PDPA transfer limitation (NV)", "unauthorised_transactions": "E-Payments User Protection Guidelines from 16 Dec 2024 (version V; contents S); Shared Responsibility Framework (S)", "labels": ["Verified", "Hypothesis-S", "Hypothesis-NV"], "sources": ["J03"]},
+    "AE": {"kyc_aml": "federal AML/CFT law; goAML (NV)", "sanctions": "local terrorist list and UNSC (NV)", "data_residency": "CBUAE localisation (S); PDPL; DIFC and ADGM regimes (NV)", "unauthorised_transactions": "CBUAE consumer protection rules (NV)", "labels": ["Hypothesis-S", "Hypothesis-NV"], "sources": ["J08"]}
+  },
+  "sources": [
+    {"id": "J01", "title": "MAS payments regulation page, last updated 28 Aug 2024", "url": "https://www.mas.gov.sg/regulation/payments", "type": "RG", "label": "Verified"},
+    {"id": "J02", "title": "MAS Types of Payment Services (seven types), last updated 10 Oct 2025", "url": "https://www.mas.gov.sg/regulation/payments/licensing-for-payment-service-providers/types-of-payment-services", "type": "RG", "label": "Verified"},
+    {"id": "J03", "title": "MAS E-Payments User Protection Guidelines, with effect from 16 Dec 2024", "url": "https://www.mas.gov.sg/regulation/guidelines/e-payments-user-protection-guidelines", "type": "RG", "label": "Verified (version); contents Hypothesis-S"},
+    {"id": "J04", "title": "Digital token service providers under FSMA Part 9 from 30 Jun 2025 (MAS clarification 6 Jun 2025, via commentary)", "url": "https://www.mas.gov.sg/news/media-releases/2025/mas-clarifies-regulatory-regime-for-digital-token-service-providers", "type": "CM", "label": "Hypothesis-S"},
+    {"id": "J05", "title": "Federal Decree-Law No. 6 of 2025 (new CBUAE law), via White & Case and Hadef & Partners", "url": "https://www.whitecase.com/insight-alert/uae-enacts-new-cbuae-law-which-repeals-and-replaces-2018-law", "type": "CM", "label": "Hypothesis-S"},
+    {"id": "J06", "title": "CBUAE Open Finance Regulation, via Pinsent Masons and Clifford Chance", "url": "https://www.pinsentmasons.com/out-law/guides/uae-open-finance", "type": "CM", "label": "Hypothesis-S"},
+    {"id": "J07", "title": "CBUAE Payment Token Services Regulation, via CMS", "url": "https://cms.law/en/are/legal-updates/the-new-cbuae-payment-token-services-regulation-10-things-you-need-to-know", "type": "CM", "label": "Hypothesis-S"},
+    {"id": "J08", "title": "CBUAE rulebook Art 30 Protection of Payment and Personal Data (search excerpt; page 403); Gulf Times on payment data residency", "url": "https://rulebook.centralbank.ae/node/5774", "type": "CM", "label": "Hypothesis-S"},
+    {"id": "B-series", "title": "Bank terms, US/UK/EU/India statutory and technical sources", "url": "docs/research/qed-fin-infra-compliance/20261123-bank-agent-terms.md#7-source-register-accessed-23-nov-2026-unless-marked", "type": "register", "label": "see file"},
+    {"id": "R7-series", "title": "R7 regulatory requirements source register G01-G56", "url": "docs/research/qed-fin-infra-compliance/20261121-r7-regulatory-requirements.md#8-source-register-accessed-20-nov-2026", "type": "register", "label": "see file"}
+  ]
+}

@@ -1,0 +1,24 @@
+✔ frontend inline JavaScript is syntactically valid (1.73925ms)
+✔ all seven first-class views have navigation links and accessible headings (0.766375ms)
+✔ there are no duplicate declared element identifiers (0.187667ms)
+✔ guest history remains tab-scoped and has explicit clear-history control (0.197334ms)
+✔ transaction job IDs are retained for refresh recovery and never automatically resubmitted (0.816167ms)
+✔ user and diagnostic strings are escaped in generated result markup (0.240083ms)
+✔ broadcast is only emitted after sendTransaction returns a hash (0.229541ms)
+✔ the idle reset must not run while a job is executing (0.230542ms)
+✔ historical evidence remains labeled separately from local Anvil execution (0.183916ms)
+✔ accepted sandbox actions use idempotency keys and lookup rather than retransmission (0.889583ms)
+✔ a changed sandbox epoch warns about historic guest receipts without erasing chain activity (0.337459ms)
+✔ chat confirmation never claims server acceptance before an acknowledged job (0.184708ms)
+✔ financial results use exact BigInt formatting and certificate reverts have readable guidance (0.262417ms)
+✔ the periodic state refresh never replaces interactive controls whose markup is unchanged (0.353292ms)
+✔ an unreachable server is reported plainly and never treated as a refused submission (0.133708ms)
+✔ a starting public server (health 503 with readiness) is shown as starting, not as an outage (0.115209ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 69.84725

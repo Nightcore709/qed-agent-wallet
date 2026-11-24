@@ -1,0 +1,1405 @@
+{
+ "base": "http://localhost:5701",
+ "at": "2026-11-22T19:18:04.692Z",
+ "routes": [
+  "/earn",
+  "/activity",
+  "/passbook",
+  "/evidence",
+  "/record/act_1m825m0j8815yesxexw",
+  "/receipts/rcp_1m825m42cr4dbwyrre9",
+  "/evidence/vault.9ff73569-13e9-453e-9db2-18caf2de083b"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/earn 1440 light": {
+   "words": 458,
+   "wordsFirst": 255,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    20,
+    21,
+    22,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 9,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.131,
+   "inkFirst": 0.211,
+   "blankPage": 0.12,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1567,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/activity 1440 light": {
+   "words": 216,
+   "wordsFirst": 216,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 7,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 0,
+   "under32": 0,
+   "under44": 19,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.277,
+   "inkFirst": 0.17,
+   "blankPage": 0.26,
+   "edgesFirst": 24,
+   "overflow": false,
+   "height": 900,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/passbook 1440 light": {
+   "words": 291,
+   "wordsFirst": 272,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    20,
+    21,
+    22,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 23,
+   "small24": 0,
+   "under32": 0,
+   "under44": 20,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.117,
+   "inkFirst": 0.204,
+   "blankPage": 0.11,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 1128,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence 1440 light": {
+   "words": 2919,
+   "wordsFirst": 359,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 182,
+   "small24": 0,
+   "under32": 0,
+   "under44": 48,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.074,
+   "inkFirst": 0.269,
+   "blankPage": 1.34,
+   "edgesFirst": 24,
+   "overflow": false,
+   "height": 1699,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/record/act_1m825m0j8815yesxexw 1440 light": {
+   "words": 480,
+   "wordsFirst": 245,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    30,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.171,
+   "inkFirst": 0.206,
+   "blankPage": 0.2,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 1763,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/receipts/rcp_1m825m42cr4dbwyrre9 1440 light": {
+   "words": 582,
+   "wordsFirst": 302,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    20,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.123,
+   "inkFirst": 0.252,
+   "blankPage": 0.52,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 1154,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence/vault.9ff73569-13e9-453e-9db2-18caf2de083b 1440 light": {
+   "words": 7278,
+   "wordsFirst": 1670,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    20,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 31,
+   "small24": 0,
+   "under32": 0,
+   "under44": 28,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.105,
+   "inkFirst": 0.251,
+   "blankPage": 2.77,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 3593,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/earn 390 light": {
+   "words": 427,
+   "wordsFirst": 152,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    20,
+    22,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 9,
+   "contrastMin": 5.52,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.064,
+   "inkFirst": 0.496,
+   "blankPage": 0.09,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 2182,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/activity 390 light": {
+   "words": 196,
+   "wordsFirst": 150,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 7,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.058,
+   "inkFirst": 0.477,
+   "blankPage": 0.06,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1104,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/passbook 390 light": {
+   "words": 274,
+   "wordsFirst": 128,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    18,
+    20,
+    22,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 5.29,
+   "contrastFails": 0,
+   "targets": 19,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.067,
+   "inkFirst": 0.401,
+   "blankPage": 0.08,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1859,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence 390 light": {
+   "words": 2644,
+   "wordsFirst": 171,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    26
+   ],
+   "weights": [
+    400,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.29,
+   "contrastFails": 0,
+   "targets": 178,
+   "small24": 0,
+   "under32": 0,
+   "under44": 7,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.076,
+   "inkFirst": 0.486,
+   "blankPage": 0.6,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 2513,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/record/act_1m825m0j8815yesxexw 390 light": {
+   "words": 460,
+   "wordsFirst": 87,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    26,
+    30
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 13,
+   "small24": 0,
+   "under32": 0,
+   "under44": 7,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.132,
+   "inkFirst": 0.293,
+   "blankPage": 0.13,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 2699,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/receipts/rcp_1m825m42cr4dbwyrre9 390 light": {
+   "words": 562,
+   "wordsFirst": 185,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    18,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 11,
+   "small24": 0,
+   "under32": 0,
+   "under44": 5,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.091,
+   "inkFirst": 0.477,
+   "blankPage": 0.11,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 1757,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence/vault.9ff73569-13e9-453e-9db2-18caf2de083b 390 light": {
+   "words": 7258,
+   "wordsFirst": 110,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    20,
+    26
+   ],
+   "weights": [
+    400,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.05,
+   "contrastFails": 0,
+   "targets": 27,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.083,
+   "inkFirst": 0.386,
+   "blankPage": 3.16,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 5869,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/earn 1440 dark": {
+   "words": 458,
+   "wordsFirst": 255,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    20,
+    21,
+    22,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 21,
+   "small24": 0,
+   "under32": 0,
+   "under44": 18,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.131,
+   "inkFirst": 0.211,
+   "blankPage": 0.12,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1567,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/activity 1440 dark": {
+   "words": 216,
+   "wordsFirst": 216,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 7,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 24,
+   "small24": 0,
+   "under32": 0,
+   "under44": 19,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.277,
+   "inkFirst": 0.17,
+   "blankPage": 0.26,
+   "edgesFirst": 24,
+   "overflow": false,
+   "height": 900,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/passbook 1440 dark": {
+   "words": 291,
+   "wordsFirst": 272,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    20,
+    21,
+    22,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 5.93,
+   "contrastFails": 0,
+   "targets": 23,
+   "small24": 0,
+   "under32": 0,
+   "under44": 20,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.117,
+   "inkFirst": 0.204,
+   "blankPage": 0.11,
+   "edgesFirst": 22,
+   "overflow": false,
+   "height": 1128,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence 1440 dark": {
+   "words": 2919,
+   "wordsFirst": 359,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.93,
+   "contrastFails": 0,
+   "targets": 182,
+   "small24": 0,
+   "under32": 0,
+   "under44": 48,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.074,
+   "inkFirst": 0.269,
+   "blankPage": 1.34,
+   "edgesFirst": 24,
+   "overflow": false,
+   "height": 1699,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/record/act_1m825m0j8815yesxexw 1440 dark": {
+   "words": 480,
+   "wordsFirst": 245,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    21,
+    30,
+    44
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 0,
+   "under44": 14,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.171,
+   "inkFirst": 0.206,
+   "blankPage": 0.2,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 1763,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/receipts/rcp_1m825m42cr4dbwyrre9 1440 dark": {
+   "words": 582,
+   "wordsFirst": 302,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    20,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 15,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.123,
+   "inkFirst": 0.252,
+   "blankPage": 0.52,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 1154,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence/vault.9ff73569-13e9-453e-9db2-18caf2de083b 1440 dark": {
+   "words": 7278,
+   "wordsFirst": 1670,
+   "sizes": [
+    12,
+    12.5,
+    13,
+    14,
+    14.5,
+    15,
+    17,
+    20,
+    21,
+    30
+   ],
+   "weights": [
+    400,
+    500,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 31,
+   "small24": 0,
+   "under32": 0,
+   "under44": 28,
+   "smallest": "a \"QED\" 73x32",
+   "smallList": [],
+   "blankFirst": 0.105,
+   "inkFirst": 0.251,
+   "blankPage": 2.77,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 3593,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/earn 390 dark": {
+   "words": 427,
+   "wordsFirst": 152,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    20,
+    22,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 17,
+   "small24": 0,
+   "under32": 0,
+   "under44": 11,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.064,
+   "inkFirst": 0.496,
+   "blankPage": 0.09,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 2182,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/activity 390 dark": {
+   "words": 196,
+   "wordsFirst": 150,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 7,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 20,
+   "small24": 0,
+   "under32": 0,
+   "under44": 12,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.058,
+   "inkFirst": 0.477,
+   "blankPage": 0.06,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1104,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/passbook 390 dark": {
+   "words": 274,
+   "wordsFirst": 128,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    18,
+    20,
+    22,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin"
+   ],
+   "colours": 6,
+   "contrastMin": 5.93,
+   "contrastFails": 0,
+   "targets": 19,
+   "small24": 0,
+   "under32": 0,
+   "under44": 10,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.067,
+   "inkFirst": 0.401,
+   "blankPage": 0.08,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 1859,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence 390 dark": {
+   "words": 2644,
+   "wordsFirst": 171,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    26
+   ],
+   "weights": [
+    400,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 5.93,
+   "contrastFails": 0,
+   "targets": 178,
+   "small24": 0,
+   "under32": 0,
+   "under44": 7,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.076,
+   "inkFirst": 0.486,
+   "blankPage": 0.6,
+   "edgesFirst": 18,
+   "overflow": false,
+   "height": 2513,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/record/act_1m825m0j8815yesxexw 390 dark": {
+   "words": 460,
+   "wordsFirst": 87,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    26,
+    30
+   ],
+   "weights": [
+    400,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 13,
+   "small24": 0,
+   "under32": 0,
+   "under44": 7,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.132,
+   "inkFirst": 0.293,
+   "blankPage": 0.13,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 2699,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/receipts/rcp_1m825m42cr4dbwyrre9 390 dark": {
+   "words": 562,
+   "wordsFirst": 185,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    18,
+    26
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 11,
+   "small24": 0,
+   "under32": 0,
+   "under44": 5,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.091,
+   "inkFirst": 0.477,
+   "blankPage": 0.11,
+   "edgesFirst": 14,
+   "overflow": false,
+   "height": 1757,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  },
+  "/evidence/vault.9ff73569-13e9-453e-9db2-18caf2de083b 390 dark": {
+   "words": 7258,
+   "wordsFirst": 110,
+   "sizes": [
+    11.5,
+    12,
+    12.5,
+    13,
+    15,
+    17,
+    18,
+    20,
+    26
+   ],
+   "weights": [
+    400,
+    550,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720
+   ],
+   "families": [
+    "Anek Latin",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 6.33,
+   "contrastFails": 0,
+   "targets": 27,
+   "small24": 0,
+   "under32": 0,
+   "under44": 21,
+   "smallest": "a \"QED\" 66x32",
+   "smallList": [],
+   "blankFirst": 0.083,
+   "inkFirst": 0.387,
+   "blankPage": 3.16,
+   "edgesFirst": 13,
+   "overflow": false,
+   "height": 5869,
+   "axe": {
+    "label-content-name-mismatch": 1
+   },
+   "fault": false
+  }
+ }
+}

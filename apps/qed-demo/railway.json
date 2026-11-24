@@ -1,0 +1,26 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "apps/qed-demo/Dockerfile",
+    "watchPatterns": [
+      "apps/qed-demo/**",
+      "docs/shared/RISK_REGISTER.md",
+      "docs/research/qed-fin-infra-compliance/20261123-jurisdiction-matrix.json",
+      ".dockerignore",
+      "docs/research/qed-qa-reliability/20261124-adversarial-ask-live-original30.json",
+      "docs/research/qed-qa-reliability/20261124-adversarial-ask-live-diagnosis.json",
+      "docs/research/qed-qa-reliability/runs/adversarial-live-calls.tsv",
+      "docs/research/qed-qa-reliability/20261124-adversarial-ask-live-rerun.json",
+      "docs/research/qed-qa-reliability/20261124-adversarial-ask-live-rerun-diagnosis.json"
+    ]
+  },
+  "deploy": {
+    "healthcheckPath": "/api/ready",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10,
+    "overlapSeconds": "0",
+    "drainingSeconds": "30"
+  }
+}

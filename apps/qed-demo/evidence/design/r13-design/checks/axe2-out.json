@@ -1,0 +1,41 @@
+{
+ "at": "2026-11-24T13:48:41.635Z",
+ "base": "http://localhost:9950",
+ "runs": 4,
+ "violations": 0,
+ "broken": 0,
+ "results": [
+  {
+   "route": "/",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Money that moves only with proof.",
+   "violations": []
+  },
+  {
+   "route": "/",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Money that moves only with proof.",
+   "violations": []
+  },
+  {
+   "route": "/",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Money that moves only with proof.",
+   "violations": []
+  },
+  {
+   "route": "/",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Money that moves only with proof.",
+   "violations": []
+  }
+ ]
+}

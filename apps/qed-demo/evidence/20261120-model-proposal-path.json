@@ -1,0 +1,169 @@
+{
+ "what": "One model-proposed instruction, from the owner's question to a receipt",
+ "producedAt": "2026-11-20 11:34:13.229 IST",
+ "howToReproduce": "node scripts/evidence-proposal.ts prg_1m7vrpjc87g7cmpqe4v",
+ "1 question and model call": {
+  "callId": "aic_1m7vrnyf9gxgtnabaxz",
+  "at": "2026-11-20 11:30:42.729 IST",
+  "provider": "claude-cli",
+  "model": "claude-opus-5-5",
+  "latencyMs": 16747,
+  "ok": true,
+  "question": "Buy 300 rupees of bitcoin every five minutes, and ask me before each purchase. Keep it small: no more than 3,000 rupees in a month.",
+  "contextFingerprint": "c3e71f84cf00c1598642a1d058d61fa0d4edf027fe8598e1b256457dae9ebe1c",
+  "replyCharacters": 525,
+  "proposalsReturned": 1,
+  "usage": {
+   "input_tokens": 2,
+   "output_tokens": 1213,
+   "cost_usd": 0.080708,
+   "turns": 2,
+   "responseId": "9d510b53-4a98-41e7-860e-9460aa1eb306"
+  }
+ },
+ "2 proposal as stored after validation": {
+  "id": "prp_1m7vrpevh7hhbgr7ejb",
+  "origin": "model",
+  "kind": "invest",
+  "title": "Buy ₹300 of Bitcoin in rupees every 5 minutes, up to ₹3,000 a month",
+  "state": "drafted",
+  "invalidReason": null,
+  "params": {
+   "instrumentId": "coindcx:BTCINR",
+   "amount": 30000,
+   "schedule": {
+    "type": "every",
+    "minutes": 5
+   }
+  },
+  "runMode": "approve",
+  "authority": {
+   "maxPerRun": 30000,
+   "maxPerMonth": 300000
+  },
+  "warnings": [
+   "The schedule needs about ₹25,92,000 a month but the monthly limit is ₹3,000: later runs in a month will be refused.",
+   "This needs about ₹25,92,000 a month; after your recorded spending, bills and instalments you have about −₹39,986 a month to spare.",
+   "Gains on digital assets are taxed at 30% in India and losses cannot be set off; 1% is deducted at source when you sell."
+  ]
+ },
+ "3 instruction and signed versions": {
+  "id": "prg_1m7vrpjc87g7cmpqe4v",
+  "kind": "invest",
+  "title": "Invest ₹300 in Bitcoin in rupees",
+  "state": "revoked",
+  "origin": "proposal:prp_1m7vrpevh7hhbgr7ejb",
+  "versions": [
+   {
+    "version": 1,
+    "state": "live",
+    "documentHash": "3d90639be0c90a925a34424a2e75337c11fc22936f9159fa119ccbd70a00a6ab",
+    "signed": "2026-11-20 11:31:03.789 IST",
+    "authority": {
+     "maxPerRun": 30000,
+     "maxPerDay": null,
+     "maxPerMonth": 300000,
+     "expiresAt": 1802930463112,
+     "runMode": "approve",
+     "noticeSec": 0,
+     "maxSlippageBps": 100,
+     "maxRuns": null
+    },
+    "params": {
+     "instrumentId": "coindcx:BTCINR",
+     "amount": 30000,
+     "schedule": {
+      "type": "every",
+      "minutes": 5
+     }
+    },
+    "approval": {
+     "id": "apr_1m7vrpjcewm8t0jraf7",
+     "purpose": "program-version",
+     "subject": "program:prg_1m7vrpjc87g7cmpqe4v@1",
+     "documentHash": "3d90639be0c90a925a34424a2e75337c11fc22936f9159fa119ccbd70a00a6ab",
+     "method": "password",
+     "passwordRequired": true,
+     "asked": "2026-11-20 11:31:03.118 IST",
+     "confirmed": "2026-11-20 11:31:03.578 IST",
+     "used": "2026-11-20 11:31:03.789 IST"
+    }
+   }
+  ]
+ },
+ "4 runs": [
+  {
+   "id": "run_1m7vrra99f1hhhem8jg",
+   "due": "2026-11-20 11:32:00.000 IST",
+   "claimed": "2026-11-20 11:32:00.361 IST",
+   "started": "2026-11-20 11:33:26.578 IST",
+   "finished": "2026-11-20 11:33:26.635 IST",
+   "outcome": "done",
+   "reason": null,
+   "approval": {
+    "id": "apr_1m7vrtx6bc553dfnb20",
+    "purpose": "run",
+    "subject": "run:run_1m7vrra99f1hhhem8jg",
+    "documentHash": "63f2d95186379597acf874f2ea8dc68166196db8514d9dda5f56ae40a6d16a92",
+    "method": "session",
+    "passwordRequired": false,
+    "asked": "2026-11-20 11:33:25.259 IST",
+    "confirmed": "2026-11-20 11:33:25.700 IST",
+    "used": null
+   },
+   "actions": [
+    {
+     "id": "act_1m7vrtyfjsq3y517y0b",
+     "outcome": "done",
+     "reference": "prg_1m7vrpjc87g7cmpqe4v#2026-11-20T06:02:00.000Z#0",
+     "venue": "paper-crypto",
+     "checks": {
+      "passed": 14,
+      "failed": []
+     },
+     "times": {
+      "asked": "2026-11-20 11:33:26.578 IST",
+      "decided": "2026-11-20 11:33:26.583 IST",
+      "submitted": "2026-11-20 11:33:26.585 IST",
+      "executed": "2026-11-20 11:33:26.632 IST",
+      "finished": "2026-11-20 11:33:26.632 IST",
+      "reconciled": "2026-11-20 11:33:26.632 IST"
+     },
+     "latencyMs": {
+      "askedToDecided": 5,
+      "decidedToSubmitted": 2,
+      "submittedToExecuted": 47,
+      "askedToReconciled": 54
+     },
+     "result": {
+      "filledQuantityAtoms": "4000",
+      "movedPaise": "26132",
+      "feesPaise": "154",
+      "taxesPaise": "0",
+      "venueState": "filled"
+     },
+     "ledgerEntries": [
+      {
+       "seq": 19,
+       "kind": "buy",
+       "memo": "Bought 0.00004 BTC at ₹64,94,459.3"
+      }
+     ],
+     "comparedWithVenue": "reconciled",
+     "receipt": {
+      "id": "rcp_1m7vrtyh8d0nnwetb46",
+      "number": 16,
+      "issued": "2026-11-20 11:33:26.632 IST",
+      "fingerprint": "5be315527f5a4e4ffb1a0370876b7a06000f35d54b2f63dd731b08386ef64839",
+      "follows": "02d419dbb8dc98386d58cb605547eb8e59addba327b7f6112d52a12a8c000530"
+     }
+    }
+   ]
+  }
+ ],
+ "5 receipt chain for this owner": {
+  "intact": true,
+  "receipts": 16,
+  "brokenAt": null
+ }
+}

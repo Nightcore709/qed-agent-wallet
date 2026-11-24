@@ -1,0 +1,1004 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "vault.e18b9864-5981-4b58-9c87-c02250b6ed1f",
+ "kind": "vault-job",
+ "title": "The owner account accepted ownership of the treasury and reserve vaults; the opening grant of 100,000.00 test tINR arrived in the vault. No mandate is signed yet.",
+ "outcome": "executed",
+ "venue": "local-chain",
+ "workspace": "usr_1m81hgnrdae243h04wr",
+ "assembledAt": "2026-11-22T11:55:08.410Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "Accept ownership of this workspace's vault set, configured as shown: QEDExecution is the treasury vault's agent, 5 venues are named, the daily cap is 10,000.00 tINR. Only after this acceptance does the opening grant of test tINR arrive.",
+    "source": "the terms the owner was shown and signed",
+    "at": "2026-11-22T11:50:56.858Z"
+   },
+   "instruments": [
+    {
+     "kind": "owner-approval",
+     "id": "provision 97867112…",
+     "signedAt": "2026-11-22T11:50:56.853Z",
+     "summary": "Accept ownership of this workspace's vault set, configured as shown: QEDExecution is the treasury vault's agent, 5 venues are named, the daily cap is 10,000.00 tINR. Only after this acceptance does the opening grant of test tINR arrive.",
+     "allowedWhenPrepared": true,
+     "checksWhenPrepared": [],
+     "document": {
+      "text": "{\"action\":\"provision\",\"kind\":\"vault-proposal\",\"network\":\"Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts\",\"note\":\"Your passkey signs the digests listed under \\\"sign\\\", one prompt for each, and nothing else. Each commits to exactly these terms on the chain; the chain checks the signature against your vault's owner account before anything runs, and the vault service only relays. The tokens are valueless test tokens on a local test chain.\",\"proposalId\":\"97867112-db8c-4589-90a8-9e8e4c2b8735\",\"sign\":[{\"digest\":\"0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097\",\"item\":0,\"kind\":\"execute\",\"signers\":1}],\"summary\":\"Accept ownership of this workspace's vault set, configured as shown: QEDExecution is the treasury vault's agent, 5 venues are named, the daily cap is 10,000.00 tINR. Only after this acceptance does the opening grant of test tINR arrive.\",\"terms\":{\"actions\":[{\"args\":[],\"contract\":\"QEDVault (treasury)\",\"function\":\"acceptOwnership\",\"to\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\"},{\"args\":[],\"contract\":\"QEDVault (dollar reserve)\",\"function\":\"acceptOwnership\",\"to\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\"}],\"chainId\":31337,\"configuration\":{\"agent\":\"0xCCFE9E4E3B2d958018d43a0639393E928f81D752\",\"asset\":\"0xF211b7851c38a77514F7D6B2798b7284fAdB4748\",\"cosigner\":\"0xee947154188eE96AA4cA183c3aa597d48f85b945\",\"execution\":\"0xCCFE9E4E3B2d958018d43a0639393E928f81D752\",\"guardian\":\"0x7A5E4c4A74A8a43130E80c45Dac923CD98B7cB4E\",\"guards\":[{\"reason\":\"Moves every owner power over the vault, and through vault.owner() over its execution and policy contracts, to another address.\",\"selector\":\"0xf2fde38b\",\"target\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\"},{\"reason\":\"The agent is the only key that can redeem the owner's mandates; replacing it changes who can move the vault's funds.\",\"selector\":\"0xbcf685ed\",\"target\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\"},{\"reason\":\"The co-signer certifies every payment independently; replacing it changes who approves the vault's outflows.\",\"selector\":\"0x02045138\",\"target\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\"},{\"reason\":\"The daily cap bounds all agent payments across every mandate; raising it lets the agent move more. Guarded by selector, so lowering also waits; pause, bumpEpoch and revokeMandate stay immediate.\",\"selector\":\"0x0840a44a\",\"target\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\"},{\"reason\":\"The venue set decides where the agent's orders may trade the vault's funds; adding a venue widens where they can go.\",\"selector\":\"0x3e07dfc2\",\"target\":\"0xCCFE9E4E3B2d958018d43a0639393E928f81D752\"},{\"reason\":\"The operator is the hot key that may call trade and pay against the vault; replacing it changes who can move the vault's funds.\",\"selector\":\"0xb3ab15fb\",\"target\":\"0xCCFE9E4E3B2d958018d43a0639393E928f81D752\"},{\"reason\":\"The standing conversion policy's limits bound automatic conversions; raising them lets more move. Guarded by selector, so any change waits; revoke() stays immediate.\",\"selector\":\"0x72b15fa4\",\"target\":\"0x563d704aDfDD52629cC533776d66aeFA3Bd59562\"},{\"reason\":\"The policy agent is the key allowed to run conversions under the policy; replacing it changes who can move the treasury's funds.\",\"selector\":\"0xbcf685ed\",\"target\":\"0x563d704aDfDD52629cC533776d66aeFA3Bd59562\"},{\"reason\":\"Moves every owner power over the vault, and through vault.owner() over its execution and policy contracts, to another address.\",\"selector\":\"0xf2fde38b\",\"target\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\"},{\"reason\":\"The agent is the only key that can redeem the owner's mandates; replacing it changes who can move the vault's funds.\",\"selector\":\"0xbcf685ed\",\"target\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\"},{\"reason\":\"The co-signer certifies every payment independently; replacing it changes who approves the vault's outflows.\",\"selector\":\"0x02045138\",\"target\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\"},{\"reason\":\"The daily cap bounds all agent payments across every mandate; raising it lets the agent move more. Guarded by selector, so lowering also waits; pause, bumpEpoch and revokeMandate stay immediate.\",\"selector\":\"0x0840a44a\",\"target\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\"}],\"lens\":\"0x4bA3bFa294b1014099aEF86d8D9b9CdeCac3a41E\",\"operator\":\"0x42f81312830828CfA1b5D4558876c9581727b05A\",\"pendingOwner\":[\"0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2\",\"0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2\"],\"reserveAsset\":\"0xe46f4127b487607F695f3824C97877D869B5f77F\",\"reserveVault\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\",\"treasuryDailyCap\":\"1000000\",\"treasuryPolicy\":\"0x563d704aDfDD52629cC533776d66aeFA3Bd59562\",\"treasuryVault\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\",\"venues\":[{\"feeBps\":30,\"label\":\"tINR/tUSD · 0.30% · deep\",\"pool\":\"0xB8aCCf46131674e3e3575f3FDe2be802b2842935\"},{\"feeBps\":5,\"label\":\"tINR/tUSD · 0.05% · thin\",\"pool\":\"0xCdbe0D29e8a0Df2865a007B3Cc115775Ab6519fd\"},{\"feeBps\":30,\"label\":\"tINR/tEUR · 0.30%\",\"pool\":\"0xaD65AF0Ee8f5BF7c53691F987934d0a8543acb4C\"},{\"feeBps\":30,\"label\":\"tUSD/tEUR · 0.30% · deep (the release's pool)\",\"pool\":\"0x950BD1E4E3fE4c3f7E3790944B37C481fABD0F2e\"},{\"feeBps\":100,\"label\":\"tINR/tUSD · 1.00% · off-market\",\"pool\":\"0x1BdcC10D7E0fd30aa79F24Ae074ccb91884eCb39\"}]},\"genesisId\":\"48652160-7131-41ae-8a90-1d5b9dfcd3c5\",\"grantAfterAcceptance\":{\"note\":\"The opening grant of valueless test tINR is minted only after the owner account owns both vaults.\",\"token\":\"tINR\",\"vault\":null},\"kind\":\"provision\",\"ownerAccount\":\"0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2\",\"release\":\"qed-20261023-health-gate-v3\",\"toSign\":[{\"account\":\"0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2\",\"calls\":[{\"action\":\"QEDVault (treasury).acceptOwnership\",\"data\":\"0x79ba5097\",\"target\":\"0xB696485e8A24B988323b091D818b6ADaAD68E533\",\"value\":\"0\"},{\"action\":\"QEDVault (dollar reserve).acceptOwnership\",\"data\":\"0x79ba5097\",\"target\":\"0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6\",\"value\":\"0\"}],\"chainId\":31337,\"deadline\":\"1795349456\",\"digest\":\"0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097\",\"kind\":\"execute\",\"nonce\":\"0\",\"note\":\"The passkey signs this EIP-712 digest of QEDOwnerAccount.execute(calls, nonce, deadline): exactly these calls, once, before the deadline. The rail relays it and pays gas.\",\"threshold\":1}],\"workspace\":\"qed-8259564107aa1713a5c3ec07\"},\"termsHash\":\"sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359\",\"v\":2,\"vault\":\"qed-8259564107aa1713a5c3ec07\"}",
+      "sha256": "2e242874bd834aa1d591d9dc7c2183ebb0bac6bfe887262bb6ddd270095d670d"
+     },
+     "approval": {
+      "id": "apr_1m81hgp2d04pd8jk50p",
+      "docHash": "2e242874bd834aa1d591d9dc7c2183ebb0bac6bfe887262bb6ddd270095d670d"
+     },
+     "signatures": [
+      {
+       "type": "webauthn-es256",
+       "credential": "sha256:578799d51aa37e47",
+       "publicKey": {
+        "x": "0xa0065a69c1f8c46bf93e4faa76db058a84b0f8a3aaf22b97414cd801136d5ba2",
+        "y": "0x755ed0cd2eeb71def442b250c9a1b37c6c61604f7bacadc73038be2944aacd4b"
+       },
+       "challenge": "0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097",
+       "challengeIs": "owner-account digest terms.toSign[0]",
+       "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000002",
+       "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"TmSy6ndXPt_XZ9j2x_-Okua8AZJvjOVqRzv5euJ9gJc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+       "signature": "0x30450220678b7f36150f99809323c617fecfee8ba6895904dd8d70932dc6c00ede5001c0022100961ca0b60e0697fd67a53524008b3fbf782b403605a3dce977c00fd628730200",
+       "rpId": "localhost"
+      }
+     ],
+     "attestation": {
+      "aaguid": "00000000-0000-0000-0000-000000000000",
+      "attested": false
+     },
+     "terms": {
+      "actions": [
+       {
+        "args": [],
+        "contract": "QEDVault (treasury)",
+        "function": "acceptOwnership",
+        "to": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+       },
+       {
+        "args": [],
+        "contract": "QEDVault (dollar reserve)",
+        "function": "acceptOwnership",
+        "to": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+       }
+      ],
+      "chainId": 31337,
+      "configuration": {
+       "agent": "0xCCFE9E4E3B2d958018d43a0639393E928f81D752",
+       "asset": "0xF211b7851c38a77514F7D6B2798b7284fAdB4748",
+       "cosigner": "0xee947154188eE96AA4cA183c3aa597d48f85b945",
+       "execution": "0xCCFE9E4E3B2d958018d43a0639393E928f81D752",
+       "guardian": "0x7A5E4c4A74A8a43130E80c45Dac923CD98B7cB4E",
+       "guards": [
+        {
+         "reason": "Moves every owner power over the vault, and through vault.owner() over its execution and policy contracts, to another address.",
+         "selector": "0xf2fde38b",
+         "target": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+        },
+        {
+         "reason": "The agent is the only key that can redeem the owner's mandates; replacing it changes who can move the vault's funds.",
+         "selector": "0xbcf685ed",
+         "target": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+        },
+        {
+         "reason": "The co-signer certifies every payment independently; replacing it changes who approves the vault's outflows.",
+         "selector": "0x02045138",
+         "target": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+        },
+        {
+         "reason": "The daily cap bounds all agent payments across every mandate; raising it lets the agent move more. Guarded by selector, so lowering also waits; pause, bumpEpoch and revokeMandate stay immediate.",
+         "selector": "0x0840a44a",
+         "target": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+        },
+        {
+         "reason": "The venue set decides where the agent's orders may trade the vault's funds; adding a venue widens where they can go.",
+         "selector": "0x3e07dfc2",
+         "target": "0xCCFE9E4E3B2d958018d43a0639393E928f81D752"
+        },
+        {
+         "reason": "The operator is the hot key that may call trade and pay against the vault; replacing it changes who can move the vault's funds.",
+         "selector": "0xb3ab15fb",
+         "target": "0xCCFE9E4E3B2d958018d43a0639393E928f81D752"
+        },
+        {
+         "reason": "The standing conversion policy's limits bound automatic conversions; raising them lets more move. Guarded by selector, so any change waits; revoke() stays immediate.",
+         "selector": "0x72b15fa4",
+         "target": "0x563d704aDfDD52629cC533776d66aeFA3Bd59562"
+        },
+        {
+         "reason": "The policy agent is the key allowed to run conversions under the policy; replacing it changes who can move the treasury's funds.",
+         "selector": "0xbcf685ed",
+         "target": "0x563d704aDfDD52629cC533776d66aeFA3Bd59562"
+        },
+        {
+         "reason": "Moves every owner power over the vault, and through vault.owner() over its execution and policy contracts, to another address.",
+         "selector": "0xf2fde38b",
+         "target": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+        },
+        {
+         "reason": "The agent is the only key that can redeem the owner's mandates; replacing it changes who can move the vault's funds.",
+         "selector": "0xbcf685ed",
+         "target": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+        },
+        {
+         "reason": "The co-signer certifies every payment independently; replacing it changes who approves the vault's outflows.",
+         "selector": "0x02045138",
+         "target": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+        },
+        {
+         "reason": "The daily cap bounds all agent payments across every mandate; raising it lets the agent move more. Guarded by selector, so lowering also waits; pause, bumpEpoch and revokeMandate stay immediate.",
+         "selector": "0x0840a44a",
+         "target": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+        }
+       ],
+       "lens": "0x4bA3bFa294b1014099aEF86d8D9b9CdeCac3a41E",
+       "operator": "0x42f81312830828CfA1b5D4558876c9581727b05A",
+       "pendingOwner": [
+        "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+        "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2"
+       ],
+       "reserveAsset": "0xe46f4127b487607F695f3824C97877D869B5f77F",
+       "reserveVault": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6",
+       "treasuryDailyCap": "1000000",
+       "treasuryPolicy": "0x563d704aDfDD52629cC533776d66aeFA3Bd59562",
+       "treasuryVault": "0xB696485e8A24B988323b091D818b6ADaAD68E533",
+       "venues": [
+        {
+         "feeBps": 30,
+         "label": "tINR/tUSD · 0.30% · deep",
+         "pool": "0xB8aCCf46131674e3e3575f3FDe2be802b2842935"
+        },
+        {
+         "feeBps": 5,
+         "label": "tINR/tUSD · 0.05% · thin",
+         "pool": "0xCdbe0D29e8a0Df2865a007B3Cc115775Ab6519fd"
+        },
+        {
+         "feeBps": 30,
+         "label": "tINR/tEUR · 0.30%",
+         "pool": "0xaD65AF0Ee8f5BF7c53691F987934d0a8543acb4C"
+        },
+        {
+         "feeBps": 30,
+         "label": "tUSD/tEUR · 0.30% · deep (the release's pool)",
+         "pool": "0x950BD1E4E3fE4c3f7E3790944B37C481fABD0F2e"
+        },
+        {
+         "feeBps": 100,
+         "label": "tINR/tUSD · 1.00% · off-market",
+         "pool": "0x1BdcC10D7E0fd30aa79F24Ae074ccb91884eCb39"
+        }
+       ]
+      },
+      "genesisId": "48652160-7131-41ae-8a90-1d5b9dfcd3c5",
+      "grantAfterAcceptance": {
+       "note": "The opening grant of valueless test tINR is minted only after the owner account owns both vaults.",
+       "token": "tINR",
+       "vault": null
+      },
+      "kind": "provision",
+      "ownerAccount": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+      "release": "qed-20261023-health-gate-v3",
+      "toSign": [
+       {
+        "account": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+        "calls": [
+         {
+          "action": "QEDVault (treasury).acceptOwnership",
+          "data": "0x79ba5097",
+          "target": "0xB696485e8A24B988323b091D818b6ADaAD68E533",
+          "value": "0"
+         },
+         {
+          "action": "QEDVault (dollar reserve).acceptOwnership",
+          "data": "0x79ba5097",
+          "target": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6",
+          "value": "0"
+         }
+        ],
+        "chainId": 31337,
+        "deadline": "1795349456",
+        "digest": "0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097",
+        "kind": "execute",
+        "nonce": "0",
+        "note": "The passkey signs this EIP-712 digest of QEDOwnerAccount.execute(calls, nonce, deadline): exactly these calls, once, before the deadline. The rail relays it and pays gas.",
+        "threshold": 1
+       }
+      ],
+      "workspace": "qed-8259564107aa1713a5c3ec07"
+     },
+     "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+     "digests": [
+      {
+       "kind": "execute",
+       "digest": "0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097",
+       "purpose": null,
+       "threshold": 1
+      }
+     ],
+     "decisionRecord": {
+      "n": 2,
+      "at": "2026-11-22T11:50:56.871Z",
+      "kind": "owner-provision",
+      "jobId": "e18b9864-5981-4b58-9c87-c02250b6ed1f",
+      "verdict": "SENT",
+      "clock": {
+       "wallTime": "2026-11-22T11:50:56.861Z",
+       "wallSeconds": 1795348256,
+       "chainSeconds": 1795348256,
+       "skewSeconds": 0,
+       "limitSeconds": 5,
+       "withinLimit": true
+      },
+      "approval": {
+       "approvalId": "apr_1m81hgp2d04pd8jk50p",
+       "docHash": "sha256:2e242874bd834aa1d591d9dc7c2183ebb0bac6bfe887262bb6ddd270095d670d",
+       "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+       "confirmedAt": "2026-11-22T11:50:56.853Z",
+       "method": "passkey",
+       "signatures": [
+        {
+         "assertions": [
+          {
+           "publicKey": {
+            "x": "0xa0065a69c1f8c46bf93e4faa76db058a84b0f8a3aaf22b97414cd801136d5ba2",
+            "y": "0x755ed0cd2eeb71def442b250c9a1b37c6c61604f7bacadc73038be2944aacd4b"
+           },
+           "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000002",
+           "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"TmSy6ndXPt_XZ9j2x_-Okua8AZJvjOVqRzv5euJ9gJc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+           "signature": "0x30450220678b7f36150f99809323c617fecfee8ba6895904dd8d70932dc6c00ede5001c0022100961ca0b60e0697fd67a53524008b3fbf782b403605a3dce977c00fd628730200"
+          }
+         ]
+        }
+       ]
+      },
+      "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+      "record": {
+       "account": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+       "actions": [
+        {
+         "args": [],
+         "contract": "QEDVault (treasury)",
+         "function": "acceptOwnership",
+         "to": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+        },
+        {
+         "args": [],
+         "contract": "QEDVault (dollar reserve)",
+         "function": "acceptOwnership",
+         "to": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+        }
+       ],
+       "execute": {
+        "deadline": "1795349456",
+        "digest": "0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097",
+        "nonce": "0"
+       },
+       "relayer": "0x5aE1Db75D1b98473Ea77B00e91e75E08a78d038f",
+       "tx": {
+        "block": "56",
+        "gasUsed": "121112",
+        "hash": "0x61294b75edf5e199a532ae042b638e5bf46a0a070af9c1090b9751104df69f9f",
+        "status": "success"
+       }
+      },
+      "evidenceHash": null,
+      "prevHash": "2dd523a06d684271d6ac15dcbfad9f9d034473a96e54d10a91398c7791dfa1e9",
+      "hash": "33b983dc878d617472bd91c50f42095bbb2b9d0f08439e98e1c7dd08471c1c01"
+     }
+    }
+   ],
+   "venues": [
+    {
+     "index": null,
+     "address": "0xB8aCCf46131674e3e3575f3FDe2be802b2842935",
+     "name": "tINR/tUSD · 0.30% · deep"
+    },
+    {
+     "index": null,
+     "address": "0xCdbe0D29e8a0Df2865a007B3Cc115775Ab6519fd",
+     "name": "tINR/tUSD · 0.05% · thin"
+    },
+    {
+     "index": null,
+     "address": "0xaD65AF0Ee8f5BF7c53691F987934d0a8543acb4C",
+     "name": "tINR/tEUR · 0.30%"
+    },
+    {
+     "index": null,
+     "address": "0x950BD1E4E3fE4c3f7E3790944B37C481fABD0F2e",
+     "name": "tUSD/tEUR · 0.30% · deep (the release's pool)"
+    },
+    {
+     "index": null,
+     "address": "0x1BdcC10D7E0fd30aa79F24Ae074ccb91884eCb39",
+     "name": "tINR/tUSD · 1.00% · off-market"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 2,
+     "at": "2026-11-22T11:50:56.871Z",
+     "kind": "owner-provision",
+     "jobId": "e18b9864-5981-4b58-9c87-c02250b6ed1f",
+     "verdict": "SENT",
+     "clock": {
+      "wallTime": "2026-11-22T11:50:56.861Z",
+      "wallSeconds": 1795348256,
+      "chainSeconds": 1795348256,
+      "skewSeconds": 0,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m81hgp2d04pd8jk50p",
+      "docHash": "sha256:2e242874bd834aa1d591d9dc7c2183ebb0bac6bfe887262bb6ddd270095d670d",
+      "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+      "confirmedAt": "2026-11-22T11:50:56.853Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0xa0065a69c1f8c46bf93e4faa76db058a84b0f8a3aaf22b97414cd801136d5ba2",
+           "y": "0x755ed0cd2eeb71def442b250c9a1b37c6c61604f7bacadc73038be2944aacd4b"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000002",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"TmSy6ndXPt_XZ9j2x_-Okua8AZJvjOVqRzv5euJ9gJc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x30450220678b7f36150f99809323c617fecfee8ba6895904dd8d70932dc6c00ede5001c0022100961ca0b60e0697fd67a53524008b3fbf782b403605a3dce977c00fd628730200"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+     "record": {
+      "account": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+      "actions": [
+       {
+        "args": [],
+        "contract": "QEDVault (treasury)",
+        "function": "acceptOwnership",
+        "to": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+       },
+       {
+        "args": [],
+        "contract": "QEDVault (dollar reserve)",
+        "function": "acceptOwnership",
+        "to": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+       }
+      ],
+      "execute": {
+       "deadline": "1795349456",
+       "digest": "0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097",
+       "nonce": "0"
+      },
+      "relayer": "0x5aE1Db75D1b98473Ea77B00e91e75E08a78d038f",
+      "tx": {
+       "block": "56",
+       "gasUsed": "121112",
+       "hash": "0x61294b75edf5e199a532ae042b638e5bf46a0a070af9c1090b9751104df69f9f",
+       "status": "success"
+      }
+     },
+     "evidenceHash": null,
+     "prevHash": "2dd523a06d684271d6ac15dcbfad9f9d034473a96e54d10a91398c7791dfa1e9",
+     "hash": "33b983dc878d617472bd91c50f42095bbb2b9d0f08439e98e1c7dd08471c1c01"
+    }
+   ]
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": false,
+   "isModel": false,
+   "label": "none",
+   "statement": "No model took part: the owner asked for this, and the vault service's own code decided it.",
+   "decidedBy": "the vault service",
+   "information": [],
+   "constraints": []
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "allowed",
+   "statement": "Each step as the vault service recorded it, with the co-signer's own checks from its hash-chained decision record.",
+   "checks": [
+    {
+     "by": "vault service",
+     "name": "owner",
+     "pass": true,
+     "detail": "Approval apr_1m81hgp2d04pd8jk50p (passkey) binds these exact terms: sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359. The owner's passkey signed acceptOwnership on both vaults as one batch for the owner account (QEDOwnerAccount.execute), checked on chain; the rail relays it and pays its gas, and holds no key that could sign it.",
+     "source": {
+      "step": 0
+     }
+    },
+    {
+     "by": "chain",
+     "name": "receipt",
+     "pass": true,
+     "detail": "The owner account owns both vaults from block 56, and through them the execution module and the treasury policy. The deployer key that configured them has no role left.",
+     "source": {
+      "step": 1
+     }
+    },
+    {
+     "by": "vault service",
+     "name": "grant",
+     "pass": true,
+     "detail": "After the acceptance, the test faucet minted 100,000.00 tINR into the treasury vault and 10,000.00 tINR into the owner account (valueless test rupees, not money).",
+     "source": {
+      "step": 2
+     }
+    }
+   ],
+   "steps": [
+    {
+     "seq": 0,
+     "key": "owner",
+     "label": "Owner accepts the vault set",
+     "status": "ok",
+     "detail": "Approval apr_1m81hgp2d04pd8jk50p (passkey) binds these exact terms: sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359. The owner's passkey signed acceptOwnership on both vaults as one batch for the owner account (QEDOwnerAccount.execute), checked on chain; the rail relays it and pays its gas, and holds no key that could sign it.",
+     "data": {
+      "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359"
+     },
+     "at": "2026-11-22T11:50:56.859Z"
+    },
+    {
+     "seq": 1,
+     "key": "receipt",
+     "label": "QEDVault.acceptOwnership mined (both vaults)",
+     "status": "ok",
+     "detail": "The owner account owns both vaults from block 56, and through them the execution module and the treasury policy. The deployer key that configured them has no role left.",
+     "data": {
+      "hash": "0x61294b75edf5e199a532ae042b638e5bf46a0a070af9c1090b9751104df69f9f",
+      "status": "success",
+      "block": "56",
+      "gasUsed": "121112",
+      "from": "0x5aE1Db75D1b98473Ea77B00e91e75E08a78d038f",
+      "to": "0x85f693c6cbf56ed9e60810ef3ebc1557855050a2",
+      "error": null,
+      "errorArgs": null,
+      "events": [
+       {
+        "name": "OwnershipTransferred",
+        "args": {
+         "from": "0xFC21e9209Dd13a18bD09ba7fBD01E12df9bA74da",
+         "to": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2"
+        }
+       },
+       {
+        "name": "OwnershipTransferred",
+        "args": {
+         "from": "0xFC21e9209Dd13a18bD09ba7fBD01E12df9bA74da",
+         "to": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2"
+        }
+       }
+      ]
+     },
+     "at": "2026-11-22T11:50:56.871Z"
+    },
+    {
+     "seq": 2,
+     "key": "grant",
+     "label": "Opening grant of test tINR",
+     "status": "ok",
+     "detail": "After the acceptance, the test faucet minted 100,000.00 tINR into the treasury vault and 10,000.00 tINR into the owner account (valueless test rupees, not money).",
+     "data": {
+      "vault": "10000000",
+      "ownerAccount": "1000000",
+      "token": "tINR",
+      "txs": [
+       "0xff4850172b0e5126531efcca480bb3727569e87479b54d8840b76ebfadc1a953",
+       "0x5c806e104aa03e23043e8b9f81bd1afd27a77ece6c28a1ee119d1051458d0bd8"
+      ]
+     },
+     "at": "2026-11-22T11:50:56.877Z"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 2,
+     "at": "2026-11-22T11:50:56.871Z",
+     "kind": "owner-provision",
+     "jobId": "e18b9864-5981-4b58-9c87-c02250b6ed1f",
+     "verdict": "SENT",
+     "clock": {
+      "wallTime": "2026-11-22T11:50:56.861Z",
+      "wallSeconds": 1795348256,
+      "chainSeconds": 1795348256,
+      "skewSeconds": 0,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m81hgp2d04pd8jk50p",
+      "docHash": "sha256:2e242874bd834aa1d591d9dc7c2183ebb0bac6bfe887262bb6ddd270095d670d",
+      "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+      "confirmedAt": "2026-11-22T11:50:56.853Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0xa0065a69c1f8c46bf93e4faa76db058a84b0f8a3aaf22b97414cd801136d5ba2",
+           "y": "0x755ed0cd2eeb71def442b250c9a1b37c6c61604f7bacadc73038be2944aacd4b"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000002",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"TmSy6ndXPt_XZ9j2x_-Okua8AZJvjOVqRzv5euJ9gJc\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x30450220678b7f36150f99809323c617fecfee8ba6895904dd8d70932dc6c00ede5001c0022100961ca0b60e0697fd67a53524008b3fbf782b403605a3dce977c00fd628730200"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:f4eb5e41c3ff8f83c52da7bd1f5b19aabf7b938849a147b2f8e681f3da0de359",
+     "record": {
+      "account": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+      "actions": [
+       {
+        "args": [],
+        "contract": "QEDVault (treasury)",
+        "function": "acceptOwnership",
+        "to": "0xB696485e8A24B988323b091D818b6ADaAD68E533"
+       },
+       {
+        "args": [],
+        "contract": "QEDVault (dollar reserve)",
+        "function": "acceptOwnership",
+        "to": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6"
+       }
+      ],
+      "execute": {
+       "deadline": "1795349456",
+       "digest": "0x4e64b2ea77573edfd767d8f6c7ff8e92e6bc01926f8ce56a473bf97ae27d8097",
+       "nonce": "0"
+      },
+      "relayer": "0x5aE1Db75D1b98473Ea77B00e91e75E08a78d038f",
+      "tx": {
+       "block": "56",
+       "gasUsed": "121112",
+       "hash": "0x61294b75edf5e199a532ae042b638e5bf46a0a070af9c1090b9751104df69f9f",
+       "status": "success"
+      }
+     },
+     "evidenceHash": null,
+     "prevHash": "2dd523a06d684271d6ac15dcbfad9f9d034473a96e54d10a91398c7791dfa1e9",
+     "hash": "33b983dc878d617472bd91c50f42095bbb2b9d0f08439e98e1c7dd08471c1c01"
+    },
+    {
+     "n": 3,
+     "at": "2026-11-22T11:50:56.877Z",
+     "kind": "faucet-grant",
+     "jobId": "e18b9864-5981-4b58-9c87-c02250b6ed1f",
+     "verdict": "GRANTED",
+     "clock": {
+      "wallTime": "2026-11-22T11:50:56.861Z",
+      "wallSeconds": 1795348256,
+      "chainSeconds": 1795348256,
+      "skewSeconds": 0,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": null,
+     "termsHash": null,
+     "record": {
+      "ownerAccount": "1000000",
+      "token": "tINR",
+      "txs": [
+       "0xff4850172b0e5126531efcca480bb3727569e87479b54d8840b76ebfadc1a953",
+       "0x5c806e104aa03e23043e8b9f81bd1afd27a77ece6c28a1ee119d1051458d0bd8"
+      ],
+      "vault": "10000000"
+     },
+     "evidenceHash": null,
+     "prevHash": "33b983dc878d617472bd91c50f42095bbb2b9d0f08439e98e1c7dd08471c1c01",
+     "hash": "e03fcba507fa7f0724109b5d7030aecedc9978c595597313962830b1196df0ea"
+    }
+   ]
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": true,
+   "ranUnder": [],
+   "requestedBy": {
+    "who": "the owner, with a fresh passkey signature over these exact terms",
+    "evidence": "proposal 97867112-db8c-4589-90a8-9e8e4c2b8735; approval apr_1m81hgp2d04pd8jk50p",
+    "at": "2026-11-22T11:50:56.858Z"
+   },
+   "signaturesUsed": [
+    {
+     "approvalId": "apr_1m81hgp2d04pd8jk50p",
+     "when": "2026-11-22T11:50:56.853Z",
+     "what": "owner-approval"
+    }
+   ],
+   "statement": "This needed the owner's fresh passkey signature over its exact terms."
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": true,
+   "moved": [],
+   "balances": [],
+   "executions": null,
+   "authorityBudget": {
+    "rule": "d7",
+    "asset": {
+     "symbol": "tINR",
+     "decimals": 2
+    },
+    "base": "1000",
+    "grants": "2000",
+    "granted": "3000",
+    "earned": "0",
+    "used": "1103",
+    "usedBy": {
+     "payments": "807",
+     "conversions": "296",
+     "promisesPaid": "0"
+    },
+    "held": "0",
+    "reserved": "0",
+    "budget": "1897",
+    "available": "1897",
+    "rate": "1/2",
+    "confirmations": 2,
+    "pendingCredits": 0,
+    "notEarnings": 0,
+    "references": [
+     {
+      "symbol": "tUSD",
+      "lo": "83.58",
+      "mid": "84",
+      "hi": "84.42",
+      "divergenceBps": 0,
+      "source": "fixed in configuration: the test market's genesis rate, tINR/tUSD · 0.30% · deep at 84.00 tINR per tUSD, ± 0.5%; no trade moves it"
+     }
+    ],
+    "statement": "18.97 tINR available = granted 30.00 (base 10.00, owner grants 20.00) + earned 0.00 − used 11.03 (payments 8.07, conversion costs 2.96, promises paid 0.00) − promised and not yet paid 0.00 − reserved for certificates not yet used 0.00",
+    "limits": [
+     "Earned means paid for, through the escrow, by a client this workspace does not know to be its own: a client the wallet has never seen cannot be told apart from an unregistered address of a member (D7 assumption A-ID; a second workspace counts as the workspace's own only when it shares a member's passkey).",
+     "Conversions count only their cost against a fixed reference band, so the mandate's own limits on amounts per payment, per period and over its life are what bound how much can be converted."
+    ],
+    "note": "The co-signer's authority budget (D7), as it stands when the case is assembled."
+   },
+   "consequence": "The owner account accepted ownership of the treasury and reserve vaults; the opening grant of 100,000.00 test tINR arrived in the vault. No mandate is signed yet.",
+   "guidance": null,
+   "units": "Amounts are integers in the token's smallest unit: tINR has 2 decimals, tUSD 6."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "ee2bc6ec26f9c0d81fb86b3555ef62eb095d8362",
+    "uncommittedChanges": true,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "local-chain",
+    "network": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts"
+   },
+   "chain": {
+    "chainId": 31337,
+    "name": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts",
+    "rpc": "127.0.0.1 (loopback only)",
+    "genesisId": "48652160-7131-41ae-8a90-1d5b9dfcd3c5",
+    "versions": {
+     "node": "v26.12.0",
+     "anvil": "anvil Version: 1.7.1",
+     "release": "qed-20261023-health-gate-v3"
+    }
+   },
+   "contracts": {
+    "ownerAccount": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+    "vault": "0xB696485e8A24B988323b091D818b6ADaAD68E533",
+    "reserve": "0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6",
+    "execution": "0xCCFE9E4E3B2d958018d43a0639393E928f81D752",
+    "treasuryPolicy": "0x563d704aDfDD52629cC533776d66aeFA3Bd59562",
+    "lens": "0x4bA3bFa294b1014099aEF86d8D9b9CdeCac3a41E",
+    "tUSD": "0xe46f4127b487607F695f3824C97877D869B5f77F",
+    "tEUR": "0x2c48919a6f16f60A32991b072cD81aeBBDae9aF3",
+    "tETH": "0x0E0DA47Ff3f7320851f4b4D3F19A29e69c9A10E2",
+    "pools": [
+     "0xB8aCCf46131674e3e3575f3FDe2be802b2842935",
+     "0xCdbe0D29e8a0Df2865a007B3Cc115775Ab6519fd",
+     "0xaD65AF0Ee8f5BF7c53691F987934d0a8543acb4C",
+     "0x950BD1E4E3fE4c3f7E3790944B37C481fABD0F2e",
+     "0x1BdcC10D7E0fd30aa79F24Ae074ccb91884eCb39"
+    ],
+    "asset": "0xF211b7851c38a77514F7D6B2798b7284fAdB4748",
+    "reserveAsset": "0xe46f4127b487607F695f3824C97877D869B5f77F"
+   },
+   "roles": {
+    "owner": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+    "ownerCustody": "passkey owner account (QEDOwnerAccount): its signers are the members' passkeys; the service holds no key that can satisfy it and only relays",
+    "operator": "0x42f81312830828CfA1b5D4558876c9581727b05A",
+    "cosigner": "0xee947154188eE96AA4cA183c3aa597d48f85b945",
+    "guardian": "0x7A5E4c4A74A8a43130E80c45Dac923CD98B7cB4E",
+    "attacker": null,
+    "creditor": "0x3b7856A825B2cf27A7Ae9955B1106D8dfaF47d37",
+    "cosignerIsolation": "separate-process"
+   },
+   "keys": {
+    "agent": "0x42f81312830828CfA1b5D4558876c9581727b05A",
+    "guardian": "0x7A5E4c4A74A8a43130E80c45Dac923CD98B7cB4E",
+    "relayer": "0x5aE1Db75D1b98473Ea77B00e91e75E08a78d038f",
+    "derivation": "HKDF-SHA256 from this installation's master secret (mode 600); none of them is a signer of the owner account"
+   },
+   "ownerAccount": {
+    "address": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2",
+    "kind": "passkey-account",
+    "threshold": 1,
+    "signers": [
+     {
+      "x": "0xa0065a69c1f8c46bf93e4faa76db058a84b0f8a3aaf22b97414cd801136d5ba2",
+      "y": "0x755ed0cd2eeb71def442b250c9a1b37c6c61604f7bacadc73038be2944aacd4b",
+      "role": "member"
+     }
+    ],
+    "build": {
+     "sha256": "84566df15d0c3965fcd83672ab8522b76bdb44f281f2a77e60137c058523a5bd",
+     "solc": "0.8.38+commit.1835d247",
+     "declaredReady": true,
+     "label": "declared ready by chain/accounts/READY.json"
+    }
+   },
+   "transactions": [
+    {
+     "hash": "0x61294b75edf5e199a532ae042b638e5bf46a0a070af9c1090b9751104df69f9f",
+     "chain": "vault",
+     "status": "success",
+     "block": "56",
+     "gasUsed": "121112",
+     "from": "0x5aE1Db75D1b98473Ea77B00e91e75E08a78d038f",
+     "to": "0x85f693c6cbf56ed9e60810ef3ebc1557855050a2",
+     "events": [
+      {
+       "name": "OwnershipTransferred",
+       "address": "0xb696485e8a24b988323b091d818b6adaad68e533",
+       "args": {
+        "from": "0xFC21e9209Dd13a18bD09ba7fBD01E12df9bA74da",
+        "to": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2"
+       }
+      },
+      {
+       "name": "OwnershipTransferred",
+       "address": "0xd8f790188bb5977227d021edeee6b157a76f3ed6",
+       "args": {
+        "from": "0xFC21e9209Dd13a18bD09ba7fBD01E12df9bA74da",
+        "to": "0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2"
+       }
+      }
+     ],
+     "network": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts",
+     "chainWhenAssembled": {
+      "status": "success",
+      "block": "56",
+      "gasUsed": "121112",
+      "from": "0x5ae1db75d1b98473ea77b00e91e75e08a78d038f",
+      "to": "0x85f693c6cbf56ed9e60810ef3ebc1557855050a2",
+      "logs": 3
+     }
+    }
+   ],
+   "ids": {
+    "job": "e18b9864-5981-4b58-9c87-c02250b6ed1f",
+    "kind": "provision",
+    "proposal": "97867112-db8c-4589-90a8-9e8e4c2b8735",
+    "vaultWorkspace": "qed-8259564107aa1713a5c3ec07",
+    "tick": null
+   },
+   "decisionChain": {
+    "ok": true,
+    "records": 19,
+    "brokenAt": null,
+    "head": "74cadfa4f1f2ebca0d7e77941a3131b3b9d61fb072f43c8ca7c505e1f0cc146a",
+    "note": "The vault service re-hashed its whole decision chain when the case was assembled."
+   }
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [],
+   "probes": [],
+   "note": "Recorded: other jobs of the same kind. Probes: the vault's own limit check now."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [],
+   "related": [
+    {
+     "caseId": "vault.5e5dc0f0-846a-4bde-8602-b1ddd4ec7b7d",
+     "at": "2026-11-22T11:55:07.301Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "failed",
+       "detail": "No standing policy yet: the owner must sign one first."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.c0484f68-0a3d-4f60-aa5f-54a9399be979",
+     "at": "2026-11-22T11:55:06.257Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "decide waited",
+       "detail": "Short 4.052955 tUSD but waiting: the market is too thin: any tranche ≥ 20000 would pay more than 150 bps."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.c05930d6-8027-4cdd-bbdb-3be8d40a25b9",
+     "at": "2026-11-22T11:55:05.422Z",
+     "what": "attack",
+     "failed": [
+      {
+       "name": "receipt reverted",
+       "detail": "Status reverted in block 35 of the ephemeral chain (455,512 gas paid by the attacker). Defence: Weak duality: any price vector is a valid upper bound. Nothing moved: every balance and the spending window are unchanged."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0xd2e9bf818a… reverted on a throwaway chain"
+    },
+    {
+     "caseId": "vault.384293bc-3565-41a6-b079-2a7e269f6859",
+     "at": "2026-11-22T11:55:04.678Z",
+     "what": "withdraw",
+     "failed": [
+      {
+       "name": "refused",
+       "detail": "Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,491.93 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation with both figures. Nothing was sent."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.bc805342-3694-4aa1-85c9-74571c483759",
+     "at": "2026-11-22T11:55:04.167Z",
+     "what": "convert",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "Per-conversion limit in the owner's signed mandate: 300.00 > 250.00 tINR; Left in the mandate's current period: 300.00 > 91.93 tINR. The AI cannot raise a limit; only the owner can sign a new mandate."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.49cb4d81-20fa-4535-b6ef-423b147e9f75",
+     "at": "2026-11-22T11:55:03.698Z",
+     "what": "policy-run",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "250.00 tINR breaks: Left in the mandate's current period. The agent cannot raise a limit."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0x4021709628… success"
+    },
+    {
+     "caseId": "vault.1b0e2fef-228e-4953-b3ac-a62ae6f61eeb",
+     "at": "2026-11-22T11:55:02.640Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "cosigner refused",
+       "detail": "Refused: C12 Authority budget (R7 D7): this conversion's cost against the reference fits in what the owner granted and the workspace earned: 250.00 tINR into tUSD for 0xd8F790188Bb5977227D021EdeEe6B157A76f3eD6, an account of the workspace, uses only its cost against the reference: what is given less"
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.1b0e2fef-228e-4953-b3ac-a62ae6f61eeb",
+     "at": "2026-11-22T11:55:02.622Z",
+     "what": "cosigner-policy-trade",
+     "failed": [
+      {
+       "name": "REFUSED",
+       "detail": "{\"block\":{\"number\":\"61\",\"timestamp\":1795348502},\"chainId\":31337,\"checks\":[{\"detail\":\"ERC-1271 owner account 0x85F693C6cBf56ed9E60810Ef3Ebc1557855050A2 answered 0x1626ba7e\",\"id\":\"C1\",\"name\":\"Mandate signed by the vault owner\",\"pass\":true},{\"detail\":\"epoch 0\",\"id\":\"C2\",\"name\":\"Mandate active and curre"
+      }
+     ],
+     "executed": false,
+     "proof": "decision record #11"
+    }
+   ]
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "37a0e450c6190d0498b953e2e093f7e8819bbed91adde77583c5777a819cdf56",
+   "server": {
+    "ok": true,
+    "count": 3,
+    "brokenAt": null,
+    "head": "eb0c884f3c281df067abdbaf059d1126ad0bc0da87a560a0413b32525d0f0924",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled"
+  },
+  "vaultDecisions": {
+   "server": {
+    "ok": true,
+    "records": 19,
+    "brokenAt": null,
+    "head": "74cadfa4f1f2ebca0d7e77941a3131b3b9d61fb072f43c8ca7c505e1f0cc146a"
+   },
+   "reHashedHere": 3
+  },
+  "note": "A vault job is recorded by the vault service, not in the wallet's receipt chain: its decision records are hash-chained there, and each one this case carries is re-hashed by the verifier. The wallet's receipt chain and ledger as a whole were verified too when the case was assembled."
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "The vault service's keys",
+   "how": "never held by this API; addresses only",
+   "why": "The agent, co-signer, guardian and relayer keys stay in the vault service."
+  }
+ ],
+ "cannotProve": [
+  "No model took part in this job: the owner asked for it directly, or the engine ran it under authority the owner wrote.",
+  "The transactions are on a local Anvil chain (chain id 31337) started for this installation, with valueless test tokens. Their hashes are not publicly verifiable; they can be re-read only from that chain while it runs (verify-evidence.ts --rpc).",
+  "The passkey's make is not attested (its AAGUID is all zeros): a signature proves possession of the key, not which device or software held it.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "e6df13eb19cf610672224e2ce9314d1ed07d91c3fcddc6e8121e05f39c714730",
+   "2": "dab73d16afb1a36a821590a67d18284a4dcd2f7e5c0ef0c3d2c79c730dfcc82a",
+   "3": "908d478badee1eee24e2650ded25562593b597a87c02a1f65c0c1cfd52f963a4",
+   "4": "518cfdd913c1a3e1dcb27f12d247703903371b534217668c181d80b984cb38f0",
+   "5": "fc347bb9f22962df31d604bd8d601d7b2bba12a1d5dc80ca4bc8b4a6917bc635",
+   "6": "541e2cfb516dd0dab58104fc02a828c33be3f694411df5151531852a6227fb73",
+   "7": "3071d5e29fc05b873a3b9b9168fc8a49bd15d88d0c014ff8fcc939699af65c40",
+   "8": "e238572837f7fb503da2538e8e6c37d0d883eaa218cea1b99f5ec1d682e62ef6"
+  },
+  "verification": "4f24a94158a2e8b352af9fd6019995736842767dc7601cfbdcba6cf59f365b0c",
+  "redactions": "1dde4be1ace84c813c6042e6a2d7bb38c062caaae268c2e7dd444caea666797f",
+  "cannotProve": "f8edec18b68663467d2f941b1d959f1d0d6eec60dbe826491817415e424f382d",
+  "root": "f93ea8b245079b8d42903c42252036d4163a8480d8ac3c76f6fb3bfb617eb50d"
+ }
+}

@@ -1,0 +1,41 @@
+/* Notifications (Meridian): what waits for the owner in the main column, how QED tells and the settings beside it (two
+   independent columns, kit.tsx useMasonry). An urgent row carries a lit edge as well as its word; a notice is delivery,
+   so the page's only tide is the counts and marks of what QED watches. Classes: pr-nt-. */
+.pr-nt-grid.board { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: var(--s5); }
+.pr-nt-grid > .panel { padding: var(--s5) var(--s6); }
+.pr-nt-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); margin-bottom: var(--s4); }
+.pr-nt-head h2 { font-size: var(--t-h3); font-weight: 650; }
+.pr-nt-head p { flex-basis: 100%; font-size: var(--t-small); color: var(--ink-3); }
+.pr-nt-calm { padding: var(--s4); border-radius: var(--r-md); background: linear-gradient(160deg, var(--qed-bg), transparent 70%); border: 1px solid var(--qed-line); color: var(--ink-2); font-size: var(--t-small); line-height: 1.55; }
+.pr-nt-list { display: grid; }
+.pr-nt-list > li { position: relative; display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: var(--s3); align-items: center; padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.pr-nt-list > li:first-child { border-top: 0; }
+.pr-nt-sec.has .pr-nt-list > li[data-u="critical"] { padding-left: var(--s4); }
+.pr-nt-sec.has .pr-nt-list > li[data-u="critical"]::before { content: ""; position: absolute; left: 0; top: var(--s3); bottom: var(--s3); width: 3px; border-radius: 2px; background: var(--loss); }
+.pr-nt-when { font-size: var(--t-small); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pr-nt-what { display: grid; gap: 4px; min-width: 0; }
+.pr-nt-what b { font-weight: 620; line-height: 1.4; }
+.pr-nt-what small { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--s2); font-size: var(--t-small); color: var(--ink-3); }
+.pr-nt-digest + .pr-nt-digest { margin-top: var(--s4); padding-top: var(--s4); border-top: 1px solid var(--rule-2); }
+.pr-nt-digest-h { margin-bottom: var(--s1); font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.pr-nt-lead { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.pr-nt-ladder { display: grid; margin-top: var(--s3); }
+.pr-nt-ladder > li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: var(--s3); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.pr-nt-ladder > li:first-child { border-top: 0; }
+.pr-nt-ladder p { font-size: var(--t-small); line-height: 1.45; color: var(--ink-2); }
+.pr-nt-ladder .pr-nt-then { color: var(--ink-3); }
+.pr-nt-u { margin-bottom: 4px; }
+.pr-nt-ico { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: color-mix(in oklab, var(--pane-2) 80%, transparent); border: 1px solid var(--rim); color: var(--ink-2); }
+.pr-nt-ico svg { width: 17px; height: 17px; stroke-width: 1.8; }
+.pr-nt-ico[data-u="critical"] { color: var(--loss); border-color: color-mix(in oklab, var(--loss) 35%, transparent); background: var(--loss-bg); }
+.pr-nt-ico[data-u="action"] { color: var(--due); border-color: color-mix(in oklab, var(--due) 35%, transparent); background: var(--due-bg); }
+.pr-nt-dedupe { display: flex; align-items: flex-start; gap: var(--s2); margin-top: var(--s2); padding-top: var(--s3); border-top: 1px solid var(--rule-2); font-size: var(--t-small); line-height: 1.45; color: var(--ink-2); }
+.pr-nt-dedupe svg { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--ink-3); }
+.pr-nt-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); align-items: end; }
+.pr-nt-save, .pr-nt-hint { grid-column: 1 / -1; }
+@media (max-width: 759px) {
+  .pr-nt-grid > .panel { padding: var(--s4); }
+  .pr-nt-list > li { grid-template-columns: minmax(0, 1fr) auto; }
+  .pr-nt-when { grid-column: 1 / -1; }
+  .pr-nt-form { grid-template-columns: minmax(0, 1fr); }
+}

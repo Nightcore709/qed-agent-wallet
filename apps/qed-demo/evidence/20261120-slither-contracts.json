@@ -1,0 +1,763 @@
+{
+ "what": "Static analysis of the vault's contracts (the approved release's, unmodified) with Slither",
+ "at": "2026-11-20T07:40:38.095Z",
+ "tool": "Slither 0.11.6, solc 0.8.26 through SOLC_VERSION, Foundry build with via_ir as the release configures it",
+ "how": "A copy of chain/vendor/{foundry.toml,contracts,lib} was made in a scratch directory and analysed there; the workspace copy and the approved release were not touched. Command: slither . --filter-paths \"lib/|contracts/test/|contracts/script/\" --exclude-informational --exclude-optimization",
+ "analysed": "44 contracts with 76 detectors",
+ "findings": 62,
+ "bySeverity": {
+  "high": 3,
+  "medium": 26,
+  "low": 33
+ },
+ "triage": [
+  {
+   "rule": "arbitrary-send-erc20",
+   "where": "QEDClearing.pay",
+   "count": 1,
+   "read": "yes",
+   "judgement": "Not exploitable as flagged. The line before the transfer reverts unless the caller is the obligation's debtor, and only a debtor can create an obligation for itself (issue uses msg.sender). The function is nonReentrant and clears the obligation before the transfer."
+  },
+  {
+   "rule": "reentrancy-balance",
+   "where": "QEDExecution.trade",
+   "count": 2,
+   "read": "yes",
+   "judgement": "Not exploitable as flagged. trade is nonReentrant. The values called stale are balance differences recomputed after the external calls, which is the intended accounting: only what this trade moved is counted. It does rely on the venues being the pools the owner named."
+  },
+  {
+   "rule": "incorrect-equality",
+   "where": "QEDExecution._swap, CPMMPool.swap",
+   "count": 2,
+   "read": "yes",
+   "judgement": "Benign: a guard against a zero-output hop, and a test pool's input check."
+  },
+  {
+   "rule": "unused-return",
+   "where": "QEDExecution, QEDTreasuryPolicy, two bounties, PrivateMinVarianceVerifier",
+   "count": 8,
+   "read": "yes",
+   "judgement": "Benign. The ignored values are a pool's timestamp, a bound, an id, and a signature-recovery error code whose failure case (zero signer) is rejected explicitly on the next line."
+  },
+  {
+   "rule": "missing-zero-check",
+   "where": "QEDVault.transferOwnership, PrivateMinVarianceVerifier constructor",
+   "count": 2,
+   "read": "yes",
+   "judgement": "Benign. Ownership transfer is two-step, so a zero address can never accept. The verifier rejects a zero signer whatever the configured vendor is."
+  },
+  {
+   "rule": "uninitialized-local",
+   "where": "seven contracts",
+   "count": 16,
+   "read": "five of sixteen",
+   "judgement": "The five read are accumulators that rely on Solidity's zero initialisation. The other eleven were not read."
+  },
+  {
+   "rule": "timestamp",
+   "where": "five contracts",
+   "count": 12,
+   "read": "no",
+   "judgement": "Not read one by one. Validity windows and due dates compare with the block time by design."
+  },
+  {
+   "rule": "calls-loop",
+   "where": "QEDExecution, QEDTreasuryPolicy, ExecutionBounty",
+   "count": 18,
+   "read": "no",
+   "judgement": "Not read one by one. Loops over hops and venues, which the contracts bound by constants."
+  },
+  {
+   "rule": "reentrancy-events",
+   "where": "QEDTreasuryPolicy.convert",
+   "count": 1,
+   "read": "no",
+   "judgement": "An event emitted after an external call; ordering of logs only."
+  }
+ ],
+ "conclusion": "No finding was judged exploitable. All three high-severity findings and the security-relevant medium and low ones were read against the code. This is one tool and one reader, on contracts that are not QED workspace code: it is not an audit. An independent audit is a requirement before any real funds.",
+ "detectors": [
+  {
+   "rule": "arbitrary-send-erc20",
+   "impact": "High",
+   "confidence": "High",
+   "file": "contracts/src/QEDClearing.sol",
+   "lines": [
+    125,
+    136
+   ],
+   "said": "QEDClearing.pay(uint256) (contracts/src/QEDClearing.sol#125-136) uses arbitrary from in transferFrom: asset.safeTransferFrom(o.debtor,o.creditor,amount) (contracts/src/QEDClearing.sol#134)"
+  },
+  {
+   "rule": "reentrancy-balance",
+   "impact": "High",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    179,
+    223
+   ],
+   "said": "Reentrancy in QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDExecution.sol#179-223): External call allowing reentrancy: - _swap(route[i],i,tokens,pre) (contracts/src/QEDExecution.sol#205) - IV2Pair(v.pool).swap(out0,out1,address(this),) (contracts/src/QEDExecution.sol#353) Balance read before the ca"
+  },
+  {
+   "rule": "reentrancy-balance",
+   "impact": "High",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    179,
+    223
+   ],
+   "said": "Reentrancy in QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDExecution.sol#179-223): External call allowing reentrancy: - vault.executePayment(m,ownerSig,c,cosignerSig) (contracts/src/QEDExecution.sol#199) Balance read before the call: - (tokens,pre) = _snapshot(order.tokenOut) (contracts/src/QEDExe"
+  },
+  {
+   "rule": "incorrect-equality",
+   "impact": "Medium",
+   "confidence": "High",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    334,
+    354
+   ],
+   "said": "QEDExecution._swap(QEDExecution.Hop,uint256,address[],uint256[]) (contracts/src/QEDExecution.sol#334-354) uses a dangerous strict equality: - out == 0 (contracts/src/QEDExecution.sol#350)"
+  },
+  {
+   "rule": "incorrect-equality",
+   "impact": "Medium",
+   "confidence": "High",
+   "file": "contracts/src/venues/CPMMPool.sol",
+   "lines": [
+    63,
+    84
+   ],
+   "said": "CPMMPool.swap(uint256,uint256,address,bytes) (contracts/src/venues/CPMMPool.sol#63-84) uses a dangerous strict equality: - in0 == 0 && in1 == 0 (contracts/src/venues/CPMMPool.sol#77)"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDClearing.sol",
+   "lines": [
+    157,
+    157
+   ],
+   "said": "QEDClearing.net(QEDClearing.Netting).prev (contracts/src/QEDClearing.sol#157) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/MaximalityBounty.sol",
+   "lines": [
+    72,
+    72
+   ],
+   "said": "MaximalityBounty.accepts(MaximalityBounty.Economy,MaximalityBounty.Certified).bound (contracts/src/bounties/MaximalityBounty.sol#72) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    186,
+    186
+   ],
+   "said": "QEDTreasuryPolicy._midOut(uint256).depthOut (contracts/src/QEDTreasuryPolicy.sol#186) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/MinVarianceVerifier.sol",
+   "lines": [
+    122,
+    122
+   ],
+   "said": "MinVarianceVerifier._checkStationarityAndGap(uint256,int256[],int256[],int256,int256[],int256).quad (contracts/src/verifiers/MinVarianceVerifier.sol#122) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/MinVarianceVerifier.sol",
+   "lines": [
+    144,
+    144
+   ],
+   "said": "MinVarianceVerifier._checkConvexity(uint256,int256[],int256[],int256).p (contracts/src/verifiers/MinVarianceVerifier.sol#144) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    185,
+    185
+   ],
+   "said": "QEDTreasuryPolicy._midOut(uint256).depthIn (contracts/src/QEDTreasuryPolicy.sol#185) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/MinVarianceVerifier.sol",
+   "lines": [
+    105,
+    105
+   ],
+   "said": "MinVarianceVerifier._checkPrimal(uint256,int256[],int256).sumW (contracts/src/verifiers/MinVarianceVerifier.sol#105) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/MinVarianceVerifier.sol",
+   "lines": [
+    121,
+    121
+   ],
+   "said": "MinVarianceVerifier._checkStationarityAndGap(uint256,int256[],int256[],int256,int256[],int256).gap (contracts/src/verifiers/MinVarianceVerifier.sol#121) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    340,
+    340
+   ],
+   "said": "QEDExecution._swap(QEDExecution.Hop,uint256,address[],uint256[]).base (contracts/src/QEDExecution.sol#340) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    264,
+    264
+   ],
+   "said": "QEDExecution._checkOrder(QEDVault.Mandate,QEDVault.Certificate,QEDExecution.Order).listed (contracts/src/QEDExecution.sol#264) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/MinVarianceVerifier.sol",
+   "lines": [
+    125,
+    125
+   ],
+   "said": "MinVarianceVerifier._checkStationarityAndGap(uint256,int256[],int256[],int256,int256[],int256).g (contracts/src/verifiers/MinVarianceVerifier.sol#125) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/OptimalityBounty.sol",
+   "lines": [
+    80,
+    80
+   ],
+   "said": "OptimalityBounty._quad(uint256,int256[],int256[]).row (contracts/src/bounties/OptimalityBounty.sol#80) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDClearing.sol",
+   "lines": [
+    221,
+    221
+   ],
+   "said": "QEDClearing.openObligations().j (contracts/src/QEDClearing.sol#221) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDClearing.sol",
+   "lines": [
+    156,
+    156
+   ],
+   "said": "QEDClearing.net(QEDClearing.Netting).bound (contracts/src/QEDClearing.sol#156) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    527,
+    527
+   ],
+   "said": "QEDVault._checkCertificate(QEDVault.Mandate,bytes32,QEDVault.Certificate,bytes).listed (contracts/src/QEDVault.sol#527) is a local variable never initialized"
+  },
+  {
+   "rule": "uninitialized-local",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/OptimalityBounty.sol",
+   "lines": [
+    62,
+    62
+   ],
+   "said": "OptimalityBounty.claim(bytes,bytes,int256[]).sumX (contracts/src/bounties/OptimalityBounty.sol#62) is a local variable never initialized"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    179,
+    223
+   ],
+   "said": "QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDExecution.sol#179-223) ignores return value by vault.executePayment(m,ownerSig,c,cosignerSig) (contracts/src/QEDExecution.sol#199)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    129,
+    166
+   ],
+   "said": "QEDTreasuryPolicy.convert(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDTreasuryPolicy.sol#129-166) ignores return value by (amountOut,None) = execution.trade(m,ownerSig,c,cosignerSig,order,route,prices) (contracts/src/QEDTreasuryPolicy.sol#153)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/PrivateMinVarianceVerifier.sol",
+   "lines": [
+    68,
+    85
+   ],
+   "said": "PrivateMinVarianceVerifier.verify(bytes,bytes) (contracts/src/verifiers/PrivateMinVarianceVerifier.sol#68-85) ignores return value by (signer,None,None) = ECDSA.tryRecover(MessageHashUtils.toEthSignedMessageHash(attestationDigest(dataCommitment,universe)),vendorSig) (contracts/src/verifiers/PrivateMinVarianceVerifier.sol#75-76)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    334,
+    354
+   ],
+   "said": "QEDExecution._swap(QEDExecution.Hop,uint256,address[],uint256[]) (contracts/src/QEDExecution.sol#334-354) ignores return value by (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/QEDExecution.sol#346)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) ignores return value by (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/bounties/ExecutionBounty.sol#81)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/OptimalityBounty.sol",
+   "lines": [
+    51,
+    76
+   ],
+   "said": "OptimalityBounty.claim(bytes,bytes,int256[]) (contracts/src/bounties/OptimalityBounty.sol#51-76) ignores return value by verifier.verify(spec,solution) (contracts/src/bounties/OptimalityBounty.sol#56)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    277,
+    290
+   ],
+   "said": "QEDExecution._dualBound(uint256,address,QEDExecution.Price[]) (contracts/src/QEDExecution.sol#277-290) ignores return value by (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/QEDExecution.sol#284)"
+  },
+  {
+   "rule": "unused-return",
+   "impact": "Medium",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    183,
+    197
+   ],
+   "said": "QEDTreasuryPolicy._midOut(uint256) (contracts/src/QEDTreasuryPolicy.sol#183-197) ignores return value by (r0,r1,None) = IV2Pair(vs[i].pool).getReserves() (contracts/src/QEDTreasuryPolicy.sol#191)"
+  },
+  {
+   "rule": "missing-zero-check",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    408,
+    408
+   ],
+   "said": "QEDVault.transferOwnership(address).newOwner (contracts/src/QEDVault.sol#408) lacks a zero-check on : - pendingOwner = newOwner (contracts/src/QEDVault.sol#409)"
+  },
+  {
+   "rule": "missing-zero-check",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/verifiers/PrivateMinVarianceVerifier.sol",
+   "lines": [
+    54,
+    54
+   ],
+   "said": "PrivateMinVarianceVerifier.constructor(IGroth16PrivateMinVariance,address).dataVendor_ (contracts/src/verifiers/PrivateMinVarianceVerifier.sol#54) lacks a zero-check on : - dataVendor = dataVendor_ (contracts/src/verifiers/PrivateMinVarianceVerifier.sol#56)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    334,
+    354
+   ],
+   "said": "QEDExecution._swap(QEDExecution.Hop,uint256,address[],uint256[]) (contracts/src/QEDExecution.sol#334-354) has external calls inside a loop: IV2Pair(v.pool).swap(out0,out1,address(this),) (contracts/src/QEDExecution.sol#353) Calls stack containing the loop: QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[])"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    179,
+    223
+   ],
+   "said": "QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDExecution.sol#179-223) has external calls inside a loop: bal = IERC20(tokens[k]).balanceOf(address(this)) (contracts/src/QEDExecution.sol#210)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    183,
+    197
+   ],
+   "said": "QEDTreasuryPolicy._midOut(uint256) (contracts/src/QEDTreasuryPolicy.sol#183-197) has external calls inside a loop: (r0,r1,None) = IV2Pair(vs[i].pool).getReserves() (contracts/src/QEDTreasuryPolicy.sol#191) Calls stack containing the loop: QEDTreasuryPolicy.convert(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[])"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: bal = IERC20(tokens[k_scope_3]).balanceOf(address(this)) (contracts/src/bounties/ExecutionBounty.sol#102)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    183,
+    197
+   ],
+   "said": "QEDTreasuryPolicy._midOut(uint256) (contracts/src/QEDTreasuryPolicy.sol#183-197) has external calls inside a loop: (r0,r1,None) = IV2Pair(vs[i].pool).getReserves() (contracts/src/QEDTreasuryPolicy.sol#191) Calls stack containing the loop: QEDTreasuryPolicy.midOut(uint256)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    277,
+    290
+   ],
+   "said": "QEDExecution._dualBound(uint256,address,QEDExecution.Price[]) (contracts/src/QEDExecution.sol#277-290) has external calls inside a loop: (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/QEDExecution.sol#284) Calls stack containing the loop: QEDExecution.quoteBound(uint256,address,QEDExecution.Price[])"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: IV2Pair(v.pool).swap(out,0,address(this),) (contracts/src/bounties/ExecutionBounty.sol#86)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: IV2Pair(v.pool).swap(0,out,address(this),) (contracts/src/bounties/ExecutionBounty.sol#86)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    277,
+    290
+   ],
+   "said": "QEDExecution._dualBound(uint256,address,QEDExecution.Price[]) (contracts/src/QEDExecution.sol#277-290) has external calls inside a loop: (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/QEDExecution.sol#284) Calls stack containing the loop: QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[])"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: amt = IERC20(tokenIn).balanceOf(address(this)) - base (contracts/src/bounties/ExecutionBounty.sol#79)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    334,
+    354
+   ],
+   "said": "QEDExecution._swap(QEDExecution.Hop,uint256,address[],uint256[]) (contracts/src/QEDExecution.sol#334-354) has external calls inside a loop: amountIn = IERC20(tokenIn).balanceOf(address(this)) - base (contracts/src/QEDExecution.sol#344) Calls stack containing the loop: QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[])"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    308,
+    324
+   ],
+   "said": "QEDExecution._snapshot(address) (contracts/src/QEDExecution.sol#308-324) has external calls inside a loop: pre[k] = IERC20(buf[k]).balanceOf(address(this)) (contracts/src/QEDExecution.sol#322) Calls stack containing the loop: QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[])"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    146,
+    163
+   ],
+   "said": "QEDExecution.setVenues(address[],uint16[]) (contracts/src/QEDExecution.sol#146-163) has external calls inside a loop: _venues.push(Venue(pools[i],IV2Pair(pools[i]).token0(),IV2Pair(pools[i]).token1(),fees[i])) (contracts/src/QEDExecution.sol#159)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: IERC20(tokens[k_scope_2]).balanceOf(address(this)) < pre[k_scope_2] (contracts/src/bounties/ExecutionBounty.sol#93)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    146,
+    163
+   ],
+   "said": "QEDExecution.setVenues(address[],uint16[]) (contracts/src/QEDExecution.sol#146-163) has external calls inside a loop: (ok,ret) = pools[i].staticcall(abi.encodeWithSignature(feeBps())) (contracts/src/QEDExecution.sol#154)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/bounties/ExecutionBounty.sol#81)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/bounties/ExecutionBounty.sol",
+   "lines": [
+    47,
+    105
+   ],
+   "said": "ExecutionBounty.claim(uint256,address,QEDExecution.Price[],QEDExecution.Hop[]) (contracts/src/bounties/ExecutionBounty.sol#47-105) has external calls inside a loop: pre[k] = IERC20(tokens[k]).balanceOf(address(this)) (contracts/src/bounties/ExecutionBounty.sol#65)"
+  },
+  {
+   "rule": "calls-loop",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDExecution.sol",
+   "lines": [
+    334,
+    354
+   ],
+   "said": "QEDExecution._swap(QEDExecution.Hop,uint256,address[],uint256[]) (contracts/src/QEDExecution.sol#334-354) has external calls inside a loop: (r0,r1,None) = IV2Pair(v.pool).getReserves() (contracts/src/QEDExecution.sol#346) Calls stack containing the loop: QEDExecution.trade(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[])"
+  },
+  {
+   "rule": "reentrancy-events",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    129,
+    166
+   ],
+   "said": "Reentrancy in QEDTreasuryPolicy.convert(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDTreasuryPolicy.sol#129-166): External calls: - (amountOut,None) = execution.trade(m,ownerSig,c,cosignerSig,order,route,prices) (contracts/src/QEDTreasuryPolicy.sol#153) Event emitted after the call(s): - PolicyConversion(c.intentId,"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    304,
+    314
+   ],
+   "said": "QEDVault.settle(uint256) (contracts/src/QEDVault.sol#304-314) uses timestamp for comparisons Dangerous comparisons: - block.timestamp < l.dueAt (contracts/src/QEDVault.sol#307)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/ProofEscrow.sol",
+   "lines": [
+    157,
+    164
+   ],
+   "said": "ProofEscrow.refund(uint256) (contracts/src/ProofEscrow.sol#157-164) uses timestamp for comparisons Dangerous comparisons: - block.timestamp <= j.deliverBy && msg.sender != j.provider (contracts/src/ProofEscrow.sol#160)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    505,
+    537
+   ],
+   "said": "QEDVault._checkCertificate(QEDVault.Mandate,bytes32,QEDVault.Certificate,bytes) (contracts/src/QEDVault.sol#505-537) uses timestamp for comparisons Dangerous comparisons: - block.timestamp < c.notBefore || block.timestamp > c.expiresAt (contracts/src/QEDVault.sol#517) - c.dueAt != 0 && (c.dueAt <= block.timestamp || c.dueAt > block.timestamp + MAX_FORWARD) (contracts/src/QEDVault.sol#522)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDLens.sol",
+   "lines": [
+    41,
+    60
+   ],
+   "said": "QEDLens.blastRadius(QEDVault,uint256) (contracts/src/QEDLens.sol#41-60) uses timestamp for comparisons Dangerous comparisons: - block.timestamp >= start + window (contracts/src/QEDLens.sol#49) - horizonEnd >= currentEnd (contracts/src/QEDLens.sol#58) - capacity < free (contracts/src/QEDLens.sol#59)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/TestUSD.sol",
+   "lines": [
+    35,
+    42
+   ],
+   "said": "TestUSD.faucet() (contracts/src/TestUSD.sol#35-42) uses timestamp for comparisons Dangerous comparisons: - last != 0 && block.timestamp < last + FAUCET_COOLDOWN (contracts/src/TestUSD.sol#37)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    539,
+    561
+   ],
+   "said": "QEDVault._consumeLimits(QEDVault.Mandate,bytes32,uint256) (contracts/src/QEDVault.sol#539-561) uses timestamp for comparisons Dangerous comparisons: - block.timestamp >= uint256(s.periodStart) + m.period (contracts/src/QEDVault.sol#542) - block.timestamp >= windowStart + WINDOW (contracts/src/QEDVault.sol#551)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    563,
+    582
+   ],
+   "said": "QEDVault._createLiability(address,uint256,uint64,bytes32,address) (contracts/src/QEDVault.sol#563-582) uses timestamp for comparisons Dangerous comparisons: - dueAt <= block.timestamp || dueAt > block.timestamp + MAX_FORWARD (contracts/src/QEDVault.sol#569)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDLens.sol",
+   "lines": [
+    62,
+    78
+   ],
+   "said": "QEDLens.snapshot(QEDVault) (contracts/src/QEDLens.sol#62-78) uses timestamp for comparisons Dangerous comparisons: - block.timestamp >= s.windowStart + v.WINDOW() (contracts/src/QEDLens.sol#68)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/ProofEscrow.sol",
+   "lines": [
+    137,
+    153
+   ],
+   "said": "ProofEscrow.deliver(uint256,bytes,bytes) (contracts/src/ProofEscrow.sol#137-153) uses timestamp for comparisons Dangerous comparisons: - block.timestamp > j.deliverBy (contracts/src/ProofEscrow.sol#141)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDTreasuryPolicy.sol",
+   "lines": [
+    129,
+    166
+   ],
+   "said": "QEDTreasuryPolicy.convert(QEDVault.Mandate,bytes,QEDVault.Certificate,bytes,QEDExecution.Order,QEDExecution.Hop[],QEDExecution.Price[]) (contracts/src/QEDTreasuryPolicy.sol#129-166) uses timestamp for comparisons Dangerous comparisons: - block.timestamp > p.validUntil (contracts/src/QEDTreasuryPolicy.sol#140)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/QEDVault.sol",
+   "lines": [
+    491,
+    503
+   ],
+   "said": "QEDVault._checkMandate(QEDVault.Mandate,bytes32,bytes) (contracts/src/QEDVault.sol#491-503) uses timestamp for comparisons Dangerous comparisons: - block.timestamp < m.validFrom || block.timestamp > m.validUntil (contracts/src/QEDVault.sol#495)"
+  },
+  {
+   "rule": "timestamp",
+   "impact": "Low",
+   "confidence": "Medium",
+   "file": "contracts/src/ProofEscrow.sol",
+   "lines": [
+    100,
+    134
+   ],
+   "said": "ProofEscrow.open(ProofEscrow.Quote,bytes) (contracts/src/ProofEscrow.sol#100-134) uses timestamp for comparisons Dangerous comparisons: - block.timestamp > q.validUntil (contracts/src/ProofEscrow.sol#102) - q.deliverBy <= block.timestamp (contracts/src/ProofEscrow.sol#103)"
+  }
+ ]
+}

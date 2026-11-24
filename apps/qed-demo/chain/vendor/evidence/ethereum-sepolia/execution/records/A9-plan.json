@@ -1,0 +1,138 @@
+{
+  "venues": [
+    {
+      "pool": "0xf88d53902b9ddf1abF20CFc020a03AFfA9298a58",
+      "r0": "821241496",
+      "r1": "717019284",
+      "feeBps": 30
+    },
+    {
+      "pool": "0x1FD2928ce46c29623Ed72a1134a761c2a3536031",
+      "r0": "257017232",
+      "r1": "223845073",
+      "feeBps": 5
+    },
+    {
+      "pool": "0x442229Dacb4dC05689F95138017d9ea2020d829b",
+      "r0": "609047365",
+      "r1": "197037824726037905",
+      "feeBps": 30
+    },
+    {
+      "pool": "0x70674A53cD7f1e46D1d10Bb17c6007D458EbdbFa",
+      "r0": "820076980",
+      "r1": "302962175273962095",
+      "feeBps": 30
+    },
+    {
+      "pool": "0x81557A91D28Ce0b17F475466A2B7E3EdB8541c64",
+      "r0": "302693907",
+      "r1": "266134097",
+      "feeBps": 100
+    }
+  ],
+  "route": [
+    {
+      "venue": 0,
+      "zeroForOne": true,
+      "amountIn": "9377351"
+    },
+    {
+      "venue": 1,
+      "zeroForOne": true,
+      "amountIn": "2931300"
+    },
+    {
+      "venue": 2,
+      "zeroForOne": true,
+      "amountIn": "4218814"
+    },
+    {
+      "venue": 3,
+      "zeroForOne": false,
+      "amountIn": "0"
+    },
+    {
+      "venue": 4,
+      "zeroForOne": true,
+      "amountIn": "3472535"
+    }
+  ],
+  "perHop": [
+    {
+      "venue": 0,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "9377351",
+      "amountOut": "8070846"
+    },
+    {
+      "venue": 1,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "2931300",
+      "amountOut": "2522932"
+    },
+    {
+      "venue": 2,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0xF61C0459cb436Ae760B3af0e58700e9df046580f",
+      "amountIn": "4218814",
+      "amountOut": "1351434774033312"
+    },
+    {
+      "venue": 3,
+      "tokenIn": "0xF61C0459cb436Ae760B3af0e58700e9df046580f",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "1351434774033312",
+      "amountOut": "3631025"
+    },
+    {
+      "venue": 4,
+      "tokenIn": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+      "tokenOut": "0x98D1A388120e5A535341532047B604655fe1362F",
+      "amountIn": "3472535",
+      "amountOut": "2988642"
+    }
+  ],
+  "prices": {
+    "0x98d1a388120e5a535341532047b604655fe1362f": "1000000000000000000000000000000000000",
+    "0x7adb609421e30b3df3063ff2de9d425564893f35": "850986631331817233444296377944244224",
+    "0xf61c0459cb436ae760b3af0e58700e9df046580f": "2674896667154493220572889088"
+  },
+  "nu": {
+    "0x98d1a388120e5a535341532047b604655fe1362f": 1,
+    "0x7adb609421e30b3df3063ff2de9d425564893f35": 0.8509866313318172,
+    "0xf61c0459cb436ae760b3af0e58700e9df046580f": 2.674896667154493e-9
+  },
+  "expectedOut": "17213445",
+  "bound": "17213448",
+  "gapPpm": 0.174,
+  "solverSweeps": 13,
+  "alternatives": [
+    {
+      "policy": "certified",
+      "description": "QED: 5 hops through 5 venues, proven within 0.174 ppm of the optimum",
+      "amountOut": "17213445",
+      "shortfallBps": 0
+    },
+    {
+      "policy": "direct-optimal",
+      "description": "Optimal split over the direct pools only (a single-pair aggregator)",
+      "amountOut": "17161807",
+      "shortfallBps": 29.99
+    },
+    {
+      "policy": "equal-split",
+      "description": "Equal split across the direct pools",
+      "amountOut": "17092246",
+      "shortfallBps": 70.4
+    },
+    {
+      "policy": "single-venue",
+      "description": "Everything through the best single pool",
+      "amountOut": "16996765",
+      "shortfallBps": 125.87
+    }
+  ]
+}

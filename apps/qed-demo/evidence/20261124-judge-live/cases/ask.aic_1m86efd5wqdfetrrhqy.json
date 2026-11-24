@@ -1,0 +1,608 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "ask.aic_1m86efd5wqdfetrrhqy",
+ "kind": "model-call",
+ "title": "Model call: 0 proposals (none)",
+ "outcome": "answered",
+ "venue": "none",
+ "workspace": "usr_1m86eeat0ah22bd6w2m",
+ "assembledAt": "2026-11-24T09:34:36.112Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "Pay CloudCo 300 test rupees from my vault.",
+    "source": "the owner's question to Ask, as typed",
+    "at": "2026-11-24T09:34:01.404Z"
+   },
+   "instruments": [],
+   "statement": "A model call grants no authority. A proposal becomes an instruction only when the owner signs its exact document with a passkey."
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": true,
+   "isModel": true,
+   "label": "model",
+   "statement": "A real model call: provider \"claude-cli\", model \"claude-opus-5-5\", as recorded when it answered.",
+   "call": {
+    "id": "aic_1m86efd5wqdfetrrhqy",
+    "at": "2026-11-24T09:34:01.404Z",
+    "provider": "claude-cli",
+    "model": "claude-opus-5-5",
+    "ok": true,
+    "error": null,
+    "latencyMs": 9053,
+    "usage": {
+     "input_tokens": 2,
+     "output_tokens": 637,
+     "cost_usd": 0.0569478,
+     "turns": 2,
+     "responseId": "sha256:2f71cc31c8d1ba74"
+    },
+    "conversationId": "cnv_1m86efp1cv8e4dsyqj5",
+    "turnId": "trn_1m86efp1c030vap1vzh"
+   },
+   "sent": {
+    "question": "Pay Vault payee cdb0c0 300 test rupees from my vault.",
+    "history": [],
+    "data": {
+     "asOf": "2026-11-24T09:34:01.404Z",
+     "currency": "INR; amounts below are in rupees unless a field says paise",
+     "position": {
+      "bank": 800000,
+      "fixedDeposit": 0,
+      "holdingsValue": 0,
+      "bankReserve": {
+       "mustStayForWhatIsDue": 159881.97,
+       "freeBeyondThat": 640118.03,
+       "shortBy": 0,
+       "hardestDate": "2027-01-06",
+       "allowsFor": {
+        "incomeLateDays": 5,
+        "salariesLost": 1
+       }
+      },
+      "creditCardOwed": 120000,
+      "personalLoanOwed": 300000,
+      "homeLoanOwed": 2000000,
+      "worstCase": 650000,
+      "floor": 500000,
+      "cushionAboveFloor": 150000,
+      "worstCaseLimitsAreIllustrative": false
+     },
+     "profile": {
+      "monthlyIncome": 120000,
+      "monthlyEverydaySpending": 70000,
+      "personalLoanInstalment": 10000,
+      "homeLoanInstalment": 20000
+     },
+     "holdings": [],
+     "dueInNext30Days": [
+      {
+       "what": "Personal loan instalment",
+       "rupees": 10000,
+       "due": "2026-12-05T03:30:00.000Z",
+       "kind": "emi"
+      },
+      {
+       "what": "Home loan instalment",
+       "rupees": 20000,
+       "due": "2026-12-05T03:30:00.000Z",
+       "kind": "emi"
+      }
+     ],
+     "programs": [],
+     "payees": [],
+     "rates": {
+      "rate.savings": {
+       "apr": "0.0275",
+       "box": [
+        "0.025",
+        "0.03"
+       ],
+       "status": "modelled",
+       "source": "X5 rate box; a modelling range, not one bank's published rate"
+      },
+      "rate.fd": {
+       "apr": "0.0625",
+       "breakPenalty": "0.01",
+       "status": "modelled",
+       "source": "X5 model; deposit break rule v3.2 is a modelling rule (D-046)"
+      },
+      "rate.card": {
+       "apr": "0.43",
+       "box": [
+        "0.40",
+        "0.46"
+       ],
+       "status": "modelled",
+       "source": "X5 rate box"
+      },
+      "rate.loan.personal": {
+       "apr": "0.14",
+       "prepayCharge": "0.03",
+       "status": "modelled",
+       "source": "X5 model"
+      },
+      "rate.loan.home": {
+       "apr": "0.0875",
+       "box": [
+        "0.08",
+        "0.095"
+       ],
+       "status": "modelled",
+       "source": "X5 rate box"
+      }
+     },
+     "cashFlow": {
+      "countedMonthlyOutflows": [
+       {
+        "what": "Everyday spending (your figure)",
+        "rupees": 70000
+       }
+      ],
+      "monthlySpareAfterOutflowsAndInstalments": 20000,
+      "note": "A negative spare figure means the recorded outflows exceed the recorded income."
+     },
+     "checks": {
+      "cardRepaymentOf50000": {
+       "certified": true,
+       "reason": null
+      },
+      "noteOnCertification": "Only the paydown kind can be certified; QED recomputes it before anything runs. A plan is certified only if two independent checkers agree it never leaves the household worse off, or deeper in a shortfall, than doing nothing in every approved scenario."
+     },
+     "instruments": [
+      {
+       "instrumentId": "coindcx:BTCINR",
+       "name": "Bitcoin in rupees",
+       "type": "digital asset traded in rupees",
+       "price": "5210652.82",
+       "priceType": "bid",
+       "priceAgeSeconds": 1,
+       "stale": false,
+       "pastYearChange": null,
+       "limitUsedForWorstCase": "0.50"
+      },
+      {
+       "instrumentId": "coindcx:ETHINR",
+       "name": "Ether in rupees",
+       "type": "digital asset traded in rupees",
+       "price": "260507.67",
+       "priceType": "bid",
+       "priceAgeSeconds": 1,
+       "stale": false,
+       "pastYearChange": null,
+       "limitUsedForWorstCase": "0.50"
+      },
+      {
+       "instrumentId": "coindcx:USDTINR",
+       "name": "Tether in rupees",
+       "type": "digital asset traded in rupees",
+       "price": "86.66",
+       "priceType": "bid",
+       "priceAgeSeconds": 1,
+       "stale": false,
+       "pastYearChange": null,
+       "limitUsedForWorstCase": "0.10"
+      },
+      {
+       "instrumentId": "amfi:119110",
+       "name": "HDFC Overnight Fund (Direct, Growth)",
+       "type": "mutual fund (overnight)",
+       "price": "104.8256",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "4.4% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.01"
+      },
+      {
+       "instrumentId": "amfi:120684",
+       "name": "ICICI Prudential Nifty Next 50 Index Fund (Direct, Growth)",
+       "type": "mutual fund (index)",
+       "price": "135.9489",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "43.2% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.25"
+      },
+      {
+       "instrumentId": "amfi:119771",
+       "name": "Kotak Arbitrage Fund (Direct, Growth)",
+       "type": "mutual fund (arbitrage)",
+       "price": "104.5959",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "3.7% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.01"
+      },
+      {
+       "instrumentId": "amfi:148381",
+       "name": "Motilal Oswal S&P 500 Index Fund (Direct, Growth)",
+       "type": "mutual fund (international)",
+       "price": "132.0387",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "22.8% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.25"
+      },
+      {
+       "instrumentId": "amfi:118701",
+       "name": "Nippon India Liquid Fund (Direct, Growth)",
+       "type": "mutual fund (liquid)",
+       "price": "105.3331",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "4.8% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.01"
+      },
+      {
+       "instrumentId": "amfi:122639",
+       "name": "Parag Parikh Flexi Cap Fund (Direct, Growth)",
+       "type": "mutual fund (flexi)",
+       "price": "110.3084",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "10.8% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.25"
+      },
+      {
+       "instrumentId": "amfi:119788",
+       "name": "SBI Gold Fund (Direct, Growth)",
+       "type": "mutual fund (gold)",
+       "price": "92.5202",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "-3.1% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.15"
+      },
+      {
+       "instrumentId": "amfi:120716",
+       "name": "UTI Nifty 50 Index Fund (Direct, Growth)",
+       "type": "mutual fund (index)",
+       "price": "102.8392",
+       "priceType": "nav",
+       "priceAgeSeconds": 140641,
+       "stale": false,
+       "pastYearChange": "7.9% from 2025-11-21 to 2026-11-23 (past change, not a forecast)",
+       "limitUsedForWorstCase": "0.25"
+      }
+     ],
+     "kinds": [
+      {
+       "kind": "invest",
+       "pillar": "grow",
+       "what": "Buy a fixed rupee amount of one fund or asset on a schedule.",
+       "paramsShape": "{\"instrumentId\": string, \"amount\": paise, \"schedule\": {\"type\":\"monthly\",\"day\":1-28,\"at\":\"HH:MM\"} | {\"type\":\"weekly\",\"weekday\":0-6,\"at\":\"HH:MM\"} | {\"type\":\"daily\",\"at\":\"HH:MM\"} | {\"type\":\"every\",\"minutes\":n}} - buys a fixed rupee amount on a schedule"
+      },
+      {
+       "kind": "sweep",
+       "pillar": "save",
+       "what": "Keep a buffer in the bank and move the rest into a liquid fund; bring it back when the buffer runs low.",
+       "paramsShape": "{\"instrumentId\": a liquid, overnight or arbitrage fund id, \"keep\": paise to keep in the bank, \"minMove\": paise, \"topUp\": true|false} - parks bank money above the buffer in the fund"
+      },
+      {
+       "kind": "paydown",
+       "pillar": "save",
+       "what": "Move savings into repaying debt or a deposit, only if two independent checkers find it never leaves you worse off in the scenarios you approve.",
+       "paramsShape": "{\"plan\": {\"card\": rupees, \"personal_loan\": rupees, \"home_loan\": rupees, \"fd\": rupees, \"liquid_fund\": rupees}} - one-off; only runs if two checkers certify it never leaves the owner worse off in the approved scenarios"
+      },
+      {
+       "kind": "bills",
+       "pillar": "spend",
+       "what": "Pay bills from payees you name when they fall due, within a cap for each bill.",
+       "paramsShape": "{\"payeeHandles\": [addresses from DATA.payees], \"capPerBill\": paise, \"leadMinutes\": n} - pays registered bills when due"
+      },
+      {
+       "kind": "exit",
+       "pillar": "protect",
+       "what": "Sell part or all of a holding when its price drops to a level you set, or falls a set percentage from its high.",
+       "paramsShape": "{\"instrumentId\": string, \"mode\": \"below\", \"price\": \"decimal text\", \"sellBps\": 1-10000} or {\"instrumentId\": string, \"mode\": \"trail\", \"trailPct\": number, \"sellBps\": 1-10000} - sells when the price falls"
+      },
+      {
+       "kind": "floor",
+       "pillar": "protect",
+       "what": "If your worst case falls below your floor, sell enough of what can fall to bring it back above. It only ever sells.",
+       "paramsShape": "{\"buffer\": paise} - sells risk when the worst case drops below the owner's floor; never buys"
+      },
+      {
+       "kind": "rebalance",
+       "pillar": "grow",
+       "what": "Hold several funds or assets in set proportions and trade back to them when they drift beyond a band.",
+       "paramsShape": "{\"legs\": [{\"instrumentId\": string, \"weightBps\": n}] summing to 10000, \"bandBps\": 50-3000} - trades back to target shares"
+      },
+      {
+       "kind": "split",
+       "pillar": "earn",
+       "what": "When pay or earnings land, send set shares to investments or to your card. The rest stays in the bank.",
+       "paramsShape": "{\"rules\": [{\"to\":\"fund\",\"instrumentId\": string,\"shareBps\": n} | {\"to\":\"card\",\"shareBps\": n}], \"minIncome\": paise} - splits recorded income when it arrives"
+      }
+     ],
+     "wallet": {
+      "available": true,
+      "what": "An on-chain vault on a local test chain with valueless test tokens: a treasury in tINR and a dollar reserve in tUSD. Every figure is decimal text in its token.",
+      "treasury": {
+       "token": "tINR",
+       "free": "99750.00",
+       "ringFenced": "0.00"
+      },
+      "reserve": {
+       "token": "tUSD",
+       "free": "2.974112"
+      },
+      "mandate": {
+       "status": "active",
+       "token": "tINR",
+       "mostPerPayment": "250.00",
+       "mostPerPeriod": "1000.00",
+       "periodHours": 24,
+       "leftInPeriod": "750.00",
+       "mostInAll": "2500.00",
+       "leftInAll": "2250.00",
+       "validUntil": "2026-12-01T09:33:29.000Z"
+      },
+      "policy": {
+       "status": "active",
+       "keepFree": "10.000000",
+       "token": "tUSD"
+      },
+      "authorityBudget": {
+       "token": "tINR",
+       "available": "8.57",
+       "note": "What may still leave the vault's control: payments to others take it, a conversion only its real cost. The co-signer refuses anything beyond it."
+      },
+      "book": [
+       {
+        "payee": "vault-payee-cdb0c0",
+        "name": "Vault payee cdb0c0"
+       }
+      ],
+      "kinds": [
+       {
+        "kind": "wallet-policy",
+        "paramsShape": "{\"targetFree\": decimal text, test dollars (tUSD) to keep free in the dollar reserve, 2 to 80} - a standing policy: from then on the engine converts test rupees into the reserve in tranches whenever it is short, each within the mandate, decided by fixed code and checked by the co-signer and the contract"
+       },
+       {
+        "kind": "wallet-pay",
+        "paramsShape": "{\"payee\": a token from wallet.book, \"amount\": decimal text in test rupees (tINR), at most 2 decimals, \"dueInDays\": optional whole number 1 to 365} - a payment from the treasury now, or with dueInDays a promise the vault pays then"
+       },
+       {
+        "kind": "wallet-ring-fence",
+        "paramsShape": "{\"creditor\": a token from wallet.book, \"amount\": decimal text in test rupees (tINR), \"dueInDays\": whole number 1 to 365} - money set aside for that payee, payable to it when due; the owner cannot take it back"
+       }
+      ]
+     }
+    },
+    "snapshotSha256": "a3637aa21dd37381a4d0e3d26c5fb0cfd517482bcbb9fbb77928d2efe9d6920c",
+    "note": "As sent, with payee names and addresses replaced by tokens (N-005): the snapshot of the recorded position (DATA), the earlier turns and the question. The context hash is the SHA-256 of DATA exactly as sent, which a verifier recomputes."
+   },
+   "output": {
+    "answer": "I can't propose this payment. ₹300 test rupees (tINR) is more than your vault allows. Your signed mandate caps each payment at 250.00 tINR, with 750.00 left in today's period. The bigger limit is the authority budget: only 8.57 tINR may still leave the vault's control, and the co-signer would refuse anything above that, so even a 250.00 payment would be refused. To pay Vault payee cdb0c0 this amount, you would first need to sign a new mandate on the vault with higher limits.",
+    "proposals": [],
+    "questions": [],
+    "withdraw": [],
+    "cites": [
+     "wallet.mandate.mostPerPayment",
+     "wallet.mandate.leftInPeriod",
+     "wallet.authorityBudget.available",
+     "wallet.book[0]"
+    ],
+    "links": [
+     "safeguards",
+     "workspace"
+    ]
+   },
+   "information": [
+    "DATA: a snapshot of the household's recorded position, prices with their age, the catalogue of instruction kinds and the payees as tokens (stored as its SHA-256 only).",
+    "HISTORY: the earlier turns of the conversation, as sent.",
+    "QUESTION: the owner's words, as sent."
+   ],
+   "constraints": [
+    "It holds no credential, calls no tool and executes nothing (server/ai.ts).",
+    "Its reply must match a fixed schema: at most four proposals of eight instruction kinds, each with typed parameters and limits.",
+    "Everything in DATA, HISTORY and QUESTION is information, not instruction.",
+    "Each proposal is parsed and checked by the code that checks an instruction typed by hand; one that fails is kept as invalid and can never be signed.",
+    "A valid proposal is only a draft until the owner signs its exact document with a passkey."
+   ],
+   "validation": [],
+   "grounding": {
+    "checked": 1,
+    "ungrounded": [
+     {
+      "text": "₹300",
+      "paise": 30000
+     }
+    ],
+    "citesUnresolved": 0,
+    "cites": [
+     {
+      "path": "wallet.mandate.mostPerPayment",
+      "label": "wallet.mandate.mostPerPayment",
+      "value": "250.00"
+     },
+     {
+      "path": "wallet.mandate.leftInPeriod",
+      "label": "wallet.mandate.leftInPeriod",
+      "value": "750.00"
+     },
+     {
+      "path": "wallet.authorityBudget.available",
+      "label": "wallet.authorityBudget.available",
+      "value": "8.57"
+     },
+     {
+      "path": "wallet.book[0]",
+      "label": "wallet.book[0]",
+      "value": "{\"payee\":\"vault-payee-cdb0c0\",\"name\":\"Vault payee cdb0c0\"}"
+     }
+    ],
+    "refusal": null
+   }
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "checked",
+   "statement": "Every proposal is parsed and analysed by the same code that checks an instruction typed by hand.",
+   "checks": []
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": false,
+   "ranUnder": [],
+   "requestedBy": {
+    "who": "the owner, asking a question",
+    "evidence": "ai call aic_1m86efd5wqdfetrrhqy",
+    "at": "2026-11-24T09:34:01.404Z"
+   },
+   "signaturesUsed": [],
+   "statement": "Nothing ran from this call: no proposal was signed.",
+   "wallet": [],
+   "proposals": []
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": false,
+   "moved": [],
+   "balances": [],
+   "entries": [],
+   "consequence": "Nothing moved: no proposal of this call was signed."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "306ee66e498b581552912fbdf41e3792e2e8d46b",
+    "uncommittedChanges": false,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "none"
+   },
+   "transactions": [],
+   "ids": {
+    "aiCall": "aic_1m86efd5wqdfetrrhqy",
+    "conversation": "cnv_1m86efp1cv8e4dsyqj5",
+    "proposals": [],
+    "programs": []
+   }
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [
+    {
+     "caseId": "ask.aic_1m86efpwvmm9cwnz96n",
+     "changed": "a different question",
+     "decision": "answered",
+     "proposals": []
+    },
+    {
+     "caseId": "ask.aic_1m86ef0h7b9szpx0tgh",
+     "changed": "a different question",
+     "decision": "proposed",
+     "proposals": [
+      "new"
+     ]
+    },
+    {
+     "caseId": "ask.aic_1m86eegkcp2xmr7byhc",
+     "changed": "a different question",
+     "decision": "proposed",
+     "proposals": [
+      "drafted"
+     ]
+    }
+   ],
+   "probes": [],
+   "note": "Other model calls of this workspace: a different question, and what QED made of the answer."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [],
+   "related": []
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "f3f08e0580aff6b42e80278ec77c9a25e1aa0571f126056748ba85ecfba3bca8",
+   "server": {
+    "ok": true,
+    "count": 0,
+    "brokenAt": null,
+    "head": "f3f08e0580aff6b42e80278ec77c9a25e1aa0571f126056748ba85ecfba3bca8",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled"
+  },
+  "note": "A model call writes no receipt. The workspace's receipt chain and ledger as a whole were verified when the case was assembled."
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "Payee names and addresses in what the model was sent",
+   "how": "replaced by tokens before sending (N-005); shown as sent",
+   "why": "The model never sees who is paid."
+  },
+  {
+   "what": "The model provider's response or session id",
+   "how": "replaced by \"sha256:\" and 16 hex digits of its SHA-256",
+   "why": "It identifies a session with the provider and is not needed to judge the decision."
+  }
+ ],
+ "cannotProve": [
+  "One call of one model: it does not show how the model behaves on other inputs.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "1cbeabf5fe2b5cf5aa3deff0f504274e61a2c0fa9b0cbf9862b14e9514c1dd2a",
+   "2": "e550b280da1cb4151d452b8497904b80534efafafa87c2b491d4ff21a91ba1c9",
+   "3": "41dd872c7382a6ed44edbb853747c3cc94cde0eb14bc7fd013736692821890e2",
+   "4": "c99603b2f11911c802a0eb10d304c36cff2074ec498c02d68eaf2c5db6d9402c",
+   "5": "d5a8f393dd5855a437b5763b81f21c08fd2a6241d6a04ff72a1ab0038663ff1b",
+   "6": "5512aebaf43a488477632ba8f4a8ff27e09374d516536c2bf34abb7816aedbe8",
+   "7": "70804b59b6212365f2306cbaff65d602ebcb7f91976a2f0f34e3c5e950ef8403",
+   "8": "8e0c7124772e9e3ae875b1bfe844f67911adcdeaca6a2f658da06d224a93ee5b"
+  },
+  "verification": "dae111357ef7de4557f97451c1c6cec09a7be6b6b409a2ad2967948ab33effc0",
+  "redactions": "5cf36263f117b656e2aee47b8bbb915d89505cf564782fc24a94a7e3b929e133",
+  "cannotProve": "f57e20cbf9b3977928b2f182b9044df7e4b8e21e6008b8662961ab9902b0c7e4",
+  "root": "9023e3059862c310f721eb7ff683ce7a0b7e0a75d5429ad3a6c51c37da305a8e"
+ }
+}

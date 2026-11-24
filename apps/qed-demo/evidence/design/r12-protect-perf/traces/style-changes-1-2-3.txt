@@ -1,0 +1,18 @@
+ 1800 ms:  7 recalcs,  24.7 ms, 718 elements
+ 1900 ms:  6 recalcs,  25.1 ms, 708 elements
+ 2000 ms:  7 recalcs,  25.2 ms, 709 elements
+ 2100 ms:  6 recalcs,  20.9 ms, 708 elements
+ 2200 ms:  9 recalcs,  25.2 ms, 1247 elements
+ 2300 ms:  5 recalcs,  53.3 ms, 3593 elements
+ 2400 ms:  6 recalcs,  65.2 ms, 4308 elements
+ 2500 ms:  6 recalcs,  58.1 ms, 4308 elements
+ 2600 ms:  6 recalcs,  63.1 ms, 4308 elements
+ 2700 ms:  5 recalcs,  22.1 ms, 1484 elements
+ 2800 ms:  7 recalcs,   3.2 ms, 112 elements
+ 2900 ms:  6 recalcs,   2.0 ms, 96 elements
+ 3000 ms:  6 recalcs,   1.6 ms, 71 elements
+ 3100 ms:  6 recalcs,   5.6 ms, 112 elements
+ 3200 ms:  4 recalcs,   1.0 ms, 22 elements
+ 3300 ms:  1 recalcs,   0.0 ms, 5 elements
+animations begun (name: first start ms, count): : 1409 (26)
+animation ends (ms): 1577, 1577, 1578, 1578, 1578, 1789, 2236, 2236, 2295, 2372, 2730, 2730, 3013, 3013, 3013, 3013, 3013, 3130, 3130, 3180, 3209

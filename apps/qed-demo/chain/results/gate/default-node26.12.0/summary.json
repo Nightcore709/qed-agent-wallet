@@ -1,0 +1,565 @@
+{
+ "schema": "qed.chain-rail.parity-gate/v1",
+ "tier": "default",
+ "startedAt": "2026-11-19T20:47:47.779Z",
+ "versions": {
+  "node": "v26.12.0",
+  "forge": "forge Version: 1.7.1",
+  "anvil": "anvil Version: 1.7.1",
+  "solc": "0.8.26"
+ },
+ "tree": {
+  "files": 537,
+  "withZk": false
+ },
+ "environment": {
+  "QED_OFFLINE": "1",
+  "ANTHROPIC_API_KEY": "(unset)",
+  "SOLC_VERSION": "0.8.26",
+  "FOUNDRY_OFFLINE": "true"
+ },
+ "suites": [
+  {
+   "label": "focused-ui",
+   "releaseCommand": "node --test agent/test/ui-contract.test.mjs agent/test/submission-tracker.test.mjs agent/test/amount-parsing.test.mjs agent/test/knowledge-and-interaction.test.mjs agent/test/final-polish.test.mjs agent/test/agent-scrolling-regression.test.mjs agent/test/release-identity.test.mjs agent/test/deploy-script.test.mjs agent/test/readiness.test.mjs",
+   "releaseTests": 62,
+   "runs": [
+    {
+     "file": "agent/test/ui-contract.test.mjs",
+     "command": "node --test agent/test/ui-contract.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 16,
+     "pass": 16,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "oldPageMarkup": true,
+     "output": "focused-ui__ui-contract.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/submission-tracker.test.mjs",
+     "command": "node --test agent/test/submission-tracker.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 4,
+     "pass": 4,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "focused-ui__submission-tracker.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/amount-parsing.test.mjs",
+     "command": "node --test agent/test/amount-parsing.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 9,
+     "pass": 9,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "focused-ui__amount-parsing.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/knowledge-and-interaction.test.mjs",
+     "command": "node --test agent/test/knowledge-and-interaction.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 8,
+     "pass": 8,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "focused-ui__knowledge-and-interaction.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/final-polish.test.mjs",
+     "command": "node --test agent/test/final-polish.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 6,
+     "pass": 6,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "oldPageMarkup": true,
+     "output": "focused-ui__final-polish.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/agent-scrolling-regression.test.mjs",
+     "command": "node --test agent/test/agent-scrolling-regression.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 3,
+     "pass": 3,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "oldPageMarkup": true,
+     "output": "focused-ui__agent-scrolling-regression.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/release-identity.test.mjs",
+     "notRun": true,
+     "reason": "Needs the release's complete runtime file set, including the circuit artefacts of the zk-optional tier. Run in the full tier."
+    },
+    {
+     "file": "agent/test/deploy-script.test.mjs",
+     "notRun": true,
+     "reason": "Asserts the old Railway deployment script; the test and its inputs are not vendored (hosting is a separately approved phase)."
+    },
+    {
+     "file": "agent/test/readiness.test.mjs",
+     "command": "node --test agent/test/readiness.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 5,
+     "pass": 5,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "focused-ui__readiness.test.mjs.txt"
+    }
+   ],
+   "tests": 51,
+   "pass": 51,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  },
+  {
+   "label": "types",
+   "releaseCommand": "tsc --noEmit -p .",
+   "releaseTests": null,
+   "runs": [],
+   "tests": 0,
+   "pass": 0,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": null,
+   "note": "The release's type check covers workbench.ts, whose dynamic import of the prover cannot resolve without the zk-optional tier. Run in the full tier."
+  },
+  {
+   "label": "typescript-tests",
+   "releaseCommand": "node --import tsx --test agent/test/*.test.ts",
+   "releaseTests": 64,
+   "runs": [
+    {
+     "file": "agent/test/engine.test.ts",
+     "command": "node --import tsx --test agent/test/engine.test.ts",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 6,
+     "pass": 6,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__engine.test.ts.txt"
+    },
+    {
+     "file": "agent/test/execution.test.ts",
+     "command": "node --import tsx --test agent/test/execution.test.ts",
+     "exit": 0,
+     "seconds": 1,
+     "tests": 6,
+     "pass": 6,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__execution.test.ts.txt"
+    },
+    {
+     "file": "agent/test/guard.test.ts",
+     "command": "node --import tsx --test agent/test/guard.test.ts",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 35,
+     "pass": 35,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__guard.test.ts.txt"
+    },
+    {
+     "file": "agent/test/netting.test.ts",
+     "command": "node --import tsx --test agent/test/netting.test.ts",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 3,
+     "pass": 3,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__netting.test.ts.txt"
+    },
+    {
+     "file": "agent/test/parity.test.ts",
+     "command": "node --import tsx --test agent/test/parity.test.ts",
+     "exit": 0,
+     "seconds": 1,
+     "tests": 1,
+     "pass": 1,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__parity.test.ts.txt"
+    },
+    {
+     "file": "agent/test/sandbox-clock.test.ts",
+     "command": "node --import tsx --test agent/test/sandbox-clock.test.ts",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 4,
+     "pass": 4,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__sandbox-clock.test.ts.txt"
+    },
+    {
+     "file": "agent/test/treasury.test.ts",
+     "command": "node --import tsx --test agent/test/treasury.test.ts",
+     "exit": 0,
+     "seconds": 3,
+     "tests": 4,
+     "pass": 4,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "typescript-tests__treasury.test.ts.txt"
+    }
+   ],
+   "tests": 59,
+   "pass": 59,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  },
+  {
+   "label": "solidity",
+   "releaseCommand": "forge test",
+   "releaseTests": 147,
+   "runs": [
+    {
+     "command": "SOLC_VERSION=0.8.26 forge test",
+     "exit": 0,
+     "seconds": 62,
+     "tests": 136,
+     "pass": 136,
+     "fail": 0,
+     "skipped": 0,
+     "suites": [
+      {
+       "suite": "contracts/test/ProofEscrow.t.sol:ProofEscrowTest",
+       "result": "ok",
+       "passed": 13,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/QEDExecution.t.sol:QEDExecutionTest",
+       "result": "ok",
+       "passed": 28,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/MinVarianceVerifier.t.sol:MinVarianceVerifierTest",
+       "result": "ok",
+       "passed": 12,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/QEDVault.t.sol:QEDVaultTest",
+       "result": "ok",
+       "passed": 36,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/QEDTreasuryPolicy.t.sol:QEDTreasuryPolicyTest",
+       "result": "ok",
+       "passed": 13,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/Bounties.t.sol:BountiesTest",
+       "result": "ok",
+       "passed": 11,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/Invariants.t.sol:InvariantsTest",
+       "result": "ok",
+       "passed": 8,
+       "failed": 0,
+       "skipped": 0
+      },
+      {
+       "suite": "contracts/test/QEDClearing.t.sol:QEDClearingTest",
+       "result": "ok",
+       "passed": 15,
+       "failed": 0,
+       "skipped": 0
+      }
+     ],
+     "failures": []
+    }
+   ],
+   "tests": 136,
+   "pass": 136,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  },
+  {
+   "label": "backend-unit",
+   "releaseCommand": "node --import tsx --test agent/test/demo.test.mjs",
+   "releaseTests": 8,
+   "runs": [
+    {
+     "file": "agent/test/demo.test.mjs",
+     "command": "node --import tsx --test agent/test/demo.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 8,
+     "pass": 8,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "backend-unit__demo.test.mjs.txt"
+    }
+   ],
+   "tests": 8,
+   "pass": 8,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  },
+  {
+   "label": "live-local-sandbox",
+   "releaseCommand": "node --import tsx --test --test-concurrency=1 agent/test/sandbox.integration.mjs agent/test/demo.integration.mjs agent/test/sandbox-clock.integration.mjs agent/test/local-runner.integration.mjs agent/test/health-gate.integration.mjs",
+   "releaseTests": 10,
+   "runs": [
+    {
+     "file": "agent/test/sandbox.integration.mjs",
+     "command": "node --import tsx --test --test-concurrency=1 agent/test/sandbox.integration.mjs",
+     "exit": 0,
+     "seconds": 3,
+     "tests": 1,
+     "pass": 1,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "live-local-sandbox__sandbox.integration.mjs.txt"
+    },
+    {
+     "file": "agent/test/demo.integration.mjs",
+     "command": "node --import tsx --test --test-concurrency=1 agent/test/demo.integration.mjs",
+     "exit": 0,
+     "seconds": 1,
+     "tests": 1,
+     "pass": 1,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "live-local-sandbox__demo.integration.mjs.txt"
+    },
+    {
+     "file": "agent/test/sandbox-clock.integration.mjs",
+     "command": "node --import tsx --test --test-concurrency=1 agent/test/sandbox-clock.integration.mjs",
+     "exit": 0,
+     "seconds": 126,
+     "tests": 3,
+     "pass": 3,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "live-local-sandbox__sandbox-clock.integration.mjs.txt"
+    },
+    {
+     "file": "agent/test/local-runner.integration.mjs",
+     "command": "node --import tsx --test --test-concurrency=1 agent/test/local-runner.integration.mjs",
+     "exit": 0,
+     "seconds": 1,
+     "tests": 2,
+     "pass": 2,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "live-local-sandbox__local-runner.integration.mjs.txt"
+    },
+    {
+     "file": "agent/test/health-gate.integration.mjs",
+     "notRun": true,
+     "reason": "Starts the release server in public mode, which binds every network interface (0.0.0.0). This workspace runs loopback only; running it needs the owner's go-ahead (F-071)."
+    }
+   ],
+   "tests": 7,
+   "pass": 7,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  },
+  {
+   "label": "workbench",
+   "releaseCommand": "node --import tsx --test agent/test/capabilities.test.mjs agent/test/workbench.integration.mjs",
+   "releaseTests": 10,
+   "runs": [
+    {
+     "file": "agent/test/capabilities.test.mjs",
+     "command": "node --import tsx --test agent/test/capabilities.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 3,
+     "pass": 3,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "workbench__capabilities.test.mjs.txt"
+    },
+    {
+     "file": "agent/test/workbench.integration.mjs",
+     "notRun": true,
+     "reason": "Statically imports the GPL-3.0-linked prover and runs the Groth16 scenario (zk-optional tier). Run in the full tier."
+    }
+   ],
+   "tests": 3,
+   "pass": 3,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  },
+  {
+   "label": "release-safety",
+   "releaseCommand": "node --experimental-strip-types --test agent/test/release-safety.test.mjs",
+   "releaseTests": 4,
+   "runs": [
+    {
+     "file": "agent/test/release-safety.test.mjs",
+     "command": "node --experimental-strip-types --test agent/test/release-safety.test.mjs",
+     "exit": 0,
+     "seconds": 0,
+     "tests": 4,
+     "pass": 4,
+     "fail": 0,
+     "cancelled": 0,
+     "skipped": 0,
+     "todo": 0,
+     "failures": [],
+     "output": "release-safety__release-safety.test.mjs.txt"
+    }
+   ],
+   "tests": 4,
+   "pass": 4,
+   "fail": 0,
+   "skipped": 0,
+   "cancelled": 0,
+   "ok": true
+  }
+ ],
+ "notRun": [
+  {
+   "file": "agent/test/deploy-script.test.mjs",
+   "label": "focused-ui",
+   "releaseTests": 7,
+   "reason": "Asserts the old Railway deployment script; the test and its inputs are not vendored (hosting is a separately approved phase)."
+  },
+  {
+   "file": "agent/test/health-gate.integration.mjs",
+   "label": "live-local-sandbox",
+   "releaseTests": 3,
+   "reason": "Starts the release server in public mode, which binds every network interface (0.0.0.0). This workspace runs loopback only; running it needs the owner's go-ahead (F-071)."
+  },
+  {
+   "file": "agent/test/release-identity.test.mjs",
+   "label": "focused-ui",
+   "releaseTests": 4,
+   "reason": "Needs the release's complete runtime file set, including the circuit artefacts of the zk-optional tier. Run in the full tier."
+  },
+  {
+   "file": "agent/test/private.test.ts",
+   "label": "typescript-tests",
+   "releaseTests": 5,
+   "reason": "Imports the GPL-3.0-linked prover (zk-optional tier). Run in the full tier."
+  },
+  {
+   "file": "agent/test/workbench.integration.mjs",
+   "label": "workbench",
+   "releaseTests": 7,
+   "reason": "Statically imports the GPL-3.0-linked prover and runs the Groth16 scenario (zk-optional tier). Run in the full tier."
+  },
+  {
+   "file": "contracts/test/PrivateMinVarianceVerifier.t.sol",
+   "label": "solidity",
+   "releaseTests": 11,
+   "reason": "Imports the GPL-3.0 Groth16Verifier.sol (zk-optional tier). Run in the full tier."
+  },
+  {
+   "file": "tsc --noEmit -p .",
+   "label": "types",
+   "releaseTests": 0,
+   "reason": "The release's type check covers workbench.ts, whose dynamic import of the prover cannot resolve without the zk-optional tier. Run in the full tier."
+  }
+ ],
+ "finishedAt": "2026-11-19T20:51:09.256Z",
+ "totals": {
+  "tests": 268,
+  "pass": 268,
+  "fail": 0,
+  "releaseTestsForTheseLabels": 305,
+  "releaseTestsNotRunHere": 37,
+  "allRunSuitesPassed": true
+ }
+}

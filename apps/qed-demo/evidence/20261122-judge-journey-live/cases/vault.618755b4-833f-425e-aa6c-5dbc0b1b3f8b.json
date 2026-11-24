@@ -1,0 +1,919 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "vault.618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+ "kind": "vault-job",
+ "title": "“Forged proof”: prices chosen to make the direct route look optimal → reverted on-chain with NotBestExecution (on an ephemeral chain of its own).",
+ "outcome": "reverted",
+ "venue": "ephemeral-chain",
+ "workspace": "usr_1m823h9ax3v64dv82zt",
+ "assembledAt": "2026-11-22T17:10:07.926Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "Security Lab · “Forged proof”: prices chosen to make the direct route look optimal. On an ephemeral chain of its own: a genuine order for 10 tUSD that its own owner signs and its own co-signer certifies, then the altered transaction, which must revert with NotBestExecution.",
+    "source": "the terms the owner was shown and signed",
+    "at": "2026-11-22T17:10:04.862Z"
+   },
+   "instruments": [
+    {
+     "kind": "owner-approval",
+     "id": "attack 963618b2…",
+     "signedAt": "2026-11-22T17:10:04.858Z",
+     "summary": "Security Lab · “Forged proof”: prices chosen to make the direct route look optimal. On an ephemeral chain of its own: a genuine order for 10 tUSD that its own owner signs and its own co-signer certifies, then the altered transaction, which must revert with NotBestExecution.",
+     "allowedWhenPrepared": true,
+     "checksWhenPrepared": [],
+     "document": {
+      "text": "{\"action\":\"attack\",\"kind\":\"vault-proposal\",\"network\":\"Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts\",\"note\":\"Nothing here is signed for your vault's owner account: this runs with the vault service's own keys (the guardian's, or those of a throwaway chain). Your passkey signs this document as your approval of exactly these terms, once. The tokens are valueless test tokens.\",\"proposalId\":\"963618b2-4710-4572-afef-bdea0d49ba4a\",\"sign\":[],\"summary\":\"Security Lab · “Forged proof”: prices chosen to make the direct route look optimal. On an ephemeral chain of its own: a genuine order for 10 tUSD that its own owner signs and its own co-signer certifies, then the altered transaction, which must revert with NotBestExecution.\",\"terms\":{\"attack\":\"forged-proof\",\"chainId\":31337,\"expect\":\"NotBestExecution\",\"genesisId\":\"0b851d93-3186-4e91-a67e-2eeb2f8f6f46\",\"genuineOrder\":{\"amount\":\"10\",\"amountIn\":\"10000000\",\"mandate\":\"the release sandbox's first mandate: ≤ 25 tUSD per payment, 100 a day, 200 in total, co-signature required\",\"tokenIn\":\"tUSD\",\"tokenOut\":\"tEUR\"},\"isolation\":\"Runs on an ephemeral Anvil chain of its own, seeded with the release's contracts and throwaway keys (its own owner, agent and co-signer), and destroyed afterwards. This workspace's vault, keys and owner, and the shared chain, are not involved.\",\"kind\":\"attack\",\"layer\":\"Weak duality: any price vector is a valid upper bound\",\"title\":\"“Forged proof”: prices chosen to make the direct route look optimal\"},\"termsHash\":\"sha256:9dade4457fdfc04ff91f848d9084b527657aec84eeacd74b3a225ebd6f7a79d2\",\"v\":2,\"vault\":\"qed-b1a3c3f33facc4c2f0f63315\"}",
+      "sha256": "02f39a8d039e5de7a653efa1f75c1614f38982722a57e2346768fb2f81aa3c41"
+     },
+     "approval": {
+      "id": "apr_1m823s19mk4xs3wvn2a",
+      "docHash": "02f39a8d039e5de7a653efa1f75c1614f38982722a57e2346768fb2f81aa3c41"
+     },
+     "signatures": [
+      {
+       "type": "webauthn-es256",
+       "credential": "sha256:ba3e92bddda1fda0",
+       "publicKey": {
+        "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+        "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88"
+       },
+       "challenge": "0xe77d325c910fb17a4d29a06c9217a9d26714199ead4bd2dfb3749f442f36c366",
+       "challengeIs": "approval challenge: SHA-256(\"qed/approval/v1\\n\" + approval id + \"\\n\" + document hash)",
+       "authenticatorData": "SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAADA",
+       "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"530yXJEPsXpNKaBskhep0mcUGZ6tS9Lfs3SfRC82w2Y\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+       "signature": "MEUCIF_ghB0xTd6AiPOahqiulKELAE3rm6gxvp-BWIaUAeTPAiEA6n5lLLGHzU5FV-RQL-bD2N2130oT9-Gau-u5RSUkc94",
+       "rpId": "localhost"
+      }
+     ],
+     "attestation": {
+      "aaguid": "00000000-0000-0000-0000-000000000000",
+      "attested": false
+     },
+     "terms": {
+      "attack": "forged-proof",
+      "chainId": 31337,
+      "expect": "NotBestExecution",
+      "genesisId": "0b851d93-3186-4e91-a67e-2eeb2f8f6f46",
+      "genuineOrder": {
+       "amount": "10",
+       "amountIn": "10000000",
+       "mandate": "the release sandbox's first mandate: ≤ 25 tUSD per payment, 100 a day, 200 in total, co-signature required",
+       "tokenIn": "tUSD",
+       "tokenOut": "tEUR"
+      },
+      "isolation": "Runs on an ephemeral Anvil chain of its own, seeded with the release's contracts and throwaway keys (its own owner, agent and co-signer), and destroyed afterwards. This workspace's vault, keys and owner, and the shared chain, are not involved.",
+      "kind": "attack",
+      "layer": "Weak duality: any price vector is a valid upper bound",
+      "title": "“Forged proof”: prices chosen to make the direct route look optimal"
+     },
+     "termsHash": "sha256:9dade4457fdfc04ff91f848d9084b527657aec84eeacd74b3a225ebd6f7a79d2",
+     "digests": []
+    }
+   ],
+   "venues": [
+    {
+     "index": null,
+     "address": "0xd842BeEa84a0479b3F936243Fb0Dfc0F75a9d870",
+     "name": "tINR/tUSD · 0.30% · deep"
+    },
+    {
+     "index": null,
+     "address": "0x1D9dD4A61ac605Cf4057AaDa80893e77f6978007",
+     "name": "tINR/tUSD · 0.05% · thin"
+    },
+    {
+     "index": null,
+     "address": "0x3B5FefeA35321B85Cb7968518a253e7230372857",
+     "name": "tINR/tEUR · 0.30%"
+    },
+    {
+     "index": null,
+     "address": "0x2ccE6552E2Fc164395E4D2815249dD19fc1C7a2B",
+     "name": "tUSD/tEUR · 0.30% · deep (the release's pool)"
+    },
+    {
+     "index": null,
+     "address": "0x5BBCbdeba246aAa062b4DE76505bc7fD411d6096",
+     "name": "tINR/tUSD · 1.00% · off-market"
+    }
+   ],
+   "decisionRecords": []
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": false,
+   "isModel": false,
+   "label": "none",
+   "statement": "No model took part: the owner asked for this, and the vault service's own code decided it.",
+   "decidedBy": "the vault service",
+   "information": [],
+   "constraints": []
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "refused",
+   "statement": "Each step as the vault service recorded it, with the co-signer's own checks from its hash-chained decision record.",
+   "checks": [
+    {
+     "by": "co-signer",
+     "name": "cosigner",
+     "pass": true,
+     "detail": "The run's own owner signed 10.00 tUSD → tEUR; its own co-signer signed an order with floor 9.01644 tEUR. The attacker now holds a real certificate, valid on this ephemeral chain only.",
+     "source": {
+      "step": 1
+     }
+    },
+    {
+     "by": "chain",
+     "name": "receipt",
+     "pass": false,
+     "detail": "Status reverted in block 35 of the ephemeral chain (455,500 gas paid by the attacker). Defence: Weak duality: any price vector is a valid upper bound. Nothing moved: every balance and the spending window are unchanged.",
+     "source": {
+      "step": 3
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Mandate signed by the vault owner",
+     "pass": true,
+     "detail": "recovered 0x2E6cD3AC22837e067FE480476092a49A4f6343b8",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Mandate active and current epoch",
+     "pass": true,
+     "detail": "epoch 0",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Conversion confirmed by the owner's signature",
+     "pass": true,
+     "detail": "instruction signer 0x2E6cD3AC22837e067FE480476092a49A4f6343b8",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Instruction nonce not seen before",
+     "pass": true,
+     "detail": "lab-618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Recipient is listed in the owner's mandate",
+     "pass": true,
+     "detail": "0xeBd8943d9d1AEA7092792FbE2E5f1B3EeE9Df345",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Execution module is the vault's agent and a mandate payee",
+     "pass": true,
+     "detail": "agent 0xC4fC0318D292A4256261ba2ebE663C6aD9a268c7",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Reserve buffer above ring-fenced liabilities preserved",
+     "pass": true,
+     "detail": "free 100.00 − 10.00 = 90.00 ≥ 5.00",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Sanctions / deny-list screening",
+     "pass": true,
+     "detail": "recipient not on deny-list",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Independent re-quote: own optimal route executes",
+     "pass": true,
+     "detail": "own route 6 hops → 9107516 (bound 9107519, gap 0.329 ppm)",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Quoted rate close to the venues' depth-weighted mid (manipulation screen)",
+     "pass": true,
+     "detail": "rate 0.910752 vs weighted mid 0.914537: 41.4 bps (limit 300)",
+     "source": {
+      "decision": 16
+     }
+    },
+    {
+     "by": "co-signer (decision record #16)",
+     "name": "Order commits to the current venue set",
+     "pass": true,
+     "detail": "0x58f3e96662ee9a2603712eb3f579f992a21b57879049929843fcedefe996d42d",
+     "source": {
+      "decision": 16
+     }
+    }
+   ],
+   "steps": [
+    {
+     "seq": 0,
+     "key": "chain",
+     "label": "Ephemeral chain started and seeded",
+     "status": "info",
+     "detail": "A new Anvil on 127.0.0.1:63456, only for this run: the release's sandbox deployed with throwaway keys (vault 0xb197860a…), provisioned by its own owner, under the release sandbox's first mandate, with a co-signer of its own. Nothing here is valid on the shared chain, and the chain is destroyed when the run ends.",
+     "data": {
+      "port": 63456,
+      "network": "Ephemeral Anvil chain 31337 of job 618755b4-833f-425e-aa6c-5dbc0b1b3f8b (127.0.0.1:63456; destroyed after the run) · valueless test tokens · throwaway keys",
+      "vault": "0xb197860a14FCf8b460B82bac7c5C8EC532d3777D",
+      "execution": "0xC4fC0318D292A4256261ba2ebE663C6aD9a268c7",
+      "cosigner": "0x71574a1A15670abb6995611e1F73eb347E02EA4E"
+     },
+     "at": "2026-11-22T17:10:05.068Z"
+    },
+    {
+     "seq": 1,
+     "key": "cosigner",
+     "label": "Genuine co-signed order",
+     "status": "ok",
+     "detail": "The run's own owner signed 10.00 tUSD → tEUR; its own co-signer signed an order with floor 9.01644 tEUR. The attacker now holds a real certificate, valid on this ephemeral chain only.",
+     "data": {
+      "floor": "9016440",
+      "orderHash": "0x862c8ffadc48756e60c055fa2aea103bc221191f1bb781033e1cd66198bbaa8a",
+      "evidenceHash": "0x0b8306b85c8dbb1bc7280a4615bddd9bf16c1bf9f83c7e7b6f8598520de3010e"
+     },
+     "at": "2026-11-22T17:10:05.080Z"
+    },
+    {
+     "seq": 2,
+     "key": "attack",
+     "label": "Malicious transaction built",
+     "status": "info",
+     "detail": "“Forged proof”: prices chosen to make the direct route look optimal. It would deliver 9.093066 tEUR instead of 9.107516 (−15.87 bps), above the 1% floor a slippage-only wallet would accept. Sent with a fixed gas limit so it is mined, not just simulated.",
+     "data": {
+      "simulatedOut": "9093066",
+      "honestOut": "9107516",
+      "floor": "9016440"
+     },
+     "at": "2026-11-22T17:10:05.089Z"
+    },
+    {
+     "seq": 3,
+     "key": "receipt",
+     "label": "Mined and reverted: NotBestExecution",
+     "status": "reverted",
+     "detail": "Status reverted in block 35 of the ephemeral chain (455,500 gas paid by the attacker). Defence: Weak duality: any price vector is a valid upper bound. Nothing moved: every balance and the spending window are unchanged.",
+     "data": {
+      "hash": "0x68ef8b346a9725521ed3eea42dae4711c83bf89d3979ce7221581d4041eaa59b",
+      "status": "reverted",
+      "block": "35",
+      "gasUsed": "455500",
+      "from": "0xC0f38BF56e80FC4933A63ffa6b6ef1a37799F218",
+      "to": "0xc4fc0318d292a4256261ba2ebe663c6ad9a268c7",
+      "error": "NotBestExecution",
+      "errorArgs": [
+       "9093066",
+       "12476323"
+      ],
+      "events": [],
+      "network": "Ephemeral Anvil chain 31337 of job 618755b4-833f-425e-aa6c-5dbc0b1b3f8b (127.0.0.1:63456; destroyed after the run) · valueless test tokens · throwaway keys",
+      "expected": "NotBestExecution",
+      "matchesExpectation": true,
+      "balancesBefore": {
+       "treasuryUsd": "100000000",
+       "reserveEur": "0",
+       "moduleUsd": "0",
+       "moduleEur": "0",
+       "attackerUsd": "0",
+       "attackerEur": "0",
+       "spentInWindow": "0"
+      },
+      "balancesAfter": {
+       "treasuryUsd": "100000000",
+       "reserveEur": "0",
+       "moduleUsd": "0",
+       "moduleEur": "0",
+       "attackerUsd": "0",
+       "attackerEur": "0",
+       "spentInWindow": "0"
+      },
+      "balancesUnchanged": true,
+      "certificateConsumed": false
+     },
+     "at": "2026-11-22T17:10:05.099Z"
+    },
+    {
+     "seq": 4,
+     "key": "teardown",
+     "label": "Ephemeral chain destroyed",
+     "status": "info",
+     "detail": "The run's chain is stopped and its folder deleted. This workspace's vaults are exactly as they were.",
+     "data": {
+      "before": [
+       "9949193",
+       "50807",
+       "5947045",
+       "50807"
+      ],
+      "after": [
+       "9949193",
+       "50807",
+       "5947045",
+       "50807"
+      ],
+      "workspaceUnchanged": true
+     },
+     "at": "2026-11-22T17:10:05.104Z"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 16,
+     "at": "2026-11-22T17:10:05.080Z",
+     "kind": "cosigner-trade",
+     "jobId": "618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+     "verdict": "APPROVED",
+     "clock": {
+      "wallTime": "2026-11-22T17:10:05.067Z",
+      "wallSeconds": 1795367405,
+      "chainSeconds": 1795367405,
+      "skewSeconds": 0,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m823s19mk4xs3wvn2a",
+      "docHash": "sha256:02f39a8d039e5de7a653efa1f75c1614f38982722a57e2346768fb2f81aa3c41",
+      "termsHash": "sha256:9dade4457fdfc04ff91f848d9084b527657aec84eeacd74b3a225ebd6f7a79d2",
+      "confirmedAt": "2026-11-22T17:10:04.858Z",
+      "method": "passkey"
+     },
+     "termsHash": "sha256:9dade4457fdfc04ff91f848d9084b527657aec84eeacd74b3a225ebd6f7a79d2",
+     "record": {
+      "block": {
+       "number": "34",
+       "timestamp": 1795367405
+      },
+      "chainId": 31337,
+      "checks": [
+       {
+        "detail": "recovered 0x2E6cD3AC22837e067FE480476092a49A4f6343b8",
+        "id": "C1",
+        "name": "Mandate signed by the vault owner",
+        "pass": true
+       },
+       {
+        "detail": "epoch 0",
+        "id": "C2",
+        "name": "Mandate active and current epoch",
+        "pass": true
+       },
+       {
+        "detail": "instruction signer 0x2E6cD3AC22837e067FE480476092a49A4f6343b8",
+        "id": "C3",
+        "name": "Conversion confirmed by the owner's signature",
+        "pass": true
+       },
+       {
+        "detail": "lab-618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+        "id": "C6",
+        "name": "Instruction nonce not seen before",
+        "pass": true
+       },
+       {
+        "detail": "0xeBd8943d9d1AEA7092792FbE2E5f1B3EeE9Df345",
+        "id": "C9",
+        "name": "Recipient is listed in the owner's mandate",
+        "pass": true
+       },
+       {
+        "detail": "agent 0xC4fC0318D292A4256261ba2ebE663C6aD9a268c7",
+        "id": "C9b",
+        "name": "Execution module is the vault's agent and a mandate payee",
+        "pass": true
+       },
+       {
+        "detail": "free 100.00 − 10.00 = 90.00 ≥ 5.00",
+        "id": "C10",
+        "name": "Reserve buffer above ring-fenced liabilities preserved",
+        "pass": true
+       },
+       {
+        "detail": "recipient not on deny-list",
+        "id": "C11",
+        "name": "Sanctions / deny-list screening",
+        "pass": true
+       },
+       {
+        "detail": "own route 6 hops → 9107516 (bound 9107519, gap 0.329 ppm)",
+        "id": "T1",
+        "name": "Independent re-quote: own optimal route executes",
+        "pass": true
+       },
+       {
+        "detail": "rate 0.910752 vs weighted mid 0.914537: 41.4 bps (limit 300)",
+        "id": "T2",
+        "name": "Quoted rate close to the venues' depth-weighted mid (manipulation screen)",
+        "pass": true
+       },
+       {
+        "detail": "0x58f3e96662ee9a2603712eb3f579f992a21b57879049929843fcedefe996d42d",
+        "id": "T3",
+        "name": "Order commits to the current venue set",
+        "pass": true
+       }
+      ],
+      "cosigner": "0x71574a1A15670abb6995611e1F73eb347E02EA4E",
+      "mandateHash": "0xe8181935b04debfc84c7dd4220dda1246c5ea6451f5bfd75e56537212c26d7b5",
+      "order": {
+       "minOut": "9016440",
+       "recipient": "0xeBd8943d9d1AEA7092792FbE2E5f1B3EeE9Df345",
+       "tokenOut": "0xc935B6e116c33D63e45758f903033203a2fd303f",
+       "tolerancePpm": 1,
+       "venueSetHash": "0x58f3e96662ee9a2603712eb3f579f992a21b57879049929843fcedefe996d42d"
+      },
+      "payment": {
+       "amount": "10000000",
+       "dueAt": "0",
+       "intentId": "0xf1eeb6b6f6f770a40e9770807a75a4581da0c8b31b0ab4fb67ecf783b94c3e3b",
+       "payee": "0xC4fC0318D292A4256261ba2ebE663C6aD9a268c7",
+       "ref": "0x862c8ffadc48756e60c055fa2aea103bc221191f1bb781033e1cd66198bbaa8a"
+      },
+      "quote": {
+       "amountOut": "9107516",
+       "bound": "9107519",
+       "gapPpm": 0.329,
+       "nu": {
+        "0x252926649dea8b6b17b1b9fb2add0501f82de92f": 2.7396420367965287e-9,
+        "0xc56b34b5835f1f220b7b654a2a18e2dd883b5fe7": 0.9042041713582607,
+        "0xc935b6e116c33d63e45758f903033203a2fd303f": 1
+       },
+       "route": [
+        {
+         "amountIn": "5736249",
+         "venue": 0,
+         "zeroForOne": true
+        },
+        {
+         "amountIn": "2180748",
+         "venue": 1,
+         "zeroForOne": true
+        },
+        {
+         "amountIn": "2083003",
+         "venue": 2,
+         "zeroForOne": false
+        },
+        {
+         "amountIn": "0",
+         "venue": 3,
+         "zeroForOne": true
+        },
+        {
+         "amountIn": "24563",
+         "venue": 4,
+         "zeroForOne": false
+        },
+        {
+         "amountIn": "0",
+         "venue": 0,
+         "zeroForOne": true
+        }
+       ]
+      },
+      "request": {
+       "amountIn": "10000000",
+       "brainEngine": "security lab",
+       "instruction": "Security lab: genuine order for 10.00 tUSD",
+       "kind": "trade",
+       "nonce": "lab-618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+       "policy": null,
+       "policyDecision": null,
+       "recipient": "0xeBd8943d9d1AEA7092792FbE2E5f1B3EeE9Df345",
+       "tokenIn": "0xc56b34B5835f1F220B7B654a2a18e2DD883b5fe7",
+       "tokenOut": "0xc935B6e116c33D63e45758f903033203a2fd303f"
+      },
+      "schema": "qed.decision-record/v1",
+      "treasury": {
+       "balance": "100000000",
+       "blastRadius24h": "100000000",
+       "dailyCap": "100000000",
+       "free": "100000000",
+       "protected": "0",
+       "spentInWindow": "0"
+      },
+      "vault": "0xb197860a14FCf8b460B82bac7c5C8EC532d3777D",
+      "verdict": "APPROVED"
+     },
+     "evidenceHash": "0x0b8306b85c8dbb1bc7280a4615bddd9bf16c1bf9f83c7e7b6f8598520de3010e",
+     "prevHash": "2bb3455644105545ba656b9f62d8aba8bf353de3d169a8d007f7e9b69c1cb2ec",
+     "hash": "2fe3fcb49a5a96c76a691965d50f89f79042fc0091fbc6ea7b9f5f9dba8820ad"
+    }
+   ]
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": true,
+   "ranUnder": [],
+   "requestedBy": {
+    "who": "the owner, with a fresh passkey signature over these exact terms",
+    "evidence": "proposal 963618b2-4710-4572-afef-bdea0d49ba4a; approval apr_1m823s19mk4xs3wvn2a",
+    "at": "2026-11-22T17:10:04.862Z"
+   },
+   "signaturesUsed": [
+    {
+     "approvalId": "apr_1m823s19mk4xs3wvn2a",
+     "when": "2026-11-22T17:10:04.858Z",
+     "what": "owner-approval"
+    }
+   ],
+   "statement": "This needed the owner's fresh passkey signature over its exact terms."
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": false,
+   "moved": [],
+   "balances": [],
+   "executions": null,
+   "thisVaultAfterwards": {
+    "unchanged": true,
+    "before": [
+     "9949193",
+     "50807",
+     "5947045",
+     "50807"
+    ],
+    "after": [
+     "9949193",
+     "50807",
+     "5947045",
+     "50807"
+    ],
+    "note": "This vault's balances read before and after the run on the throwaway chain."
+   },
+   "authorityBudget": {
+    "rule": "d7",
+    "asset": {
+     "symbol": "tINR",
+     "decimals": 2
+    },
+    "base": "1000",
+    "grants": "2000",
+    "granted": "3000",
+    "earned": "0",
+    "used": "1103",
+    "usedBy": {
+     "payments": "807",
+     "conversions": "296",
+     "promisesPaid": "0"
+    },
+    "held": "0",
+    "reserved": "0",
+    "budget": "1897",
+    "available": "1897",
+    "rate": "1/2",
+    "confirmations": 2,
+    "pendingCredits": 0,
+    "notEarnings": 0,
+    "references": [
+     {
+      "symbol": "tUSD",
+      "lo": "83.58",
+      "mid": "84",
+      "hi": "84.42",
+      "divergenceBps": 0,
+      "source": "fixed in configuration: the test market's genesis rate, tINR/tUSD · 0.30% · deep at 84.00 tINR per tUSD, ± 0.5%; no trade moves it"
+     }
+    ],
+    "statement": "18.97 tINR available = granted 30.00 (base 10.00, owner grants 20.00) + earned 0.00 − used 11.03 (payments 8.07, conversion costs 2.96, promises paid 0.00) − promised and not yet paid 0.00 − reserved for certificates not yet used 0.00",
+    "limits": [
+     "Earned means paid for, through the escrow, by a client this workspace does not know to be its own: a client the wallet has never seen cannot be told apart from an unregistered address of a member (D7 assumption A-ID; a second workspace counts as the workspace's own only when it shares a member's passkey).",
+     "Conversions count only their cost against a fixed reference band, so the mandate's own limits on amounts per payment, per period and over its life are what bound how much can be converted."
+    ],
+    "note": "The co-signer's authority budget (D7), as it stands when the case is assembled."
+   },
+   "consequence": "“Forged proof”: prices chosen to make the direct route look optimal → reverted on-chain with NotBestExecution (on an ephemeral chain of its own).",
+   "guidance": null,
+   "units": "Amounts are integers in the token's smallest unit: tINR has 2 decimals, tUSD 6."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "97eae284effe86bcca5cb1f5d754d5783f09a544",
+    "uncommittedChanges": true,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "ephemeral-chain",
+    "network": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts"
+   },
+   "chain": {
+    "chainId": 31337,
+    "name": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts",
+    "rpc": "127.0.0.1 (loopback only)",
+    "genesisId": "0b851d93-3186-4e91-a67e-2eeb2f8f6f46",
+    "versions": {
+     "node": "v26.12.0",
+     "anvil": "anvil Version: 1.7.1",
+     "release": "qed-20261023-health-gate-v3"
+    }
+   },
+   "contracts": {
+    "ownerAccount": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+    "vault": "0xF12460c7EfA439E25c32daEf3fd67e29ED34e547",
+    "reserve": "0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602",
+    "execution": "0xB63bD6347352F578f362ea7d8431A2F46d15Fb28",
+    "treasuryPolicy": "0x4Ebf4D77AEc92eb1529aedE6f20f63e7bAFa9Ec6",
+    "lens": "0xaf8F956792Df84C4fB86B04b076984e98c720993",
+    "tUSD": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75",
+    "tEUR": "0xcBd23E56ffce572ec83d7673eBCE876Df45aBF89",
+    "tETH": "0x27Fb7fe90c52289B5A69307390Ff53b42d949E62",
+    "pools": [
+     "0xd842BeEa84a0479b3F936243Fb0Dfc0F75a9d870",
+     "0x1D9dD4A61ac605Cf4057AaDa80893e77f6978007",
+     "0x3B5FefeA35321B85Cb7968518a253e7230372857",
+     "0x2ccE6552E2Fc164395E4D2815249dD19fc1C7a2B",
+     "0x5BBCbdeba246aAa062b4DE76505bc7fD411d6096"
+    ],
+    "asset": "0x4E46E31Ec844ebc03CAb530Eb93140720a22DB99",
+    "reserveAsset": "0xd72385F6F5bfDFeA48F426368bA47D1E5CbcaE75"
+   },
+   "roles": {
+    "owner": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+    "ownerCustody": "passkey owner account (QEDOwnerAccount): its signers are the members' passkeys; the service holds no key that can satisfy it and only relays",
+    "operator": "0x9740aD10271efDda0C83b5BD8f8EFe0AB4206e4A",
+    "cosigner": "0x1F5E91128AA34dF55c43E3C1D32C4992A5f401ed",
+    "guardian": "0xDCFd1BFB7988741AE97F279b613Df604dC3cDcd9",
+    "attacker": null,
+    "creditor": "0xbFD975f1d141D7dfBC07A8970DF9e64B0d77EE26",
+    "cosignerIsolation": "separate-process"
+   },
+   "keys": {
+    "agent": "0x9740aD10271efDda0C83b5BD8f8EFe0AB4206e4A",
+    "guardian": "0xDCFd1BFB7988741AE97F279b613Df604dC3cDcd9",
+    "relayer": "0xefFc074CFb8a817901118Db396e64DF094d197de",
+    "derivation": "HKDF-SHA256 from this installation's master secret (mode 600); none of them is a signer of the owner account"
+   },
+   "ownerAccount": {
+    "address": "0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA",
+    "kind": "passkey-account",
+    "threshold": 1,
+    "signers": [
+     {
+      "x": "0x5b9fec995e05275adc93de2bd67860b5ead46b4204f0eb5ad5d9812f878320af",
+      "y": "0xcac3cebd1fea79cc79ac07de1ccf6c26bc00dd64b12715960609d6d9ea432f88",
+      "role": "member"
+     }
+    ],
+    "build": {
+     "sha256": "84566df15d0c3965fcd83672ab8522b76bdb44f281f2a77e60137c058523a5bd",
+     "solc": "0.8.38+commit.1835d247",
+     "declaredReady": true,
+     "label": "declared ready by chain/accounts/READY.json"
+    }
+   },
+   "transactions": [
+    {
+     "hash": "0x68ef8b346a9725521ed3eea42dae4711c83bf89d3979ce7221581d4041eaa59b",
+     "chain": "ephemeral",
+     "status": "reverted",
+     "block": "35",
+     "gasUsed": "455500",
+     "from": "0xC0f38BF56e80FC4933A63ffa6b6ef1a37799F218",
+     "to": "0xc4fc0318d292a4256261ba2ebe663c6ad9a268c7",
+     "events": [],
+     "network": "Ephemeral Anvil chain 31337 of job 618755b4-833f-425e-aa6c-5dbc0b1b3f8b (127.0.0.1:63456; destroyed after the run) · valueless test tokens · throwaway keys",
+     "error": "NotBestExecution",
+     "chainWhenAssembled": null
+    }
+   ],
+   "ids": {
+    "job": "618755b4-833f-425e-aa6c-5dbc0b1b3f8b",
+    "kind": "attack",
+    "proposal": "963618b2-4710-4572-afef-bdea0d49ba4a",
+    "vaultWorkspace": "qed-b1a3c3f33facc4c2f0f63315",
+    "tick": null
+   },
+   "decisionChain": {
+    "ok": true,
+    "records": 19,
+    "brokenAt": null,
+    "head": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710",
+    "note": "The vault service re-hashed its whole decision chain when the case was assembled."
+   }
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [],
+   "probes": [],
+   "note": "Recorded: other jobs of the same kind. Probes: the vault's own limit check now."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [
+    {
+     "check": "receipt",
+     "by": "chain",
+     "detail": "Status reverted in block 35 of the ephemeral chain (455,500 gas paid by the attacker). Defence: Weak duality: any price vector is a valid upper bound. Nothing moved: every balance and the spending window are unchanged."
+    }
+   ],
+   "related": [
+    {
+     "caseId": "vault.bbcb2d9b-a3f4-4b33-b6a2-8abe71bb6c80",
+     "at": "2026-11-22T17:10:07.012Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "failed",
+       "detail": "No standing policy yet: the owner must sign one first."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.100a5fce-0255-4171-bb4c-30d62dff2e56",
+     "at": "2026-11-22T17:10:05.970Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "decide waited",
+       "detail": "Short 4.052955 tUSD but waiting: the market is too thin: any tranche ≥ 20000 would pay more than 150 bps."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.54d7cbfe-f51a-4387-9b21-b066ef57a498",
+     "at": "2026-11-22T17:10:04.366Z",
+     "what": "withdraw",
+     "failed": [
+      {
+       "name": "refused",
+       "detail": "Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,491.93 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation with both figures. Nothing was sent."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.345707f7-04b5-4ce2-8e25-ec4ffe1afd76",
+     "at": "2026-11-22T17:10:03.828Z",
+     "what": "convert",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "Per-conversion limit in the owner's signed mandate: 300.00 > 250.00 tINR; Left in the mandate's current period: 300.00 > 91.93 tINR. The AI cannot raise a limit; only the owner can sign a new mandate."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.0d8fa413-6b28-444d-8a6b-12a5a55565bd",
+     "at": "2026-11-22T17:10:03.329Z",
+     "what": "policy-run",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "250.00 tINR breaks: Left in the mandate's current period. The agent cannot raise a limit."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0xc9746a0efb… success"
+    },
+    {
+     "caseId": "vault.00caeefc-5bda-45e8-a9c1-f09657fa8ff7",
+     "at": "2026-11-22T17:10:02.273Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "cosigner refused",
+       "detail": "Refused: C12 not met: Authority budget (R7 D7): this conversion's cost against the reference fits in what the owner granted and the workspace earned: 250.00 tINR into tUSD for 0x5b02c9D592b85d758EB85C3Bdbb3ebD19Ea7f602, an account of the workspace, uses only its cost against the reference: what is g"
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.00caeefc-5bda-45e8-a9c1-f09657fa8ff7",
+     "at": "2026-11-22T17:10:02.253Z",
+     "what": "cosigner-policy-trade",
+     "failed": [
+      {
+       "name": "REFUSED",
+       "detail": "{\"block\":{\"number\":\"61\",\"timestamp\":1795367402},\"chainId\":31337,\"checks\":[{\"detail\":\"ERC-1271 owner account 0x28a24063A31216d5cA75E6F37DCFbC9883Ae10cA answered 0x1626ba7e\",\"id\":\"C1\",\"name\":\"Mandate signed by the vault owner\",\"pass\":true},{\"detail\":\"epoch 0\",\"id\":\"C2\",\"name\":\"Mandate active and curre"
+      }
+     ],
+     "executed": false,
+     "proof": "decision record #11"
+    }
+   ]
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "54e4700388159d3924902a302f6bfcc32d83403cf57dab5f30714e7cdd86000c",
+   "server": {
+    "ok": true,
+    "count": 3,
+    "brokenAt": null,
+    "head": "09a17c7f2840d9690e2c49d3e2d19c6cdc4bdf5cdfc80621246711245a1a5a8b",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled"
+  },
+  "vaultDecisions": {
+   "server": {
+    "ok": true,
+    "records": 19,
+    "brokenAt": null,
+    "head": "c8d990097fce03639896678710379c344b4ce79922cbc013d3b1e18ff0ef9710"
+   },
+   "reHashedHere": 1
+  },
+  "note": "A vault job is recorded by the vault service, not in the wallet's receipt chain: its decision records are hash-chained there, and each one this case carries is re-hashed by the verifier. The wallet's receipt chain and ledger as a whole were verified too when the case was assembled."
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "The vault service's keys",
+   "how": "never held by this API; addresses only",
+   "why": "The agent, co-signer, guardian and relayer keys stay in the vault service."
+  }
+ ],
+ "cannotProve": [
+  "No model took part in this job: the owner asked for it directly, or the engine ran it under authority the owner wrote.",
+  "This ran on a throwaway chain of its own that no longer exists; its transaction can be read only from the vault service's record.",
+  "The passkey's make is not attested (its AAGUID is all zeros): a signature proves possession of the key, not which device or software held it.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "40aab318ddf3cffcdffd0b6ef5f5452b3aec7b77bc5299306045e719a5f3358c",
+   "2": "dab73d16afb1a36a821590a67d18284a4dcd2f7e5c0ef0c3d2c79c730dfcc82a",
+   "3": "26769f44f07be56f2130c5ac9c45c5f1a45aec2ce355e7ac76bb83ac43430f79",
+   "4": "f821e043a75ade294fc3ba8f9414119fa97bba5b6d7c118d0ee83b771f5c5acd",
+   "5": "6d444f1e16f2d60a3cfc670690959c4fc8314dcf4f7b6337118c04fc3a2f1bed",
+   "6": "796b914e239615d3601029b224660a51f0fbd3119fda4253306845545937752a",
+   "7": "3071d5e29fc05b873a3b9b9168fc8a49bd15d88d0c014ff8fcc939699af65c40",
+   "8": "710eeb574e643e1c380f80ef3e896bc377b058f6e52bb02008f5dd48079b08e2"
+  },
+  "verification": "15685136db3050521ae03e309735fd71b5e20c9ae79fbc3e9532339ca10e9bb7",
+  "redactions": "1dde4be1ace84c813c6042e6a2d7bb38c062caaae268c2e7dd444caea666797f",
+  "cannotProve": "3463396a6ca14d09d822a69ab302928f1a87d212ca284db3cad900c13e40b8b8",
+  "root": "5c3cf85ad87213303f95ae11f9fd3c6198bac808afdac579ca8ab06cbd978903"
+ }
+}

@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: demo economy: 169 of 200 cancelled, certificate exact, greedy only 162
+ok 1 - demo economy: 169 of 200 cancelled, certificate exact, greedy only 162
+  ---
+  duration_ms: 2.074833
+  type: 'test'
+  ...
+# Subtest: solver equals an exhaustive brute-force oracle on 150 tiny economies
+ok 2 - solver equals an exhaustive brute-force oracle on 150 tiny economies
+  ---
+  duration_ms: 118.207
+  type: 'test'
+  ...
+# Subtest: netting never changes a net position and leaves an acyclic remainder that settles with net debits only
+ok 3 - netting never changes a net position and leaves an acyclic remainder that settles with net debits only
+  ---
+  duration_ms: 8.222334
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 306.713375

@@ -1,0 +1,304 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "ask.aic_1m81ffqtd17dmcrmam9",
+ "kind": "model-call",
+ "title": "Model call: 1 proposal (drafted)",
+ "outcome": "proposed",
+ "venue": "none",
+ "workspace": "usr_1m81ffny1gh44s9946y",
+ "assembledAt": "2026-11-22T11:20:07.067Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "Buy ₹500 of Bitcoin for me every minute, at most 2 times, and never more than ₹1,000 this month.",
+    "source": "the owner's question to Ask, as typed",
+    "at": "2026-11-22T11:15:28.717Z"
+   },
+   "instruments": [],
+   "statement": "A model call grants no authority. A proposal becomes an instruction only when the owner signs its exact document with a passkey."
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": true,
+   "isModel": false,
+   "label": "scripted-test-double",
+   "statement": "A scripted test double, NOT a model: it answers from a fixed file, and QED honours it only on an isolated test stack. Recorded as provider \"scripted\", model \"scripted-test-double\".",
+   "call": {
+    "id": "aic_1m81ffqtd17dmcrmam9",
+    "at": "2026-11-22T11:15:28.717Z",
+    "provider": "scripted",
+    "model": "scripted-test-double",
+    "ok": true,
+    "error": null,
+    "latencyMs": 1,
+    "usage": {
+     "responseId": null
+    },
+    "conversationId": "cnv_1m81ffqtzje62pe4gq3",
+    "turnId": "trn_1m81ffqtzgjn7q8rfec"
+   },
+   "sent": {
+    "question": "Buy ₹500 of Bitcoin for me every minute, at most 2 times, and never more than ₹1,000 this month.",
+    "history": [],
+    "snapshotSha256": "6f0d4e610c6a8176cbe3c51e1eec5180071385451b3b4063ca5e9bf7136e152c",
+    "note": "As sent: payee names and addresses replaced by tokens (N-005). Besides these, the model received a snapshot of the recorded position (DATA); QED stores only its SHA-256."
+   },
+   "output": {
+    "answer": "This is a standing instruction to buy ₹500 of Bitcoin every minute, at most twice, and never more than ₹1,000 this month. Bitcoin's price can fall sharply, and each purchase takes the price of its minute. Nothing runs until you sign it.",
+    "proposals": [
+     {
+      "kind": "invest",
+      "title": "Buy ₹500 of Bitcoin every minute",
+      "rationale": "A fixed ₹500 purchase each minute, at most twice and within the ₹1,000 monthly limit you gave. The trade-off: each purchase takes the price of that minute.",
+      "paramsJson": "{\"instrumentId\":\"coindcx:BTCINR\",\"amount\":50000,\"schedule\":{\"type\":\"every\",\"minutes\":1}}",
+      "runMode": "auto",
+      "supersedes": null,
+      "limits": {
+       "maxPerRun": 50000,
+       "maxPerMonth": 100000,
+       "maxRuns": 2,
+       "endsInDays": null
+      }
+     }
+    ],
+    "questions": [],
+    "withdraw": [],
+    "cites": [],
+    "links": [
+     "instructions"
+    ]
+   },
+   "scriptedReplies": {
+    "file": "20261122-judge-journey/scripted-double-replies.json",
+    "sha256NowOnDisk": "7cfe3e89ac33fa8789f7f1f209be780a4746865df6f6803ae67f9c6981f42f37",
+    "note": "The file the double answers from, as it is when the case is assembled. QED does not record which file answered each call."
+   },
+   "information": [
+    "DATA: a snapshot of the household's recorded position, prices with their age, the catalogue of instruction kinds and the payees as tokens (stored as its SHA-256 only).",
+    "HISTORY: the earlier turns of the conversation, as sent.",
+    "QUESTION: the owner's words, as sent."
+   ],
+   "constraints": [
+    "It holds no credential, calls no tool and executes nothing (server/ai.ts).",
+    "Its reply must match a fixed schema: at most four proposals of eight instruction kinds, each with typed parameters and limits.",
+    "Everything in DATA, HISTORY and QUESTION is information, not instruction.",
+    "Each proposal is parsed and checked by the code that checks an instruction typed by hand; one that fails is kept as invalid and can never be signed.",
+    "A valid proposal is only a draft until the owner signs its exact document with a passkey."
+   ],
+   "validation": [
+    {
+     "proposalId": "prp_1m81ffqtzf7pyvv7chk",
+     "kind": "invest",
+     "title": "Buy ₹500 of Bitcoin every minute",
+     "state": "drafted",
+     "invalidReason": null,
+     "tier": "bounded",
+     "warnings": [
+      "The schedule needs about ₹2,16,00,000 a month but the monthly limit is ₹1,000: later runs in a month will be refused.",
+      "Gains on digital assets are taxed at 30% in India and losses cannot be set off; 1% is deducted at source when you sell."
+     ],
+     "refusals": [],
+     "ceilingPaise": 100000,
+     "ownerFigures": [
+      50000,
+      100000
+     ]
+    }
+   ],
+   "grounding": {
+    "checked": 2,
+    "ungrounded": [],
+    "citesUnresolved": 0,
+    "cites": [],
+    "refusal": null
+   }
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "checked",
+   "statement": "Every proposal is parsed and analysed by the same code that checks an instruction typed by hand.",
+   "checks": [
+    {
+     "by": "validation (server/ai.ts storeProposal, then server/programs.ts buildDraft)",
+     "name": "proposal-valid: Buy ₹500 of Bitcoin every minute",
+     "pass": true,
+     "detail": "Valid as a draft: ₹500 into Bitcoin in rupees, every 1 minute"
+    }
+   ]
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": true,
+   "ranUnder": [],
+   "requestedBy": {
+    "who": "the owner, asking a question",
+    "evidence": "ai call aic_1m81ffqtd17dmcrmam9",
+    "at": "2026-11-22T11:15:28.717Z"
+   },
+   "signaturesUsed": [],
+   "statement": "1 of these proposals became an instruction, each only after the owner signed it.",
+   "proposals": [
+    {
+     "proposalId": "prp_1m81ffqtzf7pyvv7chk",
+     "program": {
+      "id": "prg_1m81ffqv96wz72f7k1k",
+      "state": "completed",
+      "signed": true
+     },
+     "neededASignature": "yes: the owner's passkey over its exact document"
+    }
+   ]
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": false,
+   "moved": [],
+   "balances": [],
+   "entries": [],
+   "consequence": "This call moved nothing itself. What ran later, under the signed instruction, is in that instruction's run cases."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "0d53fb1be0e0520f14431b8f43ed17b8de58c2b4",
+    "uncommittedChanges": true,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "none"
+   },
+   "transactions": [],
+   "ids": {
+    "aiCall": "aic_1m81ffqtd17dmcrmam9",
+    "conversation": "cnv_1m81ffqtzje62pe4gq3",
+    "proposals": [
+     "prp_1m81ffqtzf7pyvv7chk"
+    ],
+    "programs": [
+     "prg_1m81ffqv96wz72f7k1k"
+    ]
+   }
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [
+    {
+     "caseId": "ask.aic_1m81ffqvtesrrh086ey",
+     "changed": "a different question",
+     "decision": "proposed",
+     "proposals": [
+      "invalid",
+      "new"
+     ]
+    }
+   ],
+   "probes": [],
+   "note": "Other model calls of this workspace: a different question, and what QED made of the answer."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [],
+   "related": [
+    {
+     "caseId": "ask.aic_1m81ffqvtesrrh086ey",
+     "at": "2026-11-22T11:15:28.765Z",
+     "what": "Pay refunds-desk@paper automatically",
+     "failed": [
+      {
+       "name": "proposal-valid",
+       "detail": "Some values need attention. (\"refunds-desk@paper\" is not one of your payees.)"
+      }
+     ],
+     "executed": false,
+     "proof": "an invalid proposal can never be drafted or signed"
+    }
+   ]
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "310d67fb4e1ea87e551575e835c5473c280360a1fbe65c5f691c7684e77a29a5",
+   "server": {
+    "ok": true,
+    "count": 2,
+    "brokenAt": null,
+    "head": "ca441aa1f28ec207e14a0790c56ea43a85a9ee506ea5fe31c05da7acb98eb7e6",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled"
+  },
+  "note": "A model call writes no receipt. The workspace's receipt chain and ledger as a whole were verified when the case was assembled."
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "The snapshot of the position sent to the model",
+   "how": "never stored by QED; its SHA-256 is",
+   "why": "Only the fingerprint was recorded when the call was made."
+  },
+  {
+   "what": "Payee names and addresses in what the model was sent",
+   "how": "replaced by tokens before sending (N-005); shown as sent",
+   "why": "The model never sees who is paid."
+  },
+  {
+   "what": "The model provider's response or session id",
+   "how": "replaced by \"sha256:\" and 16 hex digits of its SHA-256",
+   "why": "It identifies a session with the provider and is not needed to judge the decision."
+  }
+ ],
+ "cannotProve": [
+  "The answer came from a scripted test double, not a model. If it follows an instruction hidden in the question, that is because it was scripted to, as a compromised model might: the case shows what QED's own code did with such a proposal, and nothing about how a real model would answer.",
+  "The snapshot the model was sent is not stored, only its SHA-256: what it contained cannot be shown from the records.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "e1e9275e29211e1d8b3983ff765fe9887637cce0ce5710557781411cc205c457",
+   "2": "b52096a866b81d1cce34867ef141e332a429e911a1802b2dd3a6a714ed2201ba",
+   "3": "66751b3001119171f810bd59674c17a23540700d2341b3360af877b81c27ece9",
+   "4": "62dd7b87a14a1c5a83c34bfb9e0cefebedad3b635628d4880e5c261170af1f0d",
+   "5": "063c51c17c586971ae30dfaee2b3d0c14e6012f5e751c24aa9ad96de25e8098a",
+   "6": "e0e3274adb1b7d82af057624c8d52c242ce7cb3d645a903095d00be2ab23a7c4",
+   "7": "506142f995f6b6405c7ae8cba313047aaaab8b07674dc68ecedeb342d50de00d",
+   "8": "6b5b1855e0eb103e80fd0be4bfca960a06f39986b1a001fef865c09b955ceef4"
+  },
+  "verification": "834bb5934f10fa70b52843bc2ffa43e320ff0bb06d3690daa324941ddf2d8405",
+  "redactions": "a0739d760ec199d9f7b44a4299d9b6118658f99bba95f555ce37a3451f4118c8",
+  "cannotProve": "a23c2950ab2c4bd421de9816682d3ae1bd9a666bd56d550695dbd7c62a449885",
+  "root": "87e3c5e64af07d0fec1e2ab440ac389fed9a77acb4e5332ee8a493881723c39a"
+ }
+}

@@ -1,3 +1,23 @@
+# QED
+
+**Current release (R13, 25 November 2026): the QED wallet application is in [`apps/qed-demo`](apps/qed-demo/README.md)**,
+deployed at <https://qed-judges-preview-production.up.railway.app/>. It acts only within authority its owner has signed
+with a passkey: every action is checked against the signed limits and the household's safety rules before it runs, and
+the owner's on-chain wallet needs an independent co-signature. Prices are live; the money is practice money (paper
+balances and valueless test tokens on a private test chain). Nothing in it can reach a real bank, broker, exchange
+account or public chain, and QED holds no financial licence.
+
+- Start it locally, what to try and what is live: [`apps/qed-demo/README.md`](apps/qed-demo/README.md)
+- Deployment, persistence, backups and rollback: [`apps/qed-demo/docs/DEPLOY.md`](apps/qed-demo/docs/DEPLOY.md)
+- Security: [`apps/qed-demo/SECURITY.md`](apps/qed-demo/SECURITY.md); requirements register: [`apps/qed-demo/register`](apps/qed-demo/register)
+- Evidence: machine-readable results under `apps/qed-demo/evidence` (screenshots are kept out of this repository;
+  local absolute paths in logs are shown as `<repo>`)
+
+The October 2026 FinTechathon submission below is unchanged. Its contracts are vendored read-only in
+`apps/qed-demo/chain/vendor`, and its zero-knowledge components (GPL-3.0, see `ATTRIBUTIONS.md`) stay optional there.
+
+---
+
 # QED — proof-carrying autonomy for AI-agent wallets
 
 **An autonomous on-chain wallet in which the AI is allowed to be wrong, manipulated or stolen — and the money is still safe, because every movement of money carries a proof the chain checks: who may pay, what may never be spent, whether paid work is optimal, whether a clearing is maximal, and whether a trade got the best price any route could.**
