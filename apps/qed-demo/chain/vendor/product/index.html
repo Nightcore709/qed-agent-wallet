@@ -1,0 +1,1546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10161d">
+<title>QED — Financial autonomy, with proof built in.</title>
+<meta name="description" content="A testnet treasury where an AI agent moves money only inside what the owner signed, and every conversion carries an on-chain proof of best execution.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=STIX+Two+Text:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#20352E;--ink2:#102D26;--ink3:#24463C;--paper:#F5F4EF;--card:#FFF;--line:#DCDDD4;--line2:#ECEDE6;
+  --muted:#5A685F;--faint:#69776E;--teal:#16664D;--teal2:#10553E;--mint:#CFEB9D;--tealbg:#EAF3E8;
+  --red:#A33D35;--redbg:#FCF0EC;--amber:#815919;--amberbg:#FAF3E3;--blue:#445B85;--bluebg:#EEF1F8;
+  --serif:"STIX Two Text",Georgia,serif;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:16px;--shadow:0 2px 4px #20352e03,0 6px 24px #20352e03;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:100px}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{font-feature-settings:"ss01" on}
+a{color:var(--teal);text-underline-offset:3px}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}button,a,input,textarea,select,summary{-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid #52876C;outline-offset:4px;border-radius:5px}
+::selection{background:#D9E8BA;color:var(--ink2)}
+[hidden]{display:none!important}
+.mono{font-family:var(--mono);font-size:.84em;letter-spacing:-.025em;overflow-wrap:anywhere}
+.serif{font-family:var(--serif)}.muted{color:var(--muted)}.faint{color:var(--faint)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* The shell stays quiet; financial actions carry the accent. */
+.app{display:grid;grid-template-columns:224px minmax(0,1fr);min-height:100vh}
+.side{background:#EEEEE7;border-right:1px solid var(--line);padding:34px 18px 22px;position:sticky;top:0;height:100vh;height:100dvh;display:flex;flex-direction:column;gap:30px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink2);padding:0 14px}
+.brand b{font-family:var(--sans);font-weight:600;font-size:33px;line-height:1;letter-spacing:-2px}
+.brand i{display:inline-block;width:9px;height:9px;border:2px solid var(--teal);margin-top:15px}
+.brand-caption{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);padding:10px 14px 0}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav a{display:flex;align-items:center;gap:12px;min-height:46px;padding:11px 14px;border-radius:9px;color:var(--muted);text-decoration:none;font-weight:500;font-size:14px;transition:background .16s,color .16s}
+.nav a svg{width:18px;height:18px;flex:none;opacity:.8}
+.nav a:hover{background:#E3E7DA;color:var(--ink2)}
+.nav a[aria-current=page]{background:var(--ink2);color:#F6F8F0;box-shadow:0 3px 7px #173a2612}
+.nav a[aria-current=page] svg{color:var(--mint);opacity:1}
+.nav a[aria-current=page]::after{content:"";width:5px;height:5px;background:var(--mint);border-radius:50%;margin-left:auto}
+.navsec{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);padding:0 14px 10px}
+.side .foot{margin-top:auto;font-size:11.5px;color:var(--muted);padding:18px 12px 0;line-height:1.65;border-top:1px solid var(--line)}
+.side .foot b{display:block;font-size:12px;color:var(--ink);font-weight:600;margin-bottom:6px}
+.side-seal{border:1px solid #C8CEC0;padding:14px 12px;border-radius:10px;font-size:11px;color:var(--muted);line-height:1.5}
+.side-seal strong{display:block;color:var(--ink);font-size:12px;font-weight:600;margin-bottom:4px}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 36px;border-bottom:1px solid var(--line);background:var(--paper);min-height:74px}
+.workspace-label{font-size:12px;font-weight:500;white-space:nowrap;color:var(--muted)}
+.workspace-label span{color:#9AA298;padding:0 8px}.workspace-label b{color:var(--ink);font-weight:500}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#FAFBF6;border-radius:6px;padding:5px 9px;font-size:11px;color:var(--muted);line-height:1.4;max-width:100%;overflow-wrap:anywhere}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--faint);flex:none}
+.dot.ok{background:#287250}.dot.warn{background:#A57B23}.dot.bad{background:var(--red)}
+.content{padding:34px 36px 64px;max-width:1512px;width:100%;margin:0 auto}
+.view{display:none}.view.on{display:block;animation:fade .22s ease-out}
+@keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);line-height:1.6}
+h1,h2,h3{margin:0;font-weight:500}
+.h1{font-family:var(--serif);font-size:58px;line-height:1.02;letter-spacing:-2px}
+.h2{font-family:var(--sans);font-size:32px;line-height:1.18;letter-spacing:-1.2px;font-weight:500;text-wrap:balance}
+.h3{font-size:15px;font-weight:600;line-height:1.45;letter-spacing:-.2px}
+.lead{font-size:16px;line-height:1.7;color:var(--muted);max-width:760px;margin:12px 0 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:26px;flex-wrap:wrap}
+.head>div:first-child{min-width:0;flex:1 1 400px}
+.head>div:first-child>.h2{max-width:820px}
+.head>.chips{justify-content:flex-end;max-width:410px}
+.head p{max-width:750px}
+.card{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:24px}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi{position:relative;padding:23px 21px;overflow:hidden}
+.kpi .k{font-size:11.5px;line-height:1.45;color:var(--muted);font-weight:500;min-height:34px}
+.kpi .v{font-family:var(--sans);font-size:clamp(25px,2.5vw,36px);line-height:1.2;margin:12px 0 10px;font-weight:500;letter-spacing:-1.3px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi .v small{font-size:11px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:0;display:inline-block}
+.kpi .s{font-size:11.5px;color:var(--faint);line-height:1.6}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #D4D8CD;background:var(--card);border-radius:8px;min-height:44px;padding:10px 16px;font-weight:600;font-size:12.5px;line-height:1.4;color:var(--ink);text-align:center;transition:background .16s,border-color .16s,box-shadow .16s}
+.btn:hover{border-color:#9EAD99;background:#F4F7EE;box-shadow:0 2px 6px #20352e08}
+.btn.primary{background:var(--ink2);border-color:var(--ink2);color:#F5F8EF}.btn.primary:hover{background:#244C3D;border-color:#244C3D}
+.btn.teal{background:var(--teal);border-color:var(--teal);color:#fff}.btn.teal:hover{background:var(--teal2);border-color:var(--teal2)}
+.btn.danger{color:var(--red);border-color:#E7D4CD;background:#FFFBF8}.btn.danger:hover{background:var(--redbg);border-color:#CE9A8D}
+.btn.sm{padding:8px 12px;font-size:12px;border-radius:7px;min-height:40px}
+.btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn.primary:disabled,.btn.teal:disabled{background:#6D7C72;border-color:#6D7C72}
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--sans);font-size:10.5px;line-height:1.5;font-weight:600;letter-spacing:.025em;border-radius:5px;padding:4px 8px;max-width:100%;overflow-wrap:anywhere}
+.b-live,.b-ok{background:var(--tealbg);color:var(--teal)}.b-script{background:var(--bluebg);color:var(--blue)}.b-hist,.b-info{background:#EFEEE8;color:#5B6359}
+.b-ref{background:var(--amberbg);color:var(--amber)}.b-rev{background:var(--redbg);color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.6}
+th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:13px 12px;border-bottom:1px solid var(--line);background:#F8F9F4}
+td{padding:14px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#FAFBF7}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tablewrap{overflow-x:auto;max-width:100%;scrollbar-width:thin;scrollbar-color:#BAC4B1 transparent}
+.tablewrap table{min-width:540px}
+.tablewrap td a.mono{white-space:nowrap}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field label{font-size:12px;font-weight:600;color:var(--muted);line-height:1.5}
+.input{border:1px solid #CCD3C5;background:#fff;border-radius:8px;padding:11px 12px;min-width:0;min-height:44px;max-width:100%;font-size:14px}
+.input:focus{outline:3px solid #D2E3BD;outline-offset:1px;border-color:var(--teal)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:0}.row>*{min-width:0;max-width:100%}
+.hr{height:1px;background:var(--line2);margin:20px 0}
+.note{font-size:12px;color:var(--muted);background:#F6F7F0;border:1px solid var(--line2);border-radius:8px;padding:13px 14px;line-height:1.7}
+.empty{color:var(--faint);font-size:13px;padding:24px 4px;line-height:1.7}
+.section-note{font-size:12px;color:var(--muted);margin:0 0 18px;line-height:1.7}
+/* Overview: an editorial opening, anchored by actual chain data. */
+.hero{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(275px,1fr);gap:20px;align-items:stretch}
+.hero-story{background:var(--ink2);color:#F8FAF0;border-color:var(--ink2);position:relative;overflow:hidden;padding:34px!important}
+.hero-story::after{content:"";width:210px;height:210px;border:1px solid #c9e5b21c;position:absolute;right:-112px;top:-110px;transform:rotate(45deg);box-shadow:0 0 0 28px #c9e5b20a,0 0 0 56px #c9e5b206;pointer-events:none}
+.hero .eyebrow{color:var(--mint)}
+.hero .h1{font-size:clamp(43px,4.4vw,67px);font-weight:400;max-width:670px;letter-spacing:-1.8px;margin-top:30px!important}
+.hero .h1 em{font-weight:400;color:var(--mint)}
+.hero .lead{font-size:14px;color:#C4D1C4;line-height:1.85;max-width:560px;margin-top:22px}
+.hero .row{gap:8px}
+.hero-story .btn.primary{background:var(--mint);color:var(--ink2);border-color:var(--mint)}
+.hero-story .btn.primary:hover{background:#E0F6B9;border-color:#E0F6B9}
+.hero-story .btn:not(.primary){background:transparent;border-color:#547063;color:#E3EADB}
+.hero-story .btn:not(.primary):hover{background:#244C3D}
+.hero-story .row .btn:last-child{font-weight:500}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:34px;border-top:1px solid #476052}
+.flow>div{padding:20px 14px 0 0;position:relative}
+.flow b{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.02em;text-transform:uppercase;color:#AFCAA5;margin-bottom:9px}
+.flow h4{margin:0 0 5px;font-size:12px;font-weight:600;color:#F8FAF0}
+.flow p{margin:0;font-size:11px;line-height:1.7;color:#BFCDBF}
+.livecard{background:#E5EAD9;color:var(--ink2);border:1px solid #D2D9C4;border-radius:var(--r);padding:27px;display:flex;flex-direction:column;gap:22px;position:relative;overflow:hidden}
+.livecard .t{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);font-weight:500;display:flex;align-items:center;justify-content:space-between}
+.livecard .t:after{content:"↗";font-family:var(--sans);font-size:19px;font-weight:400;color:#476A4E}
+.livecard .big{font-family:var(--sans);font-size:clamp(26px,3vw,42px);font-weight:500;line-height:1.25;letter-spacing:-1.7px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.livecard .kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:13px 14px;font-size:12px;padding-top:22px;border-top:1px solid #CCD5BE}
+.livecard .kv span:nth-child(odd){color:#52634D}
+.livecard .row{margin-top:auto}.livecard .row .btn{width:100%}
+.livecard .row .btn:not(.teal){background:#F1F4E8!important;border-color:#CBD3BD!important;color:var(--ink2)!important}
+.livecard div[style*="color:#8FA3B6"]{color:#52634D!important}
+.cap{display:flex;flex-direction:column;gap:12px;text-decoration:none;color:inherit;position:relative;padding:23px;transition:border-color .16s,background .16s}
+.cap:after{content:"↗";position:absolute;top:21px;right:23px;color:#7F9476;font-size:17px}
+.cap:hover{border-color:#9CAC8D;background:#FCFDF8}
+.cap .h3{font-size:15px;max-width:92%}
+.cap p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.75}
+#v-overview>.head .h2{font-size:27px;max-width:680px}
+#v-overview>.head>.chips{max-width:none;justify-content:flex-start}
+/* Agent: proposal, permission, execution and receipt remain separate. */
+#v-agent>.head{align-items:flex-start}#v-agent .head .h2{font-size:34px}
+#v-agent .head>.chips{max-width:340px;flex:0 1 340px;margin-top:5px}
+.agent{display:grid;grid-template-columns:minmax(0,1fr) 352px;gap:20px;align-items:start}
+.chat{display:flex;flex-direction:column;height:calc(100dvh - 246px);min-height:620px;max-height:1000px;overflow:hidden;border-color:#D2D8CA}
+.chat-heading{padding:20px 24px 17px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line2);background:#FCFDF9}
+.agent-mark{display:grid;place-items:center;flex:none;width:35px;height:35px;border-radius:10px;background:var(--ink2);color:var(--mint);font-family:var(--serif);font-size:24px}
+.chat-heading strong{font-size:13px;font-weight:600;display:block}.chat-heading small{font-size:11px;color:var(--muted)}
+.chat-guide{display:flex;gap:16px;padding:11px 24px;border-bottom:1px solid var(--line2);font-size:10px;color:var(--faint);background:#F8FAF3;flex-wrap:wrap}
+.chat-guide b{font-family:var(--mono);font-size:9px;font-weight:400;color:var(--teal);margin-right:5px}
+.msgs{flex:1;min-height:0;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:22px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#C5CEBA transparent;overscroll-behavior:contain}
+.msg{max-width:96%;display:flex;flex-direction:column;gap:9px;flex-shrink:0;min-width:0}
+.msg.me{align-self:flex-end;max-width:88%}
+.msg .bub{padding:14px 16px;border-radius:11px;font-size:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.me .bub{background:#EAF0E1;color:var(--ink2);border:1px solid #D9E3CE;border-bottom-right-radius:3px}
+.msg.ai .bub{background:#F6F7F2;border:1px solid #E7EBE0;border-top-left-radius:3px}
+.msg .meta{font-family:var(--mono);font-size:9.5px;color:var(--faint);display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 2px}
+.msg.me .meta{justify-content:flex-end}
+.prop{border:1px solid #D7C59B;border-top:3px solid #B49451;border-radius:10px;background:#FFFCF4;padding:18px;display:flex;flex-direction:column;gap:15px}
+.prop .amt{font-family:var(--sans);font-size:22px;font-weight:500;line-height:1.5;letter-spacing:-.7px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;margin-top:5px}
+.prop>.row:first-child>.badge{align-self:flex-start}
+.prop .checks{border-top:1px solid #E9E1CF;padding-top:13px}
+.prop>.row:last-of-type{border-top:1px solid #E9E1CF;padding-top:14px}
+.prop .btn[data-confirm]{flex:1;min-height:46px}.prop .btn[data-dismiss]{background:transparent}
+.checks{display:flex;flex-direction:column;gap:8px;font-size:12px}
+.checks div{display:flex;gap:8px;align-items:flex-start}
+.checks .i{flex:none;width:17px;height:17px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;margin-top:1px}
+.checks .p .i{background:var(--tealbg);color:var(--teal)}.checks .f .i{background:var(--redbg);color:var(--red)}
+.sugg-label{padding:12px 24px 0;font-size:10px;line-height:1.6;color:var(--faint);border-top:1px solid var(--line2)}
+.sugg{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;padding:8px 24px 12px;scrollbar-width:thin;scrollbar-color:#CBD3C3 transparent}
+.sugg button{flex:none;white-space:nowrap;border:1px solid #DAE0D2;background:#FAFCF5;border-radius:7px;padding:9px 12px;min-height:40px;font-size:11px;color:var(--muted);transition:background .15s}
+.sugg button:hover{border-color:#96AE82;background:#EFF5E5;color:var(--ink2)}
+.composer{display:flex;gap:9px;padding:0 18px 16px;align-items:flex-end}
+.composer textarea{flex:1;resize:vertical;border:1px solid #CDD5C5;border-radius:9px;padding:13px 14px;min-height:50px;max-height:140px;width:100%;min-width:0;font-size:13px;line-height:1.7;background:#FFF}
+.composer textarea::placeholder{color:#76816F;opacity:1}
+.composer textarea:focus{outline:3px solid #D2E3BD;outline-offset:1px;border-color:var(--teal)}
+.composer .btn{min-height:50px;padding:13px 17px}
+.composer-note{padding:0 20px 14px;color:var(--muted);font-size:10px;line-height:1.6}
+.panel{position:sticky;top:22px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel .pad{padding:21px}
+.panel-caption{font-size:11px;color:var(--muted);margin:7px 0 0}
+.idle-hint{margin-top:20px;padding:22px 18px;background:#F6F8F0;border:1px dashed #C9D3BC;border-radius:10px}
+.idle-hint strong{display:block;font-weight:500;font-family:var(--serif);font-size:23px;line-height:1.2;letter-spacing:-.5px;margin-bottom:9px}
+.idle-hint p{margin:0;font-size:12px;line-height:1.8;color:var(--muted)}
+.panel .card:has(#tl:not(:empty),#job-result:not(:empty)) .idle-hint{display:none}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tl:empty{margin-top:0!important}
+.tl li{display:grid;grid-template-columns:25px minmax(0,1fr);gap:11px;padding:0 0 18px;position:relative}
+.tl li:before{content:"";position:absolute;left:12px;top:24px;bottom:0;width:1px;background:#DCE3D3}
+.tl li:last-child:before{display:none}
+.tl .m{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:10px;font-weight:500;background:#F2F4EC;color:var(--faint);border:1px solid var(--line);z-index:1}
+.tl .ok .m{background:var(--teal);color:#fff;border-color:var(--teal)}.tl .refused .m{background:var(--amberbg);color:var(--amber);border-color:#CEB57A}.tl .reverted .m{background:var(--redbg);color:var(--red);border-color:#DBADA3}
+.tl .pending .m{background:#fff;border:2px solid var(--teal);color:var(--teal)}.tl .run .m{animation:pulse 1.5s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px #16664d12}}
+.tl .lbl{font-weight:600;font-size:12px;line-height:1.5;padding-top:3px}
+.tl .det{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.7;overflow-wrap:anywhere}
+.tl .todo .lbl{color:var(--faint);font-weight:400}
+#job-result:not(:empty){margin:16px 0}
+.result{border-radius:10px;padding:17px 15px;border:1px solid;overflow-wrap:anywhere}
+.result.ok{background:var(--tealbg);border-color:#BED3B8}.result.ref{background:var(--amberbg);border-color:#DECDA5}.result.rev{background:var(--redbg);border-color:#E7BCB2}
+.result .rt{font-weight:600;font-size:14px;margin-bottom:8px}.result .kv2{border-top:1px solid #ccd5c0;padding-top:12px}
+.kv2{display:grid;grid-template-columns:minmax(75px,.6fr) minmax(0,1fr);gap:9px 14px;font-size:12px;line-height:1.65;font-variant-numeric:tabular-nums}
+.kv2 span:nth-child(odd){color:var(--muted)}.kv2>*,.livecard .kv>*{min-width:0;overflow-wrap:anywhere}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.mini div{background:#FAFBF6;padding:15px 13px;min-width:0}.mini div:nth-child(odd){border-right:1px solid var(--line2)}.mini div:nth-child(-n+2){border-bottom:1px solid var(--line2)}
+.mini b{display:block;font-family:var(--sans);font-weight:500;font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-1px;overflow-wrap:anywhere}
+.mini span{display:block;font-size:10px;color:var(--muted);line-height:1.6;margin-top:5px}
+/* Proofs, treasury controls and evidence share one financial grammar. */
+#tr-kpis .kpi:first-child{background:var(--ink2);border-color:var(--ink2);color:#F8FAF0}
+#tr-kpis .kpi:first-child .k,#tr-kpis .kpi:first-child .s,#tr-kpis .kpi:first-child .v small{color:#C0D2B9}
+#tr-mandate{font-variant-numeric:tabular-nums}#tr-mandate td{padding:11px 0;overflow-wrap:anywhere}#tr-mandate td+td{padding-left:12px}
+#f-mandate,#f-policy{padding-top:8px}#f-mandate button,#f-policy button{flex-grow:1}
+#tr-mhash{font-size:10px}#tr-policy{background:#F8FAF2;border:1px solid #E4E9DC;padding:15px;border-radius:9px}
+.proof-intro{background:#E9EEDF;border:1px solid #D1DCC3;border-radius:12px;padding:19px 22px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.proof-symbol{font-family:var(--serif);font-size:38px;line-height:1;color:var(--teal);flex:none}
+.proof-intro strong{display:block;font-size:13px;font-weight:600}.proof-intro p{font-size:12px;line-height:1.7;color:var(--muted);margin:4px 0 0}
+#ex-last{border-top:3px solid #94B276}#ex-last .kv2{grid-template-columns:minmax(110px,.7fr) minmax(0,1fr)}
+#ex-last .kv2>span{border-bottom:1px solid var(--line2);padding:6px 0}
+#ex-last .kv2>span:nth-child(6){font-size:21px;color:var(--teal);letter-spacing:-.7px;line-height:1.4}
+#ex-route{overflow-x:auto;scrollbar-width:thin}#ex-route table{min-width:380px}
+.bars{display:flex;flex-direction:column;gap:17px}
+.bar{display:grid;grid-template-columns:minmax(90px,1fr) minmax(45px,.65fr) 72px;gap:10px;align-items:center;font-size:11px;line-height:1.7}
+.bar .track{height:7px;background:#EEF1E7;border-radius:2px;overflow:hidden}.bar .fill{height:100%;background:#9BAA8F;border-radius:2px}.bar.best .fill{background:var(--teal)}.bar.best{font-weight:600;color:var(--teal)}
+.bar .val{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:10px}
+.meter{height:7px;background:#E7EBDD;border-radius:3px;overflow:hidden;position:relative}.meter i{display:block;height:100%;background:var(--teal);border-radius:3px;transition:width .35s}.meter .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.formula{font-family:var(--serif);font-size:20px;background:#F0F4E8;border:1px solid #D8E2CA;border-radius:10px;padding:20px;overflow-x:auto;white-space:normal;line-height:1.8;color:var(--ink2)}
+#lab-attacks{counter-reset:attack}
+.attack{display:flex;flex-direction:column;gap:14px;position:relative;counter-increment:attack;padding-top:24px;border-top:2px solid #DBC4A6}
+.attack:before{content:"TEST / " counter(attack,decimal-leading-zero);font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:#8A6F47;display:block}
+.attack .h3{font-size:16px}.attack .exp{font-size:12px;line-height:1.75;color:var(--muted)}.attack>div:last-child{margin-top:auto;padding-top:5px}.attack .btn{width:100%}
+#sv-cards{counter-reset:scenario}#sv-cards>.card{counter-increment:scenario;padding:26px;gap:17px!important}
+#sv-cards>.card:before{content:"SCENARIO / " counter(scenario,decimal-leading-zero);font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:.1em}
+#sv-cards>.card>.row:first-child{align-items:flex-start}#sv-cards .h3{font-size:18px;font-weight:500;letter-spacing:-.4px;flex:1 1 210px}#sv-cards p{line-height:1.8}
+#sv-cards>.card>.row:last-child{border-top:1px solid var(--line2);padding-top:17px;margin-top:auto}
+#sv-run{border-top:3px solid var(--teal)}
+#ev-kpis .kpi{background:#F9FBF4}#ev-kpis .v{font-size:34px}
+#ev-contracts .mono{font-size:11px}#ev-tx .badge{min-width:62px}#ev-tx td:nth-child(2){min-width:220px}
+#ev-q{max-width:100%}#ev-run{max-width:100%}
+details{border-top:1px solid var(--line2);padding-top:12px}summary{min-height:38px;padding:7px 0}
+.log{font-family:var(--mono);font-size:11px;background:var(--ink2);color:#CFDBC7;border-radius:8px;padding:16px;max-height:260px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--ink2);color:#F2F7E7;padding:14px 18px;border:1px solid #52705C;border-radius:10px;font-size:13px;box-shadow:0 8px 30px #102d2626;max-width:min(420px,calc(100vw - 32px));z-index:50;display:none;overflow-wrap:anywhere}
+.disclaimer{font-size:11px;line-height:1.8;color:var(--faint);border-top:1px solid var(--line);padding:20px 36px;margin-top:auto}.disclaimer a{overflow-wrap:anywhere}
+.spin{width:14px;height:14px;border:2px solid #ffffff66;border-top-color:#fff;border-radius:50%;animation:rot .8s linear infinite;display:inline-block}.btn:not(.primary):not(.teal) .spin{border-color:#20352e33;border-top-color:var(--ink)}
+@keyframes rot{to{transform:rotate(360deg)}}
+@media(min-width:1600px){.content{padding-top:42px}.hero .h1{font-size:72px}.hero .lead{font-size:16px}.flow p{font-size:12px}.agent{grid-template-columns:minmax(0,1fr) 390px}}
+@media(max-width:1240px){
+  .app{grid-template-columns:196px minmax(0,1fr)}.side{padding-left:12px;padding-right:12px}.content{padding:28px}.topbar{padding:16px 28px;flex-wrap:wrap}.workspace-label{width:100%}.topbar #status{flex:1}.hero{grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr)}.hero-story{padding:27px!important}.hero .h1{font-size:48px}.hero-story .row .btn{flex:1 1 auto}.flow{grid-template-columns:repeat(2,minmax(0,1fr))}.flow>div{padding-top:17px}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi .k{min-height:0}.agent{grid-template-columns:minmax(0,1fr) 305px;gap:16px}.chat-heading,.msgs{padding:18px}.chat-guide{gap:9px;padding:10px 18px}.chat{min-height:670px}.panel .pad{padding:17px}.mini b{font-size:22px}#v-agent .head>.chips{max-width:100%;flex:1 1 100%;justify-content:flex-start}.head .h2{font-size:29px}#caps.g3,#lab-attacks.g3{grid-template-columns:repeat(2,minmax(0,1fr))}.hero .lead{font-size:13px}.disclaimer{padding:20px 28px}
+}
+@media(max-width:1080px){
+  .agent{grid-template-columns:1fr}.chat{height:660px;min-height:0}.panel{position:static;display:grid;grid-template-columns:1.1fr 1fr;align-items:start}.hero{grid-template-columns:1fr}.hero .h1{font-size:58px}.hero .lead{font-size:15px;max-width:650px}.flow{grid-template-columns:repeat(4,minmax(0,1fr))}.livecard{display:grid;grid-template-columns:1fr 1fr;gap:18px 25px}.livecard .t{grid-column:1/-1}.livecard .kv{grid-column:2;grid-row:2/5;padding-top:0;border:0}.livecard .row{grid-column:1}.livecard>div:last-child{grid-column:1}.livecard .big{font-size:37px}.g2{grid-template-columns:1fr}.bar{grid-template-columns:200px minmax(45px,1fr) 85px}#sv-cards.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.proof-intro{align-items:flex-start}
+}
+@media(max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}.side{height:auto;position:static;padding:18px 24px 12px;gap:18px;overflow:visible;border-right:0;border-bottom:1px solid var(--line)}.side-brand{display:flex;gap:18px;align-items:center}.brand{padding:0}.brand b{font-size:29px}.brand i{margin-top:11px}.brand-caption{padding:0;font-size:9px}.nav{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.nav a{justify-content:center;padding:10px 5px;font-size:11px;gap:6px;min-height:44px}.nav a svg{width:15px;height:15px}.nav a[aria-current=page]::after{display:none}.navsec,.side .foot,.side-seal{display:none}.topbar{min-height:0;padding:12px 24px;gap:8px}.workspace-label{display:none}.content{padding:28px 24px 48px}.head .h2{font-size:31px}.hero-story{padding:32px!important}.hero .h1{font-size:60px}.head>div:first-child{flex-basis:100%}.head>.chips{justify-content:flex-start}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.chat{height:660px}.panel{gap:18px}.disclaimer{padding:20px 24px}
+}
+@media(max-width:600px){
+  html{scroll-padding-top:20px}.side{padding:16px 16px 12px;gap:14px}.side-brand{justify-content:space-between;padding:0 3px}.brand b{font-size:28px}.brand-caption{font-size:8px;letter-spacing:.12em}.nav{grid-template-columns:repeat(12,minmax(0,1fr));gap:5px}.nav a{grid-column:span 3;white-space:nowrap;font-size:10.5px;gap:5px;padding:10px 3px;min-height:44px;border-radius:7px}.nav a svg{width:14px;height:14px}.nav a:nth-child(n+5){grid-column:span 4}.topbar{padding:10px 18px;align-items:flex-start;gap:8px}.topbar #status{gap:6px;flex-basis:100%;width:100%}.topbar>.chips:last-child{display:none}.chip{font-size:10px;padding:5px 7px}.content{padding:25px 18px 40px}.head{margin-bottom:21px;gap:12px}.h2,.head .h2,#v-agent .head .h2{font-size:28px;letter-spacing:-1px;line-height:1.2}.eyebrow{font-size:9px}.lead{font-size:14px;line-height:1.75}.head .lead{font-size:13px!important}.pad{padding:20px}.g2,.g3,.g4,#caps.g3,#lab-attacks.g3,#sv-cards.g2{grid-template-columns:1fr;gap:13px}.hero{gap:14px}.hero-story{padding:26px 22px!important;border-radius:13px}.hero .h1{font-size:44px;letter-spacing:-1.4px;margin-top:23px!important}.hero .lead{font-size:13px;margin-top:18px}.hero-story .row{margin-top:23px!important}.hero-story .row .btn{flex:1 1 100%;min-height:46px}.flow{grid-template-columns:1fr 1fr;margin-top:27px;gap:0 12px}.flow>div{padding-right:0;padding-top:18px}.flow b{font-size:8px}.flow p{font-size:11px}.livecard{display:flex;padding:24px;gap:20px}.livecard .kv{border-top:1px solid #CCD5BE;padding-top:19px;gap:11px 18px}.livecard .big{font-size:38px}.livecard .row .btn{width:auto;flex:1 1 100%}#v-overview>.head .h2{font-size:25px}.cap{padding:22px}.cap p{font-size:13px}.chat{height:690px;min-height:0;max-height:none;border-radius:12px}.chat-heading{padding:17px}.chat-guide{padding:10px 16px;justify-content:space-between;gap:6px;font-size:9px}.chat-guide b{font-size:8px;margin-right:3px}.msgs{padding:19px 15px;gap:20px}.msg{max-width:100%}.msg .bub{font-size:13px;padding:13px;line-height:1.8}.msg.me{max-width:92%}.prop{padding:14px;gap:13px}.prop .amt{font-size:20px}.prop .btn[data-confirm]{flex-basis:100%}.prop .btn[data-dismiss]{width:100%}.prop .badge{font-size:10px}.checks{font-size:11.5px}.sugg-label{padding:11px 16px 0}.sugg{padding:8px 16px 12px}.sugg button{min-height:44px}.composer{padding:0 12px 12px;gap:7px}.composer textarea{font-size:16px;min-height:54px;padding:12px 10px}.composer .btn{min-height:54px;padding:12px;font-size:12px}.composer-note{padding:0 15px 13px;font-size:9px}.panel{display:flex;gap:14px}.panel .pad{padding:21px}.mini b{font-size:27px}.mini span{font-size:11px}.tl .lbl{font-size:13px}.tl .det{font-size:12px}.kv2{font-size:12px}.kpi .k{font-size:12px}.kpi .v{font-size:38px;margin:10px 0}.kpi .s{font-size:12px}#tr-kpis,#ev-kpis{gap:12px}.field{flex-basis:100%!important;min-width:0!important}.input{font-size:16px}.row .btn{max-width:100%}.btn.sm{min-height:44px}#f-mandate .btn,#f-policy .btn,#tick,#auto{width:100%}#tr-mhash{font-size:9px}#tr-mandate td{font-size:12px}.proof-intro{padding:17px;gap:13px}.proof-symbol{font-size:29px}.proof-intro strong{font-size:12px}.proof-intro p{font-size:11px}.formula{font-size:17px;padding:16px}.bar{grid-template-columns:minmax(90px,1fr) minmax(30px,.65fr) 68px;gap:8px;font-size:10.5px}.bar .val{font-size:9px}#ex-last .kv2{grid-template-columns:100px minmax(0,1fr);gap:5px 12px}#ex-last .kv2>span:nth-child(6){font-size:19px}.tablewrap table{min-width:510px}.tablewrap{margin-top:8px}th,td{padding:12px 10px}#ev-q,#ev-run{width:100%!important}#v-evidence>.card>.row>.row{width:100%}#ev-ledger{width:100%}#sv-cards>.card{padding:22px}.attack .btn{min-height:44px}#sv-cards .btn{width:100%;min-height:44px}#sv-cards .h3{font-size:18px}.disclaimer{padding:18px;font-size:10.5px}.toast{right:16px;bottom:16px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(forced-colors:active){.nav a[aria-current=page]{outline:2px solid Highlight}.btn,.badge,.result{border:1px solid currentColor}}
+
+/* QED / FINANCIAL INSTRUMENT — Modern Dark × restrained Art Deco × professional Web3.
+   This layer deliberately preserves existing accessible markup and IDs. */
+:root {
+  color-scheme:dark;
+  --ink:#efece5;--ink2:#0c1118;--ink3:#1a2632;
+  --paper:#0e131a;--card:#161d25;--line:#343b43;--line2:#2b333b;
+  --muted:#bac0c5;--faint:#a1acb3;
+  --teal:#dbbe88;--teal2:#eccb94;--mint:#e8c992;--tealbg:#282b27;
+  --red:#f2aa9e;--redbg:#302121;--amber:#e6c38b;--amberbg:#32291e;
+  --blue:#b1c8eb;--bluebg:#202c3a;
+  --shadow:none;--r:12px;
+}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-size:14px;letter-spacing:.005em}
+::selection{background:#b69864;color:#10161b}
+a{color:var(--teal2)}
+:focus-visible{outline:2px solid #e4c488;outline-offset:3px}
+.app{grid-template-columns:236px minmax(0,1fr);background:#10161d}
+.side{background:#0a0f15;border-right:1px solid #343638;padding:37px 17px 24px;gap:36px}
+.brand{color:#f1eadf;gap:12px}
+.brand b{font-family:var(--serif);font-weight:500;font-size:43px;letter-spacing:-2.8px}
+.brand i{width:8px;height:8px;border-color:#e0bc80;transform:rotate(45deg);margin-top:18px}
+.brand-caption{color:#b8a78b;font-size:9px;letter-spacing:.18em}
+.navsec{color:#928d85;letter-spacing:.2em;font-weight:600;font-size:9px}
+.nav{gap:4px}
+.nav a{font-size:12px;font-weight:500;letter-spacing:.015em;color:#b3b8b9;min-height:47px;padding:11px 14px;border-radius:5px}
+.nav a svg{opacity:.76;stroke-width:1.5}
+.nav a:hover{background:#1c252e;color:#fff}
+.nav a[aria-current=page]{background:#202b33;color:#fff;box-shadow:inset 2px 0 #d9b77e}
+.nav a[aria-current=page]::after{width:5px;height:5px;background:#dfc089}
+.nav a[aria-current=page] svg{color:#dfc089}
+.side-seal{background:#121b23;border:1px solid #393e41;border-radius:3px;color:#aaaeb0;line-height:1.75;padding:22px 17px;position:relative}
+.side-seal:before,.side-seal:after{content:"";position:absolute;width:14px;height:14px;border-color:#ba9c67;border-style:solid;pointer-events:none}
+.side-seal:before{top:-1px;left:-1px;border-width:1px 0 0 1px}.side-seal:after{right:-1px;bottom:-1px;border-width:0 1px 1px 0}
+.side-seal strong{font-family:var(--serif);font-weight:500;line-height:1.25;color:#f5ead7;font-size:22px;letter-spacing:-.6px;margin-bottom:16px}
+.side .foot{border-color:#33383d;color:#a9aaa9;font-size:11px}.side .foot b{color:#dfc28f}
+.main{background:radial-gradient(ellipse 95% 38% at 90% 0%,#1e252d 0%,transparent 66%),#10161d;min-height:100vh}
+.topbar{padding:21px clamp(24px,4vw,62px);border-color:#343a41;background:rgba(13,20,27,.86);backdrop-filter:blur(18px);min-height:80px}
+.workspace-label{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#c3c0b7}
+.workspace-label b{color:#e7e0d5}.workspace-label span{color:#a49276}
+.chips{gap:8px}.chip{background:#171f27;border:1px solid #384149;border-radius:4px;color:#cccbd0;padding:7px 11px;font-size:10px;letter-spacing:.035em}
+.dot{background:#98a4a8}.dot.ok{background:#9edaba}.dot.warn{background:#f1d098}.dot.bad{background:#e99595}
+.content{max-width:1500px;padding:clamp(25px,3.5vw,55px) clamp(24px,4vw,64px) 82px}
+.view.on{animation:enterQ .3s ease both}
+@keyframes enterQ{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:none}}
+.eyebrow{color:#dfbe88;font-size:10px;letter-spacing:.19em;line-height:1.8}
+.h1{font-family:var(--serif);font-size:clamp(61px,6.2vw,103px);font-weight:400;letter-spacing:-4.5px;line-height:.99}
+.h2{font-family:var(--serif);font-size:clamp(31px,3.15vw,49px);font-weight:400;letter-spacing:-1.2px;line-height:1.16}
+.h3{font-size:15px;color:#f0ede5;font-weight:600}
+.lead,.muted{color:var(--muted)}.faint{color:var(--faint)}
+.head{margin-bottom:32px;border-bottom:1px solid #353d44;padding-bottom:24px;align-items:end}
+.head p{font-size:14px;line-height:1.8;color:#c3c6c4}
+.card{background:#171f27;border:1px solid #343d46;border-radius:10px;box-shadow:none}
+.pad{padding:25px}
+.grid{gap:14px}
+.btn{background:#202a33;color:#e9e3d7;border-color:#465057;border-radius:5px;font-size:12px;font-weight:600;min-height:45px;letter-spacing:.025em;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
+.btn:hover{background:#2c3740;border-color:#c9a979;color:#fff;box-shadow:none;transform:translateY(-1px)}
+.btn.primary,.btn.teal{background:#dfbe88;color:#11171d;border:1px solid #dfbe88}
+.btn.primary:hover,.btn.teal:hover{background:#f1d4a6;border-color:#f1d4a6;color:#0d141a}
+.btn.danger{color:#f0af9f;border-color:#7b554d;background:#2a2222}.btn.danger:hover{background:#3b2929;border-color:#e1a094}
+.btn:disabled{opacity:.55;transform:none}.btn.primary:disabled,.btn.teal:disabled{color:#28313b;background:#7e7b72;border-color:#7e7b72}
+.badge{font-size:10px;border-radius:3px;letter-spacing:.06em;padding:5px 8px}
+.b-live,.b-ok{background:#21352e;color:#9de1bc}.b-script{background:#233245;color:#b3caea}.b-hist,.b-info{background:#30343b;color:#d1d5d6}.b-ref{background:#403322;color:#f1cf92}.b-rev{background:#472a2b;color:#f3b2a6}
+.kpi{padding:24px;min-height:156px;border-top:1px solid #66543b}
+.kpi .k{font-family:var(--mono);font-size:10px;line-height:1.65;letter-spacing:.05em;color:#bdc1bf;font-weight:400}
+.kpi .v{font-size:clamp(25px,2.45vw,37px);letter-spacing:-1.3px;color:#f8f0e4;margin:18px 0 11px}
+.kpi .v small,.kpi .s{color:#afb8b9}
+.tablewrap{scrollbar-color:#74787b transparent}
+table{color:#e8e7e3}th{background:#1b252d;color:#a9b4bc;font-family:var(--mono);font-weight:500;font-size:9px;letter-spacing:.08em;border-color:#3b444c}
+td{border-color:#303840}tbody tr:hover{background:#1e2831}
+.field label{color:#c3c5c3}
+.input,.composer textarea{background:#111920;border:1px solid #49535a;color:#f4eee3;border-radius:5px}
+.input:focus,.composer textarea:focus{outline:2px solid #c1a270;outline-offset:1px;border-color:#c1a270}
+.input::placeholder,.composer textarea::placeholder{color:#98a7ad}
+.note{background:#1c252b;border-color:#39444b;color:#c5c7c4;border-radius:5px}
+.hr{background:#333d45}.empty{color:#acb6b9}.section-note{color:#b3bcbf}
+/* A signature, editorial launch composition. No blank dashboard panel. */
+.hero{gap:0!important;grid-template-columns:minmax(0,1.2fr) minmax(290px,.7fr);border:1px solid #565042;border-radius:3px;overflow:hidden;position:relative;background:#141b22}
+.hero:before{content:"QED / 001  •  PROOF-CARRYING FINANCE";position:absolute;top:17px;right:27px;font-family:var(--mono);font-size:9px;letter-spacing:.13em;color:#c6a977;z-index:2;pointer-events:none}
+.hero-story{background:radial-gradient(circle at 18% 18%,#273139,#141b22 60%)!important;border:0!important;border-radius:0!important;padding:clamp(30px,4.1vw,63px)!important;min-height:570px;display:flex;flex-direction:column;justify-content:center;position:relative}
+.hero-story:before{content:"";display:block;position:absolute;top:23px;left:29px;width:41px;height:41px;border-top:1px solid #9a8057;border-left:1px solid #9a8057;pointer-events:none}
+.hero-story .eyebrow{font-size:9px;margin-top:0;letter-spacing:.18em}
+.hero .h1{font-size:clamp(58px,5.25vw,96px);letter-spacing:-3.8px;max-width:850px;color:#f7f0e7}
+.hero .h1 em{color:#e2c08c;font-weight:400;font-style:italic}
+.hero .lead{color:#c8cbc9;line-height:1.77;max-width:660px;font-size:14px;margin-top:26px}
+.hero-story>.row{margin-top:30px!important}
+.flow{margin-top:53px!important;border-top:1px solid #4e5050;gap:13px}
+.flow>div{border:0;border-top:1px solid #6f664d;padding:17px 4px 0 0;background:transparent}
+.flow b{color:#dcbf8e!important;font-size:9px!important;letter-spacing:.14em}
+.flow h4{color:#f5eee3;font-size:12px;letter-spacing:.005em}
+.flow p{color:#b8c0c0;font-size:11px;line-height:1.6}
+.livecard{background:linear-gradient(157deg,#1e2930,#18232d 65%,#152029)!important;color:#f4ece0!important;border:0!important;border-left:1px solid #54504a!important;border-radius:0!important;padding:clamp(30px,3vw,48px)!important;display:flex;flex-direction:column;justify-content:center;gap:25px!important;min-height:570px}
+.livecard .t{color:#d8bb88!important;font-family:var(--mono);font-size:10px;letter-spacing:.17em;text-transform:uppercase}
+.livecard .big{color:#f5e9d2!important;font-family:var(--serif);font-size:clamp(45px,4vw,72px);letter-spacing:-2.1px;line-height:1.1}
+.livecard div[style*="color:#8FA3B6"],.livecard span{color:#c1c8c8!important}
+.livecard .kv{border-color:#4b5355!important;color:#c4c8c6!important;gap:13px 18px}
+.livecard .kv>span:nth-child(even){color:#f0e8db!important}
+.livecard .row .btn{min-height:44px;flex:1 1 100%;white-space:normal;text-align:center}
+.livecard .row .btn[style]{background:#2b333b!important;border-color:#64605a!important;color:#ece4d6!important}
+#v-overview>.head{margin-top:43px!important}
+#v-overview>.head .h2{font-family:var(--serif);font-size:clamp(27px,2.7vw,39px);max-width:840px}
+.cap{background:#151e26;border-color:#343d45;border-radius:5px;padding:27px 25px;min-height:214px;gap:13px}
+.cap:before{content:"";display:block;width:26px;height:1px;background:#caa972}
+.cap:hover{border-color:#b79864;background:#1c2730}
+.cap:after{color:#d6b881}
+.cap .h3{font-family:var(--serif);font-size:21px;font-weight:400;color:#f5ece0;line-height:1.25}
+.cap p{color:#c3c8c8;font-size:12px;line-height:1.75}
+/* Flagship AI workspace — conversation is first-class; proof stages are legible. */
+#v-agent .head .h2{font-family:var(--serif);font-size:clamp(32px,3.4vw,47px)}
+.agent{grid-template-columns:minmax(0,1fr) minmax(300px,352px);gap:20px}
+.chat{height:clamp(610px,calc(100dvh - 240px),850px);min-height:610px;max-height:none;background:#141c24;border-color:#485057;border-radius:7px}
+.chat-heading{background:#1c2630;border-color:#424950;padding:19px 22px}
+.agent-mark{background:#d6b784;color:#101820;border-radius:2px;font-family:var(--serif);font-size:23px}
+.chat-heading strong{color:#faf0e0}.chat-heading small{color:#b5bdc2}
+.chat-heading .clear-chat{margin-left:auto;font-size:10px;min-height:37px;padding:8px 11px;border-color:#586066;flex:none}
+.chat-guide{background:#172129;border-color:#38434c;color:#b5bec0;font-size:10px;padding:13px 22px;gap:17px}
+.chat-guide b{color:#dbbe8b;font-size:9px}
+.msgs{background:radial-gradient(circle at 50% 30%,#1b262e,#121a22 74%);padding:26px;gap:18px;scrollbar-color:#5c6770 transparent}
+.msgs:has(.msg:only-child){justify-content:center}
+.msg .bub{border-radius:8px;font-size:13.5px;line-height:1.85;padding:17px 19px}
+.msg.me .bub{background:#30382f;border-color:#57533d;color:#f2e8d4;border-bottom-right-radius:2px}
+.msg.ai .bub{background:#202a33;border-color:#434b51;color:#e3e6e4;border-top-left-radius:2px}
+.msg .meta{color:#aeb8bc}
+.prop{border:1px solid #806e50;border-top:2px solid #d4b67e;background:#23272a;border-radius:5px;padding:19px}
+.prop .amt{font-family:var(--serif);color:#f4e9d6;font-size:30px;line-height:1.25}
+.prop .checks{border-color:#575047}
+.prop>.row:last-of-type{border-color:#575047}
+.checks .p .i{background:#264335;color:#a5d7b5}.checks .f .i{background:#46302a;color:#f2a99d}
+.sugg-label{background:#172128;border-color:#38434b;color:#c4bdad;padding:13px 22px 0;font-size:10px}
+.sugg{background:#172128;padding:10px 22px 15px;scrollbar-color:#737270 transparent}
+.sugg button{color:#ded3be;border-color:#4d5050;background:#232d34;border-radius:3px;font-size:11px}
+.sugg button:hover{background:#333d45;border-color:#d4b37f;color:#fff}
+.composer{background:#172128;padding:13px 17px 13px;gap:10px;border-top:1px solid #3e494f}
+.composer textarea{min-height:54px;border-radius:4px;background:#0e161d;font-size:13px;padding:14px 15px;resize:none}
+.composer .btn{min-height:53px}
+.composer-note{background:#172128;color:#aeb8b8;padding:0 20px 15px}
+.panel{top:23px;gap:14px}.panel .pad{padding:23px}
+.panel-caption{color:#aeb9bc}.idle-hint{background:#1d292e;border:1px solid #4d554e;border-radius:5px;padding:23px}
+.idle-hint strong{color:#f3e7d4;font-family:var(--serif);font-size:25px}
+.idle-hint p{color:#b7c0bd;font-size:12px}
+.tl .m{background:#202a32;border-color:#556067;color:#c6ceca}
+.tl .ok .m{background:#29483b;border-color:#6c9880;color:#dcf2e0}
+.tl .pending .m{background:#29362f;border-color:#c4a873;color:#efdaa8}
+.tl .refused .m{background:#463525;border-color:#d8b77f;color:#f1dbb7}
+.tl .reverted .m{background:#462b2b;border-color:#b7807b;color:#f1b5ab}
+.tl .lbl{color:#e6e6e0;font-size:12.5px}.tl .todo .lbl{color:#bbc4c5}.tl .det{color:#b1bdc0}
+.tl li:before{background:#4d555d}
+.result{border-radius:5px;border-color:#525960;color:#e9ece8;background:#1c262e;overflow-wrap:anywhere}
+.result.ok{background:#21362d;border-color:#47715b}
+.result.ref{background:#352b1e;border-color:#75603f}
+.result.rev{background:#382728;border-color:#775052}
+.result .rt{color:#f6ebe1;font-size:14px}
+.failure-summary{font-size:12.5px;line-height:1.7;margin:7px 0;color:#dedbd3;overflow-wrap:anywhere}
+.diagnostics{margin-top:14px;border-top:1px solid #615451;padding-top:10px}
+.diagnostics summary{color:#ead1a5;cursor:pointer;min-height:35px;font-size:11px}
+.diagnostics pre{font-family:var(--mono);font-size:10px;max-height:220px;max-width:100%;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:#e0d5c5;line-height:1.7}
+.kv2 span:nth-child(odd){color:#b7bebe}
+.mini{border-color:#374149;border-radius:4px}
+.mini div{background:#202a32}.mini div:nth-child(odd),.mini div:nth-child(-n+2){border-color:#38434c}
+.mini b{color:#f0e5d3}.mini span{color:#b7c3c3}
+#tr-kpis .kpi:first-child{background:#272b2b;border-color:#a28b67;color:#f5ecdf}
+#tr-kpis .kpi:first-child .k,#tr-kpis .kpi:first-child .s,#tr-kpis .kpi:first-child .v small{color:#d3c0a1}
+#tr-policy{background:#212b30;border-color:#485057;border-radius:4px}
+.proof-intro{background:#242a2b;border-color:#62583f;border-radius:4px;padding:24px 27px}
+.proof-symbol{font-family:var(--serif);font-size:50px;color:#e1c58d}
+.proof-intro strong{color:#f6e9d3}.proof-intro p{color:#c0c6c6}
+#ex-last{border-color:#c1a170}
+#ex-last .kv2>span{border-color:#364148}
+#ex-last .kv2>span:nth-child(6){color:#e6ce9e}
+.bar .track,.meter{background:#343d46}.bar .fill{background:#7f8790}.bar.best .fill,.meter i{background:#d9b97e}.bar.best{color:#e8cc99}
+.formula{background:#222c31;border:1px solid #485057;border-radius:4px;color:#e7dcce;font-size:19px}
+.attack{border-top:2px solid #b89a68}.attack:before{color:#d9bb88}
+#sv-cards>.card:before{color:#d6b47b}
+#sv-run{border-top-color:#cfab72}
+#ev-kpis .kpi{background:#20282e}
+details{border-color:#39444b}
+.log{background:#0a1016;border:1px solid #4a5156;color:#d6dad1}
+.toast{background:#202c32;color:#f6e5ce;border:1px solid #78654c;border-radius:5px;box-shadow:0 12px 32px #0006}
+.disclaimer{border-color:#374047;color:#a8b3b8;background:#0e151b}
+/* Keep hierarchy and touch usability coherent on smaller screens. */
+@media(max-width:1240px){.app{grid-template-columns:202px minmax(0,1fr)}.hero{grid-template-columns:minmax(0,1.15fr) minmax(270px,.8fr)}.hero .h1{font-size:clamp(52px,5vw,72px)}.hero-story{padding:35px!important}.agent{grid-template-columns:minmax(0,1fr) 310px}.content{padding:32px 30px 64px}}
+@media(max-width:1080px){.hero{grid-template-columns:1fr}.hero-story{min-height:0;padding:49px 42px!important}.hero .h1{font-size:clamp(55px,7vw,80px)}.livecard{min-height:0;border-left:0!important;border-top:1px solid #585044!important;display:grid;grid-template-columns:1fr 1fr;gap:16px 24px!important}.livecard .t{grid-column:1/-1}.livecard .kv{grid-column:2;grid-row:2/5}.livecard .row{grid-column:1}.livecard>div:last-child{grid-column:1}.agent{grid-template-columns:1fr}.chat{height:660px;min-height:0}.panel{position:static}}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{background:#0c1319;border:0;border-bottom:1px solid #444544;padding:18px 24px 15px;gap:20px}.nav a{font-size:11px;padding:10px 7px;gap:7px}.nav a[aria-current=page]{box-shadow:inset 0 -2px #e1bc81}.brand b{font-size:33px}.brand i{margin-top:12px}.topbar{background:#151c24;padding:11px 24px}.content{padding:33px 24px 58px}.hero:before{top:10px;font-size:8px}.head{margin-bottom:25px}.h2,.head .h2{font-size:37px}.hero-story{padding:47px 36px!important}}
+@media(max-width:600px){.side{padding:15px 14px 10px;gap:13px}.nav{gap:4px}.nav a{font-size:10px;min-height:46px;border-radius:3px;padding:9px 4px}.topbar{padding:11px 15px}.content{padding:23px 15px 46px}.head{padding-bottom:21px;margin-bottom:24px}.h2,.head .h2,#v-agent .head .h2{font-size:32px}.hero{border-color:#44423b}.hero:before{font-size:7px;right:14px;top:11px}.hero-story{padding:52px 23px 26px!important}.hero-story:before{top:26px;left:22px;width:23px;height:23px}.hero .h1{font-size:clamp(48px,11.5vw,62px);letter-spacing:-2.3px;margin-top:17px!important}.hero .lead{font-size:13px;line-height:1.75}.flow{grid-template-columns:1fr 1fr;gap:8px 14px;margin-top:36px!important}.flow p{font-size:10.5px}.livecard{display:flex;min-height:0;padding:27px 23px!important;gap:16px!important}.livecard .big{font-size:50px}.livecard .kv{padding-top:18px}.livecard .row .btn{width:100%}.head .h2{font-size:32px}.card{border-radius:5px}.pad{padding:20px}.cap{min-height:0}.chat{height:min(760px,calc(100dvh - 106px));min-height:600px;border-radius:5px}.chat-heading{padding:14px 13px;gap:9px}.chat-heading .clear-chat{font-size:9px;padding:7px 8px}.chat-guide{padding:10px 13px;gap:8px}.msgs{padding:15px 13px}.msgs:has(.msg:only-child){justify-content:flex-start}.sugg-label{padding:10px 13px 0}.sugg{padding:8px 13px 11px}.composer{padding:10px 10px 12px}.composer textarea{font-size:16px}.composer .btn{padding:12px 13px}.composer-note{padding:0 12px 12px}.panel{display:flex}.mini b{font-size:25px}.tablewrap{max-width:100%}.proof-intro{padding:17px}.formula{font-size:17px}.bar{grid-template-columns:minmax(90px,1fr) minmax(30px,.65fr) 68px}.disclaimer{padding:17px 15px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Chain snapshots can reset while a guest's private messages remain in this tab. */
+.epoch-note{margin:0;padding:11px 17px;background:#32291e;border-bottom:1px solid #7b623c;color:#f1d2a0;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+@media(max-width:600px){.composer textarea{min-height:78px;line-height:1.5}.epoch-note{font-size:11px;padding:11px 13px}}
+
+/* Thoughtful first-use surface, replacing the chatbot's enormous empty state. */
+.h1[tabindex="-1"]:focus,.h2[tabindex="-1"]:focus{outline:none}
+.agent-welcome{width:100%;max-width:710px;margin:auto 0;border:1px solid #4b514e;background:linear-gradient(130deg,#252d31,#19232b);padding:clamp(23px,3vw,34px);position:relative;overflow:hidden}
+.agent-welcome:after{content:"";width:115px;height:115px;border:1px solid #856b46;position:absolute;right:-65px;top:-65px;transform:rotate(45deg);pointer-events:none}
+.agent-welcome h3{font-family:var(--serif);color:#fbefdd;font-size:clamp(31px,3.1vw,49px);font-weight:400;letter-spacing:-1.2px;line-height:1.13;margin:14px 0 17px}
+.agent-welcome h3 em{color:#e8c68d;font-weight:400}
+.agent-welcome p{color:#c4ccca;font-size:12.5px;line-height:1.85;max-width:575px;margin:0 0 30px}
+.welcome-stages{border-top:1px solid #5d6059;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:18px}
+.welcome-stages>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.welcome-stages span{font-family:var(--mono);font-size:10px;color:#ebc990;letter-spacing:.1em}
+.welcome-stages strong{font-size:12px;color:#f4eddf;font-weight:600}
+.welcome-stages small{font-size:10px;color:#aebbbf;line-height:1.4}
+@media(max-width:600px){.agent-welcome{padding:22px 18px;margin:0}.agent-welcome h3{font-size:34px}.agent-welcome p{font-size:12px;margin-bottom:22px}.welcome-stages{gap:8px}.welcome-stages small{font-size:9px}.composer textarea{min-height:62px}.head .h2[tabindex="-1"]{font-size:30px}}
+
+.recover-job{margin:11px 0 0;min-height:42px}
+
+/* Capabilities are an editorial protocol index, not nine generic SaaS cards. */
+#caps.g3{gap:0;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #786b50;border-left:1px solid #343f46}
+#caps .cap{border:0;border-right:1px solid #343f46;border-bottom:1px solid #343f46;border-radius:0;background:transparent;box-shadow:none;padding:28px 25px;min-height:218px;transition:background .2s ease}
+#caps .cap:hover{background:#1d2931}
+#caps .cap:before{background:#b49a70;width:30px}
+#caps .cap .h3{font-size:22px}
+#caps .cap p{max-width:375px}
+@media(max-width:1100px){#caps.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){#caps.g3{grid-template-columns:1fr}#caps .cap{min-height:0;padding:23px 20px}#caps .cap .h3{font-size:21px}}
+/* Compact welcome so the financial composer remains visible above the fold. */
+#v-agent .agent-welcome .welcome-stages{display:none}
+#v-agent .agent-welcome{padding:24px 28px;min-height:0}
+#v-agent .agent-welcome h3{font-size:clamp(32px,3.15vw,43px);margin:9px 0 12px}
+#v-agent .agent-welcome p{font-size:12.5px;line-height:1.7;margin:0}
+#v-agent .chat{background:linear-gradient(180deg,#19232c 0%,#141d26 82%,#19232b 100%)}
+#v-agent .msgs{padding:clamp(18px,2.4vw,34px);gap:22px}
+#v-agent .msg .bub{font-size:14px;line-height:1.77}
+#v-agent .chat-heading{background:#1b2730;border-color:#37424a}
+#v-agent .chat-heading strong{font-size:14px}
+#v-agent .chat-guide{border-color:#37424a}
+#v-agent .composer{background:#1c2831;border-top:1px solid #37444d;padding:17px 19px 13px}
+#v-agent .composer textarea{border-radius:5px;background:#10181f;line-height:1.55;font-size:14px;min-height:59px;padding:15px 16px}
+#v-agent .composer textarea:focus{border-color:#e5c589;outline:2px solid #796341;outline-offset:1px}
+#v-agent .composer .btn{min-height:59px;padding:14px 22px}
+#v-agent .composer-note{padding:0 20px 15px;background:#1c2831;font-size:11px;line-height:1.65}
+#v-agent .sugg{background:#18242d;padding-bottom:15px;scroll-snap-type:x proximity}
+#v-agent .sugg button{scroll-snap-align:start;font-size:11.5px;min-height:43px;padding:10px 14px;transition:background .17s,border-color .17s,transform .17s}
+#v-agent .sugg button:hover{transform:translateY(-2px)}
+#v-agent .sugg-label{background:#18242d;font-size:11px;color:#bac2c4}
+#v-agent .agent-welcome{margin:auto 0;max-width:790px;padding:clamp(26px,3.5vw,45px);border-color:#786849;background:radial-gradient(circle at 98% 2%,rgba(216,177,112,.10),transparent 44%),linear-gradient(145deg,#28323a,#1a2730)}
+#v-agent .agent-welcome h3{font-size:clamp(37px,4.1vw,58px)}
+#v-agent .agent-welcome p{font-size:14px;max-width:550px}
+#v-agent .agent-welcome .welcome-stages strong{font-size:13px}
+#v-agent .panel .card:first-child{border-top:2px solid #bca06e}
+.agent-context{margin-top:0;padding:22px;display:flex;flex-direction:column;gap:13px;background:linear-gradient(145deg,#222b31,#19232b)}
+.agent-context h3{margin:0;color:#f2e4ce;font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-.4px}
+.agent-context p{color:#b7c2c1;font-size:12px;line-height:1.72;margin:0}
+.agent-context .context-links{display:grid;gap:7px}
+.agent-context .context-links a{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #46515a;padding:11px 13px;border-radius:4px;text-decoration:none;color:#e1d9c9;font-size:12px;transition:background .2s,border-color .2s}
+.agent-context .context-links a:hover{background:#2b3740;border-color:#bfa477;color:#fff}
+.agent-context .context-links a span{color:#dabe8e}
+.agent-action{display:inline-flex;align-self:flex-start;margin-top:2px;padding:9px 12px;color:#e8cf9e!important;border:1px solid #6f6149;border-radius:4px;text-decoration:none;font-size:12px;font-weight:600;transition:background .16s}
+.agent-action:hover{background:#30342f}
+@media (max-width:1080px){#v-agent .agent{height:auto}#v-agent .chat{height:clamp(620px,75dvh,830px)}#v-agent .panel{max-height:none;overflow:visible}}
+@media (max-width:600px){.side .nav{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#736143 transparent;scroll-snap-type:x proximity}.side .nav a{flex:none;white-space:nowrap;padding:10px 12px;scroll-snap-align:start}.side{gap:11px}#v-agent .composer textarea{font-size:16px;min-height:66px}#v-agent .agent-welcome{padding:24px 20px}#v-agent .agent-welcome h3{font-size:37px}#v-agent .panel{display:flex}#v-agent .msgs{padding:17px}#v-agent .sugg button{min-height:44px}}
+@media (prefers-reduced-motion:reduce){#v-agent .view.on,#v-agent .sugg button{transition:none!important;animation:none!important}}
+/* The initial greeting is compact and complete, not a clipped scroll panel. */
+#v-agent .chat:has(.agent-welcome) .sugg,
+#v-agent .chat:has(.agent-welcome) .sugg-label{display:none}
+#v-agent .msgs:has(.agent-welcome){justify-content:center}
+#v-agent .agent-welcome{margin:0;padding:24px 26px;max-width:none}
+#v-agent .agent-welcome h3{font-size:clamp(30px,3vw,41px);margin:7px 0 10px;line-height:1.17}
+#v-agent .agent-welcome p{font-size:12.5px;line-height:1.68;margin:0 0 13px;max-width:540px}
+#v-agent .agent-welcome .welcome-stages{display:none}
+.welcome-shortcuts{display:flex;gap:8px;flex-wrap:wrap}
+.welcome-shortcuts button{background:#303a3e;border:1px solid #8d7956;color:#f6deb0;min-height:36px;border-radius:4px;padding:7px 10px;cursor:pointer;font-size:11px;letter-spacing:.02em}
+.welcome-shortcuts button:hover{background:#3c4547;border-color:#e0c18d}
+@media(max-width:600px){#v-agent .agent-welcome{padding:20px 18px}#v-agent .agent-welcome h3{font-size:34px}}
+
+/* Final integrated product surface: graphite, warm metal and readable financial states. */
+:root{--focus:#f2d19a} :focus-visible{outline:2px solid var(--focus);outline-offset:4px}
+.workbench{display:grid;grid-template-columns:.8fr 1.2fr;overflow:hidden;margin-bottom:28px;border-color:#78654a}
+.workbench-intro{padding:38px;background:linear-gradient(140deg,#293239,#1b252e);display:flex;flex-direction:column;align-items:flex-start;gap:20px}
+.workbench-intro h3{font:400 clamp(36px,4vw,54px)/1.1 var(--serif);letter-spacing:-1.5px;margin:0;color:#f5ead7}.workbench-intro h3 em{color:#daba83;font-weight:400}
+.workbench-intro p{font-size:13px;line-height:1.8;color:#c1c8c8;margin:0;max-width:330px}.wb-assurance{display:grid;gap:14px;font-size:12px;color:#e6d8bf;border-top:1px solid #55534a;padding-top:23px;width:100%}
+.workbench-fields{padding:32px;display:grid;gap:9px;background:#151f28}.workbench-fields label{display:block;font-weight:600;font-size:12px;color:#e3d9c8;margin:10px 0 8px}.workbench-fields .input{width:100%;max-width:100%;box-sizing:border-box}.workbench-fields select{min-height:48px}.workbench-fields small{display:block;margin:8px 0 18px;line-height:1.6;color:#aebbbc;font-size:12px}.workbench-fields textarea{resize:vertical;line-height:1.8;min-height:120px;font-family:var(--mono)}
+.wb-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid #38434b;padding-top:20px;margin-top:8px;font-size:12px}.wb-error{color:#ffb8a6;background:#3e2422;border:1px solid #855046;padding:13px;font-size:13px}
+.section-divider{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:34px 0 18px}.section-divider .h3{margin-top:7px}.tool-proposal{border-color:#92774c!important;border-top:2px solid #d5b57b!important;background:#202c34!important;width:100%;box-sizing:border-box}.tool-proposal .h3{margin:15px 0 10px;font:400 27px/1.2 var(--serif);color:#f3e3c7}.tool-terms{margin:16px 0;display:grid;gap:0}.tool-terms>div{display:grid;grid-template-columns:minmax(90px,.7fr) minmax(0,1.3fr);gap:14px;padding:10px 0;border-bottom:1px solid #45505a}.tool-terms dt{font-size:12px;color:#b9c5c8}.tool-terms dd{margin:0;font-variant-numeric:tabular-nums;font-size:14px;overflow-wrap:anywhere;color:#f2e9d8}.tool-proposal .faint{font-size:12px;line-height:1.7}.proposal-outcome{border-left:2px solid #c7b081;padding:11px 14px;background:#18232c;font-size:13px}.msg.ai .bub{white-space:pre-wrap}.local-evidence{border-top:2px solid #c7ac78}.local-evidence>p{font-size:13px;line-height:1.7}.local-record{padding:16px 0;border-top:1px solid #3c474e}.local-record summary{display:flex;justify-content:space-between;gap:14px;cursor:pointer;font-weight:600;font-size:14px}.local-record p{font-size:13px;line-height:1.8}.local-record pre,.diagnostics pre{max-height:350px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;line-height:1.7;color:#c3ced1}.result .rt{line-height:1.4}.prop .row{row-gap:12px}.prop .btn{min-height:44px}.badge{line-height:1.5}.card{min-width:0}.grid>*{min-width:0}
+/* Agent height is content-aware; the layout rules below supersede the old fixed 680–910px canvas. */
+@media(max-width:850px){.workbench{grid-template-columns:1fr}.workbench-intro{padding:26px;gap:16px}.workbench-intro h3 br{display:none}.wb-assurance{grid-template-columns:repeat(3,1fr);gap:12px}.workbench-fields{padding:25px}}
+@media(max-width:600px){.wb-assurance{grid-template-columns:1fr;gap:8px}.workbench-intro{padding:24px 20px}.workbench-intro h3{font-size:36px}.workbench-fields{padding:22px 18px}.workbench-fields .input{font-size:16px}.wb-footer{align-items:stretch;flex-direction:column}.wb-footer .btn{width:100%}.section-divider{align-items:flex-start}.section-divider .badge{white-space:normal}.tool-proposal .h3{font-size:25px}.tool-terms>div{grid-template-columns:1fr;gap:5px}.prop .row .btn{width:100%}.local-record summary{align-items:flex-start;flex-wrap:wrap}#v-agent .chat{height:auto;max-height:none;min-height:0}.workbench-intro p{max-width:none}.head .lead{line-height:1.7}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* QED review refinement — deliberately dense first use, fluid conversation thereafter.
+   One authoritative final override avoids the conflicting height rules inherited
+   from the two previous UI passes. No fictitious balance/receipt widgets. */
+#v-agent .agent{align-items:start;min-height:0;grid-template-columns:minmax(0,1fr) minmax(286px,350px);gap:clamp(16px,2vw,25px)}
+#v-agent .chat{height:clamp(565px,calc(100dvh - 310px),735px);min-height:0;max-height:none}
+#v-agent .chat:has(.agent-welcome){height:auto;min-height:0}
+#v-agent .chat:has(.agent-welcome) .msgs{flex:0 0 auto;overflow:visible;justify-content:flex-start;padding:22px}
+#v-agent .chat:has(.agent-welcome) .composer{margin-top:0}
+#v-agent .agent-welcome{margin:0;max-width:none;padding:clamp(23px,2.6vw,34px);border:1px solid #806d4c}
+#v-agent .agent-welcome h3{font-size:clamp(34px,3.4vw,50px);margin:9px 0 15px}
+#v-agent .agent-welcome p{max-width:590px;margin:0 0 22px;font-size:13px;line-height:1.75}
+#v-agent .agent-welcome .welcome-stages{display:grid;margin-top:22px;gap:clamp(9px,1.5vw,20px)}
+#v-agent .agent-welcome .welcome-stages strong{font-size:12px}
+#v-agent .agent-welcome .welcome-stages small{font-size:10px;line-height:1.55;color:#bdc6c5}
+#v-agent .welcome-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;align-items:stretch}
+#v-agent .welcome-shortcuts button{position:relative;display:flex;align-items:flex-start;flex-direction:column;gap:8px;min-width:0;text-align:left;padding:15px 12px 21px;min-height:116px;white-space:normal;background:#151f27;border:1px solid #55606a;border-radius:4px;color:#f5e9d2;transition:background .16s,border-color .16s,transform .16s}
+#v-agent .welcome-shortcuts button:hover{background:#24323b;border-color:#d6b884;transform:translateY(-2px)}
+#v-agent .shortcut-index{font:10px/1.4 var(--mono);color:#d1b17a;letter-spacing:.07em}
+#v-agent .welcome-shortcuts strong{font:400 18px/1.25 var(--serif);color:#f7ecdb}
+#v-agent .welcome-shortcuts small{font:11px/1.5 var(--sans);color:#b9c5c9}
+#v-agent .shortcut-arrow{position:absolute;right:11px;top:12px;font-size:13px;color:#d0b37c}
+#v-agent .panel{position:static;max-height:none;overflow:visible;align-self:start}
+#v-agent .panel .card{transition:border-color .18s,background .18s}
+#v-agent .panel .card:hover{border-color:#675d48}
+#v-agent .composer-note{font-size:10.5px;line-height:1.55}
+@media(max-width:1080px){
+ #v-agent .agent{grid-template-columns:1fr}
+ #v-agent .chat{height:clamp(560px,70dvh,720px)}
+ #v-agent .chat:has(.agent-welcome){height:auto}
+ #v-agent .panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+ #v-agent .panel .agent-context{grid-column:1/-1}
+}
+@media(max-width:640px){
+ #v-agent .agent{gap:16px}
+ #v-agent .chat{height:min(690px,78dvh);min-height:530px}
+ #v-agent .chat:has(.agent-welcome){height:auto;min-height:0}
+ #v-agent .chat:has(.agent-welcome) .msgs{padding:11px}
+ #v-agent .agent-welcome{padding:23px 18px}
+ #v-agent .agent-welcome h3{font-size:clamp(29px,8vw,38px)}
+ #v-agent .agent-welcome p{font-size:12px}
+ #v-agent .welcome-shortcuts{grid-template-columns:1fr;gap:7px}
+ #v-agent .welcome-shortcuts button{min-height:0;padding:11px 38px 11px 12px;gap:3px}
+ #v-agent .welcome-shortcuts strong{font-size:17px}
+ #v-agent .welcome-shortcuts small{font-size:10px}
+ #v-agent .agent-welcome .welcome-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:15px;padding-top:13px}
+ #v-agent .agent-welcome .welcome-stages strong{font-size:11px}
+ #v-agent .agent-welcome .welcome-stages small{font-size:9px}
+ #v-agent .panel{display:flex;gap:13px}
+ #v-agent .chat:has(.agent-welcome) .composer{padding:12px 11px 9px}
+ #v-agent .chat:has(.agent-welcome) .composer textarea{min-height:52px}
+}
+@media(prefers-reduced-motion:reduce){#v-agent .welcome-shortcuts button:hover{transform:none}}
+
+/* QED final visual architecture - audited first-use and cross-view system */
+/* Dark Art Deco financial system. These overrides reconcile earlier conflicting passes. */
+:root{--qed-gold:#dfbf87;--qed-gold-dim:#a88e67;--qed-midnight:#0c131a;--qed-surface:#18232c;--qed-line:#39434b;--qed-copy:#e9e9e5}
+html{scroll-behavior:smooth}
+body{background:var(--qed-midnight)}
+.main{background:radial-gradient(ellipse 1050px 650px at 92% -230px,rgba(194,158,95,.065),transparent 76%),#10171e}
+.content{max-width:1720px;padding:38px clamp(23px,4vw,68px) 72px}
+.view>.head{padding-bottom:25px;border-bottom:1px solid #384149;margin-bottom:26px;min-height:104px}
+.view>.head .h2{font-family:var(--serif);font-weight:400;letter-spacing:-.025em;line-height:1.12;font-size:clamp(33px,3vw,48px);color:#f3ebe0;max-width:1100px}
+.view>.head .lead{color:#bbc2c6;line-height:1.7;max-width:870px}
+.view>.head .eyebrow{letter-spacing:.23em;color:var(--qed-gold);font-size:9px}
+.view>.head .chips{align-self:flex-start}
+.side{background:#0b1218}
+.topbar{background:#10171e}
+.nav a{border:1px solid transparent;transition:background .18s,border-color .18s,transform .18s}
+.nav a:hover{border-color:#38454e;transform:translateX(2px)}
+.nav a[aria-current=page]{background:linear-gradient(115deg,#202e38,#263037);border-color:#48545a;border-left:2px solid var(--qed-gold);box-shadow:inset 0 0 0 1px #11161b22}
+.card{border-radius:6px;box-shadow:0 12px 35px rgba(0,0,0,.07)}
+.btn{transition:background .15s,border-color .15s,box-shadow .15s,transform .15s}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn.primary{background:#e0bc80!important;border-color:#e0bc80!important;color:#141a1f!important}
+.btn.primary:hover:not(:disabled){background:#f2d5a0!important;border-color:#f2d5a0!important}
+.chip,.badge{border-radius:3px}
+#v-overview .hero-story{min-height:495px;background:radial-gradient(circle at 104% -7%,rgba(221,188,131,.15),transparent 42%),linear-gradient(135deg,#26343c,#18242d)!important}
+#v-overview .hero-story .h1{font-family:var(--serif);font-size:clamp(47px,5vw,76px);font-weight:400;line-height:1.08;letter-spacing:-.04em}
+#v-overview .hero-story .lead{max-width:600px;line-height:1.8}
+#v-overview .livecard{background:linear-gradient(138deg,#242e34,#17232b)!important;border-color:#756648!important;color:#ece5d9!important}
+#v-overview #caps .cap{border-top:2px solid #8d7451;min-height:178px}
+#v-overview #caps .cap:hover{border-color:#dbb87c;background:#25313b}
+#v-agent .agent{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,315px);gap:18px;align-items:start}
+#v-agent .chat{border:1px solid #46515b;background:#19252e;min-width:0}
+#v-agent .chat-heading{min-height:69px;padding:14px 18px;background:#1b2a33}
+#v-agent .chat-heading .clear-chat{margin-left:auto}
+#v-agent .chat-guide{padding:10px 18px;gap:15px}
+#v-agent .chat:has(.agent-welcome){height:auto;min-height:0;max-height:none;overflow:visible}
+#v-agent .chat:has(.agent-welcome) .msgs{min-height:0;flex:0 0 auto;overflow:visible;padding:0;display:block}
+#v-agent .agent-welcome{position:relative;width:100%;max-width:none;margin:0;padding:clamp(21px,2.3vw,31px);background:linear-gradient(133deg,#222e36,#1b2933);border:0;border-radius:0}
+#v-agent .agent-welcome:after{width:130px;height:130px;right:-92px;top:-92px;opacity:.65}
+#v-agent .welcome-mast{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#v-agent .welcome-non-custody{font:9px/1.5 var(--mono);letter-spacing:.06em;color:#9fb5bb}
+#v-agent .agent-welcome h3{font-family:var(--serif);font-weight:400;font-size:clamp(34px,3.45vw,51px);letter-spacing:-.035em;line-height:1.15;margin:10px 0 12px;max-width:810px;color:#f4e9d9}
+#v-agent .agent-welcome h3 em{color:#ddb77b;font-style:italic}
+#v-agent .agent-welcome p{max-width:740px;color:#bec9cd;font-size:12.5px;line-height:1.7;margin:0 0 19px}
+#v-agent .welcome-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#v-agent .welcome-shortcuts button,#v-agent .welcome-service-link{position:relative;display:flex;flex-direction:column;gap:3px;align-items:flex-start;text-align:left;background:#141f28;border:1px solid #3c4b54;border-radius:4px;min-height:88px;padding:13px 33px 12px 14px;min-width:0;color:#f5e9da;text-decoration:none;transition:background .18s,border-color .18s,transform .18s}
+#v-agent .welcome-shortcuts button:hover,#v-agent .welcome-service-link:hover{background:#25333d;border-color:#d8b47b;transform:translateY(-2px)}
+#v-agent .shortcut-index{font:9px/1.4 var(--mono);color:#c7a675;letter-spacing:.12em}
+#v-agent .welcome-shortcuts strong{font:400 19px/1.3 var(--serif);color:#f0e6d8}
+#v-agent .welcome-shortcuts small{font-size:10px;color:#bbc6ca;line-height:1.6}
+#v-agent .shortcut-arrow{position:absolute;right:14px;top:13px;color:#deb981;font-size:13px}
+#v-agent .welcome-trust-line{margin-top:17px;border-top:1px solid #4c5559;padding-top:11px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#c9d2d2;font-size:10px}
+#v-agent .welcome-trust-line b{font:9px var(--mono);color:#cfb07c;margin-right:5px}
+#v-agent .composer{border-top:1px solid #394950;padding:12px 14px 10px;margin-top:0}
+#v-agent .composer textarea{min-height:51px;max-height:180px;background:#10191f;border-color:#46525c;color:#f4ede5;resize:vertical}
+#v-agent .composer .btn{min-width:76px}
+#v-agent .composer-note{padding:1px 16px 13px;font-size:10px;color:#aebdc2}
+#v-agent .panel{gap:12px}
+#v-agent .panel>.card{border-radius:5px;border-color:#424d54}
+#v-agent .panel .pad{padding:18px}
+#v-agent .panel .h3{font-size:13px;color:#f2e8d8}
+#v-agent .panel-caption{font-size:10.5px;line-height:1.5}
+#v-agent .idle-hint{margin-top:13px;padding:15px;background:linear-gradient(136deg,#222e34,#1d2b32);border:1px solid #49564f;border-radius:3px}
+#v-agent .idle-hint .idle-dot{width:7px;height:7px;display:block;background:#c8ae7b;border-radius:50%;box-shadow:0 0 0 3px #c8ae7b15;margin-bottom:9px}
+#v-agent .idle-hint strong{font-family:var(--serif);font-size:20px;line-height:1.15;letter-spacing:-.02em;margin-bottom:7px;color:#f1e3ce}
+#v-agent .idle-hint p{font-size:10.5px;line-height:1.65;color:#becbd0}
+#v-agent .idle-chain{display:flex;flex-wrap:wrap;gap:5px;margin-top:13px;border-top:1px solid #43525b;padding-top:11px}
+#v-agent .idle-chain span{font:8px/1.4 var(--mono);letter-spacing:0;color:#c4b18e;padding:4px 6px;background:#19252c;border:1px solid #455159}
+#v-agent .mini{grid-template-columns:repeat(2,minmax(0,1fr))}
+#v-agent .mini div{padding:11px}
+#v-agent .mini b{font-size:21px;letter-spacing:-.04em}
+#v-agent .mini span{font-size:9.5px}
+#v-agent .agent-capability-deck{margin-top:20px;border:1px solid #39474f;background:linear-gradient(128deg,#152029,#1c2830);padding:22px 24px 24px}
+#v-agent .deck-heading{display:flex;justify-content:space-between;gap:26px;align-items:flex-end;margin-bottom:18px}
+#v-agent .deck-heading h3{font-family:var(--serif);font-size:27px;font-weight:400;line-height:1.25;margin-top:6px;color:#f2e7d8;letter-spacing:-.025em}
+#v-agent .deck-heading p{margin:0;font-size:11px;color:#b8c4ca;line-height:1.7;max-width:390px}
+#v-agent .deck-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+#v-agent .deck-links a{position:relative;min-width:0;display:flex;flex-direction:column;gap:9px;border:1px solid #41515c;background:#111c24;padding:15px 25px 16px 14px;text-decoration:none;color:#f4e9da;transition:border-color .18s,transform .18s,background .18s}
+#v-agent .deck-links a:hover{border-color:#d7b47a;transform:translateY(-2px);background:#24323e}
+#v-agent .deck-links a>span{font:9px var(--mono);color:#d6b47b;letter-spacing:.1em}
+#v-agent .deck-links a strong{font:400 18px/1.2 var(--serif);color:#f1e5d3}
+#v-agent .deck-links a small{font-size:10px;line-height:1.65;color:#bac8ca}
+#v-agent .deck-links a i{position:absolute;top:14px;right:12px;font-style:normal;font-size:12px;color:#c7ab7c}
+#v-agent .msg.ai .bub{background:#212d34;color:#e4e8e7;border-color:#3e4a53}
+#v-agent .msg.me .bub{background:#384035;color:#eee9dc;border-color:#6c664c}
+#v-agent .sugg button{border-radius:3px}
+#v-treasury .g4 .kpi,#v-evidence .g4 .kpi{border-top:2px solid #8a7552;background:linear-gradient(145deg,#212d35,#19252d)}
+#v-treasury>.grid.g2>.card,#v-execution>.grid.g2>.card{border-top:2px solid #826c4c}
+#v-execution .proof-intro{background:linear-gradient(100deg,#2d3534,#1c2933)}
+#v-lab #lab-attacks>.card{border-top:2px solid #9a7f53;transition:transform .18s,border-color .18s}
+#v-lab #lab-attacks>.card:hover{border-color:#bfa170;transform:translateY(-2px)}
+#v-services .workbench{border-color:#7a694d;box-shadow:0 15px 45px #0002}
+#v-services .workbench-intro{background:linear-gradient(135deg,#2a363d,#162530)}
+#v-services #sv-cards>.card{border-top:2px solid #816e51;transition:transform .18s,border-color .18s}
+#v-services #sv-cards>.card:hover{transform:translateY(-2px);border-color:#d4b17c}
+#v-evidence .local-evidence{border-top:2px solid #b79b68}
+#v-evidence #ev-tx tr:hover{background:#263139}
+#v-evidence #ev-tx a{text-decoration:underline;text-decoration-color:#8d7756;text-underline-offset:4px}
+@media(max-width:1300px){#v-agent .agent{grid-template-columns:minmax(0,1fr) 286px}#v-agent .deck-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1080px){#v-agent .agent{grid-template-columns:1fr}#v-agent .chat:has(.agent-welcome){height:auto}#v-agent .panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}#v-agent .deck-heading{align-items:flex-start}}
+@media(max-width:680px){.content{padding:20px 14px 46px}.view>.head{min-height:0;padding-bottom:20px;margin-bottom:18px}.view>.head .h2{font-size:clamp(29px,7.5vw,38px)}#v-agent .agent{gap:13px}#v-agent .chat-heading{padding:12px}#v-agent .chat-guide{gap:9px;font-size:9px;padding:9px 12px}#v-agent .agent-welcome{padding:19px 14px}#v-agent .agent-welcome h3{font-size:clamp(30px,7.6vw,38px);margin:12px 0}#v-agent .agent-welcome p{font-size:11.5px;margin-bottom:14px}#v-agent .welcome-shortcuts{grid-template-columns:1fr;gap:7px}#v-agent .welcome-shortcuts button,#v-agent .welcome-service-link{min-height:61px;padding:10px 31px 9px 12px;gap:1px}#v-agent .welcome-shortcuts strong{font-size:17px}#v-agent .welcome-shortcuts small{font-size:10px}#v-agent .welcome-trust-line{gap:8px}#v-agent .panel{display:flex;gap:13px}#v-agent .deck-heading{display:block}#v-agent .deck-heading p{margin-top:9px}#v-agent .agent-capability-deck{padding:17px 14px}#v-agent .deck-links{grid-template-columns:1fr 1fr}#v-agent .deck-links a{padding:12px 24px 14px 11px}#v-agent .deck-links a strong{font-size:15px}#v-agent .deck-links a small{font-size:9px}#v-agent .deck-heading h3{font-size:24px}}
+@media(max-width:370px){#v-agent .deck-links{grid-template-columns:1fr}#v-agent .welcome-trust-line span[aria-hidden]{display:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}#v-agent .welcome-shortcuts button:hover,#v-agent .welcome-service-link:hover,#v-agent .deck-links a:hover,.btn:hover{transform:none!important}}
+
+/* Mobile navigation is a single accessible scrollable rail, not two cramped rows. */
+@media(max-width:900px){
+ .side{position:static;height:auto;max-height:none;overflow:visible;gap:10px;padding:12px 17px}
+ .side .brand{padding:0 3px}.brand-caption{display:none}
+ .side .nav{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;white-space:nowrap;overflow-x:auto;overflow-y:hidden;gap:6px;scrollbar-width:thin;scrollbar-color:#b49765 transparent;scroll-snap-type:x proximity;padding:4px 0 8px}
+ .side .nav a{flex:none!important;scroll-snap-align:start;font-size:12px;min-height:42px;padding:9px 13px;white-space:nowrap}
+ .side .foot,.side-seal,.navsec{display:none}
+ .topbar{min-height:48px;padding:10px 16px}
+}
+@media(max-width:680px){
+ #v-agent .welcome-shortcuts small,#v-agent .deck-links a small{font-size:11px}
+ #v-agent .welcome-shortcuts .shortcut-index,#v-agent .deck-links a>span{font-size:10px}
+ #v-agent .deck-links a strong{font-size:17px}
+ #v-agent .welcome-trust-line{font-size:11px}
+ #v-agent .composer-note{font-size:11px}
+}
+
+@media(max-width:900px){
+ .app{grid-template-columns:minmax(0,1fr)}
+ .side{min-width:0;max-width:100vw;overflow:hidden}
+ .side .nav{min-width:0;width:100%;max-width:calc(100vw - 34px)}
+ .main{min-width:0;max-width:100vw}
+}
+
+
+
+/* Purposeful, real destinations inside the independently scrollable right rail. */
+#v-agent .agent-explore-rail{display:flex;flex-direction:column;gap:12px;border-top:1px solid #917750;background:linear-gradient(148deg,#202e36,#17232d);min-height:220px}
+#v-agent .agent-explore-rail h3{font:400 24px/1.15 var(--serif);letter-spacing:-.025em;color:#f0e4d2;margin:0}
+#v-agent .agent-explore-rail p{font-size:11px;line-height:1.72;margin:0;color:#c0cace}
+#v-agent .agent-rail-link{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #4b5961;color:#eed5a7;text-decoration:none;padding:10px;font-size:11px;border-radius:3px;transition:border-color .15s,background .15s}
+#v-agent .agent-rail-link:hover{border-color:#dfc18c;background:#293741}
+/* Final Agent layout: NEVER let execution-history length size the conversation.
+   Both welcome and active-chat states are content-first. The conversation alone
+   determines row height; the execution rail is an independently scrolling
+   overlay constrained to that exact height. No delayed switch to scrolling. */
+@media (min-width:1081px) {
+  #v-agent .agent,
+  #v-agent .agent:not(:has(.agent-welcome)),
+  #v-agent .agent:has(.agent-welcome) {
+    --rail-width: clamp(286px, 19.2vw, 315px);
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0,1fr) var(--rail-width);
+    grid-template-rows: auto;
+    align-items: start;
+    gap: clamp(14px,1.5vw,24px);
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  #v-agent .agent > .chat,
+  #v-agent .agent:has(.agent-welcome) > .chat {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+  #v-agent .chat > .msgs {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: clamp(245px, 45dvh, 520px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    justify-content: flex-start;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #897453 #17232c;
+  }
+  #v-agent .chat:has(.agent-welcome) > .msgs {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    max-height: none;
+    justify-content: flex-start;
+    overflow: visible;
+    padding: 0;
+  }
+  #v-agent .chat:has(.agent-welcome) .agent-welcome {
+    flex: none;
+    width: 100%;
+    margin: 0;
+  }
+  #v-agent .agent > .panel,
+  #v-agent .agent:has(.agent-welcome) > .panel {
+    position: absolute;
+    inset: 0 0 auto auto;
+    width: var(--rail-width);
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ab936c #121b23;
+    padding-right: 5px;
+  }
+  #v-agent .agent > .panel > .card { flex: 0 0 auto; }
+  #v-agent .agent > .panel:focus-visible { outline: 2px solid #dfbf87; outline-offset: 2px; }
+  #v-agent .agent-capability-deck { margin-top: 18px; }
+}
+/* Mobile/tablet retain accessible document scrolling and no overlays. */
+@media (max-width:1080px) {
+  #v-agent .agent,
+  #v-agent .agent:not(:has(.agent-welcome)),
+  #v-agent .agent:has(.agent-welcome) {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    align-items: start;
+  }
+  #v-agent .agent > .chat,
+  #v-agent .agent:has(.agent-welcome) > .chat {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+  #v-agent .chat > .msgs {
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: min(55dvh, 540px);
+    overflow-y: auto;
+    justify-content: flex-start;
+  }
+  #v-agent .chat:has(.agent-welcome) > .msgs {
+    flex: 0 0 auto;
+    max-height: none;
+    overflow: visible;
+    justify-content: flex-start;
+  }
+  #v-agent .agent > .panel,
+  #v-agent .agent:has(.agent-welcome) > .panel {
+    position: static;
+    inset: auto;
+    width: auto;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side" aria-label="Main navigation">
+  <div class="side-brand"><a class="brand" href="#overview"><b>QED</b><i aria-hidden="true"></i><span class="sr">home</span></a><div class="brand-caption">Proof-carrying autonomy</div></div>
+  <div><div class="navsec">Workspace</div><nav class="nav" id="nav">
+    <a href="#overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</a>
+    <a href="#agent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 4z"/></svg>Agent</a>
+    <a href="#treasury"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/></svg>Treasury</a>
+    <a href="#execution"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17l5-5 4 3 7-8"/><path d="M15 7h5v5"/></svg>Execution</a>
+    <a href="#lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Security Lab</a>
+    <a href="#services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.3 11l7.4-4M8.3 13l7.4 4"/></svg>Economies</a>
+    <a href="#evidence"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Evidence</a>
+  </nav></div>
+  <div class="side-seal"><strong>Intelligence proposes.<br>Proof permits.</strong>Owner-defined authority.<br>Independently enforced.</div>
+  <div class="foot"><b>Testnet only.</b> Valueless tokens on a disposable chain and on Ethereum Sepolia. Not audited; not for real funds.</div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="workspace-label">QED <span>/</span> <b>Treasury workspace</b></div>
+    <div class="chips" id="status" aria-live="polite">
+      <span class="chip"><span class="dot" id="d-chain"></span><span id="s-chain">Connecting…</span></span>
+      <span class="chip"><span class="dot" id="d-ai"></span><span id="s-ai">AI engine</span></span>
+    </div>
+    <div class="chips"><span class="chip" title="Every amount here is a valueless test token">Valueless test assets</span></div>
+  </header>
+  <main class="content" id="main-content" tabindex="-1">
+
+  <!-- OVERVIEW -->
+  <section class="view" id="v-overview" aria-labelledby="t-ov">
+    <div class="hero">
+      <div class="card pad hero-story" style="padding:30px 30px 26px">
+        <div class="eyebrow">Proof-carrying autonomy · FinTechathon 2026</div>
+        <h1 class="h1" id="t-ov" style="margin-top:12px">AI proposes.<br><em>Proof decides.</em></h1>
+        <p class="lead">Tell the AI what you want your treasury to do. QED checks your owner-signed limits, has an independent co-signer verify the action, then proves the execution quality on-chain. You stay in control; the agent cannot move funds on its own.</p>
+        <div class="row" style="margin-top:22px">
+          <a class="btn primary" href="#agent">Try a real conversion →</a>
+          <a class="btn" href="#lab">Test the safeguards</a>
+          <a class="btn" href="#evidence">Explore the evidence ↗</a>
+        </div>
+        <div class="flow" aria-label="How a decision becomes a transaction">
+          <div class="ai"><b>1 · Proposes</b><h4>AI agent</h4><p>Reads your instruction, plans the route, builds the proof. Holds no key that can pay alone.</p></div>
+          <div class="co"><b>2 · Re-derives</b><h4>Co-signer</h4><p>Separate process and key. Re-quotes from the chain and signs only what the owner allowed.</p></div>
+          <div class="ch"><b>3 · Enforces</b><h4>Contracts</h4><p>Mandate, caps, ring-fenced liabilities, and the best-execution inequality. A worse route reverts.</p></div>
+          <div class="vf"><b>4 · Verifies</b><h4>Anyone</h4><p>Receipts, bounds and proofs can be re-derived from the chain without trusting QED.</p></div>
+        </div>
+      </div>
+      <div class="livecard" aria-live="polite">
+        <div class="t">Live sandbox</div>
+        <div><div class="big" id="ov-reserve">—</div><div style="color:#8FA3B6;font-size:13px">free in the euro reserve</div></div>
+        <div class="kv">
+          <span>Treasury</span><span id="ov-treasury">—</span>
+          <span>Mandate</span><span id="ov-mandate">—</span>
+          <span>Chain</span><span id="ov-chain">—</span>
+          <span>AI engine</span><span id="ov-ai">—</span>
+          <span>Activity</span><span id="ov-activity">—</span>
+        </div>
+        <div class="row"><a class="btn teal sm" href="#agent">Convert tUSD → tEUR</a><a class="btn sm" style="background:#1D3256;border-color:#2E4A72;color:#fff" href="#treasury">Run the treasury policy</a></div>
+        <div style="font-size:12px;color:#8FA3B6">A shared, disposable local chain running the real QED contracts. Each action here sends a real transaction and waits for its receipt.</div>
+      </div>
+    </div>
+    <div class="head" style="margin-top:34px"><div><div class="eyebrow">Capabilities</div><h2 class="h2" style="margin-top:6px">One treasury. Independently enforced limits.</h2></div>
+      <div class="chips"><span class="badge b-live">LIVE · your inputs, new transactions</span><span class="badge b-script">SCRIPTED · fixed scenario, new transactions</span><span class="badge b-hist">HISTORICAL · Sepolia receipts</span></div></div>
+    <div class="grid g3" id="caps"></div>
+  </section>
+
+  <!-- AGENT -->
+  <section class="view" id="v-agent" aria-labelledby="t-ag">
+    <div class="head"><div><div class="eyebrow">Agent</div><h2 class="h2" id="t-ag" style="margin-top:6px">Your intent. Your authority.</h2><p class="lead" style="font-size:14px;margin-top:9px">Ask a question or propose a conversion. Review the details before you authorize execution.</p></div>
+      <div class="chips"><span class="badge b-info" data-sandbox-status>CONNECTING</span><span class="chip" id="ag-engine">AI engine</span></div></div>
+    <div class="agent">
+      <div class="card chat">
+        <div class="chat-heading"><span class="agent-mark" aria-hidden="true">Q</span><div><strong>QED treasury agent</strong><small>Guest workspace · private chat stays in this tab</small></div><button class="btn sm clear-chat" id="clear-chat" type="button" title="Clear this tab’s chat history">Clear chat</button></div>
+        <div class="chat-guide" aria-label="Workflow"><span><b>01</b> Instruct</span><span><b>02</b> Review</span><span><b>03</b> Confirm</span><span><b>04</b> Inspect proof</span></div>
+        <div class="epoch-note" id="epoch-note" role="status" hidden>The shared sandbox restarted or reset. Earlier messages may reference a prior disposable chain; current balances and on-chain history are authoritative.</div>
+        <div class="msgs" id="msgs" aria-live="polite" aria-label="Conversation"></div>
+        <div class="sugg-label">Explore an example · selecting a prompt sends it to the agent</div>
+        <div class="sugg" id="sugg" aria-label="Example instructions"></div>
+        <form class="composer" id="composer" autocomplete="off">
+          <label class="sr" for="q">Instruction or question</label>
+          <textarea id="q" rows="1" maxlength="2000" placeholder="Ask QED anything…"></textarea>
+          <button class="btn primary" id="send" type="submit">Send</button>
+        </form>
+        <div class="composer-note">Test assets only · Confirm each proposal before execution · Chat stays in this tab and clears when the tab closes. On-chain sandbox activity is shared.</div>
+      </div>
+      <div class="panel" role="region" aria-label="Execution trail and treasury balances; scroll independently" tabindex="0">
+        <div class="card pad">
+          <div class="row" style="justify-content:space-between"><div class="h3">Execution trail</div><span class="badge b-info" id="job-badge">Idle</span></div>
+          <p class="panel-caption">Authorization, verification, then settlement.</p>
+          <div class="idle-hint"><span class="idle-dot" aria-hidden="true"></span><strong>Awaiting your instruction</strong><p>No transaction has been submitted. Once you confirm exact terms, authorization, proof checks and the mined receipt appear here.</p><div class="idle-chain"><span>Mandate</span><span>Co-signer</span><span>Proof</span><span>Receipt</span></div></div>
+          <div id="job-result" aria-live="polite"></div>
+          <ol class="tl" id="tl" style="margin-top:14px"></ol>
+        </div>
+        <div class="card pad">
+          <div class="h3" style="margin-bottom:10px">Live balances</div>
+          <div class="mini">
+            <div><b id="ag-free">—</b><span>tUSD free in treasury</span></div>
+            <div><b id="ag-res">—</b><span>tEUR in euro reserve</span></div>
+            <div><b id="ag-cap">—</b><span>max per conversion (signed)</span></div>
+            <div><b id="ag-left">—</b><span>tUSD left today</span></div>
+          </div>
+        </div>
+        <div class="card pad agent-explore-rail">
+          <span class="eyebrow">BEYOND CONVERSION / VERIFIED ECONOMIES</span>
+          <h3>More than a wallet.</h3>
+          <p>Turn instructions into signed, certified workflows. Explore paid-work escrow, portfolio proofs, debt clearing and privacy-preserving verification using valueless local scenarios.</p>
+          <a class="agent-rail-link" href="#services" data-preset-workbench="portfolio">Explore the financial workbench <span aria-hidden="true">↗</span></a>
+          <a class="agent-rail-link" href="#evidence">Inspect the proof evidence <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </div>
+    <section class="agent-capability-deck" aria-label="Explore the proof-carrying system">
+      <div class="deck-heading"><div><span class="eyebrow">THE PROOF LIBRARY · FOUR WAYS TO GO DEEPER</span><h3>Beyond a wallet. An entire verifiable economy.</h3></div><p>Every path opens a working screen. Configurable scenarios use valueless local assets and require confirmation before execution.</p></div>
+      <div class="deck-links"><a href="#services" data-preset-workbench="portfolio"><span>01 / OPTIMALITY</span><strong>Portfolio & escrow</strong><small>Price a job; verify the KKT certificate.</small><i aria-hidden="true">↗</i></a><a href="#services" data-preset-workbench="clearing"><span>02 / CLEARING</span><strong>Settle a debt network</strong><small>Change obligations; verify maximal netting.</small><i aria-hidden="true">↗</i></a><a href="#services" data-preset-workbench="private_portfolio"><span>03 / PRIVACY</span><strong>Verify without revealing</strong><small>Build a provider-bound Groth16 proof.</small><i aria-hidden="true">↗</i></a><a href="#lab"><span>04 / SECURITY</span><strong>Attack the guardrails</strong><small>Inspect actual denied transactions.</small><i aria-hidden="true">↗</i></a></div>
+    </section>
+  </section>
+
+  <!-- TREASURY -->
+  <section class="view" id="v-treasury" aria-labelledby="t-tr">
+    <div class="head"><div><div class="eyebrow">Treasury</div><h2 class="h2" id="t-tr" style="margin-top:6px">Capital, with clear boundaries.</h2><p class="lead" style="font-size:14px;margin-top:9px">Read live balances. Sign spending limits. Set the reserve target your agent works toward.</p></div>
+      <div class="row"><span class="badge b-info" data-sandbox-status>CONNECTING</span><button class="btn sm danger" id="reset">Reset sandbox</button></div></div>
+    <div class="grid g4" id="tr-kpis"></div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card pad">
+        <div class="row" style="justify-content:space-between"><div class="h3">Owner's signed mandate</div><span class="chip mono" id="tr-mhash">—</span></div>
+        <table style="margin-top:10px"><tbody id="tr-mandate"></tbody></table>
+        <div class="hr"></div>
+        <form class="row" id="f-mandate" style="align-items:flex-end">
+          <div class="field" style="flex:1;min-width:160px"><label for="m-cap">New per-conversion limit (tUSD)</label><input class="input" id="m-cap" type="number" min="1" max="100" step="0.000001" value="40"></div>
+          <button class="btn" type="submit">Sign as sandbox owner</button>
+        </form>
+        <p class="note" style="margin:12px 0 0">The owner key in this sandbox is a development key held by the demo server, so you can play the owner. In production the owner signs in their own wallet. The AI can never sign a mandate, and the vault's on-chain daily cap (100 tUSD) still applies.</p>
+      </div>
+      <div class="card pad">
+        <div class="row" style="justify-content:space-between"><div class="h3">Standing treasury policy</div><span class="badge b-info" id="tr-pstate">Not signed</span></div>
+        <p class="muted" style="margin:8px 0 12px;font-size:13.5px">The owner signs a target once. Each tick the agent decides how much to convert — X = min(need, market impact, policy cap, mandate cap, free funds) — the co-signer re-derives X, and the agent stops when the target is met.</p>
+        <div id="tr-policy"></div>
+        <form class="row" id="f-policy" style="align-items:flex-end;margin-top:12px">
+          <div class="field" style="flex:1;min-width:160px"><label for="p-target">Keep free in euro reserve (tEUR)</label><input class="input" id="p-target" type="number" min="2" max="80" step="0.000001" value="30"></div>
+          <button class="btn" type="submit">Sign policy</button>
+        </form>
+        <div class="row" style="margin-top:12px"><button class="btn teal" id="tick">Run one tick</button><button class="btn primary" id="auto">Run until the target is met</button></div>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between"><div class="h3">Activity on the sandbox chain</div><span class="faint" style="font-size:12.5px">Newest first · shared by everyone using this sandbox</span></div>
+      <div class="tablewrap"><table style="margin-top:8px"><thead><tr><th>#</th><th>Event</th><th>Outcome</th><th>Transaction</th></tr></thead><tbody id="tr-hist"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- EXECUTION -->
+  <section class="view" id="v-execution" aria-labelledby="t-ex">
+    <div class="head"><div><div class="eyebrow">Certified execution</div><h2 class="h2" id="t-ex" style="margin-top:6px">A route is chosen. Its quality is proven.</h2></div><span class="badge b-info" data-sandbox-status>CONNECTING</span></div>
+    <div class="proof-intro"><span class="proof-symbol" aria-hidden="true">≤</span><div><strong>A mathematical ceiling. An independently checked result.</strong><p>The contract compares actual output with a certified upper bound. The scope is the five owner-approved venues, with a tolerance of one part per million.</p></div></div>
+    <div class="grid g2">
+      <div class="card pad">
+        <div class="eyebrow" style="margin-bottom:8px">The verification rule</div><div class="h3">The check QEDExecution runs in every trade</div>
+        <p class="muted" style="font-size:13.5px;margin:8px 0 12px">For any prices ν, no route through the owner's constant-product venues can return more than</p>
+        <div class="formula">B(ν) = ν<sub>in</sub>·A + Σ<sub>venues</sub> [(√(ν<sub>b</sub>R<sub>b</sub>) − √(ν<sub>a</sub>R<sub>a</sub>/γ))₊² + (√(ν<sub>a</sub>R<sub>a</sub>) − √(ν<sub>b</sub>R<sub>b</sub>/γ))₊²]</div>
+        <p class="muted" style="font-size:13.5px;margin:12px 0 0">The contract recomputes B from live reserves, rounding every step upward, and accepts only if <span class="mono">out·10⁶ ≥ B·(10⁶ − τ)</span>, τ = 1 ppm. Any ν is a valid bound, so a proof cannot be forged; at the right ν the bound meets the optimum. Scope: the five owner-approved venues, not all of DeFi.</p>
+      </div>
+      <div class="card pad" id="ex-last"><div class="h3">Last trade</div><div class="empty">No trade yet in this sandbox. Convert something from the Agent screen.</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card pad"><div class="h3">Route and proof prices of the last trade</div><div id="ex-route"><div class="empty">—</div></div></div>
+      <div class="card pad"><div class="h3">What simpler routers would have delivered</div><p class="muted" style="font-size:13px;margin:6px 0 12px">Same amount, same live reserves; shortfall against QED's certified route.</p><div id="ex-alts"><div class="empty">—</div></div></div>
+    </div>
+    <div class="card pad" style="margin-top:16px"><div class="h3">Owner-approved venues (live reserves)</div>
+      <div class="tablewrap"><table style="margin-top:8px"><thead><tr><th>#</th><th>Venue</th><th class="num">Fee</th><th class="num">Reserve 0</th><th class="num">Reserve 1</th></tr></thead><tbody id="ex-venues"></tbody></table></div></div>
+  </section>
+
+  <!-- LAB -->
+  <section class="view" id="v-lab" aria-labelledby="t-lab">
+    <div class="head"><div><div class="eyebrow">Security Lab</div><h2 class="h2" id="t-lab" style="margin-top:6px">Challenge the agent. Inspect the defence.</h2>
+      <p class="lead" style="font-size:15px">Each attack starts from a genuine order the owner approved and the co-signer signed. The malicious transaction is mined with a fixed gas limit, so you get a real reverted receipt, not a simulation.</p></div><span class="badge b-info" data-sandbox-status>CONNECTING</span></div>
+    <div class="grid g3" id="lab-attacks"></div>
+    <div class="card pad" style="margin-top:16px"><div class="row" style="justify-content:space-between"><div class="h3">Refusals in this sandbox</div><a href="#evidence" style="font-size:13px">48 more, mined on Ethereum Sepolia →</a></div>
+      <div class="tablewrap"><table style="margin-top:8px"><thead><tr><th>Attack</th><th>On-chain result</th><th>Transaction</th></tr></thead><tbody id="lab-hist"></tbody></table></div></div>
+  </section>
+
+  <!-- ECONOMIES -->
+  <section class="view" id="v-services" aria-labelledby="t-sv">
+    <div class="head"><div><div class="eyebrow">Financial services · clearing · private proofs</div><h2 class="h2" id="t-sv" style="margin-top:6px">More than a conversion. An economy.</h2>
+      <p class="lead" style="font-size:15px">Set your own inputs for a proof-backed financial scenario. Review the terms, confirm, then inspect real receipts. These use fresh local test assets, separate from your main treasury. Original fixed scenarios remain available below.</p></div><span class="badge b-info">LOCAL PROOFS</span></div>
+    <div class="card workbench">
+      <div class="workbench-intro"><div class="eyebrow">CONFIGURABLE / LOCAL CONTRACTS</div><h3>Make the proof<br><em>your own.</em></h3><p>Choose the terms. The existing contracts decide whether they qualify.</p><div class="wb-assurance"><span>01 · Set exact inputs</span><span>02 · Confirm in Agent</span><span>03 · Inspect settlement</span></div><p class="faint">Development identities sign only on Anvil. Custom scenarios are synthetic demonstrations, not investment recommendations.</p></div>
+      <form id="workbench-form" class="workbench-fields">
+        <label for="wb-tool">Financial mechanism</label><select class="input" id="wb-tool"><option value="portfolio">Paid portfolio · KKT certificate</option><option value="private_portfolio">Private portfolio · Groth16 proof</option><option value="clearing">Multilateral debt clearing</option><option value="payment">Delegated payment · CloudCo</option><option value="liability">Protected liability · CloudCo</option><option value="execution_bounty">Execution bounty challenge</option></select>
+        <div id="wb-portfolio"><label for="wb-price">Escrow price · tUSD</label><input id="wb-price" class="input" inputmode="decimal" value="7.5" aria-describedby="wb-price-note"><small id="wb-price-note">Greater than zero, up to 25 tUSD. Six decimal places supported.</small><label for="wb-vols">Annual volatility assumptions · %</label><input id="wb-vols" class="input" value="8, 10, 12, 9, 30, 5"><small>2–6 synthetic assets; 1–100% each; zero correlations. Private proofs require exactly six.</small></div>
+        <div id="wb-clearing" hidden><label for="wb-members">Members · comma separated</label><input id="wb-members" class="input" value="Northwind, QED, CloudCo"><label for="wb-debts">Debts · one “debtor, creditor, tUSD” per line</label><textarea id="wb-debts" class="input" rows="4">Northwind, QED, 10
+QED, CloudCo, 8
+CloudCo, Northwind, 7</textarea><small>2–6 members, up to 16 obligations, at most 1,000 tUSD per debt. Each local member signs its own obligations.</small></div>
+        <div id="wb-amount-group" hidden><label for="wb-amount">Amount · tUSD</label><input id="wb-amount" class="input" inputmode="decimal" value="3.5"><small id="wb-limit"></small></div>
+        <div class="wb-footer"><span class="faint">Preparation signs nothing.</span><button type="submit" class="btn primary">Review proposal →</button></div>
+        <p id="wb-error" role="alert" class="wb-error" hidden></p>
+      </form>
+    </div>
+    <div class="section-divider"><div><div class="eyebrow">ORIGINAL REPRODUCTIONS</div><h3 class="h3">The complete scripted economies</h3></div><span class="badge b-script">FIXED INPUTS</span></div>
+    <div class="grid g2" id="sv-cards"></div>
+    <div class="card pad" style="margin-top:16px" id="sv-run" hidden>
+      <div class="row" style="justify-content:space-between"><div class="h3" id="sv-title">Run</div><span class="badge b-info" id="sv-badge">Starting</span></div>
+      <div class="tablewrap"><table style="margin-top:8px"><thead><tr><th>Step</th><th>What happened</th><th>Result</th></tr></thead><tbody id="sv-steps"></tbody></table></div>
+      <details style="margin-top:12px"><summary class="muted" style="cursor:pointer;font-size:13px">Process log</summary><div class="log" id="sv-log"></div></details>
+    </div>
+  </section>
+
+  <!-- EVIDENCE -->
+  <section class="view" id="v-evidence" aria-labelledby="t-ev">
+    <div class="head"><div><div class="eyebrow">Evidence</div><h2 class="h2" id="t-ev" style="margin-top:6px">Don’t take our word. Follow the evidence.</h2>
+      <p class="lead" style="font-size:15px">Mined earlier by the QED team on the public testnet, before this app existed. These are not transactions your session created. Every claim can be re-derived with <span class="mono">npm run verify</span>, without keys.</p></div><span class="badge b-hist">HISTORICAL</span></div>
+    <div class="card pad local-evidence"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">THIS TAB / LOCAL ANVIL</div><h3 class="h3">Your execution records</h3></div><span class="badge b-live">LOCAL RECEIPTS</span></div><p class="muted">Completed operations kept in this tab. These are separate from the historical Sepolia ledger below; a sandbox reset invalidates their live chain context.</p><div id="ev-local" class="local-receipts"></div></div><div class="section-divider"><h3 class="h3">Historical public-chain evidence</h3><span class="badge b-hist">SEPOLIA</span></div><div class="grid g4" id="ev-kpis"></div>
+    <div class="card pad" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between">
+        <div class="row"><label class="sr" for="ev-q">Filter</label><input class="input" id="ev-q" placeholder="Filter: E1, NotBestExecution, escrow…" style="width:280px"><select class="input" id="ev-run" aria-label="Run"><option value="">All runs</option></select></div>
+        <a class="btn sm" id="ev-ledger" target="_blank" rel="noopener" href="https://nightcore709.github.io/qed-agent-wallet/">Full proof ledger ↗</a>
+      </div>
+      <div class="tablewrap"><table style="margin-top:8px"><thead><tr><th>ID</th><th>What it proves</th><th>Result</th><th>Transaction</th></tr></thead><tbody id="ev-tx"></tbody></table></div>
+    </div>
+    <div class="card pad" style="margin-top:16px"><div class="h3">Contracts verified on Sourcify (exact bytecode match)</div>
+      <div class="tablewrap"><table style="margin-top:8px"><thead><tr><th>Contract</th><th>Address</th><th>Match</th></tr></thead><tbody id="ev-contracts"></tbody></table></div></div>
+  </section>
+
+  </main>
+  <footer class="disclaimer">QED is a testnet prototype for FinTechathon 2026. The live sandbox is a shared, disposable local chain with development keys held by this server; the historical evidence is on Ethereum Sepolia. Nothing here is audited or suitable for real funds. Source: <a href="https://github.com/Nightcore709/qed-agent-wallet" target="_blank" rel="noopener">github.com/Nightcore709/qed-agent-wallet</a>.</footer>
+</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+// Browser crypto.randomUUID is restricted to secure contexts in some engines.
+// Prefer it where available, with a cryptographically secure v4 fallback.
+// Never create a transaction/idempotency identifier from Math.random.
+function secureUUID(){
+  if(typeof globalThis.crypto?.randomUUID==="function")return globalThis.crypto.randomUUID();
+  if(typeof globalThis.crypto?.getRandomValues!=="function")throw new Error("Secure browser randomness is unavailable. Open QED on localhost or HTTPS before submitting any action.");
+  const bytes=new Uint8Array(16);globalThis.crypto.getRandomValues(bytes);
+  bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+  const hex=Array.from(bytes,n=>n.toString(16).padStart(2,"0")).join("");
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+}
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Exact micro-token formatting. Financial amounts must never be rounded via Number.
+const f6=r=>{
+  if(r==null)return "—";
+  try{
+    const n=BigInt(r),abs=n<0n?-n:n;
+    const whole=(abs/1000000n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+    const fraction=(abs%1000000n).toString().padStart(6,"0").replace(/0+$/,"").padEnd(2,"0");
+    return (n<0n?"-":"")+whole+"."+fraction;
+  }catch{return "—";}
+};
+const f2=r=>{
+  if(r==null)return "—";
+  try{
+    const n=BigInt(r),abs=n<0n?-n:n;
+    const rounded=(abs+5000n)/10000n;
+    const whole=(rounded/100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
+    return (n<0n?"-":"")+whole+"."+(rounded%100n).toString().padStart(2,"0");
+  }catch{return "—";}
+};
+const short=h=>h?h.slice(0,10)+"…"+h.slice(-6):"";
+const ETH="https://sepolia.etherscan.io";
+let S=null, EV=null, busy=false;
+let AI_CONNECTION={configured:false,verified:false,model:null};
+function toast(t){const el=$("#toast");el.textContent=t;el.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.display="none",4200);}
+async function api(path,opts={}){
+  let r;
+  try{r=await fetch(path,{...opts,headers:{"Content-Type":"application/json","X-QED-Client":clientToken(),...(opts.headers||{})}});}
+  // A bare "Failed to fetch" does not tell a user whether anything was sent; status 0 keeps pending-submission recovery.
+  catch{const error=new Error("The QED server could not be reached. Nothing is resent automatically; a pending submission is looked up, never repeated, once the connection returns.");error.status=0;throw error;}
+  let data={};try{data=await r.json();}catch{}
+  if(!r.ok){const error=new Error(data.error||("Request failed ("+r.status+")"));error.status=r.status;error.data=data;throw error;}
+  return data;
+}
+const store={get(k,d){try{const v=sessionStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{sessionStorage.setItem(k,JSON.stringify(v))}catch{}},remove(k){try{sessionStorage.removeItem(k)}catch{}}};
+
+function clientToken(){let id=store.get("qed-client-token",null);if(!id){id=secureUUID();store.set("qed-client-token",id);}return id;}
+
+/* ── routing ── */
+const VIEWS=["overview","agent","treasury","execution","lab","services","evidence"];
+function route(){
+  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):"overview";
+  for(const x of VIEWS)$("#v-"+x).classList.toggle("on",x===v);
+  for(const a of document.querySelectorAll("#nav a")){if(a.getAttribute("href")==="#"+v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");}
+  if(v==="evidence"){loadEvidence();drawLocalEvidence();}
+  document.title="QED — "+(document.querySelector("#v-"+v+" h2")?.textContent||"Proof-carrying finance");
+  if(arguments[0]?.type==="hashchange"){
+    const heading=document.querySelector("#v-"+v+" h1, #v-"+v+" h2");
+    if(heading){heading.setAttribute("tabindex","-1");heading.focus({preventScroll:true});}
+  }
+  window.scrollTo({top:0});
+}
+addEventListener("hashchange",route);
+
+/* ── capabilities ── */
+const CAPS=[
+  ["LIVE","Certified token conversion","Any amount within the signed mandate, routed across five venues with a same-transaction optimality proof.","#agent"],
+  ["LIVE","Autonomous treasury policy","Sign a reserve target; the agent decides each tranche and stops when the target is met.","#treasury"],
+  ["LIVE","Signed authority","Owner mandate, per-conversion and daily caps, independent co-signer. Over-limit requests are refused before signing.","#treasury"],
+  ["LIVE","Security lab","Inferior routes, skims, forged proofs, redirected outputs, stolen orders: real reverted transactions.","#lab"],
+  ["LIVE","Grounded agent chat","Questions are answered from chain state; transactions need the owner's confirmation.","#agent"],
+  ["SCRIPTED","Paid analysis, escrow and portfolio optimality","An AI business quotes, gets paid through escrow, and is paid only for a portfolio the chain verifies optimal.","#services"],
+  ["SCRIPTED","Certified multilateral clearing","Five AI businesses in gridlock; netting with a proof of maximality, then settlement.","#services"],
+  ["SCRIPTED","Zero-knowledge optimality","A Groth16 proof that a portfolio is optimal for data nobody sees on-chain, verified by the escrow.","#services"],
+  ["HISTORICAL","196 Sepolia transactions","Every claim above, executed on the public testnet, with 24 contracts verified on Sourcify.","#evidence"],
+];
+function renderCaps(){
+  $("#caps").innerHTML=CAPS.map(([d,t,p,h])=>`<a class="card pad cap" href="${h}"><span class="badge ${d==="LIVE"?"b-live":d==="SCRIPTED"?"b-script":"b-hist"}" style="align-self:flex-start">${d}</span><div class="h3">${esc(t)}</div><p>${esc(p)}</p></a>`).join("");
+}
+
+/* ── state ── */
+function observeSandboxEpoch(state){
+  if(!state?.startedAt||state.resets==null)return;
+  const epoch=state.startedAt+":"+state.resets;
+  const prior=store.get("qed-sandbox-epoch",null);
+  if(prior&&prior!==epoch)store.set("qed-sandbox-epoch-warning",true);
+  store.set("qed-sandbox-epoch",epoch);
+  $("#epoch-note").hidden=!store.get("qed-sandbox-epoch-warning",false);
+}
+function setSandboxStatus(status){
+  for(const node of document.querySelectorAll("[data-sandbox-status]")){
+    const ready=status==="ready", starting=status==="starting";
+    node.className="badge "+(ready?"b-live":starting?"b-ref":"b-rev");
+    node.textContent=ready?"CHAIN LIVE":starting?"CHAIN STARTING":"CHAIN UNAVAILABLE";
+  }
+}
+async function refresh(){
+  // A public server answers 503 with its readiness until the sandbox can serve: that is a status, not an outage.
+  try{const h=await api("/api/health").catch(e=>{if(e.status===503&&e.data?.readiness)return e.data;throw e;});
+    const st=h.ready===false&&h.sandbox==="ready"?"failed":h.sandbox;
+    setSandboxStatus(st);
+    $("#d-chain").className="dot "+(st==="ready"?"ok":st==="starting"?"warn":"bad");
+    AI_CONNECTION={configured:!!h.modelConfigured,verified:!!h.claudeObserved?.at,model:h.claudeObserved?.model||null};
+    $("#d-ai").className="dot "+(AI_CONNECTION.verified?"ok":"warn");
+    $("#s-ai").textContent=AI_CONNECTION.verified?"Claude connected · actual response observed":AI_CONNECTION.configured?"Claude configured · not yet verified":"AI offline · deterministic parser";
+    $("#ag-engine").textContent=AI_CONNECTION.verified?"Claude connected · "+AI_CONNECTION.model:AI_CONNECTION.configured?"Claude configured · unverified":"AI offline · deterministic parser";
+    if(st!=="ready"){$("#s-chain").textContent=st==="starting"?"Sandbox chain starting…":"Sandbox chain unavailable";return;}
+    S=await api("/api/sandbox/state");observeSandboxEpoch(S);render();
+  }catch(e){setSandboxStatus("failed");$("#d-chain").className="dot bad";$("#s-chain").textContent="Backend unreachable";$("#d-ai").className="dot warn";$("#s-ai").textContent="AI status unavailable";$("#ag-engine").textContent="AI status unavailable";}
+}
+let labAttacksHtml="";
+function render(){
+  if(!S||S.status!=="ready")return;
+  $("#s-chain").textContent="Sandbox chain live · block "+S.network.block;
+  $("#ov-reserve").textContent=f2(S.reserve.free)+" tEUR";
+  $("#ov-treasury").textContent=f2(S.treasury.balance)+" tUSD ("+f2(S.treasury.availableToday)+" spendable today)";
+  $("#ov-mandate").textContent="v"+S.mandate.version+" · ≤ "+f2(S.mandate.maxPerPayment)+" tUSD per conversion";
+  $("#ov-chain").textContent="Anvil 31337 · block "+S.network.block;
+  $("#ov-ai").textContent=AI_CONNECTION.verified?"Claude connected · "+AI_CONNECTION.model:AI_CONNECTION.configured?"Claude configured · not yet tested":"offline parser (labelled)";
+  $("#ov-activity").textContent=S.history.length?S.history.length+" events · "+S.history.filter(h=>h.tx).length+" transactions":"none yet";
+  $("#ag-free").textContent=f2(S.treasury.free);$("#ag-res").textContent=f2(S.reserve.balance);
+  $("#ag-cap").textContent=f2(S.mandate.maxPerPayment);$("#ag-left").textContent=f2(S.treasury.availableToday);
+  const k=(t,v,u,s)=>`<div class="card pad kpi"><div class="k">${t}</div><div class="v">${v}<small>${u}</small></div><div class="s">${s}</div></div>`;
+  $("#tr-kpis").innerHTML=k("Treasury (QEDVault)",f2(S.treasury.balance),"tUSD",f2(S.treasury.free)+" free · "+f2(S.treasury.ringFenced)+" ring-fenced")+k("Euro reserve (QEDVault)",f2(S.reserve.balance),"tEUR",f2(S.reserve.free)+" free · agent cannot spend from it")+k("Spent today",f2(S.treasury.spentInWindow),"tUSD",f2(S.treasury.availableToday)+" left in the window")+k("Worst case if keys are stolen",f2(S.treasury.blastRadius24h),"tUSD","24 h blast radius, computed on-chain");
+  $("#tr-mhash").textContent="v"+S.mandate.version+" · "+short(S.mandate.hash);
+  $("#tr-mandate").innerHTML=[["Per conversion","≤ "+f2(S.mandate.maxPerPayment)+" tUSD"],["Per day","≤ "+f2(S.mandate.maxPerPeriod)+" tUSD"],["In total","≤ "+f2(S.mandate.maxTotal)+" tUSD"],["Payees",S.mandate.payees.join(" · ")],["Co-signature","required on every payment"],["Valid until",new Date(Number(S.mandate.validUntil)*1000).toUTCString().slice(5,22)+" UTC"]].map(([a,b])=>`<tr><td class="muted" style="width:38%">${a}</td><td>${esc(b)}</td></tr>`).join("");
+  if(S.policy){
+    const tgt=Number(S.policy.targetFree),free=Number(S.reserve.free),pct=Math.min(100,free/Math.max(tgt,1)*100);
+    $("#tr-pstate").className="badge "+(free>=tgt?"b-ok":"b-ref");$("#tr-pstate").textContent=free>=tgt?"Target met":"Short "+f2(tgt-free)+" tEUR";
+    $("#tr-policy").innerHTML=`<div class="row" style="justify-content:space-between;font-size:13px"><span>${f2(free)} tEUR free</span><span class="muted">target ${f2(tgt)} · ${S.policy.ticks} ticks</span></div><div class="meter" style="margin-top:6px"><i style="width:${pct}%"></i></div><div class="faint" style="font-size:12px;margin-top:6px">Tranches ${f2(S.policy.minTranche)}–${f2(S.policy.maxTranche)} tUSD · at most ${S.policy.maxImpactBps/100}% execution cost</div>`;
+  }else{$("#tr-pstate").className="badge b-info";$("#tr-pstate").textContent="Not signed";$("#tr-policy").innerHTML=`<div class="empty" style="padding:4px 0">No standing policy yet. Sign one to let the agent act on its own.</div>`;}
+  const oc={executed:["b-ok","Executed"],refused:["b-ref","Refused · no tx"],reverted:["b-rev","Reverted on-chain"],"no-action":["b-info","No action"],error:["b-rev","Error"]};
+  $("#tr-hist").innerHTML=S.history.length?S.history.map(h=>`<tr><td class="faint">${h.n}</td><td>${esc(h.title)}</td><td><span class="badge ${oc[h.outcome]?.[0]||"b-info"}">${h.outcome==="executed"&&!h.tx?"Signed / recorded (off-chain)":oc[h.outcome]?.[1]||"Unknown"}</span></td><td>${h.tx?`<span class="mono" title="${esc(h.tx.hash)}">${short(h.tx.hash)}</span><div class="faint" style="font-size:12px">block ${h.tx.block}</div>`:'<span class="faint">—</span>'}</td></tr>`).join(""):`<tr><td colspan="4" class="empty">Nothing yet. Every conversion, refusal and attack appears here with its transaction.</td></tr>`;
+  $("#lab-hist").innerHTML=S.history.filter(h=>h.kind==="attack").map(h=>`<tr><td>${esc(h.title.split(" → ")[0])}</td><td><span class="badge b-rev">${esc(h.tx?.error||"reverted")}</span></td><td><span class="mono">${short(h.tx?.hash)}</span> <span class="faint" style="font-size:12px">block ${h.tx?.block}</span></td></tr>`).join("")||`<tr><td colspan="3" class="empty">No attacks launched yet in this sandbox.</td></tr>`;
+  // Rebuilt only when it changes: replacing these buttons on every poll dropped keyboard focus and in-flight clicks.
+  const attacksHtml=S.attacks.map(a=>`<div class="card pad attack"><div class="h3">${esc(a.title)}</div><div class="exp">Expected defence: <b>${esc(a.expect)}</b> — ${esc(a.layer)}</div><div><button class="btn danger sm" data-attack="${a.kind}">Launch on-chain</button></div></div>`).join("");
+  if(attacksHtml!==labAttacksHtml){$("#lab-attacks").innerHTML=attacksHtml;labAttacksHtml=attacksHtml;}
+  renderExecution();
+}
+function renderExecution(){
+  $("#ex-venues").innerHTML=S.venues.map(v=>`<tr><td class="faint">${v.i}</td><td>${esc(v.label)}</td><td class="num">${(v.feeBps/100).toFixed(2)}%</td><td class="num">${fmtTok(v.r0,v.token0)} ${v.token0}</td><td class="num">${fmtTok(v.r1,v.token1)} ${v.token1}</td></tr>`).join("");
+  const t=S.lastTrade;if(!t)return;
+  $("#ex-last").innerHTML=`<div class="row" style="justify-content:space-between"><div class="h3">Last trade</div><span class="badge b-ok">Accepted on-chain</span></div>
+   <div class="kv2" style="margin-top:12px"><span>Instruction</span><span>${esc(t.instruction)}</span><span>In</span><span>${f6(t.amountIn)} tUSD</span><span>Out</span><span><b>${f6(t.amountOut)} tEUR</b></span><span>On-chain bound B</span><span>${f6(t.bound)} tEUR</span><span>Gap to bound</span><span><b>${Number(t.gapPpm).toFixed(3)} ppm</b> (accepted if ≤ τ = ${t.tolerancePpm} ppm)</span><span>Co-signed floor</span><span>${f6(t.floor)} tEUR</span><span>Co-signer checks</span><span>${t.cosignerChecks} passed</span><span>Transaction</span><span class="mono">${esc(t.hash)}</span><span>Block · gas</span><span>${t.block} · ${Number(t.gasUsed).toLocaleString("en-US")}</span><span>Decided by</span><span>${esc(t.engine)}</span></div>`;
+  const p=t.plan||{};
+  $("#ex-route").innerHTML=`<table style="margin-top:8px"><thead><tr><th>Hop</th><th>Venue</th><th class="num">In</th><th class="num">Out</th></tr></thead><tbody>${(p.hops||[]).map((h,i)=>`<tr><td class="faint">${i+1}</td><td>${esc(h.label)}<div class="faint" style="font-size:12px">${h.tokenIn} → ${h.tokenOut}</div></td><td class="num">${fmtTok(h.amountIn,h.tokenIn)}</td><td class="num">${fmtTok(h.amountOut,h.tokenOut)}</td></tr>`).join("")}</tbody></table>
+   <div class="faint" style="font-size:12.5px;margin-top:10px">Proof prices ν (per raw unit, tEUR = 1): ${Object.entries(p.prices||{}).map(([k,v])=>`${k} ${Number(v).toPrecision(6)}`).join(" · ")} · solver sweeps ${p.sweeps}</div>`;
+  const alts=(p.alternatives||[]).slice().sort((a,b)=>a.shortfallBps-b.shortfallBps);const mx=Math.max(1,...alts.map(a=>a.shortfallBps));
+  $("#ex-alts").innerHTML=`<div class="bars">${alts.map(a=>`<div class="bar ${a.policy==="certified"?"best":""}"><span>${esc(a.policy==="certified"?"QED certified route":a.description||a.policy)}</span><div class="track"><div class="fill" style="width:${a.policy==="certified"?2:Math.max(2,a.shortfallBps/mx*100)}%"></div></div><span class="val">${a.policy==="certified"?"0 bps":"−"+a.shortfallBps.toFixed(2)+" bps"}</span></div>`).join("")}</div>`;
+}
+function fmtTok(raw,sym){const d=sym==="tETH"?18:6;return (Number(raw)/10**d).toLocaleString("en-US",{maximumFractionDigits:sym==="tETH"?6:2,minimumFractionDigits:sym==="tETH"?4:2});}
+
+/* ── jobs (chain-mutating operations) ── */
+const STEPS={convert:[["interpret","AI interprets the instruction"],["mandate","Signed mandate and vault limits"],["owner","Owner confirms the exact conversion"],["cosigner","Independent co-signer re-derives and signs"],["plan","Agent routes and builds the proof"],["submit","Preflight & broadcast"],["receipt","Mined and checked on-chain"],["reconcile","Balances reconciled"]],
+  "policy-tick":[["decide","Agent observes and decides"],["cosigner","Co-signer re-derives the decision"],["plan","Agent routes and builds the proof"],["submit","Preflight & broadcast"],["receipt","Mined and checked on-chain"],["reconcile","Reserve re-read"]],
+  attack:[["cosigner","Genuine co-signed order"],["attack","Malicious transaction built"],["receipt","Mined: the chain's verdict"]]};
+function drawTimeline(kind,steps,running){
+  // a "pending" step followed by later steps has completed (e.g. submitted → mined): show it as done
+  steps=steps.map((s,i)=>s.status==="pending"&&i<steps.length-1?{...s,status:"ok"}:s);
+  if(!STEPS[kind]){
+    $("#tl").innerHTML=steps.slice(-10).map(s=>`<li class="${s.status==='pending'?'pending':s.status==='reverted'?'reverted':'ok'}"><span class="m">${s.status==='pending'?'·':s.status==='reverted'?'×':'✓'}</span><div><div class="lbl">${esc(s.label)}</div><div class="det">${esc(s.detail)}</div></div></li>`).join("");return;
+  }
+  const plan=STEPS[kind]||[];const got=Object.fromEntries(steps.map(s=>[s.key,s]));
+  const stopped=steps.some(s=>s.status==="refused"||s.status==="reverted");
+  let firstTodo=true;
+  $("#tl").innerHTML=plan.map(([k,l],i)=>{const s=got[k];
+    if(s){const cls=s.status==="ok"||s.status==="info"?"ok":s.status;const mark=cls==="ok"?"✓":cls==="refused"?"!":cls==="reverted"?"✕":i+1;
+      return `<li class="${cls}${s.status==="pending"&&running?" run":""}"><span class="m">${mark}</span><div><div class="lbl">${esc(s.label)}</div><div class="det">${esc(s.detail)}</div></div></li>`;}
+    const run=running&&!stopped&&firstTodo;firstTodo=false;
+    return `<li class="todo${run?" pending run":""}"><span class="m">${i+1}</span><div><div class="lbl">${esc(l)}</div>${stopped?'<div class="det">Not reached</div>':""}</div></li>`;}).join("");
+}
+function errorDetails(error,heading="Operation could not be verified"){
+  const raw=String(error||"The service did not return a detailed cause.");
+  const certificateError=/0x4205b2b5|CertificateNotActive/i.test(raw);
+  const shortError=certificateError
+    ? "The vault rejected a co-signer certificate because the current chain timestamp was outside its signed validity window. No successful payment is confirmed. Inspect the timestamps and refresh the authorization before trying again."
+    :raw.length>135?raw.slice(0,132)+"…":raw;
+  return `<div class="result rev"><div class="rt">${esc(heading)}</div><p class="failure-summary">${esc(shortError)}</p><details class="diagnostics"><summary>Technical details</summary><pre>${esc(raw)}</pre></details></div>`;
+}
+function failedStage(steps){
+  const last=[...(steps||[])].reverse().find(s=>s.key==="submit");
+  if(last?.status==="ok")return "Broadcast acknowledged; final outcome requires inspection";
+  if(last?.status==="pending")return "Preflight or submission failed; broadcast not confirmed";
+  return "Operation failed before completion";
+}
+function showResult(j,kind){
+  if(j.status==="running"){
+    $("#job-badge").className="badge b-info";$("#job-badge").textContent="Still running";
+    $("#job-result").innerHTML='<div class="result"><div class="rt">Still processing</div><p class="failure-summary">The operation has not finished. Its reference remains in this tab. Check the same job again rather than submitting a duplicate.</p><button class="btn sm recover-job" type="button" data-recover>Check status again</button></div>';
+    return;
+  }
+  if(j.status==="failed"){
+    $("#job-badge").className="badge b-rev";$("#job-badge").textContent="Execution error";
+    const reverted=/(?:reverted unexpectedly|transaction .* reverted)/i.test(j.error||"");
+    const header=reverted?"Transaction mined as a revert":failedStage(j.steps);
+    $("#job-result").innerHTML=errorDetails(j.error,header);
+    return;
+  }
+  const r=j.result||{};
+  const map={executed:["ok","b-ok","Confirmed on-chain"],refused:["ref","b-ref","Refused — no transaction"],reverted:["rev","b-rev","Mined as a revert"],"no-action":["ok","b-info","No action needed"]};
+  const validSuccess=r.outcome!=="executed" || r.tx?.status==="success" || (["mandate","policy"].includes(kind)&&r.steps?.some(s=>s.key==="owner"&&s.status==="ok"));
+  const m=validSuccess?(r.outcome==="executed"&&!r.tx?["ok","b-ok","Signed in sandbox · no chain transaction"]:map[r.outcome]||["rev","b-rev","Unexpected outcome"]):["rev","b-rev","Receipt not verified"];
+  $("#job-badge").className="badge "+m[1];$("#job-badge").textContent=m[2];
+  $("#job-result").innerHTML=`<div class="result ${m[0]}"><div class="rt">${esc(m[2])}</div><p class="failure-summary">${esc(r.summary||"No outcome summary was provided.")}</p>${r.tx?`<div class="kv2" style="margin-top:8px"><span>Transaction hash</span><span class="mono">${esc(r.tx.hash)}</span><span>Receipt · block</span><span>${esc(r.tx.status)} · ${esc(r.tx.block)}${r.tx.error?" · "+esc(r.tx.error):""}</span><span>Network</span><span>Disposable Anvil sandbox (31337), not Sepolia</span></div>`:""}${r.evidence?`<details class="diagnostics"><summary>Inspect proof &amp; exact balance reconciliation</summary><pre>${esc(JSON.stringify(r.evidence,null,2))}</pre></details>`:""}</div>`;
+}
+async function pollJob(id,kind,onDone){
+  let j={id,status:"running",steps:[]};
+  for(let i=0;i<600;i++){
+    await new Promise(r=>setTimeout(r,350));
+    try{j=await api("/api/jobs/"+encodeURIComponent(id));}
+    catch(e){
+      if(/Unknown job/i.test(String(e.message))){
+        store.remove("qed-active-job");
+        showResult({status:"failed",error:"The server no longer recognizes this job. Its final blockchain state could not be recovered; do not resubmit without checking sandbox history.",steps:j.steps||[]},kind);
+        return;
+      }
+      if(i<3||i%12!==0)continue;
+      $("#job-badge").className="badge b-ref";$("#job-badge").textContent="Connection interrupted";
+      $("#job-result").innerHTML=errorDetails(e.message,"Status unavailable — do not resubmit")+'<button class="btn sm recover-job" type="button" data-recover>Check status again</button>';
+      return; // Persist job id; reconnect on refresh. No automatic financial retry.
+    }
+    drawTimeline(kind,j.steps||[],j.status==="running");
+    if(j.status!=="running")break;
+  }
+  if(j.status!=="running"){
+    store.remove("qed-active-job");
+    const saved=store.get("qed-local-receipts",[]).filter(x=>x.id!==j.id);
+    saved.unshift({id:j.id,kind,at:new Date().toISOString(),epoch:store.get("qed-sandbox-epoch",null),status:j.status,result:j.result,error:j.error,steps:j.steps});store.set("qed-local-receipts",saved.slice(0,15));drawLocalEvidence();
+  }
+  showResult(j,kind);
+  if(j.status!=="running")onDone?.(j);
+}
+async function runJob(path,body,kind,onDone){
+  if(busy||store.get("qed-active-job",null)||store.get("qed-pending-submission",null)){
+    toast("An operation may still be in progress. Check its original status before submitting another action.");return;
+  }
+  busy=true;setBusy(true);
+  $("#job-badge").className="badge b-info";$("#job-badge").textContent="Preparing";$("#job-result").innerHTML="";
+  drawTimeline(kind,[],true);
+  let acceptedJob=false;
+  try{
+    if(typeof globalThis.crypto?.randomUUID!=="function")throw new Error("Secure browser operation references are not available. No request was sent.");
+    // Save the request reference BEFORE POST. Losing its response must never lead
+    // to another payment request. Recovery uses GET /api/submissions/:reference.
+    const reference=secureUUID();
+    store.set("qed-pending-submission",{key:reference,kind});
+    const job=await api(path,{method:"POST",headers:{"Idempotency-Key":reference},body:JSON.stringify(body||{})});
+    if(typeof job.id!=="string")throw new Error("The response had no job ID. Acceptance remains uncertain.");
+    store.set("qed-active-job",{id:job.id,kind});
+    store.remove("qed-pending-submission");
+    acceptedJob=true;
+    await pollJob(job.id,kind,onDone);
+  }catch(e){
+    // A concrete client-side rejection (400–499) means this request was refused
+    // without starting a new job. Network failures and 5xx remain uncertain.
+    if(e.status>=400&&e.status<500&&!acceptedJob)store.remove("qed-pending-submission");
+    const unacknowledged=!!store.get("qed-pending-submission",null);
+    const uncertain=unacknowledged||acceptedJob;
+    $("#job-badge").className="badge "+(uncertain?"b-ref":"b-rev");
+    $("#job-badge").textContent=uncertain?"Execution status unknown":"Request refused";
+    $("#job-result").innerHTML=errorDetails(e.message,uncertain?"Execution may already be underway — do not submit again":"The request was not accepted")+
+      (unacknowledged?'<button class="btn sm recover-job" type="button" data-recover-submit>Find original operation</button>':acceptedJob?'<button class="btn sm recover-job" type="button" data-recover>Check original job</button>':"");
+    if(!uncertain)onDone?.({status:"failed",error:String(e.message)});
+  }finally{busy=false;setBusy(false);refresh();}
+}
+function setBusy(b){for(const el of document.querySelectorAll("[data-attack],#tick,#auto,#send,#reset,#f-mandate button,#f-policy button,[data-confirm],[data-run],#workbench-form button"))el.disabled=b;}
+
+/* ── chat ── */
+let chat=store.get("qed-chat",[]);let askPending=false;
+const SUGG=["Quote 12.5 tUSD to tEUR","Pay CloudCo 3.5 tUSD","Run my policy tick once","Convert 10 tUSD to tEUR","Convert the maximum allowed amount","Would converting 80 tUSD violate my mandate?","How does the 1 ppm proof work?","Why did the last trade execute?","How does certified debt clearing work?","Explain zero-knowledge portfolio optimality","What does proof-backed escrow pay for?","What can an attacker do with both hot keys?","What are QED's limitations?"];
+function drawChat(){
+  if(chat.length>1)chat=chat.filter(m=>m.kind!=="welcome");
+  if(!chat.length)chat=[{who:"ai",kind:"welcome",text:"Tell QED what you want to do. Your signed rules, independent co-signer and on-chain proof decide what can execute.",engine:"QED"}];
+  $("#msgs").innerHTML=chat.map((m,i)=>{
+    if(m.kind==="welcome")return `<section class="agent-welcome" aria-label="Getting started"><div class="welcome-mast"><span class="eyebrow">YOUR FINANCIAL WORKSPACE / START HERE</span><span class="welcome-non-custody">PROPOSALS ARE NOT PAYMENTS</span></div><h3>Ask freely.<em> Move only with proof.</em></h3><p>Talk to the agent in your own words. Get a quote, challenge a rule, or prepare a transaction. Every state-changing action remains yours to confirm, and every financial result must be verified.</p><div class="welcome-shortcuts" aria-label="Try a real interaction"><button type="button" data-welcome-question="Convert 10 tUSD to tEUR"><span class="shortcut-index">01 · EXECUTE</span><strong>Convert 10 tUSD</strong><small>Review the signed mandate, then confirm</small><span class="shortcut-arrow" aria-hidden="true">↗</span></button><button type="button" data-welcome-question="Quote 12.5 tUSD to tEUR"><span class="shortcut-index">02 · QUOTE</span><strong>Calculate a route</strong><small>Read-only, no transaction broadcast</small><span class="shortcut-arrow" aria-hidden="true">↗</span></button><button type="button" data-welcome-question="Would converting 80 tUSD violate my mandate?"><span class="shortcut-index">03 · CHALLENGE</span><strong>Test the limits</strong><small>Learn why an action cannot execute</small><span class="shortcut-arrow" aria-hidden="true">↗</span></button><a href="#services" class="welcome-service-link"><span class="shortcut-index">04 · EXPLORE</span><strong>Advanced economies</strong><small>Escrow · portfolio · clearing · ZK</small><span class="shortcut-arrow" aria-hidden="true">↗</span></a></div><div class="welcome-trust-line"><span><b>01</b> AI proposes</span><span aria-hidden="true">→</span><span><b>02</b> Owner confirms</span><span aria-hidden="true">→</span><span><b>03</b> Contract verifies</span></div></section>`;
+    if(m.who==="me")return `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`;
+    let extra="";
+    if(m.kind==="proposal"||m.kind==="check"){
+      extra=`<div class="prop"><div class="row" style="justify-content:space-between"><div><div class="faint" style="font-size:12px">${m.kind==="proposal"?"Proposed conversion":"Limit check (nothing sent)"}</div><div class="amt">${f6(m.amount)} tUSD → tEUR</div></div><span class="badge ${m.allowed?"b-ok":"b-ref"}">${m.allowed?"Within signed limits":"Breaks signed limits"}</span></div>
+      <div class="checks">${(m.checks||[]).map(c=>`<div class="${c.pass?"p":"f"}"><span class="i">${c.pass?"✓":"✕"}</span><span>${esc(c.rule)}${c.rule.startsWith("Amount")?"":": "+f2(c.limit)+" tUSD"}</span></div>`).join("")}</div>
+      ${m.kind==="proposal"&&!m.done?`<div class="row"><button class="btn ${m.allowed?"teal":""}" data-confirm="${i}">${m.allowed?"Confirm as owner and execute":"Check refusal in sandbox"}</button><button class="btn sm" data-dismiss="${i}">Dismiss</button></div>`:""}${m.done?`<div class="faint" style="font-size:12.5px">${esc(m.done)}</div>`:""}</div>`;
+    }
+    if(m.kind==="tool_proposal"){
+      const scenario=!['convert','policy_tick'].includes(m.tool);
+      extra=`<div class="prop tool-proposal"><div class="row" style="justify-content:space-between"><span class="eyebrow">${scenario?'ISOLATED SCENARIO':'TREASURY PROPOSAL'}</span><span class="badge ${m.allowed===false?'b-ref':'b-info'}">${m.allowed===false?'Outside limits':'Not executed'}</span></div><h3 class="h3">${esc(toolLabel(m.tool))}</h3><dl class="tool-terms">${Object.entries(m.parameters||{}).map(([k,v])=>`<div><dt>${esc(k==='volatilities'?'Volatility assumptions (%)':k==='amount'?'Amount (tUSD)':k==='price'?'Escrow price (tUSD)':k)}</dt><dd>${esc(typeof v==='object'?JSON.stringify(v):v)}</dd></div>`).join('')}</dl>${!m.done?`<p class="faint">${scenario?'Fresh test assets and development signers. Main treasury is not spent.':'Current owner mandate and independent co-signer checks apply.'} Proposal expires after 10 minutes.</p><div class="row"><button class="btn primary" data-confirm="${i}">${m.allowed===false?'Submit for refusal':'Confirm exact terms & execute'}</button><button class="btn sm" data-dismiss="${i}">Dismiss</button></div>`:`<div class="proposal-outcome">${esc(m.done)}</div>`}</div>`;
+    }
+    const validAction=m.action&&["#treasury","#services","#lab","#execution","#evidence"].includes(m.action.href);
+    const action=validAction?`<a class="agent-action" href="${m.action.href}">${esc(m.action.label)} ↗</a>`:"";
+    return `<div class="msg ai"><div class="bub">${esc(m.text)}</div>${extra}${action}<div class="meta"><span>${esc(m.engine||"")}</span>${m.kind==="refusal"?'<span class="badge b-ref">Refused</span>':""}</div></div>`;
+  }).join("");
+  $("#msgs").scrollTop=$("#msgs").scrollHeight;store.set("qed-chat",chat.slice(-40));
+}
+$("#clear-chat").addEventListener("click",async()=>{
+  if(busy||store.get("qed-active-job",null)||store.get("qed-pending-submission",null)||askPending){toast("Wait for the current operation before clearing chat.");return;}
+  try{await api("/api/agent/clear",{method:"POST",body:"{}"});}catch(e){toast(e.message);return;}
+  chat=[];store.remove("qed-chat");store.remove("qed-sandbox-epoch-warning");$("#epoch-note").hidden=true;drawChat();toast("This tab’s chat was cleared. Sandbox transactions are unaffected.");
+});
+$("#sugg").innerHTML=SUGG.map(s=>`<button type="button">${esc(s)}</button>`).join("");
+$("#sugg").addEventListener("click",e=>{const b=e.target.closest("button");if(b){$("#q").value=b.textContent;ask();}});
+$("#composer").addEventListener("submit",e=>{e.preventDefault();ask();});
+$("#q").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask();}});
+async function ask(){
+  const text=$("#q").value.trim();if(text.length<2||askPending)return;
+  chat=chat.filter(m=>m.kind!=="welcome");
+  askPending=true;$("#send").disabled=true;$("#send").textContent="Thinking…";
+  $("#q").value="";chat.push({who:"me",text});const slot={who:"ai",text:"…",engine:"thinking"};chat.push(slot);drawChat();
+  // answers fill their own placeholder, so replies stay next to their question even when they arrive out of order
+  try{const r=await api("/api/agent",{method:"POST",body:JSON.stringify({message:text})});
+    Object.assign(slot,{...r,text:r.reply});
+    if(r.kind==='plan')for(const p of r.proposals||[])chat.push({...p,who:'ai',text:p.reply,engine:r.engine});
+  }catch(e){Object.assign(slot,{text:e.message,engine:"error"});}
+  askPending=false;$("#send").disabled=false;$("#send").textContent="Send";
+  drawChat();
+}
+$("#msgs").addEventListener("click",e=>{
+  const example=e.target.closest("[data-welcome-question]");
+  if(example){$("#q").value=example.dataset.welcomeQuestion;ask();return;}
+  const c=e.target.closest("[data-confirm]"),d=e.target.closest("[data-dismiss]");
+  if(d){chat[+d.dataset.dismiss].done="Dismissed. Nothing was sent.";drawChat();}
+  if(c){const m=chat[+c.dataset.confirm];if(busy||store.get("qed-active-job",null)||store.get("qed-pending-submission",null)||!m||m.done){toast("Check the existing operation before confirming a new one.");return;}
+    m.done="Submission requested; awaiting acceptance. Follow the execution status.";drawChat();
+    runJob(m.proposalId?"/api/tools/confirm":"/api/sandbox/convert",m.proposalId?{proposalId:m.proposalId}:{instruction:m.instruction},m.tool||"convert",j=>{
+      const r=j.result||{};
+      m.done=j.status==="failed"?"Execution error; inspect the status panel.":r.outcome==="executed"&&r.tx?.status==="success"?"Confirmed · "+short(r.tx.hash)+" · block "+r.tx.block:r.outcome==="refused"?"Refused: "+r.summary:r.summary||"Outcome unverified";
+      chat.push({who:"ai",text:j.status==="failed"?"The execution could not be verified. Inspect the execution status and diagnostics before trying again.":r.summary||"An outcome was returned without a summary.",engine:r.outcome==="executed"&&r.tx?.status==="success"?"on-chain receipt":"QED pipeline",kind:r.outcome==="refused"?"refusal":""});drawChat();
+    });
+  }
+});
+
+/* ── treasury, lab ── */
+$("#f-mandate").addEventListener("submit",e=>{e.preventDefault();runJob("/api/sandbox/mandate",{maxPerPayment:$("#m-cap").value},"mandate",j=>toast(j.result?.summary||j.error));});
+$("#f-policy").addEventListener("submit",e=>{e.preventDefault();runJob("/api/sandbox/policy",{targetFree:$("#p-target").value},"policy",j=>toast(j.result?.summary||j.error));});
+$("#tick").addEventListener("click",()=>{if(!S?.policy){toast("Sign a standing policy first.");return;}location.hash="#agent";runJob("/api/sandbox/policy-tick",{},"policy-tick",j=>toast(j.result?.summary||j.error));});
+$("#auto").addEventListener("click",async()=>{if(!S?.policy){toast("Sign a standing policy first.");return;}location.hash="#agent";
+  for(let i=0;i<6;i++){let out;await runJob("/api/sandbox/policy-tick",{},"policy-tick",j=>out=j);if(!out||out.status==="failed"||out.result?.outcome!=="executed"){toast(out?.result?.summary||out?.error||"Stopped.");break;}await new Promise(r=>setTimeout(r,600));}});
+$("#reset").addEventListener("click",()=>{if(confirmReset())runJob("/api/sandbox/reset",{},"reset",j=>{if(j.status==="done"&&j.result?.outcome!=="error"){chat=[];store.remove("qed-chat");store.remove("qed-sandbox-epoch");store.remove("qed-sandbox-epoch-warning");$("#epoch-note").hidden=true;drawChat();toast("Sandbox reset. This tab’s chat has been cleared.");}else toast("Reset was not confirmed; inspect the execution result.");});});
+function confirmReset(){const b=$("#reset");if(b.dataset.armed){delete b.dataset.armed;b.textContent="Reset sandbox";return true;}b.dataset.armed="1";b.textContent="Confirm shared reset";b.title="This resets the shared sandbox state for every visitor, including current balances and transactions.";setTimeout(()=>{delete b.dataset.armed;b.textContent="Reset sandbox";},3000);return false;}
+$("#lab-attacks").addEventListener("click",e=>{const b=e.target.closest("[data-attack]");if(!b)return;location.hash="#agent";runJob("/api/sandbox/attack",{kind:b.dataset.attack},"attack");});
+
+const TOOL_LABELS={convert:'Certified conversion',policy_tick:'Standing policy tick',portfolio:'Paid portfolio · KKT',private_portfolio:'Private portfolio · Groth16',clearing:'Certified debt clearing',payment:'Delegated CloudCo payment',liability:'Protected CloudCo liability',execution_bounty:'Execution bounty challenge'};
+function toolLabel(n){return TOOL_LABELS[n]||n;}
+function workbenchFields(){const t=$("#wb-tool").value;$("#wb-portfolio").hidden=!['portfolio','private_portfolio'].includes(t);$("#wb-clearing").hidden=t!=='clearing';$("#wb-amount-group").hidden=!['payment','liability','execution_bounty'].includes(t);$("#wb-limit").textContent=t==='payment'?'Up to 10 tUSD: original co-signer earned-autonomy policy applies.':t==='liability'?'Up to 95 tUSD. Owner protects funds, then the creditor receives payment even while the agent is paused.':'Up to 25 tUSD. A genuine rejected claim leaves the bounty pool unchanged.';}
+$("#wb-tool").addEventListener('change',workbenchFields);workbenchFields();
+document.querySelectorAll("[data-preset-workbench]").forEach(a=>a.addEventListener("click",()=>{
+  const value=a.dataset.presetWorkbench;
+  if([...$("#wb-tool").options].some(o=>o.value===value)){
+    $("#wb-tool").value=value;workbenchFields();
+  }
+}));
+$("#workbench-form").addEventListener('submit',async e=>{
+  e.preventDefault();const tool=$("#wb-tool").value;let parameters;
+  if(['portfolio','private_portfolio'].includes(tool))parameters={price:$("#wb-price").value.trim(),volatilities:$("#wb-vols").value.split(',').map(x=>Number(x.trim()))};
+  else if(tool==='clearing')parameters={members:$("#wb-members").value.split(',').map(x=>x.trim()),obligations:$("#wb-debts").value.trim().split('\n').map(l=>{const [from,to,amount,...rest]=l.split(',').map(x=>x.trim());return rest.length?{}:{from,to,amount};})};
+  else parameters={amount:$("#wb-amount").value.trim()};
+  const b=e.target.querySelector('button');b.disabled=true;$("#wb-error").hidden=true;
+  try{const r=await api('/api/tools/prepare',{method:'POST',body:JSON.stringify({tool,parameters})});chat=chat.filter(m=>m.kind!=='welcome');chat.push({...r,who:'ai',text:r.reply});drawChat();location.hash='#agent';}catch(err){$("#wb-error").hidden=false;$("#wb-error").textContent=err.message;}finally{b.disabled=false;}
+});
+function drawLocalEvidence(){
+  const records=store.get('qed-local-receipts',[]);
+  $("#ev-local").innerHTML=records.length?records.map(j=>`<details class="local-record"><summary><span>${esc(toolLabel(j.kind))}</span><span class="badge ${j.result?.outcome==='executed'?'b-ok':'b-info'}">${esc(j.result?.outcome||j.status)}</span></summary><p>${esc(j.result?.summary||j.error)}</p><div class="faint">${esc(j.at)} · Anvil 31337</div><pre>${esc(JSON.stringify({transaction:j.result?.tx,evidence:j.result?.evidence,steps:j.steps},null,2))}</pre></details>`).join(''):'<p class="empty">No completed operations in this tab yet. Execute a proposal in Agent to create a local record.</p>';
+}
+/* ── scripted economies ── */
+const RUNS=[
+  ["economy","Paid work, escrow and portfolio optimality","An AI business quotes a job, the client pays into escrow, the agent buys data and delivers a minimum-variance portfolio the chain verifies with its KKT certificate. Includes the conversation layer, 18 attacks, the honeypot vault and a pause.","Run 1 on Sepolia · ~2–4 min"],
+  ["clearing","Certified multilateral clearing","Five AI businesses owe each other 200 tUSD in 11 debts. QED proves its netting is maximal (a min-cost-flow dual), refuses non-maximal netting and over-settlement, then settles 31 tUSD.","Run 2 on Sepolia · ~1–2 min"],
+  ["privacy","Zero-knowledge optimality","A Groth16 proof that a portfolio is optimal for a covariance model nobody sees on-chain; the unchanged escrow pays only for a verified proof and refuses three counterfeits.","Run 3 on Sepolia · ~1–2 min"],
+  ["execution","The complete best-execution economy","Every phase of Run 4: deployment, conversion, eight attacks inside a genuine order, a front-run, the autonomous policy loop and the on-chain policy contract.","Run 4 on Sepolia · ~2–3 min"],
+];
+$("#sv-cards").innerHTML=RUNS.map(([k,t,p,n])=>`<div class="card pad" style="display:flex;flex-direction:column;gap:10px"><div class="row" style="justify-content:space-between"><div class="h3">${esc(t)}</div><span class="badge b-script">SCRIPTED</span></div><p class="muted" style="margin:0;font-size:13.5px">${esc(p)}</p><div class="row" style="justify-content:space-between"><span class="faint" style="font-size:12.5px">${esc(n)}</span><button class="btn sm" data-run="${k}">Run demonstration</button></div></div>`).join("");
+$("#sv-cards").addEventListener("click",async e=>{const b=e.target.closest("[data-run]");if(!b)return;
+  const k=b.dataset.run;const body={scenario:k};if(k==="execution")body.instruction="Move 20 tUSD into the euro reserve — CloudCo's euro invoices are due next week.";
+  try{const r=await api("/api/run",{method:"POST",body:JSON.stringify(body)});store.set("qed-run",r.id);followRun(r.id,RUNS.find(x=>x[0]===k)[1]);}catch(err){toast(err.message);}});
+async function followRun(id,title){
+  $("#sv-title").textContent=title||"Scripted run";
+  for(let i=0;i<900;i++){let r;try{r=await api("/api/run/"+id);}catch{break;}
+    $("#sv-run").hidden=false;if(!title)$("#sv-title").textContent="Scripted run ("+r.scenario+")";
+    $("#sv-badge").className="badge "+(r.status==="complete"?"b-ok":r.status==="failed"?"b-rev":"b-info");$("#sv-badge").textContent=r.status==="running"?"Running · "+r.emittedSteps+" steps":r.status==="complete"?"Complete · "+r.steps.length+" steps":"Failed";
+    $("#sv-steps").innerHTML=r.steps.slice(-60).reverse().map(s=>`<tr><td class="faint mono">${esc(s.id)}</td><td>${esc(s.title)}</td><td>${s.transaction?`<span class="badge ${s.transaction.status==="success"?"b-ok":"b-rev"}">${s.transaction.status==="success"?"mined":"reverted"}${s.error?" · "+esc(s.error.name):""}</span><div class="mono faint" style="font-size:11px">${short(s.transaction.hash)}</div>`:'<span class="badge b-info">off-chain</span>'}</td></tr>`).join("");
+    $("#sv-log").textContent=(r.lastLines||[]).join("\n");
+    if(r.status!=="running")break;await new Promise(r=>setTimeout(r,1500));}
+}
+
+/* ── evidence ── */
+async function loadEvidence(){
+  if(EV)return;try{EV=await api("/api/evidence");}catch(e){$("#ev-tx").innerHTML=`<tr><td colspan="4" class="evidence-unavailable">Historical evidence could not be loaded from this demo backend. The original public proof ledger is available using the link above. No results have been invented.</td></tr>`;$("#ev-contracts").innerHTML=`<tr><td colspan="3" class="faint">Contract index unavailable until the backend reconnects.</td></tr>`;return;}
+  const runs=[...new Set(EV.transactions.map(t=>t.run))];$("#ev-run").innerHTML='<option value="">All runs</option>'+runs.map(r=>`<option>${esc(r)}</option>`).join("");
+  const rev=EV.transactions.filter(t=>t.status==="reverted").length;
+  const k=(t,v,s)=>`<div class="card pad kpi"><div class="k">${t}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  $("#ev-kpis").innerHTML=k("Transactions indexed here",EV.transactions.length,"196 in total across all runs, see docs/EVIDENCE.md")+k("Attacks reverted",rev,"each with its designed custom error")+k("Contracts verified",EV.contracts.length,"Sourcify, creation and runtime match")+k("Independent re-check","244 / 244","npm run verify, from a public RPC, no keys");
+  $("#ev-contracts").innerHTML=EV.contracts.map(c=>`<tr><td>${esc(c.name)}</td><td><a class="mono" target="_blank" rel="noopener" href="https://repo.sourcify.dev/11155111/${esc(c.address)}">${esc(c.address)}</a></td><td><span class="badge b-ok">${esc(c.match)}</span></td></tr>`).join("");
+  drawEvidence();
+}
+function drawEvidence(){
+  if(!EV)return;const q=$("#ev-q").value.toLowerCase(),run=$("#ev-run").value;
+  const rows=EV.transactions.filter(t=>(!run||t.run===run)&&(!q||(t.id+" "+t.title+" "+(t.error||"")+" "+t.phase).toLowerCase().includes(q)));
+  $("#ev-tx").innerHTML=rows.slice(0,250).map(t=>`<tr><td class="mono">${esc(t.id)}</td><td>${esc(t.title)}<div class="faint" style="font-size:12px">${esc(t.run)}</div></td><td><span class="badge ${t.status==="success"?"b-ok":"b-rev"}">${t.status==="success"?"success":"reverted"}${t.error?" · "+esc(t.error):""}</span></td><td><a class="mono" target="_blank" rel="noopener" href="${ETH}/tx/${esc(t.hash)}">${short(t.hash)} ↗</a></td></tr>`).join("")||`<tr><td colspan="4" class="empty">No match.</td></tr>`;
+}
+$("#ev-q").addEventListener("input",drawEvidence);$("#ev-run").addEventListener("change",drawEvidence);
+
+/* ── boot ── */
+renderCaps();drawChat();route();refresh();
+setInterval(()=>{if(!document.hidden&&!busy)refresh();},6000);
+const lastRun=store.get("qed-run",null);if(lastRun)followRun(lastRun);
+async function recoverActiveJob(){
+  const interrupted=store.get("qed-active-job",null);
+  if(!interrupted?.id||!interrupted?.kind){toast("No unfinished job is recorded in this tab.");return;}
+  if(busy)return;
+  busy=true;setBusy(true);
+  $("#job-badge").className="badge b-info";$("#job-badge").textContent="Checking existing job";
+  try{
+    await pollJob(interrupted.id,interrupted.kind,updateRecoveredChat);
+  }catch(e){$("#job-result").innerHTML=errorDetails(e.message,"Could not recover the operation status");}
+  finally{busy=false;setBusy(false);refresh();}
+}
+// A broken connection during POST can hide an accepted job ID. Resolve by
+// reference lookup only; never replay the financial request itself.
+async function recoverPendingSubmission(){
+  const pending=store.get("qed-pending-submission",null);
+  if(!pending?.key||!pending?.kind||busy)return;
+  busy=true;setBusy(true);
+  $("#job-badge").className="badge b-info";$("#job-badge").textContent="Locating original operation";
+  try{
+    const accepted=await api("/api/submissions/"+encodeURIComponent(pending.key));
+    if(typeof accepted.id!=="string")throw new Error("No job reference was returned. Do not submit a new transaction.");
+    store.set("qed-active-job",{id:accepted.id,kind:pending.kind});
+    store.remove("qed-pending-submission");
+    await pollJob(accepted.id,pending.kind,updateRecoveredChat);
+  }catch(e){
+    $("#job-badge").className="badge b-ref";$("#job-badge").textContent="Unresolved submission";
+    $("#job-result").innerHTML=errorDetails(e.message,"Original operation status remains uncertain")+
+      '<p class="failure-summary">The server cannot confirm this reference. Inspect current sandbox transactions before starting anything new. Clearing this reference does not reverse a transaction.</p>'+
+      '<button class="btn sm recover-job" type="button" data-recover-submit>Check original status again</button> '+
+      '<button class="btn sm" type="button" data-discard-submission>Dismiss unresolved reference</button>';
+  }finally{busy=false;setBusy(false);refresh();}
+}
+function updateRecoveredChat(j){
+  const pending=[...chat].reverse().find(m=>m.who==="ai"&&m.done?.startsWith("Submission requested;"));
+  if(!pending)return;
+  const r=j.result||{};
+  pending.done=j.status==="failed"?"Execution error; inspect the status panel.":
+    r.outcome==="executed"&&r.tx?.status==="success"?"Confirmed · "+short(r.tx.hash)+" · block "+r.tx.block:
+    r.summary||"Outcome not verified; inspect the sandbox history.";
+  drawChat();
+}
+$("#job-result").addEventListener("click",e=>{
+  if(e.target.closest("[data-recover]"))recoverActiveJob();
+  if(e.target.closest("[data-recover-submit]"))recoverPendingSubmission();
+  if(e.target.closest("[data-discard-submission]")){
+    if(confirm("Only dismiss this browser reference after checking the current sandbox history. This does not cancel, reverse, or rule out a financial transaction. Dismiss?")){
+      store.remove("qed-pending-submission");
+      $("#job-result").innerHTML="";
+      $("#job-badge").textContent="Reference dismissed · outcome unverified";
+      toast("Reference dismissed in this tab. Any chain activity remains unchanged.");
+    }
+  }
+});
+if(store.get("qed-active-job",null)){
+  store.remove("qed-pending-submission");
+  recoverActiveJob();
+}else if(store.get("qed-pending-submission",null))recoverPendingSubmission();
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+# slither QEDBountyBoard.sol --compile-force-framework solc --solc <svm 0.8.26> --solc-args '--via-ir --optimize --optimize-runs 200 --evm-version cancun'   (on a copy; see run.sh step 5)
+# recorded 2026-11-23T22:46:45Z by scripts/run.sh; sources sha256 043d9e7871f0f004
+# forge Version: 1.7.1, Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+# solc 0.8.26 from Foundry's compiler cache (offline = true); SOLC_VERSION=0.8.26
+
+# slither 0.11.6; compiler Version: 0.8.26+commit.8a97fa7a.Darwin.appleclang
+
+Detector: incorrect-exp
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) has bitwise-xor operator ^ instead of the exponentiation operator **: 
+	 - inverse = (3 * denominator) ^ 2 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#205)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-exponentiation
+
+Detector: reentrancy-balance
+Reentrancy in QEDBountyBoard._judge(QEDBountyBoard.Bounty,bytes) (QEDBountyBoard.sol#303-319):
+	External call allowing reentrancy:
+	- (ok,reason) = judge.call(claim) (QEDBountyBoard.sol#310)
+	Balance read before the call:
+	- before = t.balanceOf(address(this)) (QEDBountyBoard.sol#308)
+	Possible stale balance used after the call in a condition:
+	- back < before || t.balanceOf(judge) != 0 (QEDBountyBoard.sol#317)
+		- stale variable `before`
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+Detector: divide-before-multiply
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse = (3 * denominator) ^ 2 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#205)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse *= 2 - denominator * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#209)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse *= 2 - denominator * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#210)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse *= 2 - denominator * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#211)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse *= 2 - denominator * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#212)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse *= 2 - denominator * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#213)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#190)
+	- inverse *= 2 - denominator * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#214)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) performs a multiplication on the result of a division:
+	- prod0 = prod0 / twos (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#193)
+	- result = prod0 * inverse (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#220)
+Math.invMod(uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#243-289) performs a multiplication on the result of a division:
+	- quotient = gcd / remainder (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#265)
+	- (gcd,remainder) = (remainder,gcd - remainder * quotient) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#267-274)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+Detector: incorrect-equality
+QEDBountyBoard.fund(uint256,uint256) (QEDBountyBoard.sol#179-190) uses a dangerous strict equality:
+	- received == 0 (QEDBountyBoard.sol#187)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Detector: timestamp
+QEDBountyBoard.reveal(uint256,address,bytes,bytes32) (QEDBountyBoard.sol#231-258) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < revealableAt (QEDBountyBoard.sol#239)
+	- block.timestamp >= expiresAt (QEDBountyBoard.sol#241)
+	- block.timestamp >= b.contestEndsAt (QEDBountyBoard.sol#249)
+QEDBountyBoard.settle(uint256) (QEDBountyBoard.sol#262-275) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < b.contestEndsAt (QEDBountyBoard.sol#267)
+QEDBountyBoard.phase(uint256) (QEDBountyBoard.sol#280-286) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < b.contestEndsAt (QEDBountyBoard.sol#285)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Detector: assembly
+SafeERC20._callOptionalReturn(IERC20,bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol#160-178) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol#163-173)
+SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol#188-198) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol#192-196)
+Address._revert(bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#138-149) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#142-145)
+Panic.panic(uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Panic.sol#50-56) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Panic.sol#51-55)
+ShortStrings.toString(ShortString) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol#63-72) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol#67-70)
+StorageSlot.getAddressSlot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#66-70) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#67-69)
+StorageSlot.getBooleanSlot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#75-79) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#76-78)
+StorageSlot.getBytes32Slot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#84-88) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#85-87)
+StorageSlot.getUint256Slot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#93-97) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#94-96)
+StorageSlot.getInt256Slot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#102-106) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#103-105)
+StorageSlot.getStringSlot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#111-115) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#112-114)
+StorageSlot.getStringSlot(string) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#120-124) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#121-123)
+StorageSlot.getBytesSlot(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#129-133) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#130-132)
+StorageSlot.getBytesSlot(bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#138-142) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#139-141)
+Strings.toString(uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#24-42) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#29-31)
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#34-36)
+Strings.toChecksumHexString(address) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#90-108) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#95-97)
+MessageHashUtils.toEthSignedMessageHash(bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol#30-36) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol#31-35)
+MessageHashUtils.toTypedDataHash(bytes32,bytes32) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol#75-83) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol#76-82)
+Math.mulDiv(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#144-223) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#151-154)
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#175-182)
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#188-197)
+Math.tryModExp(uint256,uint256,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#337-361) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#339-360)
+Math.tryModExp(bytes,bytes,bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#377-399) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#389-398)
+SafeCast.toUint(bool) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol#1157-1161) uses assembly
+	- INLINE ASM (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol#1158-1160)
+QEDBountyBoard._judge(QEDBountyBoard.Bounty,bytes) (QEDBountyBoard.sol#303-319) uses assembly
+	- INLINE ASM (QEDBountyBoard.sol#312-314)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC1363.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC165.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC20.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Errors.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Panic.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#5)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#4)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol#5)
+		-^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol#4)
+	- Version constraint 0.8.26 is used by:
+		-0.8.26 (QEDBountyBoard.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Detector: dead-code
+ReentrancyGuard._reentrancyGuardEntered() (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol#84-86) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC1363.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC165.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC20.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC5267.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Errors.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Panic.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/StorageSlot.sol#5)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Strings.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/Math.sol#4)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol#5)
+	- ^0.8.20 (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol#4)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Detector: low-level-calls
+Low level call in Address.sendValue(address,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#33-42):
+	- (success,None) = recipient.call{value: amount}() (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#38)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#75-81):
+	- (success,returndata) = target.call{value: value}(data) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#79)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#87-90):
+	- (success,returndata) = target.staticcall(data) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#88)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#96-99):
+	- (success,returndata) = target.delegatecall(data) (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/Address.sol#97)
+Low level call in QEDBountyBoard._judge(QEDBountyBoard.Bounty,bytes) (QEDBountyBoard.sol#303-319):
+	- (ok,reason) = judge.call(claim) (QEDBountyBoard.sol#310)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+Detector: naming-convention
+Function EIP712._EIP712Name() (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol#146-148) is not in mixedCase
+Function EIP712._EIP712Version() (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol#157-159) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Detector: too-many-digits
+ShortStrings.slitherConstructorConstantVariables() (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol#40-122) uses literals with too many digits:
+	- FALLBACK_SENTINEL = 0x00000000000000000000000000000000000000000000000000000000000000FF (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol#42)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Detector: constable-states
+EIP712._nameFallback (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol#51) should be constant 
+EIP712._versionFallback (../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol#52) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+QEDBountyBoard.sol analyzed (18 contracts with 102 detectors), 51 result(s) found
+'<home>/Library/Application Support/svm/0.8.26/solc-0.8.26 --version' running
+'<home>/Library/Application Support/svm/0.8.26/solc-0.8.26 @openzeppelin/contracts/=<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/ QEDBountyBoard.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --optimize-runs 200 --evm-version cancun --allow-paths .,<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts' running
+# exit status: 255 (255 = findings reported, not a crash)
+
+# results touching QEDBountyBoard.sol: 8 (success True); the others are in the vendored OpenZeppelin files
+#   [High/Medium] reentrancy-balance: QEDBountyBoard.sol#L303-L319
+#   [Medium/High] incorrect-equality: QEDBountyBoard.sol#L179-L190
+#   [Low/Medium] timestamp: QEDBountyBoard.sol#L231-L258
+#   [Low/Medium] timestamp: QEDBountyBoard.sol#L262-L275
+#   [Low/Medium] timestamp: QEDBountyBoard.sol#L280-L286
+#   [Informational/High] assembly: QEDBountyBoard.sol#L303-L319
+#   [Informational/High] pragma: ../../../../../../..<repo>/apps/qed-demo/chain/vendor/lib/openzeppelin-contracts/contracts/interfaces/IERC1363.sol#L4
+#   [Informational/High] low-level-calls: QEDBountyBoard.sol#L303-L319
+# (the summary lines above were passed through the same path redaction after the run; scripts/run.sh now does it itself)

@@ -1,0 +1,299 @@
+/* Ask (Meridian, DESIGN.md M1 to M11): the conversation with QED as one surface. The thread reads down the middle of
+   the page, aligned with the bar and the dock; the person's turns are plain, QED's carry the orb; a proposal is a glass
+   card inside QED's reply with its bound, its figures and where it stands; the composer is docked at the foot of the
+   conversation on a frosted floor. From 1200 px the conversations stand in a rail on the left and this conversation's
+   proposals, with how to carry on, in a rail on the right. The page scrolls as one: nothing empty below the composer. */
+
+/* ------------------------------------------------------------------------------------------------ the page
+   On the Ask page only, the stage runs to the bottom edge of the window and the composer rests at its foot, so the
+   composer is in the same place whether the page is scrolled or at its end (no empty region below it, no jump). Ask
+   fills the window itself (min-height: the window less its own top, measured in Ask.tsx before it is painted); the shell
+   keeps its own layout, so its margins collapse as on every page and nothing moves when Ask has loaded (a flex shell
+   here moved the whole body 8 px once the screen's code arrived: CLS 0.047 on the phone profile). The shell's own part is
+   the .is-ask modifier in shell.css. */
+/* (the shell's part of this, .app.is-ask, lives in shell.css since R11's merge) */
+
+.ak { min-height: calc(100dvh - var(--ak-top, 0px)); display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.ak > .ak-conv { width: 100%; max-width: 760px; justify-self: center; }
+.ak.ak-wide { grid-template-columns: minmax(200px, 1fr) minmax(0, 720px) minmax(200px, 1fr); column-gap: var(--s6); }
+.ak.ak-wide > .ak-conv { max-width: none; }
+.ak-conv { display: flex; flex-direction: column; min-width: 0; }
+.ak-body { flex: 1 0 auto; display: grid; align-content: start; gap: var(--s8); padding: var(--s8) 0 var(--s6); min-width: 0; }
+.ak-quiet { font-size: var(--t-small); color: var(--ink-3); line-height: 1.5; }
+.ak-sec-h { font-size: var(--t-small); font-weight: 620; color: var(--ink-2); letter-spacing: var(--track-label); }
+
+/* ------------------------------------------------------------------------------------------------ the head */
+.ak-head { display: grid; gap: var(--s3); }
+.ak-title { min-height: 2.5em; font-size: var(--t-h2); font-weight: 650; line-height: 1.25; letter-spacing: -.02em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; text-wrap: balance; }
+.ak-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); min-height: 30px; }
+.ak-count { font-size: var(--t-small); color: var(--ink-3); }
+.ak-tally { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.ak-head > .ak-tally { min-height: 3em; }
+.ak-tools { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); }
+.ak .ak-new, .ak .ak-menu-btn { --h: 40px; }
+.ak-engine { display: inline-flex; align-items: center; gap: 8px; min-height: 30px; padding: 4px 12px; border-radius: var(--r-pill); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 80%, transparent); font-size: var(--t-small); font-weight: 580; line-height: 1.3; color: var(--ink-2); }
+.ak-engine::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--qed); box-shadow: 0 0 8px color-mix(in oklab, var(--qed) 60%, transparent); }
+.ak-engine.off::before { background: var(--ink-4); box-shadow: none; }
+.ak-engine.wait { visibility: hidden; width: 200px; }
+.ak-engine b { color: var(--ink); font-weight: 650; }
+
+/* the first view: who answers, what a reply can and cannot do, and where to begin */
+.ak-hero { display: grid; justify-items: start; gap: var(--s4); padding-top: var(--s2); }
+.ak-hero > .ak-tools { justify-self: stretch; }
+.ak-hero > .orb { --o: 52px; margin-bottom: var(--s1); }
+.ak-hero h1 { font-size: var(--t-display); line-height: 1; font-weight: 650; letter-spacing: var(--track-hero); max-width: 15ch; }
+.ak-hero h1 .dim { display: block; margin-top: var(--s2); font-size: var(--t-h1); line-height: 1.15; letter-spacing: var(--track-h); font-weight: 600; color: var(--ink-3); }
+.ak-lede { max-width: 62ch; font-size: var(--t-lead); line-height: 1.55; color: var(--ink-2); }
+.ak-starters, .ak-waiting { display: grid; gap: var(--s3); }
+.ak-starters ul, .ak-wait-list { display: grid; gap: var(--s2); }
+.ak-wait-list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.ak-wait-list li { display: grid; }
+.ak-start-wait { min-height: 52px; }
+.ak-starters button { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 52px; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: linear-gradient(160deg, var(--gloss), transparent 55%), color-mix(in oklab, var(--pane-2) 72%, transparent); color: var(--ink); font-weight: 560; text-align: left; cursor: pointer; transition: border-color var(--d1) var(--ease-out), transform var(--d-spring) var(--ease-spring), background-color var(--d2) var(--ease-out); }
+.ak-starters button:hover { border-color: var(--edge); transform: translateY(-1px); }
+.ak-starters svg { flex: none; width: 16px; height: 16px; color: var(--qed); }
+.ak-wait-list button { display: grid; gap: 6px; width: 100%; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid color-mix(in oklab, var(--due) 32%, transparent); background: linear-gradient(160deg, var(--due-bg), transparent 75%), color-mix(in oklab, var(--pane-2) 72%, transparent); color: var(--ink); text-align: left; cursor: pointer; transition: border-color var(--d1) var(--ease-out), transform var(--d-spring) var(--ease-spring); }
+.ak-wait-list button:hover { border-color: var(--due); transform: translateY(-1px); }
+.ak-wait-list .t { font-weight: 640; line-height: 1.35; overflow-wrap: anywhere; }
+.ak-wait-list .a { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-small); font-weight: 620; color: var(--brand); }
+.ak-wait-list .a svg { width: 15px; height: 15px; }
+.ak-rules { display: grid; gap: var(--s4); padding: var(--s5); border-radius: var(--r-lg); border: 1px dashed var(--rule-2); background: color-mix(in oklab, var(--pane) 55%, transparent); scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+.ak-rules:focus { outline: none; }
+.ak-rules-top { display: grid; gap: 2px; }
+.ak-rules-top p { font-size: var(--t-small); color: var(--ink-3); }
+.ak-rules-act { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); font-size: var(--t-small); color: var(--ink-3); }
+.ak-rules-act .btn { --h: 40px; }
+
+/* ------------------------------------------------------------------------------------------------ the thread */
+.ak-thread { display: grid; gap: var(--s12); }
+.ak-turn { display: grid; gap: var(--s5); min-width: 0; scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+/* the person's words, plain: a quiet glass bubble on the right, no colour of its own */
+.ak-you { justify-self: end; display: grid; justify-items: end; gap: 6px; max-width: min(86%, 64ch); min-width: 0; }
+.ak-you-text { padding: 12px 18px; border-radius: 22px 22px 6px 22px; border: 1px solid var(--rim); background: linear-gradient(160deg, var(--gloss), transparent 60%), color-mix(in oklab, var(--pane-2) 90%, transparent); box-shadow: var(--lift-1); color: var(--ink); font-size: var(--t-body); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ak-when { padding-right: 6px; font-size: var(--t-micro); color: var(--ink-3); }
+/* QED's reply: the orb, who wrote the words, the words, what they rest on, and any proposals */
+.ak-reply { display: grid; gap: var(--s4); min-width: 0; }
+.ak-by { display: flex; align-items: center; gap: 10px; font-size: var(--t-small); color: var(--ink-3); line-height: 1.4; }
+.ak-by .orb { --o: 26px; }
+.ak-answer { display: grid; gap: var(--s3); max-width: 66ch; font-size: var(--t-lead); line-height: 1.62; color: var(--ink); }
+.ak-answer p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ak-reply.own .ak-answer { font-size: var(--t-body); color: var(--ink-2); }
+.ak-grounded { display: flex; gap: var(--s2); align-items: flex-start; max-width: 66ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.ak-grounded .seal { margin-top: 3px; }
+.ak-cites > summary { display: inline-flex; align-items: center; min-height: 32px; font-size: var(--t-small); font-weight: 580; color: var(--ink-2); }
+.ak-rests { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--s2); margin-top: var(--s2); }
+.ak-cite { display: grid; align-content: start; gap: 2px; min-width: min(150px, 100%); max-width: 100%; padding: 10px 14px; border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 72%, transparent); }
+.ak-cite dt { font-size: var(--t-micro); font-weight: 600; color: var(--ink-3); }
+.ak-cite dd { font-size: var(--t-body); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere; }
+.ak-obj ul { display: grid; gap: 2px; font-size: var(--t-small); font-weight: 430; }
+.ak-obj span { color: var(--ink-3); }
+.ak-obj b { color: var(--ink); font-weight: 620; }
+.ak-where { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); font-size: var(--t-small); }
+.ak-where > span { color: var(--ink-3); margin-right: 2px; }
+.ak-to { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 72%, transparent); color: var(--ink); font-weight: 620; text-decoration: none; transition: border-color var(--d1) var(--ease-out); }
+.ak-to:hover { border-color: var(--edge); }
+.ak-to svg { width: 14px; height: 14px; color: var(--ink-3); }
+.ak-asks { display: grid; gap: var(--s2); }
+.ak-asks > span { font-size: var(--t-small); color: var(--ink-3); }
+.ak-asks ul { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.ak-q { min-height: 40px; padding: 8px 16px; border-radius: var(--r-pill); border: 1px solid var(--qed-line); background: var(--qed-bg); color: var(--ink); font-size: var(--t-small); font-weight: 600; text-align: left; cursor: pointer; }
+.ak-q:hover { border-color: var(--qed); }
+.ak-none { font-size: var(--t-small); color: var(--ink-3); }
+.ak-all { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); font-size: var(--t-small); color: var(--ink-3); }
+.ak-all .btn { --h: 44px; }
+.ak-drafted-note:focus { outline: none; }
+.ak-drafted-note:focus-visible .note { outline: 2px solid var(--focus); outline-offset: 3px; }
+.ak-gap { margin-top: 6px; }
+.ak-detail { display: block; margin-top: 4px; color: var(--ink-2); }
+.ak-err { font-size: var(--t-small); font-weight: 580; color: var(--loss); padding: 0 var(--s4); }
+
+/* an opened conversation is there at once (it is what the page is for, and the browser records its largest text only
+   when it is painted: an arriving turn held phone LCP at 3.0 s); a turn that has just arrived is the one that moves:
+   the words slide in from the right, the reply rises out of a blur */
+.ak-turn[data-arrive] { animation: none; }
+.ak-turn[data-pending] { opacity: 1; transform: none; }
+.ak-fresh .ak-you { animation: ak-you-in var(--d3) var(--ease-out) both; }
+.ak-fresh .ak-reply { animation: arrive var(--d4) var(--ease-out) 90ms both; }
+@keyframes ak-you-in { from { opacity: 0; transform: translateX(18px) scale(.98); } }
+.ak-pending .ak-by > span { color: var(--ink-2); }
+.ak-wait { display: grid; gap: 10px; max-width: 520px; }
+.ak-wait .skel { height: 12px; border-radius: var(--r-xs); }
+.ak-wait .skel:nth-child(2) { width: 88%; }
+.ak-wait .skel:nth-child(3) { width: 60%; }
+
+/* ------------------------------------------------------------------------------------------------ a proposal: a card of tinted glass in QED's hand */
+.ak-cards { display: grid; gap: var(--s4); }
+.ak-card { position: relative; display: grid; gap: var(--s4); min-width: 0; padding: var(--s5) var(--s6); border-radius: var(--r-lg); border: 1px solid var(--rim); box-shadow: var(--lift-1); scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4));
+  background: radial-gradient(120% 70% at 0% 0%, color-mix(in oklab, var(--qed) 13%, transparent), transparent 58%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.ak-card:focus { outline: none; }
+.ak-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.ak-card.closed { gap: var(--s3); box-shadow: none; background: linear-gradient(152deg, var(--gloss), transparent 40%), color-mix(in oklab, var(--pane) 72%, transparent); }
+.ak-card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s2) var(--s4); }
+.ak-card-by { font-size: var(--t-small); color: var(--ink-3); line-height: 1.4; }
+.ak-card-by .by-qed { color: var(--qed); font-weight: 620; }
+.ak-card-t { font-size: var(--t-h2); font-weight: 650; line-height: 1.25; letter-spacing: -.02em; }
+.ak-card.closed .ak-card-t { font-size: var(--t-lead); color: var(--ink-2); }
+.ak-card.closed .ak-card-what { font-size: var(--t-small); color: var(--ink-2); }
+.ak-card-what { max-width: 66ch; line-height: 1.55; color: var(--ink); }
+.ak-card-why { max-width: 66ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.ak-corrects { font-size: var(--t-small); color: var(--ink-2); }
+.ak-closed { max-width: 72ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.ak-closed b { color: var(--ink); font-weight: 620; }
+.ak-corrects a, .ak-closed a { font-weight: 620; }
+/* the bound leads: the most it could move, under QED's bracket, then what that figure is and is not */
+.ak-bound { display: grid; gap: 4px; padding: var(--s4) var(--s5); border-radius: var(--r-md); border: 1px solid var(--qed-line); background: linear-gradient(160deg, var(--qed-bg), transparent 72%), color-mix(in oklab, var(--pane-2) 62%, transparent); }
+.ak-bound .k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.ak-bound .v { justify-self: start; display: grid; font-size: var(--t-fig-m); font-weight: 650; line-height: 1.05; letter-spacing: var(--track-fig); font-variant-numeric: tabular-nums lining-nums; color: var(--ink); }
+/* the money bar's span for what QED may move (DESIGN.md M14): end ticks on a tide line, no glow */
+.ak-bound .v::before { content: ""; height: 9px; margin-bottom: 7px; border: solid var(--part-reach); border-width: 0 2px; background: linear-gradient(var(--part-reach), var(--part-reach)) bottom / 100% 3px no-repeat; }
+.ak-bound .v.words { font-size: var(--t-h2); letter-spacing: -.02em; }
+.ak-bound .s { max-width: 72ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.ak-tier { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); font-size: var(--t-small); line-height: 1.45; color: var(--ink-2); }
+.ak-tier b { color: var(--ink); font-weight: 620; }
+/* the figures QED worked out, each with what kind of figure it is */
+.ak-figs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: var(--s2); }
+.ak-figs > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; gap: 4px var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 66%, transparent); }
+.ak-figs dt { font-size: var(--t-small); line-height: 1.35; color: var(--ink-2); }
+.ak-figs .v { font-weight: 660; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums lining-nums; color: var(--ink); }
+.ak-figs .n { grid-column: 1 / -1; font-size: var(--t-micro); line-height: 1.45; color: var(--ink-2); overflow-wrap: anywhere; }
+.ak-drafted { max-width: 72ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-3); }
+.ak-checks { display: grid; gap: 2px; }
+.ak-sheet-checks { margin-top: var(--s2); }
+.ak-sheet-said { margin-top: var(--s3); }
+.ak-was > summary { display: inline-flex; align-items: center; min-height: 32px; font-size: var(--t-small); font-weight: 580; color: var(--ink-2); }
+.ak-was-body { display: grid; gap: var(--s3); margin-top: var(--s2); }
+/* where it stands, and the next step */
+.ak-card-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3) var(--s4); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.ak-card-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.ak-card-acts .btn { --h: 44px; }
+.ak-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--t-small); }
+.ak-steps li { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px 0 4px; border-radius: var(--r-pill); border: 1px solid var(--rim); background: color-mix(in oklab, var(--well) 42%, transparent); color: var(--ink-2); font-weight: 600; white-space: nowrap; transition: background-color var(--d2) var(--ease-out), color var(--d2) var(--ease-out); }
+.ak-steps li + li::before { content: ""; width: 8px; height: 1px; margin-left: -11px; margin-right: 3px; background: var(--rule-2); }
+.ak-steps i { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: var(--t-micro); font-weight: 700; background: var(--pane-2); color: var(--ink-2); }
+.ak-steps i svg { width: 13px; height: 13px; stroke-width: 3; }
+.ak-steps li.done i { background: var(--gain-bg); color: var(--gain); }
+.ak-steps li.now { color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); border-color: transparent; box-shadow: var(--shadow-btn); }
+.ak-steps li.now i { background: color-mix(in oklab, var(--on-act) 14%, transparent); color: var(--on-act); }
+.ak-steps li.work { color: var(--ink); background: var(--hold-bg); border-color: color-mix(in oklab, var(--hold) 30%, transparent); }
+.ak-steps li.work i { background: transparent; color: var(--hold); box-shadow: inset 0 0 0 2px var(--hold); }
+.ak-steps li.fail { color: var(--ink); background: var(--loss-bg); border-color: color-mix(in oklab, var(--loss) 34%, transparent); }
+.ak-steps li.fail i { background: var(--loss); color: var(--on-loss); }
+
+/* ------------------------------------------------------------------------------------------------ the rails (from 1200 px) */
+/* a rail never reaches past the window: what does not fit scrolls inside it (a rail taller than the window made the page
+   scroll on past the end of the stage), with room around its panels so their edges and shadows are not cut */
+.ak-side { position: sticky; top: calc(var(--bar-top, 0px) + var(--s3)); align-self: start; display: grid; align-content: start; gap: var(--s4); min-width: 0; max-height: calc(100dvh - var(--bar-top, 0px) - var(--bar-bottom, 0px) - var(--s8)); }
+.ak-side { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; margin: -4px -8px; padding: 4px 8px 12px; scroll-padding-block: var(--s12); }
+.ak-side[data-more="bottom"] { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--s5)), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - var(--s5)), transparent); }
+.ak-side[data-more="top"] { -webkit-mask-image: linear-gradient(to top, #000 calc(100% - var(--s5)), transparent); mask-image: linear-gradient(to top, #000 calc(100% - var(--s5)), transparent); }
+.ak-side[data-more="top bottom"] { -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--s5), #000 calc(100% - var(--s5)), transparent); mask-image: linear-gradient(to bottom, transparent, #000 var(--s5), #000 calc(100% - var(--s5)), transparent); }
+.ak-rail { display: grid; gap: var(--s3); min-width: 0; min-height: 0; padding: var(--s4); border-radius: var(--r-lg); border: 1px solid var(--rim); box-shadow: var(--lift-1); background: linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); }
+.ak-rail h2 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; }
+.ak-rail-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); min-height: 40px; }
+.ak-rail-foot { padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.ak-rules-link { display: inline-flex; align-items: center; min-height: 32px; font-size: var(--t-small); font-weight: 600; }
+.ak-convs { display: grid; align-content: start; gap: 2px; margin: 0 -8px; padding: 2px 8px; }
+.ak-conv-link { display: grid; gap: 3px; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid transparent; color: var(--ink); text-decoration: none; transition: background-color var(--d1) var(--ease-out); }
+.ak-conv-link .t { font-size: var(--t-small); font-weight: 600; line-height: 1.35; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.ak-conv-link .m { font-size: var(--t-micro); color: var(--ink-3); }
+.ak-conv-link:hover { background: color-mix(in oklab, var(--pane-2) 72%, transparent); }
+.ak-conv-link[aria-current="page"] { background: linear-gradient(180deg, var(--gloss), transparent 70%), var(--pane-2); border-color: var(--rim); box-shadow: inset 3px 0 0 var(--act), var(--lift-1); }
+.ak-sum-list { display: grid; gap: 2px; margin: 0 -8px; padding: 0 8px; }
+.ak-sum-list a { display: grid; justify-items: start; gap: 6px; padding: 10px 12px; border-radius: var(--r-sm); color: var(--ink); text-decoration: none; }
+.ak-sum-list a:hover { background: color-mix(in oklab, var(--pane-2) 72%, transparent); }
+.ak-sum-list .t { font-size: var(--t-small); font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.ak-sum-list .stamp { height: 24px; font-size: var(--t-micro); }
+.ak-guide ul { display: grid; gap: var(--s3); }
+.ak-guide li { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.ak-guide li b { display: block; color: var(--ink); font-weight: 620; }
+/* the same conversations behind one button where there is no rail */
+.ak-menu { position: relative; }
+.ak-menu-btn .count { margin-left: 2px; }
+/* opaque: inside the frosted stage a second backdrop blur draws nothing, and 90% glass let the page show through */
+.ak-pop { left: 0; right: auto; top: calc(100% + 8px); --origin: top left; width: min(360px, calc(100vw - 40px)); display: grid; gap: var(--s2); padding: var(--s2); background: linear-gradient(160deg, var(--gloss), transparent 30%), var(--sheet); }
+.ak-pop a.ak-conv-link { display: grid; align-items: start; gap: 3px; min-height: 44px; padding: 10px 12px; border-radius: var(--r-sm); }
+.ak-pop a.ak-conv-link .t { font-size: var(--t-small); }
+.ak-pop .ak-convs { max-height: min(50vh, 420px); margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; }
+.ak-pop-foot { display: grid; justify-items: start; gap: var(--s2); padding: var(--s2) var(--s2) 4px; border-top: 1px solid var(--rule); }
+.ak-pop-foot .btn { --h: 44px; }
+
+/* ------------------------------------------------------------------------------------------------ the composer, docked at the foot of the conversation
+   It stands on a floor that fades from clear to the page's ground and runs to the bottom of the window, lit by the
+   section's own horizon light, so the thread fades out under it instead of showing through between the composer and the
+   dock; on a phone's keyboard it stands on the keyboard (--ak-kb, viewport.ts). The floor is not frosted: inside the
+   stage (itself frosted) a second backdrop blur draws nothing in Chromium, so the ground is made opaque instead. */
+.ak-foot { position: sticky; bottom: var(--ak-kb, 0px); z-index: 4; margin-top: auto; padding: var(--s3) 0 calc(var(--bar-bottom, 76px) + var(--s3)); }
+.ak-foot::before { content: ""; position: absolute; z-index: -1; inset: calc(-1 * var(--s10)) calc(-1 * var(--s6)) 0; pointer-events: none;
+  background: radial-gradient(64% 120% at 50% 132%, color-mix(in oklab, var(--glow-a) 62%, transparent), transparent 74%), linear-gradient(to bottom, transparent, color-mix(in oklab, var(--ground) 55%, var(--sheet)) var(--s12));
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--s10)), linear-gradient(to right, transparent, #000 var(--s6), #000 calc(100% - var(--s6)), transparent); -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--s10)), linear-gradient(to right, transparent, #000 var(--s6), #000 calc(100% - var(--s6)), transparent); mask-composite: intersect; }
+:root[data-fx="plain"] .ak-foot::before { background: linear-gradient(to bottom, transparent, var(--ground) var(--s10)); }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .ak-foot::before { background: linear-gradient(to bottom, transparent, var(--ground) var(--s10)); } }
+@media (forced-colors: active) { .ak-foot::before { background: Canvas; mask-image: none; -webkit-mask-image: none; } }
+.ak-composer { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+.ak-field { display: flex; align-items: flex-end; gap: var(--s3); padding: 7px 7px 7px var(--s4); border-radius: var(--r-lg); border: 1px solid var(--rim);
+  background: linear-gradient(170deg, var(--gloss), transparent 42% 72%, color-mix(in oklab, var(--gloss) 60%, transparent)), var(--pane-3);
+  backdrop-filter: blur(var(--blur)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
+  box-shadow: var(--lift-3); transition: border-color var(--d1) var(--ease-out), box-shadow var(--d2) var(--ease-out); }
+.ak-field:hover { border-color: var(--edge); }
+.ak-field:focus-within { border-color: var(--focus); box-shadow: 0 0 0 4px color-mix(in oklab, var(--focus) 24%, transparent), var(--lift-3); }
+@media (forced-colors: active) { .ak-field:focus-within { outline: 2px solid Highlight; outline-offset: 2px; } }
+.ak-field > .orb { margin-bottom: 11px; }
+.ak-field textarea { flex: 1; min-width: 0; min-height: 44px; max-height: 212px; margin: 0; padding: 10px 0; border: 0; outline: 0; background: transparent; box-shadow: none; resize: none; font-size: var(--t-body); line-height: 24px; color: var(--ink); }
+.ak-field textarea::placeholder { color: var(--ink-3); opacity: 1; }
+.ak-field textarea:disabled { cursor: not-allowed; }
+.ak-send { --h: 44px; flex: none; }
+.ak-hint { padding: 0 var(--s4); font-size: var(--t-micro); line-height: 1.5; color: var(--ink-3); }
+.ak-hint kbd { padding: 2px 5px; }
+
+/* ------------------------------------------------------------------------------------------------ narrower windows */
+@media (max-width: 759px) {
+  .ak-body { gap: var(--s6); padding-top: var(--s6); }
+  /* the count has a line of its own on a phone, so the row is the same height before and after the conversation is read */
+  .ak-count { flex-basis: 100%; }
+  .ak-hero > .orb { --o: 44px; }
+  .ak-lede { font-size: var(--t-body); }
+  .ak-thread { gap: var(--s10); }
+  .ak-you { max-width: 94%; }
+  .ak-answer { font-size: var(--t-body); }
+  .ak-card { padding: var(--s4); gap: var(--s3); }
+  .ak-card-t { font-size: var(--t-lead); }
+  .ak-bound { padding: var(--s3) var(--s4); }
+  .ak-card-acts, .ak-card-acts .btn { width: 100%; }
+  /* the steps: the one that matters keeps its words; the others keep theirs for a screen reader */
+  .ak-steps li:not(.now):not(.work):not(.fail) { padding-right: 4px; }
+  .ak-steps li:not(.now):not(.work):not(.fail) .ak-step-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* phones: 17 px in the field (a phone zooms the page when a field under 16 px takes focus); what is sent with a
+     question is said while the composer is in use, and the dock steps aside so the composer stands on the keyboard */
+  .ak-field textarea { font-size: var(--t-lead); }
+  .ak-hint { display: none; }
+  .ak-composer:focus-within .ak-hint { display: block; }
+  .ak-keys { display: none; }
+  .ak-foot { padding-bottom: calc(var(--bar-bottom, 84px) + var(--s3)); }
+  .ak-foot:focus-within { padding-bottom: var(--s3); transition: padding-bottom var(--d3) var(--ease-out); }
+}
+/* small phones: the send button is its arrow (its name stays "Send" or "Ask"), so the field keeps the width */
+@media (max-width: 480px) { .ak-send { width: 44px; padding: 0; } .ak-send-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+@media (max-width: 380px) { .ak-engine { font-size: var(--t-micro); } }
+/* printed, a conversation is its thread: no composer, rails or floor */
+@media print { .ak-foot, .ak-side, .ak-tools { display: none !important; } .ak.ak-wide { grid-template-columns: minmax(0, 1fr); } }
+
+/* the wallet sheet's network line and every field of the terms (R12 section 4), as the wallet's own sheet shows them */
+.ak-sheet-where { margin-top: var(--s2); color: var(--ink-2); line-height: 1.5; }
+.ak-sheet-fields { margin-top: var(--s3); }
+.ak-sheet-fields > summary { display: inline-flex; align-items: center; min-height: 32px; font-size: var(--t-small); font-weight: 600; color: var(--brand); cursor: pointer; }
+.ak-sheet-fields dd { overflow-wrap: anywhere; }
+
+/* Ask's structured questions (R13): choices as pills, a typed answer beside them, the answer kept once given */
+.ak-clar { display: grid; gap: var(--s3); padding: var(--s4); border: 1px solid var(--qed-line); border-radius: var(--r-md); background: var(--qed-bg); }
+.ak-clar-h { font-size: var(--t-small); color: var(--ink-3); }
+.ak-clar-q { display: grid; gap: var(--s2); }
+.ak-clar-t { font-weight: 600; }
+.ak-clar-ch { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.ak-clar-typed { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.ak-clar-typed .input { flex: 1 1 220px; min-width: 0; }
+.ak-clar-a { display: flex; align-items: center; gap: 6px; font-size: var(--t-small); color: var(--ink-2); }
+.ak-clar-a svg { width: 14px; height: 14px; color: var(--gain); }
+.ak-payee-check { display: grid; gap: var(--s3); }
+.ak-sure { display: flex; align-items: flex-start; gap: var(--s2); font-size: var(--t-small); }
+.ak-quiet { font-size: var(--t-small); color: var(--ink-3); }

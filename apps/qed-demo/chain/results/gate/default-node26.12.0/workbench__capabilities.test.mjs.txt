@@ -1,0 +1,13 @@
+(node:47814) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ tool arguments preserve micro-units and reject unsupported authority (1.348209ms)
+✔ proposal confirmation is tab-bound, one-use, expires and rejects chain resets (0.725ms)
+✔ correction supersedes previous proposal and textual yes never signs (1.551083ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 188.260958

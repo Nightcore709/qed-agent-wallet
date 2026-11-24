@@ -1,0 +1,553 @@
+{
+ "at": "2026-11-24T13:43:44.519Z",
+ "base": "http://localhost:9950",
+ "runs": 68,
+ "violations": 0,
+ "broken": 0,
+ "results": [
+  {
+   "route": "/",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Good evening, Asha. Here is your money.",
+   "violations": []
+  },
+  {
+   "route": "/",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Good evening, Asha. Here is your money.",
+   "violations": []
+  },
+  {
+   "route": "/",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Good evening, Asha. Here is your money.",
+   "violations": []
+  },
+  {
+   "route": "/",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Good evening, Asha. Here is your money.",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/protect",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Protect",
+   "violations": []
+  },
+  {
+   "route": "/protect",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Protect",
+   "violations": []
+  },
+  {
+   "route": "/protect",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Protect",
+   "violations": []
+  },
+  {
+   "route": "/protect",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Protect",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/vault",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/treasury",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/treasury",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/treasury",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/treasury",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/mandate",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/mandate",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/mandate",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/mandate",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/convert",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/convert",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/convert",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/convert",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/policy",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/policy",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/policy",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/policy",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/records",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/records",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/records",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/vault/records",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "On-chain wallet. Test money, owned by passkey.",
+   "violations": []
+  },
+  {
+   "route": "/security",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Security and recovery",
+   "violations": []
+  },
+  {
+   "route": "/security",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Security and recovery",
+   "violations": []
+  },
+  {
+   "route": "/security",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Security and recovery",
+   "violations": []
+  },
+  {
+   "route": "/security",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Security and recovery",
+   "violations": []
+  },
+  {
+   "route": "/safeguards",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Safeguards",
+   "violations": []
+  },
+  {
+   "route": "/safeguards",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Safeguards",
+   "violations": []
+  },
+  {
+   "route": "/safeguards",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Safeguards",
+   "violations": []
+  },
+  {
+   "route": "/safeguards",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Safeguards",
+   "violations": []
+  },
+  {
+   "route": "/pay",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Spend",
+   "violations": []
+  },
+  {
+   "route": "/pay",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Spend",
+   "violations": []
+  },
+  {
+   "route": "/pay",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Spend",
+   "violations": []
+  },
+  {
+   "route": "/pay",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Spend",
+   "violations": []
+  },
+  {
+   "route": "/holdings",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Grow. What you own, and how far it could fall.",
+   "violations": []
+  },
+  {
+   "route": "/holdings",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Grow. What you own, and how far it could fall.",
+   "violations": []
+  },
+  {
+   "route": "/holdings",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Grow. What you own, and how far it could fall.",
+   "violations": []
+  },
+  {
+   "route": "/holdings",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Grow. What you own, and how far it could fall.",
+   "violations": []
+  },
+  {
+   "route": "/earn",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Earn",
+   "violations": []
+  },
+  {
+   "route": "/earn",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Earn",
+   "violations": []
+  },
+  {
+   "route": "/earn",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Earn",
+   "violations": []
+  },
+  {
+   "route": "/earn",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Earn",
+   "violations": []
+  },
+  {
+   "route": "/record/act_1m86t17w0nvrnr0a3qw",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Buy ₹200 of Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/record/act_1m86t17w0nvrnr0a3qw",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Buy ₹200 of Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/record/act_1m86t17w0nvrnr0a3qw",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Buy ₹200 of Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/record/act_1m86t17w0nvrnr0a3qw",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Buy ₹200 of Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/instructions/prg_1m86t14ce03mc3mwzry",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Invest ₹200 in Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/instructions/prg_1m86t14ce03mc3mwzry",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Invest ₹200 in Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/instructions/prg_1m86t14ce03mc3mwzry",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Invest ₹200 in Bitcoin in rupees",
+   "violations": []
+  },
+  {
+   "route": "/instructions/prg_1m86t14ce03mc3mwzry",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Invest ₹200 in Bitcoin in rupees",
+   "violations": []
+  }
+ ]
+}

@@ -1,0 +1,67 @@
+{
+ "320": {
+  "overflow": 0,
+  "small": [],
+  "focusStops": 43,
+  "underBars": [],
+  "chartFollows": "coindcx:BTCINR",
+  "focusInSheet": true,
+  "tabStaysInSheet": true,
+  "sheetText": "s order book at 18:51:44. This estimate holds for 60 more seconds; after that it cannot be signed. An estimate, not a fill: the order is checked again against prices and your balance when it is sent, and the fill is the venue's own price and time, shown on its record. The document's fingerprint is 911a3b24 d3a3faea; the same fingerprint is stored with whatever runs under it. Not now Approve and send with your passkey",
+  "sheetClosed": true,
+  "focusBack": "See what this would do",
+  "consoleErrors": []
+ },
+ "375": {
+  "overflow": 0,
+  "small": [],
+  "focusStops": 43,
+  "underBars": [],
+  "chartFollows": "coindcx:BTCINR",
+  "focusInSheet": true,
+  "tabStaysInSheet": true,
+  "sheetText": "s order book at 18:51:47. This estimate holds for 60 more seconds; after that it cannot be signed. An estimate, not a fill: the order is checked again against prices and your balance when it is sent, and the fill is the venue's own price and time, shown on its record. The document's fingerprint is c0508a0a bd563612; the same fingerprint is stored with whatever runs under it. Not now Approve and send with your passkey",
+  "sheetClosed": true,
+  "focusBack": "See what this would do",
+  "consoleErrors": []
+ },
+ "390": {
+  "overflow": 0,
+  "small": [],
+  "focusStops": 43,
+  "underBars": [],
+  "chartFollows": "coindcx:BTCINR",
+  "focusInSheet": true,
+  "tabStaysInSheet": true,
+  "sheetText": "s order book at 18:51:54. This estimate holds for 60 more seconds; after that it cannot be signed. An estimate, not a fill: the order is checked again against prices and your balance when it is sent, and the fill is the venue's own price and time, shown on its record. The document's fingerprint is 3247967b 50943a56; the same fingerprint is stored with whatever runs under it. Not now Approve and send with your passkey",
+  "sheetClosed": true,
+  "focusBack": "See what this would do",
+  "consoleErrors": []
+ },
+ "640": {
+  "overflow": 0,
+  "small": [],
+  "focusStops": 44,
+  "underBars": [],
+  "chartFollows": "coindcx:BTCINR",
+  "focusInSheet": true,
+  "tabStaysInSheet": true,
+  "sheetText": "s order book at 18:51:57. This estimate holds for 60 more seconds; after that it cannot be signed. An estimate, not a fill: the order is checked again against prices and your balance when it is sent, and the fill is the venue's own price and time, shown on its record. The document's fingerprint is a8298f27 e0b5c9c2; the same fingerprint is stored with whatever runs under it. Not now Approve and send with your passkey",
+  "sheetClosed": true,
+  "focusBack": "See what this would do",
+  "consoleErrors": []
+ },
+ "1280": {
+  "overflow": 0,
+  "small": [],
+  "focusStops": 44,
+  "underBars": [],
+  "chartFollows": "coindcx:BTCINR",
+  "focusInSheet": true,
+  "tabStaysInSheet": true,
+  "sheetText": "s order book at 18:51:50. This estimate holds for 60 more seconds; after that it cannot be signed. An estimate, not a fill: the order is checked again against prices and your balance when it is sent, and the fill is the venue's own price and time, shown on its record. The document's fingerprint is 2d4f9265 40d2d1ca; the same fingerprint is stored with whatever runs under it. Not now Approve and send with your passkey",
+  "sheetClosed": true,
+  "focusBack": "See what this would do",
+  "consoleErrors": []
+ }
+}

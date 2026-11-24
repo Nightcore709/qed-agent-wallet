@@ -1,0 +1,53 @@
+TAP version 13
+# Subtest: configurable contracts: escrow/KKT, clearing, delegated payment, protected liability, Groth16, execution bounty
+    # Subtest: portfolio
+    ok 1 - portfolio
+      ---
+      duration_ms: 123.465167
+      type: 'test'
+      ...
+    # Subtest: clearing
+    ok 2 - clearing
+      ---
+      duration_ms: 183.083583
+      type: 'test'
+      ...
+    # Subtest: payment
+    ok 3 - payment
+      ---
+      duration_ms: 100.394833
+      type: 'test'
+      ...
+    # Subtest: liability
+    ok 4 - liability
+      ---
+      duration_ms: 2666.882208
+      type: 'test'
+      ...
+    # Subtest: private_portfolio
+    ok 5 - private_portfolio
+      ---
+      duration_ms: 1488.888
+      type: 'test'
+      ...
+    # Subtest: execution_bounty
+    ok 6 - execution_bounty
+      ---
+      duration_ms: 80.430917
+      type: 'test'
+      ...
+    1..6
+ok 1 - configurable contracts: escrow/KKT, clearing, delegated payment, protected liability, Groth16, execution bounty
+  ---
+  duration_ms: 6048.447041
+  type: 'test'
+  ...
+1..1
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10625.088958

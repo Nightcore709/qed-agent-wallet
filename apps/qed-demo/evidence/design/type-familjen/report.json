@@ -1,0 +1,10 @@
+{
+ "/ 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/protect 1440 light": {
+  "errors": [],
+  "fault": false
+ }
+}

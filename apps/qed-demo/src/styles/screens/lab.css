@@ -1,0 +1,140 @@
+/* The Portfolio lab (/holdings/lab, src/screens/Lab.tsx, R12); design system "Meridian", DESIGN.md M4 and M6. A command
+   grid in order of importance: the mix beside what watches it, the promises, the simulation on recorded prices, the
+   study, a dollar liability, the terms. Every class is the lab's own (lb-); shared ones are only ever scoped under
+   .lb-page. Loaded with the screen's code, so pages that never open the lab never download it. Tokens only. */
+
+.lb-page { display: grid; gap: var(--s5); min-width: 0; }
+.lb-page > * { min-width: 0; }
+.lb-head { margin-bottom: 0; }
+.lb-head h1 .dim { color: var(--ink-3); font-weight: 560; }
+.lb-head h1 { max-width: 20ch; }
+.lb-acts { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.lb-disclaimer { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-small); color: var(--ink-2); }
+.lb-disclaimer svg { width: 16px; height: 16px; flex: none; color: var(--qed); }
+
+/* what a figure is: one chip per panel, in words; colour only repeats them */
+.lb-chip { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--r-pill); font-size: var(--t-micro); font-weight: 620; color: var(--ink); border: 1px solid var(--rule-2); background: color-mix(in oklab, var(--pane) 70%, transparent); white-space: nowrap; }
+.lb-chip.books { border-color: color-mix(in oklab, var(--ink) 35%, transparent); }
+.lb-chip.research { border-style: solid; border-color: color-mix(in oklab, var(--ink) 30%, transparent); }
+.lb-chip.simulation { border-style: dashed; }
+.lb-chip.illustration { border-style: dotted; }
+.lb-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+
+.lb-page .panel-head h2 { display: inline-flex; align-items: center; gap: 8px; }
+.lb-page .panel-head h2 svg { width: 18px; height: 18px; color: var(--ink-2); }
+.lb-lead { font-size: var(--t-fig-m); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; }
+.lb-lead.out { color: var(--due); }
+.lb-lead-s { font-size: var(--t-lead); font-weight: 560; color: var(--ink); max-width: 72ch; line-height: 1.45; }
+.lb-sub { margin-top: var(--s2); color: var(--ink-2); max-width: 66ch; }
+.lb-note { margin-top: var(--s3); font-size: var(--t-small); color: var(--ink-2); max-width: 78ch; line-height: 1.5; }
+.lb-note a + a { margin-left: var(--s3); }
+.lb-h3 { margin-top: var(--s5); font-size: var(--t-body); font-weight: 650; color: var(--ink); display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.lb-notes { display: grid; gap: 6px; padding-left: 1.1em; font-size: var(--t-small); color: var(--ink-2); max-width: 82ch; }
+.lb-notes li { list-style: disc; }
+
+/* the two lead panels share a row on a computer and stack on a phone, the mix first */
+.lb-top { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: var(--s5); align-items: stretch; }
+.lb-facts { display: grid; gap: var(--s3); margin-top: var(--s5); }
+.lb-facts li { display: grid; gap: 2px; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 60%, transparent); }
+.lb-facts b { font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+.lb-facts span { font-size: var(--t-small); color: var(--ink-2); }
+.lb-mix .btn { margin-top: var(--s4); }
+.lb-mix { background: radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--glow-a) 30%, transparent), transparent 62%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+
+/* each holding's share against its target, inside the band */
+.lb-legs { display: grid; gap: var(--s4); margin-top: var(--s5); }
+.lb-leg-row { display: flex; justify-content: space-between; gap: var(--s3); align-items: baseline; }
+.lb-leg-name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.lb-leg-fig { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; font-weight: 620; }
+.lb-leg-sub { margin-top: 4px; font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.lb-bar { position: relative; height: 12px; margin-top: 6px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--well) 70%, transparent); box-shadow: inset 0 0 0 1px var(--rule); }
+.lb-band { position: absolute; top: -3px; bottom: -3px; border-radius: 4px; background: var(--hatch), color-mix(in oklab, var(--ink) 5%, transparent); box-shadow: inset 0 0 0 1px var(--rule-2); }
+.lb-fill { position: absolute; left: 0; top: 2px; bottom: 2px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--c1) 88%, transparent); }
+.lb-fill.out { background: color-mix(in oklab, var(--due) 75%, transparent); }
+.lb-target { position: absolute; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--ink); }
+.lb-key { margin-top: var(--s4); display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--s3); font-size: var(--t-micro); color: var(--ink-2); }
+.lb-key-fill, .lb-key-band, .lb-key-target { display: inline-block; width: 14px; height: 10px; border-radius: 3px; vertical-align: -1px; }
+.lb-key-fill { background: color-mix(in oklab, var(--c1) 88%, transparent); }
+.lb-key-band { background: var(--hatch), color-mix(in oklab, var(--ink) 5%, transparent); box-shadow: inset 0 0 0 1px var(--rule-2); }
+.lb-key-target { width: 2px; height: 12px; background: var(--ink); }
+
+.lb-trades { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.lb-trades h3 { font-size: var(--t-body); font-weight: 650; margin-bottom: var(--s3); }
+.lb-scroll { overflow-x: auto; }
+.lb-table { min-width: 34rem; }
+.lb-table.compact { min-width: 22rem; }
+.lb-page .lb-table th, .lb-page .lb-table td { font-size: var(--t-small); font-variant-numeric: tabular-nums lining-nums; }
+.lb-page .lb-table th .sub, .lb-page .lb-table td .sub { display: block; margin-top: 2px; font-size: var(--t-micro); font-weight: 430; color: var(--ink-2); white-space: normal; }
+.lb-page .lb-table tfoot th, .lb-page .lb-table tfoot td { font-weight: 650; border-top: 1px solid var(--rule-2); padding: var(--s3); }
+/* a row's own heading reads as the row's first cell, not as a column head */
+.lb-page .lb-table tbody th, .lb-page .lb-table tfoot th { background: none; border-radius: 0; font-weight: 600; color: var(--ink); white-space: normal; letter-spacing: normal; text-align: left; border-bottom: 1px solid var(--rule); padding: var(--s3); padding-left: var(--s4); vertical-align: top; }
+.lb-page .lb-table tbody tr:last-child th { border-bottom: 0; }
+.lb-propose { margin-top: var(--s5); display: grid; justify-items: start; gap: 0; }
+
+/* monitoring: four tiles, then the ladder of cash */
+.lb-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+.lb-page .lb-tiles .tile { display: grid; align-content: start; gap: 4px; }
+.lb-page .lb-tiles .k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.lb-page .lb-tiles .v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; }
+.lb-page .lb-tiles .s { font-size: var(--t-micro); color: var(--ink-2); line-height: 1.4; }
+.lb-page .lb-tiles .tile.lb-warn { border-color: color-mix(in oklab, var(--due) 45%, transparent); }
+.lb-ladder { display: grid; gap: 2px; margin-top: var(--s2); }
+.lb-ladder li { display: flex; justify-content: space-between; gap: var(--s3); padding: 7px 0; border-bottom: 1px solid var(--rule); font-size: var(--t-small); color: var(--ink-2); }
+.lb-ladder li b { color: var(--ink); font-weight: 620; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+
+/* certificates */
+.lb-declare { display: flex; gap: var(--s3); align-items: flex-start; padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rule-2); background: color-mix(in oklab, var(--pane-2) 60%, transparent); cursor: pointer; }
+.lb-declare input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--act); }
+.lb-declare .muted { display: block; font-size: var(--t-small); margin-top: 2px; }
+.lb-certs .lb-notes { margin-top: var(--s3); }
+.lb-cert-group { display: grid; gap: var(--s3); margin-top: var(--s5); }
+.lb-group-h { font-size: var(--t-body); font-weight: 650; }
+
+/* charts: a lit line per strategy over a faint grid; the table beside it is the exact equivalent */
+.lb-chart { margin: var(--s4) 0 0; min-width: 0; }
+.lb-chart > svg { display: block; overflow: visible; max-width: 100%; }
+.lb-grid { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.lb-axis { fill: var(--ink-2); font-size: var(--t-micro); font-family: var(--font); font-variant-numeric: tabular-nums lining-nums; }
+.lb-chart figcaption { display: grid; gap: 4px; margin-top: var(--s2); font-size: var(--t-micro); }
+.lb-legend { display: flex; flex-wrap: wrap; gap: 4px var(--s4); color: var(--ink); font-weight: 560; }
+.lb-swatch { display: inline-block; width: 22px; height: 6px; margin-right: 6px; vertical-align: 2px; }
+.lb-eval .lb-scroll, .lb-study .lb-scroll { margin-top: var(--s4); }
+
+.lb-twin { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5); margin-top: var(--s2); }
+.lb-twin .lb-table { margin-top: var(--s3); }
+.lb-prov { margin-top: var(--s5); }
+.lb-prov summary { cursor: pointer; font-size: var(--t-small); font-weight: 600; color: var(--brand); }
+.lb-files { display: grid; gap: 4px; margin-top: var(--s3); font-size: var(--t-micro); color: var(--ink); overflow-wrap: anywhere; }
+.lb-files code { font-size: var(--t-micro); }
+
+/* a dollar liability */
+.lb-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s3) var(--s4); margin-top: var(--s4); }
+.lb-form > * { flex: 1 1 12rem; }
+.lb-form > .btn { flex: 0 0 auto; }
+.lb-hedge-out { display: grid; gap: var(--s4); margin-top: var(--s5); }
+.lb-page .lb-hedge-out .tile { display: grid; align-content: start; gap: 6px; }
+.lb-page .lb-hedge-out .tile .k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.lb-page .lb-hedge-out .tile .v { font-size: var(--t-fig-s); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+.lb-page .lb-hedge-out .tile .s { font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.lb-hedge-study { margin-top: var(--s5); }
+
+/* terms */
+.lb-term-list { display: grid; gap: var(--s3); }
+.lb-term-list li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: var(--s3); align-items: start; font-size: var(--t-small); }
+.lb-term-list .sub { display: block; margin-top: 2px; font-size: var(--t-micro); color: var(--ink-2); }
+.lb-status { justify-self: start; font-size: var(--t-micro); font-weight: 650; padding: 2px 10px; border-radius: var(--r-pill); border: 1px solid var(--rule-2); color: var(--ink); text-transform: capitalize; }
+.lb-status.verified, .lb-status.calibrated { color: var(--gain); border-color: color-mix(in oklab, var(--gain) 40%, transparent); }
+.lb-status.unverified, .lb-status.modelled { color: var(--due); border-color: color-mix(in oklab, var(--due) 40%, transparent); }
+
+@media (max-width: 1080px) { .lb-top { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 340px) { .lb-tiles { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 720px) {
+  .lb-twin { grid-template-columns: minmax(0, 1fr); }
+  .lb-lead { font-size: var(--t-fig-s); }
+  .lb-term-list li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
+
+/* The allocator (R13): how the shares are chosen, and the evidence for a mix other than equal shares */
+.lb-policy { margin: var(--s3) 0 var(--s4); max-width: 46ch; }
+.lb-evidence { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.lb-evidence h3 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); margin-bottom: var(--s3); }

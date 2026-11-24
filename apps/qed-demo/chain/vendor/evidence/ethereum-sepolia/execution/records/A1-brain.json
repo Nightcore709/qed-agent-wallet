@@ -1,0 +1,13 @@
+{
+  "input": "Move 20 tUSD of this month's revenue into the euro reserve — CloudCo's euro invoices are due next week.",
+  "engine": "anthropic:claude-sonnet-5-5",
+  "output": "{\"intent\":\"pay\",\"reply\":\"Understood. I'm proposing a payment of 20 tUSD to Euro reserve, an approved payee. It's within your daily cap of 100 tUSD, and 100 tUSD is currently free. The guard and co-signer will re-check it before anything executes. Please confirm to proceed.\",\"proposal\":{\"kind\":\"pay\",\"payeeLabel\":\"Euro reserve\",\"amountUsd\":20,\"dueInDays\":7,\"memo\":\"Move this month's revenue into euro reserve ahead of CloudCo euro invoices due next week\"},\"clarify\":null,\"flags\":[],\"confidence\":0.93}",
+  "guarded": {
+    "intent": "pay",
+    "payee": "0x6fb7178744fa0b76be8ec9bb58a262e541bd9c53",
+    "amount": "20000000",
+    "flags": [],
+    "needsConfirmation": true,
+    "reply": "Proposed: pay 20.00 tUSD to Euro reserve as a ring-fenced forward payment due in 7 day(s). After this, free balance would be 80.00 tUSD and 0.00 tUSD stays ring-fenced. This moves money, so I need your explicit confirmation — reply \"confirm\" or \"cancel\"."
+  }
+}

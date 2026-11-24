@@ -1,0 +1,167 @@
+/* Home (Meridian, DESIGN.md M7): a command grid on twelve columns. Row one: the position (what is free, kept, held, and
+   what QED may move) beside what needs the owner. Row two: the balance at worst over the coming days beside what QED
+   may do. Row three: the day book beside where the money is. Each row's panels share one height by design: the position
+   spreads its figures, the side panels end in their own foot. */
+
+.home { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
+/* the head: the greeting on the left; beside it, as wide as the three actions in one row, what QED is doing today and
+   what the owner can do, set on the greeting's last line (R12: the space beside the greeting, composed, not filled) */
+.hm-head { display: grid; grid-template-columns: minmax(0, 1fr) fit-content(52%); column-gap: var(--s8); row-gap: var(--s4); align-items: end; margin-bottom: 0; }
+.hm-head h1 { max-width: 20ch; }
+.hm-head h1 .dim { color: var(--ink-3); font-weight: 560; }
+.hm-now { display: grid; gap: var(--s4); align-content: end; min-width: 0; padding-bottom: 6px; }
+/* the sentence takes the actions' width and adds none of its own */
+.hm-now p { contain: inline-size; margin-top: 0; max-width: none; font-size: var(--t-body); color: var(--ink-2); }
+.hm-when { color: var(--ink); font-weight: 600; }
+.hm-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+
+/* two independent columns (useMasonry, kit.tsx): the main one for the position, the horizon and the day book, the side
+   one for what needs the owner, what QED may do, where the money is and ways to do better; the document keeps the order
+   of importance, which is the reading order on a phone */
+.hm-grid.board { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); column-gap: var(--s5); }
+.hm-grid.board > * { margin-bottom: var(--s5); }
+.hm-position, .hm-needs, .hm-authority { display: flex; flex-direction: column; }
+
+/* ------------------------------------------------------------------------------------------------ the position */
+.hm-position { container-type: inline-size; padding: var(--s6) var(--s6) var(--s5); background: radial-gradient(90% 70% at 0% 0%, color-mix(in oklab, var(--glow-a) 38%, transparent), transparent 62%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.hm-pos-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.hm-pos-head h2 { font-size: var(--t-body); font-weight: 600; color: var(--ink-2); letter-spacing: -.005em; }
+.hm-hero { margin-top: var(--s2); font-size: var(--t-fig-hero); line-height: .95; font-weight: 640; letter-spacing: var(--track-hero); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.hm-hero .paise { font-size: .42em; opacity: 1; color: var(--ink-3); letter-spacing: -.02em; }
+.hm-hero.short { color: var(--loss); }
+.hm-hero-sub { margin-top: var(--s3); color: var(--ink-2); max-width: 52ch; }
+.hm-bar-wrap { display: grid; gap: var(--s2); margin-top: var(--s6); }
+/* the bar's sum, its parts' materials beside their figures */
+.hm-sum { font-size: var(--t-small); color: var(--ink-3); line-height: 1.6; font-variant-numeric: tabular-nums lining-nums; }
+.hm-sum .mbar-sw { margin-right: 6px; vertical-align: -1px; }
+.hm-sum b { color: var(--ink-2); font-weight: 620; white-space: nowrap; }
+.hm-sum b.short { color: var(--loss); }
+.hm-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); margin-top: var(--s5); }
+.hm-tiles .tile { display: grid; align-content: start; gap: 4px; }
+/* QED's tile is told by its tint and its span swatch, not by a coloured outline (R13: no lit outline beside a bar) */
+.hm-tiles .tile.qed { background: linear-gradient(160deg, var(--qed-bg), transparent 70%), color-mix(in oklab, var(--pane-2) 70%, transparent); }
+.hm-tiles .k { display: inline-flex; align-items: center; gap: 7px; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.hm-tiles .v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; }
+.hm-tiles .s { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+
+/* ------------------------------------------------------------------------------------------------ what needs the owner */
+.hm-needs .panel-head { align-items: center; justify-content: flex-start; }
+.hm-needs-list { display: grid; gap: var(--s3); align-content: start; }
+.need { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 72%, transparent); border: 1px solid var(--rim); }
+.need.urgent { background: linear-gradient(160deg, var(--due-bg), transparent 75%), color-mix(in oklab, var(--pane-2) 72%, transparent); border-color: color-mix(in oklab, var(--due) 34%, transparent); }
+.need-body h3 { font-size: var(--t-body); font-weight: 650; letter-spacing: -.012em; }
+.need-body .d { margin-top: 4px; color: var(--ink-2); font-size: var(--t-small); line-height: 1.5; }
+.need-body .d.clamped p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.need-body .d .more { font-size: var(--t-small); margin-top: 2px; }
+.need-when { margin-top: 6px; font-size: var(--t-small); color: var(--ink-3); }
+.need-when b { color: var(--due); font-weight: 650; }
+.need-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.need.setup-steps { background: color-mix(in oklab, var(--pane-2) 60%, transparent); }
+.need.setup-steps h3 .faint { font-weight: 500; margin-left: 6px; }
+.hm-steps { display: grid; gap: 2px; margin: var(--s2) 0; }
+.hm-steps li { font-size: var(--t-small); }
+.hm-steps li > a { display: grid; grid-template-columns: 18px minmax(0, 1fr) 14px; align-items: center; gap: var(--s2); min-height: 34px; }
+.hm-steps li.done svg { width: 15px; height: 15px; color: var(--gain); }
+.hm-steps li.done { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: var(--s2); min-height: 34px; color: var(--ink-3); }
+.hm-steps a { color: var(--ink); text-decoration: none; border-radius: var(--r-sm); padding: 0 6px; margin: 0 -6px; }
+.hm-steps a:hover { background: var(--pane-2); }
+.hm-steps a i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--ink-3); }
+.hm-steps a svg { width: 14px; height: 14px; color: var(--ink-3); }
+.hm-calm { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4); align-items: start; padding: var(--s4); border-radius: var(--r-md); background: linear-gradient(160deg, var(--qed-bg), transparent 70%); border: 1px solid var(--qed-line); color: var(--ink-2); font-size: var(--t-small); line-height: 1.55; }
+
+/* ------------------------------------------------------------------------------------------------ what QED may do */
+.hm-lanes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
+.hm-lanes li { padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.hm-lanes li:first-child { border-top: 0; padding-top: 0; }
+.ln-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px var(--s3); }
+.ln-t { color: var(--ink); font-weight: 620; font-size: var(--t-small); text-decoration: none; line-height: 1.35; }
+.ln-t:hover { text-decoration: underline; }
+.ln-mode { flex: none; font-size: var(--t-micro); font-weight: 650; color: var(--qed); white-space: nowrap; }
+.ln-mode.m-approve { color: var(--due); } .ln-mode.m-watch { color: var(--hold); } .ln-mode.m-paused { color: var(--ink-3); } .ln-mode.m-chain { color: var(--gain); }
+.hm-lanes .meter { margin-top: var(--s2); }
+.ln-s { margin-top: 6px; font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+.ln-s b { color: var(--ink-2); font-weight: 650; }
+.hm-more-line { margin-top: var(--s3); }
+
+/* ------------------------------------------------------------------------------------------------ the day book */
+.hm-col-h { font-size: var(--t-micro); font-weight: 650; color: var(--ink-3); letter-spacing: .02em; margin: var(--s2) 0 var(--s2); }
+.hm-days { display: grid; }
+.hm-days li { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: var(--s3); align-items: baseline; padding: 10px 0; border-top: 1px solid var(--rule); }
+.hm-days li:first-child { border-top: 0; }
+.hm-days .when { font-size: var(--t-small); color: var(--ink-2); font-weight: 560; display: grid; }
+.hm-days .when small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 450; }
+.hm-days .what { min-width: 0; font-weight: 600; font-size: var(--t-body); letter-spacing: -.008em; display: grid; gap: 2px; }
+.hm-days .what a { color: var(--ink); text-decoration: none; }
+.hm-days .what a:hover { text-decoration: underline; }
+.hm-days .why { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); line-height: 1.4; }
+.hm-days .why.due { color: var(--due); font-weight: 600; }
+.hm-days .amt { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; display: grid; letter-spacing: -.01em; }
+.hm-days .amt.in { color: var(--gain); }
+.hm-days .amt small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 450; }
+.hm-empty-line { padding: var(--s2) 0; }
+.hm-today { display: flex; align-items: center; gap: var(--s3); margin: var(--s4) 0 var(--s2); font-size: var(--t-micro); font-weight: 700; color: var(--brand); }
+.hm-today::before, .hm-today::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
+
+/* ------------------------------------------------------------------------------------------------ where the money is */
+.hm-net { display: grid; gap: 2px; padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 72%, transparent); border: 1px solid var(--rim); margin-bottom: var(--s4); }
+.hm-net span { font-size: var(--t-small); color: var(--ink-2); font-weight: 600; }
+.hm-net { container-type: inline-size; }
+.hm-net b { font-size: var(--t-fig-m-fit); white-space: nowrap; font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.05; font-variant-numeric: tabular-nums lining-nums; }
+.hm-net b.neg { color: var(--loss); }
+.hm-net small { font-size: var(--t-micro); color: var(--ink-3); }
+.hm-book { display: grid; }
+.hm-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4); padding: 9px 0; border-top: 1px solid var(--rule); }
+.hm-row:first-child { border-top: 0; }
+.hm-row .nw { display: grid; min-width: 0; gap: 1px; }
+.hm-row .n { font-weight: 620; font-size: var(--t-small); }
+.hm-row .n a { color: var(--ink); text-decoration: none; } .hm-row .n a:hover { text-decoration: underline; }
+.hm-row .w { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+.hm-row .val { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; display: grid; font-size: var(--t-small); }
+.hm-row .val small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 450; }
+.hm-row .val.quiet { color: var(--ink-3); font-weight: 500; }
+.hm-total { display: flex; justify-content: space-between; gap: var(--s3); margin: var(--s1) 0 var(--s4); padding-top: var(--s2); border-top: 1px solid var(--rule-2); font-size: var(--t-small); color: var(--ink-2); }
+.hm-total b { color: var(--ink); font-weight: 680; font-variant-numeric: tabular-nums lining-nums; }
+
+/* ------------------------------------------------------------------------------------------------ ways to do better */
+.hm-better-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--s3); }
+.hm-better-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 72%, transparent); border: 1px solid var(--rim); }
+.hm-better-list li .btn { grid-column: 2; justify-self: start; }
+.hm-better-list h3 { font-size: var(--t-body); }
+.hm-better-none { max-width: 76ch; }
+
+/* side by side down to 900 px (R13: from 760 to 1099 px the head stacked and left the right half of the stage empty
+   beside the greeting), the actions a little tighter there so the three keep one row; stacked below that, the three
+   share the width in equal cells, never a short row */
+@media (min-width: 900px) and (max-width: 1099px) { .hm-acts { gap: 6px; } .hm-acts .btn { padding: 0 var(--s3); } }
+@media (max-width: 899px) {
+  .hm-head { grid-template-columns: minmax(0, 1fr); }
+  .hm-now p { contain: none; max-width: 64ch; }
+  .hm-acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 759px) {
+  .home { gap: var(--s5); }
+  .hm-grid { gap: var(--s4); }
+  .hm-now { gap: var(--s3); padding-bottom: 0; }
+  /* the one primary action across the width, the two others sharing the row under it: never one left alone */
+  .hm-acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hm-acts .btn { padding: 0 var(--s3); }
+  .hm-acts .btn.fill { grid-column: 1 / -1; }
+  .hm-position { padding: var(--s5) var(--s4) var(--s4); }
+  /* the hero never wider than its panel, at any text size the browser is set to (R12: at 24 px it pushed the page wider) */
+  .hm-hero { font-size: var(--t-fig-hero-fit); }
+  /* the three figures under the bar as rows of one list, not three tall cards */
+  .hm-tiles { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: var(--s4); border-top: 1px solid var(--rule); }
+  .hm-tiles .tile, .hm-tiles .tile.qed { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 2px var(--s3); padding: var(--s3) 0; background: none; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; }
+  .hm-tiles .tile:last-child { border-bottom: 0; padding-bottom: 0; }
+  .hm-tiles .v { font-size: var(--t-lead); text-align: right; white-space: nowrap; }
+  .hm-tiles .s { grid-column: 1 / -1; }
+  .hm-days li { grid-template-columns: minmax(0, 1fr) auto; }
+  .hm-days .when { grid-column: 1 / -1; grid-template-columns: auto auto; justify-content: start; gap: 6px; }
+}
+
+/* Text enlarged to 200% on a 320 px screen (R13 leftovers, checked with the root size at 200%): what grows with the text gives way to the width. */
+@media (max-width: 479px) {
+  .hm-row, .hm-row .nw, .hm-total, .hm-total b { min-width: 0; }
+  .hm-row > * { overflow-wrap: anywhere; }
+  .hm-total { flex-wrap: wrap; }
+}

@@ -1,0 +1,519 @@
+/* Earn (Meridian, DESIGN.md M1 to M11). A command grid read top to bottom: the head (drawn before any data); what is held
+   in escrow for you across the page (the hero figure, its sentence and the work at true scale with the held part
+   bracketed on the left, its four parts as tiles on the right); who acts next, one numbered sequence (the owner's moves
+   in any part it plays, then the others', the soonest deadline first); then two chapters, the work on paper and the work through the escrow
+   on the chain, each job a glass card read as one journey: its milestones on one route of five stations (Offer, Escrow,
+   Work, Decision or Check, Settled), the stations passed drawn solid, the station where each waits lit in the colour of
+   whose move it is; then money in, one day book around today.
+   Tokens only; every class is this screen's own (er-); a shared class is used, never redefined. */
+
+.earn { display: grid; gap: var(--s6); }
+.er-head { margin-bottom: 0; }
+
+/* ------------------------------------------------------------------------------------------------ what is held for you
+   across the page: the hero, its sentence and the work at true scale on the left, its four parts as tiles on the right */
+.er-position { padding: var(--s6) var(--s6) var(--s5); background: radial-gradient(70% 90% at 0% 0%, color-mix(in oklab, var(--glow-a) 34%, transparent), transparent 62%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.er-pos-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--s5) var(--s10); align-items: center; }
+/* nothing on paper yet: the figure and its sentence alone (Earn's own name: a bare .solo is the shell's full-screen layout) */
+.er-pos-main.er-pos-solo { grid-template-columns: minmax(0, 1fr); }
+.er-pos-fig { min-width: 0; }
+.er-pos-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.er-pos-head h2 { font-size: var(--t-body); font-weight: 600; color: var(--ink-2); letter-spacing: -.005em; }
+.er-hero { margin-top: var(--s2); font-size: var(--t-fig-hero); line-height: .95; font-weight: 640; letter-spacing: var(--track-hero); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.er-hero .paise { opacity: 1; color: var(--ink-3); }
+.er-hero.none { color: var(--ink-3); }
+.er-hero-sub { margin-top: var(--s3); max-width: 56ch; color: var(--ink-2); }
+
+/* the work on paper at true scale: paid, held (yours, the client's, disputed), back; the bracket is the held part */
+.er-bar { position: relative; height: 14px; margin-top: var(--s6); }
+.er-segs { display: flex; gap: 3px; height: 100%; border-radius: var(--r-pill); overflow: hidden; animation: er-reveal var(--d4) var(--ease-out) both; }
+@keyframes er-reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.er-seg { display: block; height: 100%; min-width: 3px; border-radius: 3px; }
+.er-seg.paid { background: linear-gradient(90deg, var(--gain), color-mix(in oklab, var(--gain) 74%, transparent)); box-shadow: 0 0 16px -2px color-mix(in oklab, var(--gain) 34%, transparent); }
+.er-seg.you { background: var(--due-mark); }
+.er-seg.them { background: var(--hold-bg); box-shadow: inset 0 0 0 1.5px var(--hold); }
+.er-seg.disputed { background: var(--hatch), color-mix(in oklab, var(--loss) 26%, transparent); box-shadow: inset 0 0 0 1.5px var(--loss); }
+.er-seg.back { background: var(--hatch); box-shadow: inset 0 0 0 1px var(--edge); }
+.er-seg.open { background: color-mix(in oklab, var(--well) 80%, transparent); box-shadow: inset 0 0 0 1px var(--edge); }
+.er-bracket { position: absolute; top: -8px; height: 30px; border: 2px solid var(--ink-2); border-bottom: 0; border-radius: 8px 8px 0 0; pointer-events: none; }
+.er-pos-sum { margin-top: var(--s3); font-size: var(--t-small); color: var(--ink-3); line-height: 1.5; font-variant-numeric: tabular-nums lining-nums; }
+.er-pos-sum strong { color: var(--ink-2); font-weight: 620; }
+.er-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+.er-tiles .tile { display: grid; align-content: start; gap: 4px; }
+.er-tiles .k { display: flex; align-items: center; gap: 7px; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.er-tiles .v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.er-tiles .s { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+.er-tiles .s .er-sw { margin-right: 6px; }
+.er-sw { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 3px; vertical-align: -1px; }
+.er-sw.paid { background: var(--gain); }
+.er-sw.you { background: var(--due-mark); }
+.er-sw.them { background: var(--hold-bg); box-shadow: inset 0 0 0 1.5px var(--hold); }
+.er-sw.disputed { background: var(--hatch), color-mix(in oklab, var(--loss) 26%, transparent); box-shadow: inset 0 0 0 1.5px var(--loss); }
+.er-sw.back { background: var(--hatch); box-shadow: inset 0 0 0 1px var(--edge); }
+.er-sw.open { background: var(--well); box-shadow: inset 0 0 0 1px var(--edge); }
+.er-pos-chain { margin-top: var(--s4); padding-top: var(--s3); border-top: 1px solid var(--rule); color: var(--ink-2); }
+.er-pos-chain a { display: inline-block; padding-block: 3px; margin-block: -3px; font-weight: 600; }
+
+/* who acts next: one sequence of numbered steps, every move the owner makes first (in any part it plays), then the
+   others', the soonest deadline first in each. Every step reads in the same order on the same columns, named once above
+   them on a computer: its number; whose move, a dot in the colour of the part; the move over its milestone and job; by
+   when, and under it what happens if nobody acts; where its step stands; the amount. The whole step is one target that
+   opens its milestone. Narrower, the same parts stack in the same order beside the number. */
+.er-next { --er-seq-cols: 28px minmax(140px, 176px) minmax(0, 1fr) minmax(200px, 264px) 176px 112px 16px; display: grid; gap: var(--s4); padding: var(--s5) var(--s6); }
+.er-next-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s1) var(--s4); }
+.er-next-head h2 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; }
+.er-seq-cols { display: grid; grid-template-columns: var(--er-seq-cols); grid-template-areas: "n who do by st amt to"; column-gap: var(--s4); padding: 0 var(--s3); font-size: var(--t-micro); font-weight: 600; color: var(--ink-3); }
+.er-seq-cols > :nth-child(1) { grid-area: who; }
+.er-seq-cols > :nth-child(2) { grid-area: do; }
+.er-seq-cols > :nth-child(3) { grid-area: by; }
+.er-seq-cols > :nth-child(4) { grid-area: st; }
+.er-seq-cols > :nth-child(5) { grid-area: amt; text-align: right; }
+.er-seq-group { display: grid; min-width: 0; }
+.er-seq-group + .er-seq-group { margin-top: var(--s3); }
+.er-seq-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s3); padding: var(--s2) 0; border-bottom: 1px solid var(--rule-2); }
+.er-seq-h h3 { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--t-small); font-weight: 650; color: var(--ink); }
+.er-seq-count { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: var(--r-pill); border: 1px solid var(--rim); background: var(--pane-2); font-size: var(--t-micro); font-weight: 680; color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.g-yours .er-seq-count { border-color: color-mix(in oklab, var(--due) 26%, transparent); background: var(--due-bg); color: var(--due); }
+.er-seq { display: grid; }
+/* the colour of whose move: amber for the owner's own and both sides', blue for the paper client's, neutral for the
+   mediator's and for others; the words always say it too */
+.er-step { --er-c: var(--ink-3); border-bottom: 1px solid var(--rule); }
+.er-step:is(.w-you, .w-earner, .w-both) { --er-c: var(--due-mark); }
+.er-step.w-client { --er-c: var(--hold); }
+.er-step.w-mediator { --er-c: var(--ink-2); }
+/* the second row takes any height a long move needs, so a deadline and what happens without it stay together */
+.er-step-go { display: grid; grid-template-columns: var(--er-seq-cols); grid-template-areas: "n who do by st amt to" "n who do then st amt to"; grid-template-rows: auto 1fr; column-gap: var(--s4); row-gap: 2px; align-items: start; min-height: 56px; padding: 12px var(--s3); border-radius: var(--r-sm); color: var(--ink); text-decoration: none; transition: background-color var(--d1) var(--ease-out); }
+.er-step-go:hover { background: var(--pane-2); text-decoration: none; }
+.er-step-n { grid-area: n; display: grid; place-items: center; width: 28px; height: 28px; margin-top: -3px; border-radius: 50%; border: 1px solid var(--rule-2); font-size: var(--t-micro); font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.g-yours .er-step-n { border-color: color-mix(in oklab, var(--due) 34%, transparent); background: var(--due-bg); color: var(--due); }
+.er-step-who { grid-area: who; display: flex; align-items: baseline; gap: var(--s2); min-width: 0; padding-top: 2px; font-size: var(--t-small); font-weight: 650; line-height: 1.35; color: var(--ink-2); overflow-wrap: anywhere; }
+.er-step-who i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--er-c); transform: translateY(-1px); }
+.er-step:is(.w-you, .w-earner, .w-both) .er-step-who { color: var(--due); }
+.er-step.w-client .er-step-who { color: var(--hold); }
+.er-step.w-unknown .er-step-who i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.er-step-do { grid-area: do; display: grid; gap: 2px; min-width: 0; }
+.er-step-do strong { font-size: var(--t-body); font-weight: 640; letter-spacing: -.008em; line-height: 1.35; overflow-wrap: anywhere; }
+.er-step-ms { font-size: var(--t-small); line-height: 1.4; color: var(--ink-3); overflow-wrap: anywhere; }
+/* on a computer the deadline and the status take their own columns; narrower, they share a line under the move */
+.er-step-meta { display: contents; }
+.er-step-by { grid-area: by; padding-top: 2px; font-size: var(--t-small); font-weight: 600; line-height: 1.35; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+.er-step-st { grid-area: st; min-width: 0; }
+.er-step-st .stamp { height: auto; min-height: 26px; padding-block: 3px; white-space: normal; line-height: 1.2; }
+.er-step-then { grid-area: then; font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); overflow-wrap: anywhere; }
+.er-step-amt { grid-area: amt; display: grid; justify-items: end; padding-top: 1px; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.er-step-amt small { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); }
+.er-step-to { grid-area: to; align-self: center; width: 16px; height: 16px; color: var(--ink-3); }
+.er-step-go:hover .er-step-to { color: var(--ink); }
+.er-seq-more { padding-top: var(--s2); }
+/* the work on the chain while its service does not answer: counted, not listed, with a way to ask again */
+.er-seq-unknown { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s4); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px dashed var(--rule-2); background: color-mix(in oklab, var(--well) 40%, transparent); }
+.er-seq-unknown p { flex: 1 1 420px; max-width: 96ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.er-seq-unknown strong { color: var(--ink); font-weight: 650; }
+.er-calm { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4); align-items: start; padding: var(--s4); border-radius: var(--r-md); background: linear-gradient(160deg, var(--qed-bg), transparent 70%); border: 1px solid var(--qed-line); color: var(--ink-2); font-size: var(--t-small); line-height: 1.55; }
+
+/* ------------------------------------------------------------------------------------------------ the two kinds of work */
+.er-kind { display: grid; gap: var(--s4); align-content: start; min-width: 0; }
+.er-kind-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--s3) var(--s6); margin-top: var(--s5); }
+.er-kind-head > div { min-width: 0; flex: 1 1 520px; }
+.er-kind-head h2 { font-size: var(--t-h1); font-weight: 650; letter-spacing: var(--track-h); line-height: 1.1; }
+.er-kind-head p { max-width: 84ch; margin-top: var(--s2); color: var(--ink-2); }
+.er-sub { margin-top: var(--s4); font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; }
+.er-how { color: var(--ink-2); }
+.er-how summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--brand); font-weight: 600; }
+.er-how p { max-width: 86ch; }
+.er-empty { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3) var(--s6); }
+.er-empty p { flex: 1 1 320px; max-width: 72ch; color: var(--ink-2); }
+.er-problem { display: grid; justify-items: start; gap: var(--s2); }
+/* the on-chain wallet's service not answering: what that means for the work, then a way to ask again */
+.er-down { display: grid; justify-items: start; gap: var(--s2); }
+.er-down > .note { justify-self: stretch; }
+.er-down .note p { max-width: 96ch; }
+.er-skel { display: grid; align-content: start; gap: var(--s2); }
+.er-skel .skel { height: 52px; }
+/* while the chain is read, its section keeps the room its empty state takes, so money in below does not jump */
+.chain-work .er-skel { min-height: 104px; }
+
+/* a kind of work's money through the escrow: one bar at true scale, its parts as figures that add up, who holds it */
+.er-sum { display: grid; gap: var(--s4); padding: var(--s5) var(--s6); }
+.er-sum-bar { height: 10px; }
+.er-sum-figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s3) var(--s5); }
+.er-sum-figs > div { display: grid; gap: 2px; align-content: start; }
+.er-sum-figs dt { display: flex; align-items: center; gap: 7px; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.er-sum-figs dd { font-size: var(--t-lead); font-weight: 650; letter-spacing: -.012em; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.er-sum-figs .all { padding-left: var(--s4); border-left: 1px solid var(--rule-2); }
+.er-sum-who { max-width: 92ch; font-size: var(--t-small); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ a job, as one journey */
+.er-job { --er-cols: minmax(0, 1fr) 288px 156px 124px 216px; padding: var(--s6); }
+.er-job-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s2) var(--s6); }
+.er-job-name { min-width: 0; }
+/* base.css resets headings; a job the owner pays for is titled one level down, under "Work you pay for" */
+.er-job-name :is(h3, h4) { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; line-height: 1.25; color: var(--ink); overflow-wrap: anywhere; }
+.er-job-who { margin-top: 4px; font-size: var(--t-small); color: var(--ink-2); overflow-wrap: anywhere; }
+.er-job-terms { max-width: 86ch; margin-top: 2px; font-size: var(--t-small); color: var(--ink-3); overflow-wrap: anywhere; }
+.er-job-fig { display: grid; flex: none; justify-items: end; text-align: right; }
+.er-job-total { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.er-job-n { margin-top: 2px; font-size: var(--t-small); color: var(--ink-3); }
+.er-job-line { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s2) var(--s4); margin-top: var(--s4); padding: 10px var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 40%, transparent); border: 1px solid var(--rim); }
+.er-job-says { flex: 1 1 320px; min-width: 0; font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.er-turn { display: inline-flex; align-items: center; gap: 7px; font-size: var(--t-small); font-weight: 650; white-space: nowrap; color: var(--ink-2); }
+.er-turn i { display: grid; place-items: center; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.er-turn.t-you { color: var(--due); } .er-turn.t-them { color: var(--hold); } .er-turn.t-void { color: var(--loss); } .er-turn.t-done { color: var(--gain); }
+.er-turn.t-unknown { color: var(--ink-3); }
+.er-turn.t-unknown i { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+.er-turn.t-done i { width: 16px; height: 16px; background: none; }
+.er-turn i svg { width: 15px; height: 15px; stroke-width: 2.6; }
+.er-job > .note { margin-top: var(--s3); }
+
+/* the route named once, over the milestones: the stations, and the ones where money is held bracketed with the sum */
+.er-ms-head, .er-ms { display: grid; grid-template-columns: var(--er-cols); column-gap: var(--s5); margin-inline: calc(-1 * var(--s3)); padding-inline: var(--s3); }
+.er-ms-head { align-items: end; margin-top: var(--s5); padding-bottom: var(--s2); font-size: var(--t-micro); font-weight: 600; color: var(--ink-3); }
+.er-h-main { grid-column: 1; }
+.er-route { grid-column: 2; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); row-gap: 6px; }
+.er-h-state { grid-column: 3; }
+.er-h-amt { grid-column: 4; text-align: right; }
+.er-stn { grid-row: 2; text-align: center; white-space: nowrap; }
+.er-held { grid-column: 2 / 5; grid-row: 1; display: flex; align-items: center; gap: 8px; height: 18px; margin-inline: calc(100% / 6); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.er-held::before, .er-held::after { content: ""; flex: 1 1 0; min-width: 8px; align-self: flex-end; height: 50%; border-top: 1.5px solid var(--rule-2); }
+.er-held::before { border-left: 1.5px solid var(--rule-2); border-top-left-radius: 5px; }
+.er-held::after { border-right: 1.5px solid var(--rule-2); border-top-right-radius: 5px; }
+.er-held.has { color: var(--hold); font-weight: 650; }
+.er-held.has::before, .er-held.has::after { border-color: color-mix(in oklab, var(--hold) 72%, transparent); }
+
+/* a milestone: the title on the route; where it stands and whose move; what happens next; the amount; the move */
+.er-ms-list { display: grid; }
+.er-ms { position: relative; grid-template-areas: "title track state amt act" "say say state amt act"; row-gap: 6px; align-items: start; padding-block: var(--s4); border-radius: var(--r-md); }
+.er-ms + .er-ms::before { content: ""; position: absolute; top: 0; left: var(--s3); right: var(--s3); height: 1px; background: var(--rule); }
+.er-ms.turn-you { background: linear-gradient(90deg, var(--due-bg), transparent 70%); }
+.er-ms.disputed { background: linear-gradient(90deg, var(--loss-bg), transparent 70%); }
+.er-ms[data-landed] { animation: er-land 1.6s var(--ease-out); }
+@keyframes er-land { from, 30% { box-shadow: inset 0 0 0 2px var(--brand-line), 0 0 0 4px var(--brand-bg); } to { box-shadow: inset 0 0 0 2px transparent, 0 0 0 4px transparent; } }
+.er-ms-title { grid-area: title; padding-top: 4px; font-size: var(--t-body); font-weight: 640; letter-spacing: -.008em; overflow-wrap: anywhere; }
+.er-ms .er-track { grid-area: track; }
+.er-ms-state { grid-area: state; display: grid; justify-items: start; align-content: start; gap: 6px; padding-top: 1px; }
+.er-ms-who { font-size: var(--t-small); color: var(--ink-3); }
+.er-ms.turn-you .er-ms-who { color: var(--due); font-weight: 650; }
+.er-ms-say { grid-area: say; min-width: 0; }
+.er-ms-next { max-width: 76ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+.er-ms-proof { display: flex; align-items: center; gap: 6px; margin-top: var(--s1); font-size: var(--t-small); font-weight: 580; color: var(--ink-2); }
+/* a step waiting for a signature or being recorded, or what a lapsed offer needs: under where it stands, ruled in the
+   colour of whose signature it waits for (amber: yours; blue: theirs) */
+.er-ms-wait { max-width: 76ch; margin-top: var(--s2); padding-left: var(--s3); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); box-shadow: inset 2px 0 0 var(--rule-2); }
+.er-ms-wait.mine { color: var(--ink); box-shadow: inset 2px 0 0 var(--due-mark); }
+.er-ms-wait.theirs { box-shadow: inset 2px 0 0 var(--hold); }
+.er-ms-next + .er-ms-wait { margin-top: var(--s1); }
+.er-ms-amt { grid-area: amt; justify-self: end; padding-top: 3px; font-size: var(--t-lead); font-weight: 650; letter-spacing: -.012em; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.er-ms-act { grid-area: act; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: var(--s2); margin-top: -6px; }
+/* the moves on a milestone, the paper client's, and asking the wallet's service again: 44 px targets, not the shared
+   small button's 34 */
+:is(.er-ms-act, .er-client-acts, .er-legacy-acts, .er-down, .er-seq-unknown) .btn.sm { --h: 44px; }
+.er-wide { grid-column: 1 / -1; min-width: 0; margin-top: var(--s2); }
+.er-line { max-width: 92ch; color: var(--ink-2); }
+/* links set in a row reach 24 px without moving the row (WCAG 2.5.8) */
+.er-line a, .er-in-how a, .er-book-foot a, .er-ms-next a { display: inline-block; padding-block: 3px; margin-block: -3px; }
+/* what a payment adds to what QED may pay out on its own: QED's hand, so its tide */
+.er-auth { max-width: 92ch; padding-left: var(--s3); color: var(--ink-2); box-shadow: inset 2px 0 0 var(--qed); }
+.er-auth strong { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+/* the paper client's part, played by the owner: a role apart, drawn dashed */
+.er-client { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s4); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px dashed var(--edge); background: color-mix(in oklab, var(--hold-bg) 60%, transparent); }
+.er-client p { font-size: var(--t-small); color: var(--ink-2); }
+.er-role { margin-right: 6px; font-weight: 650; color: var(--hold); }
+.er-client-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+/* the simulated mediator's part, also played by the owner: a role apart from the client's, dashed on neutral glass */
+.er-client.er-med { background: color-mix(in oklab, var(--well) 50%, transparent); }
+.er-med .er-role { color: var(--ink-2); }
+
+/* the paper escrow's deadlines (R12 task comparison, gap 16). Who acts next on a paper milestone, by when, and what
+   happens if they do not: three labelled lines, the four parts a step on the chain is said in (actor and step, deadline,
+   default). A step in "who acts next" says its default under its milestone. */
+.er-pn { display: grid; gap: 4px; max-width: 76ch; font-size: var(--t-small); line-height: 1.5; }
+.er-pn > div { display: grid; grid-template-columns: 60px minmax(0, 1fr); column-gap: var(--s3); }
+.er-pn dt { font-weight: 600; color: var(--ink-3); }
+.er-pn dd { color: var(--ink-2); overflow-wrap: anywhere; }
+.er-pn dd strong { font-weight: 650; color: var(--ink); }
+/* a dispute: ruled in the loss colour while open; its decider, rule and deadlines as label and value rows; then each
+   side's evidence, oldest first */
+.er-dsp { display: grid; gap: var(--s2); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--well) 40%, transparent); }
+.er-dsp.er-dsp-open { box-shadow: inset 3px 0 0 var(--loss); }
+.er-dsp-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px var(--s3); font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+.er-dsp-when { font-size: var(--t-small); font-weight: 450; color: var(--ink-3); }
+.er-dsp-why { max-width: 76ch; font-size: var(--t-small); color: var(--ink); overflow-wrap: anywhere; }
+.er-dsp-terms { display: grid; gap: 4px; font-size: var(--t-small); line-height: 1.5; }
+.er-dsp-terms > div { display: grid; grid-template-columns: 108px minmax(0, 1fr); column-gap: var(--s3); }
+.er-dsp-terms dt { font-weight: 600; color: var(--ink-3); }
+.er-dsp-terms dd { max-width: 80ch; color: var(--ink-2); overflow-wrap: anywhere; font-variant-numeric: tabular-nums lining-nums; }
+.er-dsp-out { font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.er-dsp-out strong { font-weight: 650; color: var(--ink); }
+.er-dsp-said { display: grid; gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--rule); font-size: var(--t-small); }
+.er-dsp-said li { display: grid; grid-template-columns: 108px minmax(0, 1fr); column-gap: var(--s3); color: var(--ink-2); overflow-wrap: anywhere; }
+.er-dsp-by { display: grid; font-weight: 600; }
+.er-dsp-by small { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); }
+/* every step on record, who took it and when, oldest first */
+.er-hist summary { display: inline-flex; align-items: center; min-height: 44px; margin-block: -6px; font-size: var(--t-small); color: var(--ink-3); }
+.er-hist ol { display: grid; gap: 6px; margin-top: var(--s1); font-size: var(--t-small); }
+.er-hist li { display: grid; grid-template-columns: 104px minmax(120px, 200px) minmax(0, 1fr); column-gap: var(--s3); color: var(--ink-2); }
+.er-hist-when { white-space: nowrap; color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.er-hist-who { font-weight: 600; }
+.er-hist-what { overflow-wrap: anywhere; }
+.er-split-rest { font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+/* a milestone from before terms were recorded, and a job waiting for its client's acceptance: said plainly first, then
+   why, then the way on; ruled amber, as both sides' move is the household's */
+.er-legacy { display: grid; justify-items: start; gap: var(--s2); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--well) 40%, transparent); box-shadow: inset 3px 0 0 var(--due-mark); }
+.er-legacy p { max-width: 80ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.er-legacy p.er-legacy-h { font-size: var(--t-body); font-weight: 650; line-height: 1.4; color: var(--ink); }
+.er-legacy-acts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s1); }
+.er-job > .er-job-wait { margin-top: var(--s3); }
+.er-ms-next.er-ms-bad { color: var(--loss); font-weight: 600; }
+/* each side's standing offer to settle, and on the sheet the other side's, ruled in the client's colour */
+.er-offers { display: grid; gap: var(--s1); font-size: var(--t-small); }
+.er-offers-h { font-weight: 650; color: var(--ink); }
+.er-offers ul { display: grid; gap: 4px; }
+.er-offers li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s3); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.er-offers-who { font-weight: 600; color: var(--ink); }
+.er-offers small { color: var(--ink-3); }
+.er-offer-theirs { max-width: 76ch; padding-left: var(--s3); font-size: var(--t-small); color: var(--ink-2); box-shadow: inset 2px 0 0 var(--hold); }
+/* a job's terms in full, one press away under its line; and the terms anywhere, as label and value rows */
+.er-jterms { margin-top: var(--s3); }
+.er-jterms summary { display: inline-flex; align-items: center; min-height: 44px; margin-block: -6px; font-size: var(--t-small); font-weight: 600; color: var(--brand); }
+.er-jterms .er-terms { margin-top: var(--s2); }
+.er-terms { display: grid; gap: var(--s2); }
+.er-terms-list { display: grid; gap: 6px; font-size: var(--t-small); line-height: 1.5; }
+.er-terms-list > div { display: grid; grid-template-columns: 184px minmax(0, 1fr); column-gap: var(--s4); }
+.er-terms-list dt { font-weight: 600; color: var(--ink-3); }
+.er-terms-list dd { max-width: 84ch; color: var(--ink-2); overflow-wrap: anywhere; font-variant-numeric: tabular-nums lining-nums; }
+/* choosing the terms: each period its own group, its length and what its end does side by side, why the usual choice is
+   usual one press away; then the terms read back in full, then the acceptances */
+.er-choose { display: grid; gap: var(--s4); }
+.er-pol { display: grid; gap: var(--s2); min-width: 0; padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.er-pol > .legend { margin-bottom: var(--s1); }
+.er-pol-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s3) var(--s4); align-items: end; }
+.er-pol .er-why p + p { margin-top: var(--s1); }
+.er-terms-read { display: grid; gap: var(--s2); padding: var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--well) 40%, transparent); }
+.er-terms-read h4 { font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+.er-accept, .er-settle { display: grid; gap: 2px; min-width: 0; }
+.er-accept-row { display: flex; align-items: flex-start; gap: var(--s3); min-height: 44px; padding-block: 10px; font-size: var(--t-small); line-height: 1.45; color: var(--ink); cursor: pointer; }
+.er-accept-row input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--brand); }
+.er-accept-row input:disabled + span { color: var(--ink-3); }
+/* a disclosure set in a row reaches 44 px into the row's own space, so the row does not move */
+.er-tech summary { display: inline-flex; align-items: center; min-height: 44px; margin-block: -6px; color: var(--ink-3); }
+.er-ms-say .er-tech, .er-ms-say .er-auth { margin-top: var(--s2); }
+.er-tech p, .er-tech dl { margin-top: var(--s1); color: var(--ink-2); }
+
+/* the route of one milestone: the rail, the part travelled drawn solid, the station where it waits lit */
+.er-track { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; height: 28px; }
+.er-rail, .er-fill, .er-return { position: absolute; top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; }
+.er-rail { left: 10%; right: 10%; background: repeating-linear-gradient(90deg, var(--rule-2) 0 4px, transparent 4px 8px); }
+.er-fill { left: 10%; width: 0; background: linear-gradient(90deg, color-mix(in oklab, var(--ink-3) 55%, transparent), var(--ink-3)); transform-origin: left center; transition: width var(--d4) var(--ease-move); animation: meter-in var(--d4) var(--ease-out) both; }
+.er-track[data-reach="1"] .er-fill { width: 20%; }
+.er-track[data-reach="2"] .er-fill { width: 40%; }
+.er-track[data-reach="3"] .er-fill { width: 60%; }
+.er-track[data-reach="4"] .er-fill { width: 80%; }
+.er-track.end-paid .er-fill { background: linear-gradient(90deg, color-mix(in oklab, var(--gain) 40%, transparent), var(--gain)); }
+/* money that went back leaves the route where it stood and returns along a dashed line to the end */
+.er-return { right: 10%; left: 10%; background: repeating-linear-gradient(90deg, var(--ink-3) 0 3px, transparent 3px 7px); }
+.er-track[data-reach="1"] .er-return { left: 30%; }
+.er-track[data-reach="2"] .er-return { left: 50%; }
+.er-track[data-reach="3"] .er-return { left: 70%; }
+.er-track > i { position: relative; z-index: 1; justify-self: center; display: grid; place-items: center; width: 12px; height: 12px; border-radius: 50%; background: var(--sheet); box-shadow: inset 0 0 0 1.5px var(--edge); color: var(--ink-2); }
+.er-track > i svg { width: 12px; height: 12px; stroke-width: 3; }
+.er-track > i.done { width: 10px; height: 10px; background: var(--ink-3); box-shadow: 0 0 0 3px color-mix(in oklab, var(--sheet) 55%, transparent); }
+.er-track > i.er-skip { opacity: .4; }
+.er-track > i.next { --er-c: var(--ink-3); --er-bg: transparent; width: 20px; height: 20px; box-shadow: inset 0 0 0 2.5px var(--er-c), 0 0 0 4px var(--er-bg), 0 0 18px -3px var(--er-c); }
+.er-track > i.next::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--er-c); }
+.er-track > i.t-you { --er-c: var(--due-mark); --er-bg: var(--due-bg); }
+.er-track > i.t-them { --er-c: var(--hold); --er-bg: var(--hold-bg); }
+.er-track > i.t-void { --er-c: var(--loss); --er-bg: var(--loss-bg); color: var(--loss); }
+.er-track > i.t-void::after { display: none; }
+/* not offered yet: a dashed ring before the first station; an offer that lapsed: the ring, empty */
+.er-track > i.early { background: transparent; box-shadow: 0 0 0 4px var(--er-bg); outline: 2px dashed var(--er-c); outline-offset: -2px; }
+.er-track > i.early::after, .er-track > i.lapsed::after { display: none; }
+.er-track > i.end { width: 22px; height: 22px; }
+.er-track > i.end.paid { background: var(--gain); color: var(--on-act); box-shadow: 0 0 0 4px var(--gain-bg), 0 0 18px -4px var(--gain); }
+.er-track > i.end.back { color: var(--ink-2); box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+/* the one station that waits on the owner breathes, slowly, behind its ring (opacity and scale only: the compositor) */
+.er-track > i.next.t-you::before { content: ""; position: absolute; inset: -9px; z-index: -1; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in oklab, var(--due-mark) 50%, transparent), transparent); animation: er-breathe 2.8s ease-in-out infinite alternate; }
+@keyframes er-breathe { from { opacity: .2; transform: scale(.8); } to { opacity: .85; transform: scale(1.12); } }
+:root[data-fx="plain"] .er-track > i.next.t-you::before { animation: none; opacity: .5; }
+
+/* a new job: a glass card under its section's head, with its own way to close */
+.er-compose { display: grid; gap: var(--s4); padding: var(--s5) var(--s6) var(--s6); }
+.er-compose-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); }
+.er-compose-head h3 { font-size: var(--t-h3); font-weight: 650; }
+.er-compose-head .icon-btn { width: 44px; height: 44px; }
+.er-form { display: grid; gap: var(--s5); }
+/* fields side by side line up on their inputs, whatever their hints; a choice of two keeps its own width */
+.er-form .form-grid { align-items: end; }
+.er-form .seg { justify-self: start; }
+.er-ms-fields { display: grid; gap: var(--s3); }
+.er-ms-fields > legend { margin-bottom: var(--s2); }
+.er-fields { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: var(--s3) var(--s4); align-items: end; }
+.er-fields.four { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, .8fr) minmax(0, .8fr) auto; }
+.er-fields-x { padding-bottom: 6px; }
+.er-answer { display: grid; justify-items: start; gap: var(--s2); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 40%, transparent); border: 1px solid var(--rim); }
+.er-answer p { max-width: 80ch; }
+.er-form-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s5); }
+.er-form-go p { flex: 1 1 260px; }
+.er-form .field .hint:last-child { margin-top: var(--s1); }
+
+/* ------------------------------------------------------------------------------------------------ money in: a day book */
+.er-book-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s6); margin-bottom: var(--s4); }
+.er-book-head h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; }
+.er-book-head p { margin-top: 3px; font-size: var(--t-small); color: var(--ink-3); }
+.er-said { margin-bottom: var(--s4); }
+.er-col-h { margin: var(--s2) 0; font-size: var(--t-small); font-weight: 650; color: var(--ink-3); }
+.er-days { display: grid; }
+.er-days > li { display: grid; grid-template-columns: 104px minmax(0, 1fr) minmax(0, 1.15fr) 196px; grid-template-areas: "when what how amt" "when what how where"; gap: 2px var(--s4); align-items: baseline; padding: 10px 0; border-top: 1px solid var(--rule); }
+.er-days > li:first-child { border-top: 0; }
+.er-in-when { grid-area: when; display: grid; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.er-in-when small { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); }
+.er-in-what { grid-area: what; display: grid; gap: 1px; min-width: 0; font-weight: 620; overflow-wrap: anywhere; }
+.er-in-what small { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); }
+.er-in-from { order: -1; }
+.er-in-how { grid-area: how; min-width: 0; font-size: var(--t-small); color: var(--ink-3); line-height: 1.45; }
+.er-in-amt { grid-area: amt; text-align: right; font-weight: 650; white-space: nowrap; letter-spacing: -.01em; font-variant-numeric: tabular-nums lining-nums; }
+.er-in-amt.in { color: var(--gain); }
+.er-in-where { grid-area: where; align-self: start; font-size: var(--t-micro); color: var(--ink-3); text-align: right; }
+.er-days > li.coming .er-in-amt { color: var(--ink-2); }
+.er-split { margin-top: var(--s1); color: var(--ink-2); }
+.er-why summary { display: inline-flex; align-items: center; min-height: 44px; margin-block: -6px; color: var(--brand); font-weight: 560; }
+.er-line { padding-top: var(--s3); }
+.er-today { display: flex; align-items: center; gap: var(--s3); margin: var(--s5) 0 var(--s2); font-size: var(--t-micro); font-weight: 700; color: var(--brand); }
+.er-today::before, .er-today::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-line), transparent); }
+.er-in-empty { display: grid; justify-items: start; gap: var(--s3); padding-top: var(--s2); }
+.er-in-empty p { max-width: 72ch; }
+.er-skel-line { display: block; height: 40px; margin-top: var(--s2); }
+.er-book-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s4); margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.er-book-foot h3 { font-size: var(--t-small); font-weight: 650; }
+.er-book-foot p { flex: 1 1 360px; max-width: 92ch; }
+/* recording money in: a short form across the top of the book, opened from its button */
+.er-in-form { display: grid; grid-template-columns: auto minmax(150px, 220px) minmax(200px, 1fr); gap: var(--s4) var(--s5); align-items: end; margin-bottom: var(--s5); padding-bottom: var(--s5); border-bottom: 1px solid var(--rule); }
+.er-in-form .field .hint { margin-top: var(--s1); }
+.er-in-wide { grid-column: 1 / -1; }
+
+/* ------------------------------------------------------------------------------------------------ narrower */
+@media (max-width: 1199px) {
+  /* a step on three lines beside whose move: the move, then its deadline with its status, then what happens if nobody
+     acts; the amount at the right. The columns are no longer named: each line says what it is */
+  .er-next { --er-seq-cols: 28px minmax(112px, 156px) minmax(0, 1fr) auto 16px; }
+  .er-seq-cols { display: none; }
+  .er-step-go { grid-template-areas: "n who do amt to" "n who meta amt to" "n who then amt to"; grid-template-rows: none; row-gap: 6px; }
+  .er-step-meta { grid-area: meta; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s3); }
+  .er-step-by { padding-top: 0; }
+  .er-job { --er-cols: minmax(0, 1fr) 264px 120px; }
+  .er-ms { grid-template-areas: "title track amt" "state state amt" "say say say" "act act act"; }
+  .er-h-state { display: none; }
+  .er-h-amt { grid-column: 3; }
+  .er-ms-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s3); margin-top: var(--s1); }
+  .er-ms-act { margin-top: var(--s1); justify-content: flex-end; }
+}
+@media (max-width: 1099px) {
+  .er-pos-main { grid-template-columns: minmax(0, 1fr); }
+  .er-days > li { grid-template-columns: 96px minmax(0, 1fr) 168px; grid-template-areas: "when what amt" "when what where" "when how how"; }
+  .er-in-form { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 759px) {
+  .earn { gap: var(--s5); }
+  .er-position { padding: var(--s5) var(--s4) var(--s4); }
+  .er-next, .er-job, .er-book, .er-sum, .er-empty { padding: var(--s5) var(--s4); }
+  .er-next { gap: var(--s3); padding-bottom: var(--s3); }
+  /* a step stacked beside its number, in the same order: whose move and the amount on one line, the move and its
+     milestone, its deadline with its status, then what happens if nobody acts. Whose move keeps room for a name; the
+     amount takes the rest, its unit beside the figure where it fits and under it where it does not */
+  .er-next { --er-seq-cols: 24px minmax(0, 1fr) auto; }
+  .er-step-go { column-gap: var(--s3); grid-template-areas: "n who amt" "n do do" "n meta meta" "n then then"; row-gap: 4px; padding: 12px var(--s2) 12px 0; }
+  .er-step-n { width: 24px; height: 24px; margin-top: -2px; }
+  .er-step-who { padding-top: 0; }
+  .er-step-amt { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: baseline; column-gap: 5px; padding-top: 0; text-align: right; }
+  .er-step-to { display: none; }
+  .er-step-meta { margin-top: 2px; }
+  .er-seq-unknown { padding: var(--s3); }
+  .er-compose { padding: var(--s4) var(--s4) var(--s5); }
+  .er-hero { font-size: var(--t-fig-hero-sm); }
+  .er-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .er-kind-head h2 { font-size: var(--t-h2); }
+  .er-kind-head .btn { flex: 1 1 auto; }
+  .er-job-head { flex-direction: column; gap: var(--s2); }
+  .er-job-fig { justify-items: start; text-align: left; }
+  /* the title beside its amount, the route across the card, then where it stands, what happens next and the move */
+  .er-job { --er-cols: minmax(0, 1fr) auto; }
+  .er-ms-head { grid-template-columns: minmax(0, 1fr); }
+  .er-h-main, .er-h-amt { display: none; }
+  .er-route { grid-column: 1; }
+  .er-ms { grid-template-areas: "title amt" "track track" "state state" "say say" "act act"; row-gap: 0; }
+  .er-ms .er-track { margin-top: var(--s2); }
+  .er-ms-state { margin-top: var(--s2); }
+  .er-ms-say { margin-top: var(--s2); }
+  .er-ms-act { justify-content: flex-start; margin-top: var(--s3); }
+  .er-ms-act .btn { flex: 1 1 auto; }
+  .er-ms-act .btn.quiet { flex: 0 1 auto; }
+  .er-client-acts .btn { flex: 1 1 100%; }
+  /* a dispute's terms, its evidence and the record of steps: each label over its words, so nothing is squeezed */
+  .er-dsp { padding: var(--s3); }
+  .er-dsp-terms > div, .er-dsp-said li, .er-hist li { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
+  .er-pn > div { grid-template-columns: 52px minmax(0, 1fr); column-gap: var(--s2); }
+  .er-terms-list > div { grid-template-columns: minmax(0, 1fr); row-gap: 2px; }
+  .er-legacy, .er-terms-read { padding: var(--s3); }
+  .er-legacy-acts { justify-self: stretch; }
+  .er-legacy-acts .btn { flex: 1 1 100%; }
+  .er-fields, .er-fields.four { grid-template-columns: minmax(0, 1fr); }
+  .er-days > li { grid-template-columns: 62px minmax(0, 1fr) auto; grid-template-areas: "when what amt" "when how how" "when where where"; }
+  .er-in-where { text-align: left; }
+  /* the four parts of the work as rows: what each is on the left, its figure on the right, aligned down the panel */
+  .er-tiles { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
+  .er-tiles .tile { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 2px var(--s3); padding: var(--s3) var(--s4); }
+  .er-tiles .v { grid-column: 2; grid-row: 1; font-size: var(--t-lead); }
+  .er-tiles .s { grid-column: 1 / -1; }
+  .er-sum-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .er-sum-figs .all { grid-column: 1 / -1; padding: var(--s2) 0 0; border-left: 0; border-top: 1px solid var(--rule-2); }
+}
+
+/* ------------------------------------------------------------------------------------------------ forced colours
+   the system takes backgrounds and shadows away, which would leave the route and the bars empty: they are drawn again
+   in the system's own colours (solid for what is passed or paid, outlined for what waits, hatched for a dispute) */
+/* The review and dispute step of work on the chain (R13 E3): its terms, the texts each side wrote, and the forms for a
+   reason, evidence or a ruling. Plain rows on the row's own surface; the texts quoted as the other side wrote them. */
+.er-dispute { display: grid; gap: var(--s2); margin-top: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rule-2); background: color-mix(in oklab, var(--well) 35%, transparent); }
+.er-dispute-kv { margin: 0; }
+.er-dispute-text blockquote { margin: var(--s1) 0 0; padding-left: var(--s3); border-left: 2px solid var(--rule-2); color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+.er-dispute-out { color: var(--ink); }
+.er-dispute-terms { margin: var(--s2) 0 0; padding-left: 1.2em; display: grid; gap: var(--s1); }
+.er-dispute-quick { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.er-dispute-ask textarea { min-height: 88px; }
+.er-dispute-fields .er-fields { margin-top: var(--s2); }
+
+/* The work directory (R13 E4): listings as plain panels; a simulated one drawn dashed, never as an action. */
+.er-dir-item { display: grid; gap: var(--s2); padding: var(--s4); margin-top: var(--s3); }
+.er-dir-item.sim { border-style: dashed; background: transparent; }
+.er-dir-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.er-dir-quotes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.er-dir-quotes li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s4); padding: var(--s2) 0; border-top: 1px solid var(--rule-2); }
+.er-dir-quotes li.sim { color: var(--ink-2); }
+.er-dir-q { min-width: 0; overflow-wrap: anywhere; }
+
+@media (forced-colors: active) {
+  .er-track, .er-segs, .er-sw, .er-held, .er-step-who i, .er-turn i { forced-color-adjust: none; }
+  .er-rail { background: repeating-linear-gradient(90deg, GrayText 0 4px, transparent 4px 8px); }
+  .er-fill, .er-track.end-paid .er-fill { background: CanvasText; }
+  .er-return { background: repeating-linear-gradient(90deg, CanvasText 0 3px, transparent 3px 7px); }
+  .er-track > i { background: Canvas; box-shadow: inset 0 0 0 1.5px CanvasText; color: CanvasText; }
+  .er-track > i.done { background: CanvasText; box-shadow: none; }
+  .er-track > i.next { box-shadow: inset 0 0 0 2.5px Highlight; }
+  .er-track > i.next::after { background: Highlight; }
+  .er-track > i.next::before { display: none; }
+  .er-track > i.early { outline-color: Highlight; box-shadow: none; }
+  .er-track > i.end.paid { background: CanvasText; color: Canvas; box-shadow: none; }
+  .er-seg, .er-sw, .er-seg.paid, .er-seg.you, .er-sw.paid, .er-sw.you { background: CanvasText; box-shadow: none; }
+  .er-seg.them, .er-seg.back, .er-seg.open, .er-sw.them, .er-sw.back, .er-sw.open { background: Canvas; box-shadow: inset 0 0 0 1.5px CanvasText; }
+  .er-seg.disputed, .er-sw.disputed { background: repeating-linear-gradient(135deg, CanvasText 0 1.5px, Canvas 1.5px 5px); box-shadow: inset 0 0 0 1.5px CanvasText; }
+  .er-held, .er-held.has, .er-turn, .er-turn.t-you, .er-turn.t-them, .er-turn.t-void, .er-turn.t-done { color: CanvasText; }
+  .er-held::before, .er-held::after, .er-held.has::before, .er-held.has::after { border-color: CanvasText; }
+  .er-track > i.t-void { color: Highlight; }
+  .er-step-who i, .er-turn i { background: CanvasText; box-shadow: none; }
+  .er-turn.t-unknown i { background: Canvas; box-shadow: inset 0 0 0 1.5px CanvasText; }
+  /* the rule beside a waiting step is a shadow, which this mode removes: a border stands in for it */
+  .er-ms-wait { box-shadow: none; border-left: 2px solid CanvasText; }
+  .er-dsp.er-dsp-open { box-shadow: none; border-left: 3px solid CanvasText; }
+  .er-legacy { box-shadow: none; border-left: 3px solid CanvasText; }
+  .er-offer-theirs { box-shadow: none; border-left: 2px solid CanvasText; }
+  .er-step.w-unknown .er-step-who i { background: Canvas; box-shadow: inset 0 0 0 1.5px CanvasText; }
+}

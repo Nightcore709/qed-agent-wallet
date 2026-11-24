@@ -1,0 +1,94 @@
+{
+  "startedAt": "2026-11-24T18:43:52.640Z",
+  "node": "v26.12.0",
+  "gasUsed": {
+    "deploy QEDVault (release bytecode)": 2173330,
+    "deploy QEDOwnerAccount (1 Member, 1 Recovery, 8 guards)": 6098034,
+    "execute: vault.acceptOwnership (1 assertion)": 97318,
+    "execute: vault.revokeMandate (1 assertion)": 99775,
+    "vault.executePayment with ERC-1271 owner signature (agent pays)": 244721,
+    "checkSignature, 1 assertion, as a transaction (estimate; includes 21000 intrinsic and calldata)": 53083,
+    "execute: scheduleCalls (1 guarded call)": 145041,
+    "applyCalls (1 guarded call)": 54618,
+    "cancel a scheduled guarded call (1 assertion)": 64243,
+    "execute: removeSigners -> scheduled change": 207212,
+    "cancel (1 assertion)": 69775,
+    "startRecovery (raw P-256)": 186682,
+    "finishRecovery": 126920
+  },
+  "chainA": {
+    "chainId": 31337,
+    "hardfork": "osaka",
+    "account": "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
+    "vault": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+    "execution": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+    "policy": "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
+    "token": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+    "eoaOwner": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    "guards": [
+      {
+        "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+        "selector": "0xf2fde38b"
+      },
+      {
+        "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+        "selector": "0xbcf685ed"
+      },
+      {
+        "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+        "selector": "0x02045138"
+      },
+      {
+        "target": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+        "selector": "0x0840a44a"
+      },
+      {
+        "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+        "selector": "0x3e07dfc2"
+      },
+      {
+        "target": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+        "selector": "0xb3ab15fb"
+      },
+      {
+        "target": "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
+        "selector": "0x72b15fa4"
+      },
+      {
+        "target": "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
+        "selector": "0xbcf685ed"
+      }
+    ]
+  },
+  "oldEoaRefused": [
+    "ringFence(address,uint256,uint64,bytes32)",
+    "withdraw(address,uint256)",
+    "unpause()",
+    "bumpEpoch()",
+    "revokeMandate(bytes32)",
+    "setAgent(address)",
+    "setCosigner(address)",
+    "setGuardian(address)",
+    "setDailyCap(uint256)",
+    "transferOwnership(address)",
+    "pause()",
+    "acceptOwnership()",
+    "mined setAgent status 0x0"
+  ],
+  "guardedCalls": {
+    "refusedImmediately": 8,
+    "delayedPathApplied": "setDailyCap(4000e6)",
+    "cancelled": "setAgent"
+  },
+  "chainB": {
+    "chainId": 31338,
+    "account": "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
+    "erc1271FromChainA": "invalid",
+    "executeFromChainA": "InvalidAssertion(0)"
+  },
+  "chainC": {
+    "hardfork": "prague",
+    "deployment": "reverted MissingPrecompile(0x100)"
+  },
+  "finishedAt": "2026-11-24T18:43:53.508Z"
+}

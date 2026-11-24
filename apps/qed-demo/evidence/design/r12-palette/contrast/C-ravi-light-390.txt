@@ -1,0 +1,1 @@
+620 text runs measured on /,/pay,/save,/vault (light, 390x844); 0 below threshold

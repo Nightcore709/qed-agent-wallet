@@ -1,0 +1,73 @@
+{
+ "at": "2026-11-24T13:48:30.478Z",
+ "base": "http://localhost:9950",
+ "runs": 8,
+ "violations": 0,
+ "broken": 0,
+ "results": [
+  {
+   "route": "/activity",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/activity",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Activity",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "light",
+   "width": 1440,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "light",
+   "width": 390,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "dark",
+   "width": 1440,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  },
+  {
+   "route": "/save",
+   "scheme": "dark",
+   "width": 390,
+   "broken": false,
+   "h1": "Save",
+   "violations": []
+  }
+ ]
+}

@@ -1,0 +1,150 @@
+/* Refutation bounties (Meridian, DESIGN.md M1 to M13; src/screens/Bounties.tsx). A command grid read top to bottom: the
+   head (drawn before any data) with its simulation label; this household's claims when it has any, each a glass card
+   with its state, its four steps (commit, reveal after the delay, the contest, settlement) and what to do next; the two
+   bounties' statements side by side, exactly as served; the claim form beside this computer's board and why a copier
+   gets nothing; then the Sepolia record, apart and marked historical.
+   Tokens only; every class is this screen's own (bt-); a shared class is used, never redefined. */
+
+.bt { display: grid; gap: var(--s8); }
+.bt-head { margin-bottom: 0; align-items: flex-end; }
+.bt-head .crumb { margin-bottom: var(--s3); }
+.bt-load-failed { display: grid; gap: var(--s3); justify-items: start; }
+/* a section's note sits on the stage itself, over the brightest part of the atmosphere: ink-2, not the shared ink-3
+   (measured 4.09:1 at 13 px in the dark theme with claims on the page, scripts/glass-contrast.ts) */
+.bt .section-head > .small { color: var(--ink-2); }
+.bt-note-acts { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); margin-top: var(--s3); }
+.bt-note-acts .btn svg { width: 15px; height: 15px; }
+
+/* two siblings side by side (the two statements, the two records), sharing a height; one column on a narrower screen */
+.bt-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5); align-items: stretch; }
+@media (max-width: 1099px) { .bt-pair { grid-template-columns: minmax(0, 1fr); } }
+
+/* the claim form on the left, this computer's board on the right */
+.bt-work { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
+@media (max-width: 1099px) { .bt-work { grid-template-columns: minmax(0, 1fr); } }
+
+.bt-fold > summary { display: list-item; min-height: 44px; padding: 12px 0; font-size: var(--t-small); font-weight: 600; line-height: 20px; color: var(--ink-2); }
+.bt-fold > summary:hover, .bt-fold[open] > summary { color: var(--ink); }
+.bt-fold { margin-top: var(--s3); }
+.bt-fold .kv { margin-top: var(--s2); }
+
+/* ------------------------------------------------------------------------------------------------ the household's claims */
+/* one claim takes the whole row; two or more share it (auto-fit: no empty half beside a single card, M4.1) */
+.bt-claims { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: var(--s5); }
+.bt-claim { height: 100%; padding: var(--s5) var(--s6); border-radius: var(--r-lg); border: 1px solid var(--rim); box-shadow: var(--lift-1);
+  background: linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); display: grid; align-content: start; gap: var(--s3); }
+.bt-claim.revealable { border-color: color-mix(in oklab, var(--due) 40%, var(--rim)); }
+.bt-claim.won { background: radial-gradient(80% 90% at 0% 0%, var(--gain-bg), transparent 60%), linear-gradient(152deg, var(--gloss), transparent 34% 78%), var(--pane); }
+.bt-claim-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s2) var(--s4); flex-wrap: wrap; }
+.bt-claim-top h3 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.016em; line-height: 1.25; }
+.bt-claim-say { color: var(--ink); line-height: 1.5; }
+.bt-claim-next { color: var(--ink-2); font-size: var(--t-small); line-height: 1.5; }
+.bt-claim-next strong { color: var(--ink); font-weight: 620; }
+.bt-claim-act { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.bt-job { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.bt-job span:not(.stamp) { flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; }
+
+/* the four steps of a claim: what is done is solid, what is under way is lit, what is missed is struck */
+/* four across in a card of any width from a half row up; two by two on a phone */
+.bt-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 124px), 1fr)); gap: var(--s2); margin: var(--s1) 0; }
+.bt-step { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--s2); align-items: start; padding: var(--s3); border-radius: var(--r-sm);
+  background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim); min-width: 0; }
+.bt-step-dot { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--edge); color: var(--ink-3); background: var(--well); }
+.bt-step-dot svg { width: 13px; height: 13px; stroke-width: 2.4; }
+.bt-step-t { display: grid; gap: 2px; min-width: 0; }
+.bt-step-t strong { font-size: var(--t-small); font-weight: 620; color: var(--ink); }
+.bt-step-d { font-size: var(--t-micro); color: var(--ink-2); line-height: 1.4; overflow-wrap: break-word; }
+.bt-step.done .bt-step-dot { background: var(--gain); border-color: var(--gain); color: var(--on-act); }
+.bt-step.now { border-color: color-mix(in oklab, var(--due) 45%, var(--rim)); background: var(--due-bg); }
+.bt-step.now .bt-step-dot { border-color: var(--due); color: var(--due); }
+.bt-step.missed .bt-step-dot { border-color: var(--loss); color: var(--loss); }
+.bt-step.off { opacity: .62; }
+
+/* what a figure or a section is made of: a test chain, a historical record (the shared stamp's shape, its own icon) */
+.bt-label svg { color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ the statements */
+.bt-st { display: flex; flex-direction: column; gap: var(--s3); }
+.bt-st-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.bt-st-top h3 { font-size: var(--t-h2); font-weight: 650; letter-spacing: var(--track-h); }
+.bt-pool { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.bt-st-dl { display: grid; gap: var(--s1); }
+.bt-st-dl dt { margin-top: var(--s3); font-size: var(--t-small); font-weight: 620; color: var(--ink-2); }
+.bt-st-dl dt:first-child { margin-top: 0; }
+.bt-st-dl dd { line-height: 1.55; overflow-wrap: anywhere; }
+.bt-limits { display: grid; gap: 4px; padding-left: 1.15em; list-style: disc; }
+.bt-limits li::marker { color: var(--ink-3); }
+.bt-test { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); overflow-wrap: anywhere; }
+/* where the bounty stands here closes the card, at the same height in both cards of the pair */
+.bt-st-here { display: grid; gap: var(--s3); justify-items: start; margin-top: auto; padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.bt-st-here p { line-height: 1.7; }
+.bt-st-here .stamp { vertical-align: 1px; }
+
+/* ------------------------------------------------------------------------------------------------ making a claim */
+.bt-make { display: grid; align-content: start; gap: var(--s4); }
+.bt-make .panel-head { margin-bottom: 0; }
+.bt-form { display: grid; gap: var(--s5); }
+.bt-pick, .bt-payto { border: 0; padding: 0; margin: 0; min-width: 0; }
+.bt-pick legend, .bt-payto legend { margin-bottom: var(--s2); }
+.bt-pick label, .bt-payto label { padding: 12px 14px; }
+.bt-text { font-family: var(--mono); font-size: var(--t-small); min-height: 168px; }
+.bt-form-acts { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); }
+.bt-closed { padding: var(--s3) var(--s4); border-radius: var(--r-sm); background: color-mix(in oklab, var(--well) 60%, transparent); border: 1px dashed var(--rule-2); color: var(--ink-2); line-height: 1.5; }
+.bt-closed strong { color: var(--ink); }
+.bt-results { display: grid; gap: var(--s3); }
+.bt-results:empty { display: none; }
+.bt-results .note .code { word-break: break-all; }
+.bt-same { display: flex; gap: var(--s2); align-items: flex-start; margin-top: var(--s2); color: var(--ink); font-weight: 560; }
+.bt-same svg { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+.bt-shapes { display: grid; gap: var(--s2); color: var(--ink-2); line-height: 1.55; }
+
+/* ------------------------------------------------------------------------------------------------ this computer's board */
+.bt-board .panel-head { margin-bottom: var(--s2); }
+.bt-board .panel-head .btn svg { width: 15px; height: 15px; }
+.bt-board-say { color: var(--ink-2); font-size: var(--t-small); line-height: 1.5; margin-bottom: var(--s4); }
+.bt-bounties { display: grid; gap: var(--s3); }
+.bt-bounty { display: grid; gap: var(--s2); justify-items: start; padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim); }
+.bt-bounty.settled { background: color-mix(in oklab, var(--pane-2) 45%, transparent); }
+.bt-bounty-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s2) var(--s3); flex-wrap: wrap; width: 100%; }
+.bt-bounty-top h3 { font-size: var(--t-body); font-weight: 650; }
+.bt-bounty-say { line-height: 1.5; }
+.bt-control { display: flex; gap: var(--s2); align-items: flex-start; font-size: var(--t-small); color: var(--ink-2); line-height: 1.45; }
+.bt-control svg { flex: none; width: 15px; height: 15px; margin-top: 2px; }
+
+/* ------------------------------------------------------------------------------------------------ the protection */
+/* the claim's four steps as one row of tiles on a wide screen, in the order they happen; a column on a narrower one */
+.bt-guard { display: grid; gap: var(--s4); }
+.bt-guard .panel-head { margin-bottom: 0; }
+.bt-guard-lead { line-height: 1.55; max-width: 96ch; }
+.bt-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); counter-reset: bt-flow; }
+.bt-flow li { display: grid; align-content: start; gap: var(--s2); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim);
+  line-height: 1.55; color: var(--ink-2); font-size: var(--t-small); counter-increment: bt-flow; }
+.bt-flow li strong { display: flex; align-items: center; gap: var(--s2); color: var(--ink); font-size: var(--t-body); font-weight: 650; }
+.bt-flow li strong::before { content: counter(bt-flow); flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  font-size: var(--t-small); font-weight: 700; color: var(--qed); background: var(--qed-bg); border: 1px solid var(--qed-line); }
+@media (max-width: 1099px) { .bt-flow { grid-template-columns: minmax(0, 1fr); } }
+.bt-guard-foot { display: grid; gap: var(--s2); }
+.bt-guard-foot p { color: var(--ink-2); line-height: 1.55; max-width: 110ch; }
+.bt-guard-foot strong { color: var(--ink); }
+
+/* ------------------------------------------------------------------------------------------------ the Sepolia record */
+.bt-past { display: grid; gap: var(--s4); }
+.bt-past .section-head { margin: 0; }
+.bt-past-say { color: var(--ink-2); max-width: 90ch; line-height: 1.5; }
+.bt-past-card { display: grid; align-content: start; gap: var(--s3); background: linear-gradient(152deg, var(--gloss), transparent 34% 78%), color-mix(in oklab, var(--pane) 82%, var(--well)); }
+.bt-past-card h3 { font-size: var(--t-h3); font-weight: 650; }
+.bt-past-status { line-height: 1.5; }
+.bt-tries-h { font-size: var(--t-body); font-weight: 650; margin-top: var(--s2); }
+.bt-tries { display: grid; gap: var(--s2); }
+.bt-tries li { display: grid; gap: 4px; padding: var(--s3) var(--s4); border-radius: var(--r-sm); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); min-width: 0; }
+.bt-try-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s3); }
+.bt-try-top .stamp { margin-left: auto; }
+.bt-tries .bt-args { word-break: break-all; }
+/* a shortened address or hash (0x and four characters each side) is one token: it moves to the next line whole */
+.bt-ref { white-space: nowrap; }
+
+@media (max-width: 560px) {
+  .bt { gap: var(--s6); }
+  .bt-claim { padding: var(--s4); }
+  .bt-step { padding: var(--s2); }
+}

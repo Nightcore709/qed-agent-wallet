@@ -1,0 +1,41 @@
+/* Where QED could move real money (src/ui/legal-routes.tsx, register N-022). Tokens only; every class is lg-.
+   Sits on the readiness page, so it keeps that page's part padding and heading size (protect.css .pr-rd-part). */
+.lg-routes { display: grid; gap: var(--s4); min-width: 0; padding: var(--s5) var(--s6); }
+.lg-head { display: grid; gap: var(--s2); }
+.lg-head h2 { font-size: var(--t-h3); font-weight: 650; }
+.lg-head p { color: var(--ink-2); max-width: 80ch; line-height: 1.5; }
+.lg-scroll { overflow-x: auto; border-radius: var(--r-md); }
+.lg-scroll:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* row headers are capability names: wrapped, on the rule, not the shared header tint */
+.lg-table tbody th { background: transparent; border-radius: 0; white-space: normal; min-width: 22ch; max-width: 34ch; padding: var(--s3) var(--s3) var(--s3) var(--s4); border-bottom: 1px solid var(--rule); font-size: var(--t-small); font-weight: 560; color: var(--ink); letter-spacing: 0; line-height: 1.4; vertical-align: middle; }
+.lg-table tbody tr:last-child th { border-bottom: 0; }
+.lg-table td { vertical-align: middle; }
+/* the verdict is the word itself; colour only repeats it */
+.lg-v { font-size: var(--t-small); font-weight: 560; white-space: nowrap; color: var(--ink-2); }
+.lg-v.licence { color: var(--ink); font-weight: 620; }
+.lg-v.counsel { color: var(--due); font-weight: 620; }
+.lg-v.none { color: var(--ink-3); font-weight: 450; }
+.lg-v.open { color: var(--gain); font-weight: 650; }
+.lg-list { display: none; }
+.lg-key, .lg-source { font-size: var(--t-small); color: var(--ink-3); line-height: 1.5; max-width: 96ch; }
+.lg-key b { color: var(--ink-2); font-weight: 620; }
+.lg-more summary { display: inline-flex; align-items: center; min-height: 32px; font-size: var(--t-small); font-weight: 600; color: var(--brand); cursor: pointer; }
+.lg-more > ul { display: grid; gap: var(--s3); margin-top: var(--s2); padding-left: 0; list-style: none; font-size: var(--t-small); }
+.lg-more > ul > li > ul { display: grid; gap: 4px; margin-top: 4px; padding-left: var(--s4); color: var(--ink-2); line-height: 1.45; }
+.lg-j { font-weight: 620; color: var(--ink); }
+.lg-label { color: var(--ink-3); }
+
+@media (max-width: 759px) {
+  .lg-routes { padding: var(--s5) var(--s4); }
+  .lg-scroll { display: none; }
+  .lg-list { display: grid; gap: 0; padding: 0; list-style: none; }
+  .lg-list > li { display: grid; gap: var(--s2); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+  .lg-list h3 { font-size: var(--t-small); font-weight: 620; color: var(--ink); line-height: 1.4; }
+  .lg-list dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px var(--s3); }
+  .lg-list dl > div { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+  .lg-list dt { flex: none; width: 2.4ch; font-size: var(--t-micro); font-weight: 650; color: var(--ink-3); letter-spacing: var(--track-label); }
+  .lg-list dd { min-width: 0; white-space: normal; line-height: 1.3; }
+}
+@media (max-width: 380px) {
+  .lg-list dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

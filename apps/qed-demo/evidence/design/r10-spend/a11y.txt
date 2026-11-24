@@ -1,0 +1,8 @@
+[a11y] 124 axe runs over 31 screens: 1 rule violated (color-contrast: 4 on 1 screen).
+[a11y] one h1 everywhere: true; headings in order: true; overflow: none at 320, 360, 390, 640, 768, 1024, 1440.
+[a11y] first Tab stop: "Skip to the page"; 40 stops checked, 0 without a visible outline. Page errors: 0. Report: <repo>/apps/qed-demo/evidence/design/r10-spend/a11y.json
+[a11y] approval sheet by keyboard: opened true, focus inside true, labelled true, 0 of 12 Tab stops on the page behind it, closed by Escape true, focus back on "Deposit".
+[a11y] focus under a pinned bar: 8260 focus stops over 31 screens at 3 sizes; wholly hidden 0; half or more hidden 9.
+[a11y] motion: the sheet enters in 0.2 s; with less motion asked for, 0.00001 s, and the longest transition on the page is 0.00001 s.
+[a11y] screens that failed to draw: none; console errors: 0.
+exit 1

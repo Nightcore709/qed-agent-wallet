@@ -1,0 +1,120 @@
+{
+ "measuredAt": "2026-11-23T10:24:31.803Z",
+ "base": "http://localhost:5751",
+ "watchMs": 15000,
+ "note": "Lab measures on this computer (headless Chrome, 1440x900, no throttling); not field data.",
+ "results": {
+  "/": {
+   "lcpMs": 112,
+   "cls": 0.0075,
+   "shifts": [
+    {
+     "value": 0.0075,
+     "sources": [
+      "div.board.home-board",
+      "section.position.field-hero",
+      "div.",
+      "nav.dock",
+      "#text"
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/pay": {
+   "lcpMs": 112,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/save": {
+   "lcpMs": 104,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/holdings": {
+   "lcpMs": 124,
+   "cls": 0.0106,
+   "shifts": [
+    {
+     "value": 0.0105,
+     "sources": [
+      "#text",
+      "#text",
+      "#text",
+      "#text",
+      "#text"
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/earn": {
+   "lcpMs": 84,
+   "cls": 0.0514,
+   "shifts": [
+    {
+     "value": 0.0514,
+     "sources": [
+      "section.pipe-group.chain-work",
+      "section.panel.income",
+      "p.small.muted"
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/protect": {
+   "lcpMs": 100,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/activity": {
+   "lcpMs": 96,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/ask": {
+   "lcpMs": 92,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  },
+  "/vault": {
+   "lcpMs": 108,
+   "cls": 0.0001,
+   "shifts": [],
+   "interactionMs": 16,
+   "jsKB": 848,
+   "cssKB": 197,
+   "pass": true
+  }
+ }
+}

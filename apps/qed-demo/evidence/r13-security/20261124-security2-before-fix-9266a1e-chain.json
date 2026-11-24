@@ -1,0 +1,53 @@
+{
+ "what": "R13 second pass, BEFORE the fix of F-14: revision 9266a1e with only the new scripts/security.ts copied in; QED_SECURITY_ONLY=r13-chain",
+ "producedAt": "2026-11-24 21:00:46.570 IST",
+ "target": "http://127.0.0.1:11550 on a scratch database (deleted with the temporary directory by the operating system)",
+ "howToReproduce": "node scripts/security.ts <report.json>",
+ "stack": {
+  "recoveryDelaySec": 8,
+  "protectionDelaySec": 8,
+  "relyingParty": "localhost",
+  "origin": "http://localhost:11550",
+  "authenticator": "server/softauthn.ts (software, ES256)"
+ },
+ "harnessWrites": [
+  "the address's recovery allowance cleared once, after showing it spent (instead of waiting an hour)",
+  "one approval's expiry set in the past (instead of waiting ten minutes)",
+  "session re-authentication time cleared (instead of waiting five minutes)",
+  "two legacy password accounts created with server/auth.ts hashPassword",
+  "one session pointed at a workspace its person does not belong to (N34)",
+  "one membership ended (N40; no route removes a member yet)",
+  "R13 second pass: one model call of a business owner with two proposals, as server/ai.ts stores them (R22, R23; the stack has no model)",
+  "one business notice of a vault recovery, as rail-signers.ts writes it (R25; no vault service on this stack)",
+  "one run of a protective instruction put in the waiting state, as the engine leaves it when a price crosses (R15)"
+ ],
+ "ids": {
+  "continuedFromPreR7": 1,
+  "newInR7": 0,
+  "r13Review": 1,
+  "note": "S01-S54 continue the 54 pre-R7 checks in order; `was` gives the earlier wording where it changed"
+ },
+ "passed": 1,
+ "failed": 1,
+ "checks": [
+  {
+   "id": "R14",
+   "area": "r13",
+   "name": "no web page can use the wallet service's chain: a WebSocket from another local origin and a request after DNS rebinding reach nothing on any port it listens on, and its clock does not move (F-14)",
+   "asvs": "V4.4.1 WebSocket origin; V3.4.5 rebinding (Host); V13.4.1 attack surface",
+   "expected": "every attempt refused; the clock moved under an hour (the chain listens on 11581)",
+   "observed": "ws://127.0.0.1:11581 opened and answered; ws://localhost:11581 opened and answered; rebind.evil.example:11581 answered 200 {\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0x7a69\"}; clock moved 63072002 s",
+   "pass": false
+  },
+  {
+   "id": "S54",
+   "area": "integrity",
+   "name": "no request produced an unhandled server error",
+   "asvs": "V16.5.3 fails securely; V16.5.4 last-resort handler",
+   "expected": "nothing on the services' error output",
+   "observed": "nothing",
+   "pass": true
+  }
+ ],
+ "measurements": []
+}

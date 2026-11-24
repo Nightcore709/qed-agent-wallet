@@ -1,0 +1,21 @@
+PASS  one select in figure#chart  
+PASS  .chart-q states the question  How has the published NAV of HDFC Overnight Fund (Direct, Growth) moved over 1 year?
+PASS  .chart-a answers with exact values  From ₹3,922.0765 (23 Nov 2025) to ₹4,127.1277 (22 Nov 2026), up 5.2%. Lowest ₹3,922.0765 (23 Nov 2025), highest ₹4,127.1277 (22 Nov 2026). Recorded values only; nothing here is a forecast.
+PASS  figcaption not empty  
+PASS  table has rows  
+PASS  table marks the lowest  
+PASS  reading starts with the prompt  Point at the line, or touch it, to read a value.
+PASS  exactly one svg.chart in the figure  
+PASS  a tap reads a point  Mon 10 Aug 2026 ₹4,066.8104 +3.69% since the start of the period
+PASS  the reading has a figure  
+PASS  the reading stays after the finger lifts  
+PASS  no sideways overflow /save at 320  0px
+PASS  no sideways overflow /holdings at 320  0px
+PASS  no sideways overflow /safeguards at 320  0px
+PASS  no sideways overflow /save at 390  0px
+PASS  no sideways overflow /holdings at 390  0px
+PASS  no sideways overflow /safeguards at 390  0px
+PASS  Home "Buy or sell" lands on the ticket  {"top":32,"focused":"Buy or sell by hand"}
+PASS  /safeguards#household opens the figures in view  {"top":32,"form":true,"focused":"Your household figures"}
+PASS  Safeguards has one link named Readiness  
+20 of 20 pass

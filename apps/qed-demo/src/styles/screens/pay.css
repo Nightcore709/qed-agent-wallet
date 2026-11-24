@@ -1,0 +1,319 @@
+/* Spend (Meridian, DESIGN.md M10): a checkout. The steps on the left under a progress rail; the payment forming on the
+   right (who, how much, route, what stays free, the button that asks for the terms); after the passkey signs, the same
+   card follows the payment to its receipt. Below: bills on record and payments so far, side by side. */
+
+.pay-page { display: grid; gap: var(--s6); }
+.pay-page .btn { --h: 44px; }
+.pay-page .btn.lg { --h: 52px; }
+.pay-head .btn { align-self: flex-end; }
+
+.pay-checkout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: var(--s5); align-items: start; }
+.pay-journey { padding: 0; overflow: visible; }
+.pay-jhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3) var(--s5); padding: var(--s5) var(--s6); border-bottom: 1px solid var(--rule); }
+.pay-jhead h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; }
+
+/* the progress rail: five pills joined by a line; the current one lit, the settled ones ticked */
+.pay-progress { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pay-progress li { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 3px 12px 3px 5px; border-radius: var(--r-pill); font-size: var(--t-small); font-weight: 600; color: var(--ink-3); background: color-mix(in oklab, var(--well) 45%, transparent); border: 1px solid var(--rim); transition: background-color var(--d2) var(--ease-out), color var(--d2) var(--ease-out); }
+.pay-progress li + li::before { content: ""; width: 10px; height: 1px; margin-left: -12px; margin-right: 4px; background: var(--rule-2); }
+.pay-progress i { min-width: 22px; min-height: 22px; padding: 2px; border-radius: var(--r-pill); line-height: 1; display: inline-grid; place-items: center; font-style: normal; font-size: var(--t-micro); font-weight: 700; background: var(--pane-2); color: var(--ink-3); }
+.pay-progress i svg { width: 13px; height: 13px; stroke-width: 3; }
+.pay-progress li.done { color: var(--ink-2); } .pay-progress li.done i { background: var(--gain-bg); color: var(--gain); }
+.pay-progress li.now { color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); border-color: transparent; box-shadow: var(--shadow-btn); }
+.pay-progress li.now i { background: color-mix(in oklab, var(--on-act) 14%, transparent); color: var(--on-act); }
+
+/* the steps */
+.pay-steps { display: grid; }
+.pay-step { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: var(--s3) var(--s6); padding: var(--s5) var(--s6); border-top: 1px solid var(--rule); }
+.pay-jhead + .pay-steps > .pay-step:first-child, .pay-form > .pay-steps > .pay-step:first-child:not(:only-child) { border-top: 0; }
+.pay-form { border-top: 1px solid var(--rule); }
+.pay-label { display: flex; align-items: baseline; gap: var(--s3); min-width: 0; padding-top: 4px; }
+.pay-label h3 { font-size: var(--t-body); font-weight: 650; letter-spacing: -.01em; }
+.pay-label label { cursor: pointer; }
+.pay-n { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--pane-2); border: 1px solid var(--rim); color: var(--ink-2); font-size: var(--t-micro); font-weight: 700; font-variant-numeric: tabular-nums; transform: translateY(-1px); }
+.pay-body { display: grid; gap: var(--s4); align-content: start; min-width: 0; }
+.pay-quiet { font-size: var(--t-small); color: var(--ink-3); line-height: 1.5; }
+.pay-err { font-size: var(--t-small); font-weight: 580; color: var(--loss); line-height: 1.45; }
+.pay-none { grid-column: 1 / -1; padding: var(--s2) 0; font-size: var(--t-small); color: var(--ink-2); }
+
+/* 1, where from: two sources as glass tiles */
+.pay-from { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); max-width: 640px; }
+.pay-from button { display: flex; align-items: flex-start; gap: var(--s3); min-height: 68px; padding: var(--s3) var(--s4); border: 1px solid var(--rim); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 70%, transparent); color: var(--ink); text-align: left; cursor: pointer; transition: border-color var(--d1) var(--ease-out), background-color var(--d2) var(--ease-out), box-shadow var(--d2) var(--ease-out), transform var(--d-spring) var(--ease-spring); }
+.pay-from button:hover { border-color: var(--edge); transform: translateY(-1px); }
+.pay-from button[aria-pressed="true"] { border-color: var(--brand-line); background: linear-gradient(160deg, var(--brand-bg), transparent 70%), var(--pane-2); box-shadow: inset 0 0 0 1px var(--brand), var(--lift-1); }
+.pay-from svg { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--ink-2); stroke-width: 1.8; }
+.pay-from button[aria-pressed="true"] svg { color: var(--brand); }
+.pay-from span { display: grid; gap: 2px; min-width: 0; }
+.pay-from b { font-weight: 650; }
+.pay-from small { font-size: var(--t-small); color: var(--ink-3); line-height: 1.4; font-variant-numeric: tabular-nums; }
+.pay-wallet .tablet { padding: 0; background: none; box-shadow: none; border: 0; border-radius: 0; }
+
+/* 2, to whom: the kind, a search, then the choices as one radio group of glass cards */
+.pay-to-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.pay-seg button { min-height: 38px; }
+.pay-search { position: relative; flex: 1 1 260px; }
+.pay-search svg { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; color: var(--ink-3); transform: translateY(-50%); pointer-events: none; }
+.pay-search .input { padding-left: 40px; border-radius: var(--r-pill); }
+/* the choices: one list of rows, as wide as the step, however many there are (R12: no card grid that leaves a hole
+   beside the last one). The chosen row is tinted and its ring filled; the ring is the radio's own shape. */
+.pay-list { display: grid; border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 45%, transparent); overflow: hidden; }
+.pay-list:has(> .pay-none) { border-style: dashed; background: none; padding: 0 var(--s4); }
+.pay-rcpt { position: relative; display: flex; align-items: center; gap: var(--s3); min-height: 60px; padding: var(--s2) var(--s4); border-top: 1px solid var(--rule); cursor: pointer; transition: background-color var(--d2) var(--ease-out); }
+.pay-rcpt:first-child { border-top: 0; }
+.pay-rcpt::after { content: ""; flex: none; width: max(20px, 1.25em); height: max(20px, 1.25em); border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--edge); transition: box-shadow var(--d2) var(--ease-out); }
+.pay-rcpt:hover { background: color-mix(in oklab, var(--pane-2) 80%, transparent); }
+.pay-rcpt.on { background: linear-gradient(90deg, var(--brand-bg), color-mix(in oklab, var(--brand-bg) 40%, transparent)); }
+.pay-rcpt.on::after { box-shadow: inset 0 0 0 6px var(--act); }
+.pay-rcpt input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.pay-rcpt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: -3px; border-radius: var(--r-md); }
+.pay-rcpt .avatar { width: max(34px, 2.7em); height: max(34px, 2.7em); background: var(--pane-2); color: var(--ink-2); border: 1px solid var(--rim); box-shadow: none; }
+.pay-rcpt.on .avatar:not(.own) { background: linear-gradient(180deg, var(--act), var(--act-2)); color: var(--on-act); border-color: transparent; }
+.pay-rc { display: grid; flex: 1; min-width: 0; line-height: 1.3; }
+.pay-rc b { font-weight: 640; overflow-wrap: anywhere; }
+.pay-rc small { font-size: var(--t-small); color: var(--ink-3); overflow-wrap: anywhere; }
+/* the payee's kind, after its name on the same line (R13: no column of its own leaving a gap in the middle of each row,
+   and no squeeze on a long name on a phone); it wraps under a long name rather than beside it */
+.pay-tag { display: inline-block; margin-left: var(--s2); padding: 0 7px; border-radius: var(--r-pill); border: 1px solid var(--rim); font-size: var(--t-micro); font-weight: 600; line-height: 1.6; color: var(--ink-3); vertical-align: 1px; white-space: nowrap; }
+.pay-rc-fig { display: grid; flex: none; justify-items: end; line-height: 1.3; text-align: right; }
+.pay-rc-fig b { font-weight: 660; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.pay-rc-fig small { font-size: var(--t-small); color: var(--ink-3); white-space: nowrap; }
+.pay-rc-fig small.due { color: var(--due); font-weight: 580; }
+.pay-add-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s5); }
+.pay-add, .pay-add-bill { display: grid; gap: var(--s3); padding: var(--s4) var(--s5); border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 40%, transparent); border: 1px solid var(--rim); }
+.pay-add-bill { margin-top: var(--s4); }
+.pay-add-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); }
+.pay-add-head h3, .pay-add-head h4 { font-size: var(--t-body); font-weight: 650; }
+.pay-add-head .icon-btn { width: 44px; height: 44px; }
+.pay-add-form { display: grid; gap: var(--s3); }
+.pay-add-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3) var(--s4); align-items: start; }
+.pay-add-grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pay-add-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s5); }
+.pay-add-go .pay-quiet { flex: 1 1 260px; }
+.pay-check { margin-top: var(--s2); }
+.pay-test { font-size: var(--t-small); color: var(--ink-2); }
+.pay-test summary { display: inline-flex; align-items: center; min-height: 44px; font-weight: 580; }
+.pay-test dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--s1) var(--s4); max-width: 84ch; margin-top: var(--s1); line-height: 1.45; }
+.pay-test dt { font-weight: 650; color: var(--ink); }
+.pay-test > p { margin-top: var(--s2); max-width: 84ch; line-height: 1.45; }
+.pay-facts { display: grid; gap: var(--s2); max-width: 96ch; }
+.pay-fact { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; overflow-wrap: anywhere; }
+.pay-fact.first { padding: var(--s2) var(--s3); border-radius: var(--r-sm); color: var(--ink); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 22%, transparent); }
+.pay-fact.warn { display: flex; align-items: flex-start; gap: var(--s2); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: var(--due-bg); color: var(--ink); border: 1px solid color-mix(in oklab, var(--due) 34%, transparent); }
+.pay-fact.warn svg { flex: none; width: 17px; height: 17px; margin-top: 1px; color: var(--due); }
+.pay-fact .linkish { margin-left: var(--s1); padding-block: 12px; margin-block: -12px; }
+/* the paper bank's name check under the payee: plain on a match, marked like the first-payment caution otherwise */
+.pay-fact.heed { padding: var(--s2) var(--s3); border-radius: var(--r-sm); color: var(--ink); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 22%, transparent); }
+.pay-fact-note { color: var(--ink-3); }
+.pay-fact.heed .pay-fact-note { color: var(--ink-2); }
+/* adding a payee: the name given beside the name the paper bank holds, then the choice */
+.pay-namecheck { display: grid; gap: var(--s2); margin-top: var(--s2); }
+.pay-namecheck-says { display: grid; gap: var(--s2); }
+.pay-names { display: grid; gap: 2px; max-width: 60ch; }
+.pay-names > div { display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: var(--s3); align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: var(--t-small); }
+.pay-names dt { color: var(--ink-2); }
+.pay-names dd { font-weight: 650; color: var(--ink); overflow-wrap: anywhere; }
+
+/* 3 and 4, how much and the route */
+.pay-split { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: var(--s3) var(--s6); align-items: start; }
+.pay-one { display: grid; max-width: 640px; }
+.pay-amount { display: grid; gap: var(--s2); }
+.pay-amount .money .input { min-height: 68px; padding-left: 48px; font-size: var(--t-fig-m); font-weight: 650; letter-spacing: var(--track-fig); border-radius: var(--r-md); }
+.pay-amount .money::before { left: 18px; font-size: var(--t-fig-s); }
+.pay-fixed-fig { font-size: var(--t-fig-m); font-weight: 660; line-height: 1.1; letter-spacing: var(--track-fig); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+.pay-say { padding-top: 6px; max-width: 60ch; font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.pay-memo { max-width: 380px; }
+.pay-fixed-route { padding-top: 10px; font-weight: 650; }
+.pay-route { display: grid; gap: var(--s1); padding-top: 6px; font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+.pay-route b { font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+
+/* ------------------------------------------------------------------------------------------------ the summary */
+.pay-summary { position: sticky; top: calc(var(--bar-top, 0px) + var(--s4)); display: grid; gap: var(--s4); padding: var(--s6);
+  background: linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); }
+.pay-summary > h2, .ps-sent > h2 { font-size: var(--t-body); font-weight: 600; color: var(--ink-2); }
+.ps-to { display: flex; align-items: center; gap: var(--s3); min-height: 44px; }
+.ps-to span:last-child { display: grid; min-width: 0; line-height: 1.3; }
+.ps-to b { font-weight: 650; overflow-wrap: anywhere; }
+.ps-to small { font-size: var(--t-small); color: var(--ink-3); overflow-wrap: anywhere; }
+.ps-to .avatar { background: linear-gradient(180deg, var(--act), var(--act-2)); color: var(--on-act); }
+.ps-amount { font-size: var(--t-fig-l); font-weight: 650; letter-spacing: var(--track-hero); line-height: 1; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.ps-amount.none { color: var(--ink-3); }
+.ps-lines { display: grid; border-top: 1px solid var(--rule); }
+.ps-lines > div { display: flex; justify-content: space-between; gap: var(--s4); padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: var(--t-small); }
+.ps-lines dt { color: var(--ink-3); } .ps-lines dd { font-weight: 620; text-align: right; }
+.ps-lines > .ps-wait dd { color: var(--ink); }
+.pay-go { display: grid; gap: var(--s2); }
+
+/* what stays free: the bank at true scale with this payment in it, and the subtraction written as one */
+.pay-free { display: grid; gap: var(--s3); min-width: 0; }
+.pay-bar { margin-top: var(--s2); }
+.pay-sum { display: grid; font-variant-numeric: tabular-nums lining-nums; }
+.pay-sum > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--s4); padding: 6px 0; font-size: var(--t-small); }
+.pay-sum dt { color: var(--ink-2); }
+.pay-sum dd { font-weight: 650; text-align: right; white-space: nowrap; }
+.pay-sum .over dt, .pay-sum .over dd { color: var(--loss); }
+.pay-sum .total { margin-top: var(--s1); padding-top: var(--s2); border-top: 1px solid var(--ink-3); }
+.pay-sum .total dt { font-weight: 650; color: var(--ink); }
+.pay-sum .total dd { font-size: var(--t-fig-s); font-weight: 680; letter-spacing: var(--track-fig); }
+
+/* after the passkey signs: the payment followed on the same card */
+.ps-sent { display: grid; gap: var(--s4); animation: resolve var(--d4) var(--ease-out) both; }
+.ps-track { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: var(--t-small); color: var(--ink-3); }
+.ps-track li { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
+.ps-track li + li::before { content: ""; width: 18px; height: 1px; background: var(--rule-2); margin-right: 2px; }
+.ps-track i { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: var(--t-micro); font-weight: 700; background: var(--pane-2); border: 1px solid var(--rim); }
+.ps-track i svg { width: 13px; height: 13px; stroke-width: 3; }
+.ps-track li.on { color: var(--ink); } .ps-track li.on i { background: var(--qed-bg); color: var(--qed); border-color: var(--qed-line); }
+.ps-what { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; line-height: 1.25; }
+.ps-said { display: flex; gap: var(--s2); align-items: flex-start; color: var(--ink-2); line-height: 1.5; }
+.ps-said .seal { margin-top: 4px; }
+.ps-why { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; padding: var(--s2) var(--s3); border-radius: var(--r-sm); background: var(--due-bg); border: 1px solid color-mix(in oklab, var(--due) 22%, transparent); }
+.ps-sent > h2:focus-visible { outline-offset: 4px; }
+.ps-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
+
+/* ------------------------------------------------------------------------------------------------ below: bills, and payments so far */
+/* the same two columns as the checkout above: bills under the steps, payments so far under the payment's card */
+.pay-below { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: var(--s5); align-items: start; }
+.pay-sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s6); margin-bottom: var(--s4); }
+.pay-sec-head h2 { font-size: var(--t-h3); font-weight: 650; }
+.pay-sec-head p { max-width: 70ch; margin-top: 3px; font-size: var(--t-small); color: var(--ink-3); }
+.pay-all { display: inline-flex; align-items: center; min-height: 44px; margin-block: -10px; font-size: var(--t-small); font-weight: 620; }
+.pay-payers { display: grid; margin-bottom: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
+.pay-payers > li { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(200px, 1fr) auto; align-items: center; gap: var(--s3) var(--s5); padding: var(--s3) var(--s4); }
+.pay-payers > li + li { border-top: 1px solid var(--rule); }
+.pay-payer { display: grid; gap: 2px; min-width: 0; }
+.pay-payer a { justify-self: start; padding-block: 12px; margin-block: -12px; font-weight: 650; color: var(--ink); text-decoration: none; }
+.pay-payer a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.pay-payer small { font-size: var(--t-small); color: var(--qed); font-weight: 580; }
+.pay-payers > li.paused .pay-payer small { color: var(--due); }
+.pay-bill-list { display: grid; }
+.pay-bill-list > li { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; grid-template-areas: "when what amt" "when who who" "acts acts acts"; align-items: baseline; gap: 4px var(--s4); padding: var(--s3) var(--s3); border-top: 1px solid var(--rule); border-radius: var(--r-sm); }
+.pay-bill-list > li:first-child { border-top: 0; }
+.pay-bill-list > li.needs { background: linear-gradient(90deg, var(--due-bg), transparent 70%); }
+.pay-bill-list .when { grid-area: when; display: grid; font-size: var(--t-small); color: var(--ink-2); font-weight: 580; }
+.pay-bill-list .when small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 430; }
+.pay-bill-list .what { grid-area: what; display: grid; min-width: 0; }
+.pay-bill-list .what b { font-weight: 650; }
+.pay-bill-list .what small { font-size: var(--t-small); color: var(--ink-3); }
+.pay-bill-list .who { grid-area: who; font-size: var(--t-small); color: var(--ink-3); line-height: 1.45; }
+.pay-bill-list .who.due { color: var(--due); font-weight: 580; }
+.pay-bill-list .amt { grid-area: amt; font-weight: 660; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; text-align: right; }
+.pay-bill-list .acts { grid-area: acts; display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
+.pay-stepup { margin-top: var(--s3); }
+.pay-settled { margin-top: var(--s4); font-size: var(--t-small); }
+.pay-settled summary { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; color: var(--ink-2); }
+.pay-settled ul { display: grid; }
+.pay-settled li { display: flex; justify-content: space-between; gap: var(--s4); padding: 8px 0; border-top: 1px solid var(--rule); }
+.pay-settled .what { display: grid; } .pay-settled .what small { color: var(--ink-3); }
+.pay-settled .amt { font-weight: 640; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pay-paid-list { display: grid; }
+.pay-paid-list > li { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; gap: var(--s3); align-items: baseline; padding: 10px 0; border-top: 1px solid var(--rule); }
+.pay-paid-list > li:first-child { border-top: 0; }
+.pay-paid-list .when { display: grid; font-size: var(--t-small); color: var(--ink-2); font-weight: 580; }
+.pay-paid-list .when small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 430; }
+.pay-paid-list .what { display: grid; gap: 2px; min-width: 0; }
+.pay-paid-list .what a { color: var(--ink); font-weight: 620; text-decoration: none; }
+.pay-paid-list .what a:hover { text-decoration: underline; }
+.pay-paid-list .what small { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+.pay-paid-list .state { justify-self: end; }
+.pay-skel { padding: var(--s6); display: grid; gap: var(--s4); }
+.pay-skel-row { display: grid; grid-template-columns: 150px 1fr; gap: var(--s6); }
+.pay-skel-row .skel { height: 56px; }
+
+@media (max-width: 1099px) {
+  .pay-checkout, .pay-below { grid-template-columns: minmax(0, 1fr); }
+  .pay-summary { position: static; }
+}
+@media (max-width: 759px) {
+  .pay-page { gap: var(--s5); }
+  .pay-page > .page-head { margin-bottom: 0; }
+  .pay-head .btn { align-self: stretch; }
+  .pay-jhead { padding: var(--s4); }
+  .pay-step { grid-template-columns: minmax(0, 1fr); padding: var(--s4); gap: var(--s3); }
+  .pay-from, .pay-split { grid-template-columns: minmax(0, 1fr); }
+  .pay-add-grid, .pay-add-grid.four { grid-template-columns: minmax(0, 1fr); }
+  .pay-names > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .pay-summary { padding: var(--s5) var(--s4); }
+  .pay-payers > li { grid-template-columns: minmax(0, 1fr); }
+  .pay-payers > li > .stamp { justify-self: start; }
+  /* the rail on one row: each step a numbered ring, the current one with its name; never four and one below */
+  .pay-jhead { display: grid; gap: var(--s3); }
+  .pay-progress { flex-wrap: nowrap; gap: 4px; }
+  .pay-progress li + li::before { display: none; }
+  .pay-progress li span { display: none; } .pay-progress li.now span { display: inline; white-space: nowrap; }
+  .pay-progress li { flex: none; padding: 3px 4px; } .pay-progress li.now { padding-right: 12px; }
+  /* the three kinds of recipient as three equal cells; a long name wraps inside its own cell */
+  .pay-to-tools { display: grid; }
+  .pay-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-radius: var(--r-md); }
+  .pay-seg button { min-height: 44px; padding: 4px 6px; justify-content: center; text-align: center; line-height: 1.2; border-radius: var(--r-sm); }
+  .pay-rcpt { padding: var(--s2) var(--s3); }
+  /* a bill and a payment on a phone: when and how much on the first line, then what it is across the width, then who
+     pays it and its actions (three columns left the name a word wide beside a long state) */
+  .pay-bill-list > li { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when amt" "what what" "who who" "acts acts"; padding-inline: 0; }
+  .pay-bill-list > li.needs { padding-inline: var(--s3); }
+  .pay-bill-list .when { grid-auto-flow: column; justify-content: start; gap: 6px; align-items: baseline; }
+  .pay-paid-list > li { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when state" "what what"; row-gap: 4px; }
+  .pay-paid-list .when { grid-area: when; grid-auto-flow: column; justify-content: start; gap: 6px; align-items: baseline; }
+  .pay-paid-list .what { grid-area: what; }
+  .pay-paid-list .state { grid-area: state; }
+}
+
+/* Subscriptions, a payment held as a repeat, and the revocation channels (R13 Spend) */
+.pay-subs { grid-column: 1 / -1; }
+.subs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4, 16px); }
+.sub { display: grid; gap: 8px; padding-block: 12px; border-top: 1px solid var(--rule, currentColor); }
+.sub:first-child { border-top: 0; }
+.sub-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.sub-name { display: inline-flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.sub-name small, .sub-cost small { display: block; color: var(--ink-3, inherit); }
+.sub-name svg { inline-size: 1em; block-size: 1em; align-self: center; }
+.sub-cost { text-align: end; }
+.sub-next { margin: 0; }
+.sub-evidence ul { margin: 6px 0 0; padding-inline-start: 1.2em; }
+.sub-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sub-none { color: var(--ink-3, inherit); }
+.sub-rule { margin-block-start: 12px; }
+.repeat-held { display: grid; gap: 10px; margin-block: 8px; }
+.repeat-why { margin: 0; }
+.repeat-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.rv-channels { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.rv-ch { display: grid; gap: 2px; padding: 8px 12px; border-inline-start: 3px solid var(--rule, currentColor); }
+.rv-ch.acknowledged { border-inline-start-color: var(--ok, currentColor); }
+.rv-ch.no-answer, .rv-ch.needs-you, .rv-ch.sent { border-inline-start-color: var(--wait, currentColor); }
+.rv-state { font-weight: 600; }
+.rv-sim { font-weight: 400; }
+/* R13: what stays in force until every channel has acknowledged, and the wallet's own revocation to sign */
+.rv-remains { margin-block-start: 14px; }
+.rv-remains h3 { font-size: var(--t-body); font-weight: 650; margin: 0 0 4px; }
+.rv-remains ul { margin: 0; padding-inline-start: 18px; display: grid; gap: 4px; }
+.rv-act { margin-block-start: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dp-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.dp-timeline, .dp-receipts { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dp-timeline li { display: grid; grid-template-columns: minmax(9em, max-content) minmax(7em, max-content) 1fr; gap: 4px 12px; }
+.dp-receipts li { display: grid; gap: 2px; }
+.dp-notice { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: var(--s4); border: 1px solid var(--rule); border-radius: var(--r-md, 8px); background: var(--well); font: inherit; }
+.dp .mono { font-family: var(--mono, ui-monospace, monospace); overflow-wrap: anywhere; }
+@media (max-width: 640px) { .dp-timeline li { grid-template-columns: 1fr; } }
+@media print { .dp-acts, .dp .btn { display: none !important; } .dp .panel { break-inside: avoid; } }
+
+/* Services QED can buy (R13, S2): the mandate, the two quotes side by side, what was bought and refused */
+.pay-commerce { grid-column: 1 / -1; display: grid; gap: var(--s5); }
+.pay-commerce h3 { font-size: var(--t-body); font-weight: 650; margin-bottom: var(--s2); }
+.cm-terms { display: grid; gap: var(--s2); }
+.cm-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: var(--s3); }
+.cm-set { margin-top: var(--s3); }
+.cm-set summary { cursor: pointer; font-weight: 600; min-height: 36px; display: flex; align-items: center; }
+.cm-form { display: grid; gap: var(--s4); margin-top: var(--s3); }
+.cm-services { display: grid; gap: var(--s2); border: 0; padding: 0; }
+.cm-services legend { font-weight: 600; margin-bottom: var(--s2); }
+.cm-services label { display: flex; align-items: center; gap: var(--s2); }
+.cm-pick { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s3); }
+.cm-quotes { width: 100%; border-collapse: collapse; margin-top: var(--s3); }
+.cm-quotes th, .cm-quotes td { text-align: left; padding: var(--s3) var(--s2); border-bottom: 1px solid var(--rim); vertical-align: middle; }
+.cm-quotes small { display: block; color: var(--ink-3); font-weight: 400; }
+.cm-yes, .cm-no { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-small); }
+.cm-yes svg, .cm-no svg { width: 14px; height: 14px; }
+.cm-yes { color: var(--gain); } .cm-no { color: var(--ink-3); }
+.cm-list { display: grid; gap: var(--s3); }
+.cm-list li { display: flex; justify-content: space-between; gap: var(--s4); align-items: flex-start; padding-bottom: var(--s3); border-bottom: 1px solid var(--rim); }
+.cm-list .what { display: grid; gap: var(--s1); min-width: 0; }
+.cm-list small { color: var(--ink-3); overflow-wrap: anywhere; }

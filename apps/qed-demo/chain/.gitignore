@@ -1,0 +1,22 @@
+# Without a trailing slash, so a linked copy (a symlink in a second worktree) is ignored as the folder is
+# Dependencies (installed with: npm ci --ignore-scripts)
+node_modules
+
+# Disposable copies of the vendored tree used by the parity gate and scripted runs; Foundry build output
+.build
+.runs/
+out
+cache
+broadcast/
+
+# Anvil state and runtime data, if a caller points the rail's data directory inside this package
+data/
+*.db
+*.db-wal
+*.db-shm
+anvil-state*.json
+
+# The optional zero-knowledge module is assembled on request only (GPL-3.0 parts; see zk-optional/README.md)
+zk-optional/vendor
+zk-optional/node_modules
+zk-optional/.build

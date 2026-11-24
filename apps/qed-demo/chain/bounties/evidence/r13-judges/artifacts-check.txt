@@ -1,0 +1,13 @@
+# node scripts/export-artifacts.mjs --check
+# recorded 2026-11-24T18:45:45Z by scripts/run.sh; sources sha256 1043938c7f25e642
+# forge Version: 1.7.1, Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+# solc 0.8.26 from Foundry's compiler cache (offline = true); SOLC_VERSION=0.8.26
+
+identical  OptimalityBounty: Forge build b749349d79f9765a vs release embedded b749349d79f9765a
+identical  MaximalityBounty: Forge build 864ee01fc8e47c74 vs release embedded 864ee01fc8e47c74
+identical  MinVarianceVerifier: Forge build e9b431bf54a4a5ab vs release embedded e9b431bf54a4a5ab
+identical  TestUSD: Forge build 5fbaf055f967b0a8 vs release embedded 5fbaf055f967b0a8
+up to date  artifacts/QEDBountyBoard.json
+up to date  artifacts/PositiveControls.json
+board source sha256 98d0ad6b25e779d5e2429872bdc9e2268e3e6722f3cdfa5d092b56b6e5fc45f5; board bytecode sha256 57b75b75f064d3cda89bb71aee9824806cfbe12c89db54995239afbf66a5f3a6
+# exit status: 0

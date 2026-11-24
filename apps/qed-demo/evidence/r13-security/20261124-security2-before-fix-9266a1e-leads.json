@@ -1,0 +1,116 @@
+{
+ "what": "R13 second pass, BEFORE the fixes: revision 9266a1e with only the new checks copied in (scripts/security.ts and five server test files). HTTP checks R15, R22 to R25 from a run with QED_SECURITY_ONLY=r13-leads; in-process checks R16 to R21 and R26 from a run with QED_SECURITY_ONLY=r13-inprocess (after R26 was rewritten for the final fix of L-11). R14 is in ...-chain.json.",
+ "producedAt": "2026-11-24 21:07:53.335 IST",
+ "checks": [
+  {
+   "id": "R22",
+   "area": "r13",
+   "name": "a member below admin reads another member's question to Ask only as hashes: no model-written title or refusal reason in any section of the case",
+   "asvs": "V8.2.2 data-specific access; V14.2.6 sensitive data",
+   "expected": "the case 200 without the title or the reason; the asker reads both",
+   "observed": "operator 200, 2 of 2 found: Pay Hidden Vendor 4,90,000 before the audit | Hidden Vendor is not a payee of this workspace; asker 200 reads the title",
+   "pass": false
+  },
+  {
+   "id": "R23",
+   "area": "r13",
+   "name": "a model's proposal is its asker's: another member below admin can neither dismiss it nor start an instruction from it",
+   "asvs": "V8.2.2 object-level access (API1)",
+   "expected": "dismiss 404; instruction from it 404; the proposal still new",
+   "observed": "dismiss 200; instruction 409 proposal_withdrawn; now dismissed",
+   "pass": false
+  },
+  {
+   "id": "R24",
+   "area": "r13",
+   "name": "an instruction's actions, a tenant's bills and a tenant's instructions are found through an index; an instruction cannot carry an arbitrary proposal id",
+   "asvs": "V15.2.2 resource limits; V2.2.1 input validation",
+   "expected": "three SEARCH ... USING INDEX plans; the 60,000-character id 404 and nothing stored",
+   "observed": "SCAN actions | SCAN bills | SCAN programs; long id 200, 1 stored",
+   "pass": false
+  },
+  {
+   "id": "R25",
+   "area": "r13",
+   "name": "in a business, only an owner or admin other than the member who made the change clears a notice of a change to who can act",
+   "asvs": "V8.2.1 function-level access; V16.3.2 security events",
+   "expected": "operator 403; the starter 403; still open; the owner 200 and it is cleared",
+   "observed": "operator 200; starter 200; open after both 0; owner 200; cleared 1",
+   "pass": false
+  },
+  {
+   "id": "R15",
+   "area": "r13",
+   "name": "a password session can neither ask again for a protective run's approval (withdrawing the request waiting) nor withdraw it; the owner's passkey then confirms it",
+   "asvs": "V8.2.1 function-level access; V6.3.4 consistent strength across pathways",
+   "expected": "ask again 401 stepup_required; withdraw 401 stepup_required; the owner's confirmation 200",
+   "observed": "ask again 200; withdraw 200; confirmation 409 approval_withdrawn",
+   "pass": false
+  },
+  {
+   "id": "R16",
+   "area": "r13",
+   "name": "one person cannot spend the vault service's host-wide budgets through many workspaces: four vault set-ups a day, and 480 requests an hour over all their workspaces",
+   "asvs": "V15.2.2 resource limits (API4); V2.4.1",
+   "expected": "its test passes",
+   "observed": "failed: Error: promise resolved \"{ \u2026(12) }\" instead of rejecting",
+   "pass": false
+  },
+  {
+   "id": "R17",
+   "area": "r13",
+   "name": "after the deadline, a release request the provider keeps waiting does not hold off the client's refund",
+   "asvs": "V2.3.2 workflow integrity; V2.3.4 business-logic limits (API6)",
+   "expected": "its test passes",
+   "observed": "failed: AssertionError: expected { refused: 'already_pending' } to match object { ok: { jobId: Any<String> } }",
+   "pass": false
+  },
+  {
+   "id": "R18",
+   "area": "r13",
+   "name": "in a business, a vault request needs the workspace's own number of signatures when it is larger than the chain's threshold; a request that only stops something needs no more than the chain asks",
+   "asvs": "V2.3.5 multi-party approval; V8.2.1",
+   "expected": "its test passes",
+   "observed": "failed: AssertionError: expected 1 to be 2 // Object.is equality",
+   "pass": false
+  },
+  {
+   "id": "R19",
+   "area": "r13",
+   "name": "the provider does not read what the client's vault service said about the client's refused funding (it names the client vault's free balance)",
+   "asvs": "V8.2.3 field-level access (API3)",
+   "expected": "its test passes",
+   "observed": "failed: AssertionError: expected 'Refused before sending: the job costs\u2026' not to match /12\\.34|free funds/",
+   "pass": false
+  },
+  {
+   "id": "R20",
+   "area": "r13",
+   "name": "questions from many workspaces are bounded together: at most QED_ASK_CONCURRENT model calls at once (the next is refused, not queued), and at most QED_ASK_ALL_HOURLY in an hour",
+   "asvs": "V15.2.2 resource limits (API4)",
+   "expected": "its test passes",
+   "observed": "failed: AssertionError: expected [ 'answered', 'answered', 'answered' ] to deeply equal [ 'answered', 'answered', 'busy' ]",
+   "pass": false
+  },
+  {
+   "id": "R21",
+   "area": "r13",
+   "name": "each workspace's tick, or its pause, is recorded as that workspace's own event, naming only its own vault",
+   "asvs": "V8.2.2 data-specific access; V16.2.5 sensitive data in logs",
+   "expected": "its test passes",
+   "observed": "failed: AssertionError: expected [] to deeply equal [ StringContaining{\u2026} ]",
+   "pass": false
+  },
+  {
+   "id": "R26",
+   "area": "r13",
+   "name": "with a recovery started by email under way, a backup one may start too, and the email one is still shown and finished with its own link and key",
+   "asvs": "V6.4.1 recovery; V2.3.2 workflow integrity",
+   "expected": "its test passes",
+   "observed": "failed: AssertionError: expected { state: 'codes', \u2026(6) } to match object { state: 'ready', \u2026(1) }",
+   "pass": false
+  }
+ ],
+ "passed": 0,
+ "failed": 12
+}

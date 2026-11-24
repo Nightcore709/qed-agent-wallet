@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: a ready public service answers 200 with every readiness check true
+ok 1 - a ready public service answers 200 with every readiness check true
+  ---
+  duration_ms: 1.094291
+  type: 'test'
+  ...
+# Subtest: public startup, failed initialisation, unresponsive Anvil, missing contracts and an unverified manifest all answer 503
+ok 2 - public startup, failed initialisation, unresponsive Anvil, missing contracts and an unverified manifest all answer 503
+  ---
+  duration_ms: 0.100333
+  type: 'test'
+  ...
+# Subtest: local development keeps HTTP 200 and reports the manifest as not required
+ok 3 - local development keeps HTTP 200 and reports the manifest as not required
+  ---
+  duration_ms: 0.09425
+  type: 'test'
+  ...
+# Subtest: readiness recovers on the next probe after a transient failure (no sticky state)
+ok 4 - readiness recovers on the next probe after a transient failure (no sticky state)
+  ---
+  duration_ms: 0.178625
+  type: 'test'
+  ...
+# Subtest: Anthropic availability never gates readiness, and the health response keeps its existing fields
+ok 5 - Anthropic availability never gates readiness, and the health response keeps its existing fields
+  ---
+  duration_ms: 0.383542
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 33.267084

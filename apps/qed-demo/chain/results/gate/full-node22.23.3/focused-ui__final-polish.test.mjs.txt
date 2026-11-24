@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: first-use agent uses four real routes and an adaptive, non-centred command workspace
+ok 1 - first-use agent uses four real routes and an adaptive, non-centred command workspace
+  ---
+  duration_ms: 1.780667
+  type: 'test'
+  ...
+# Subtest: deeper Agent routes lead to actual configurable tool forms
+ok 2 - deeper Agent routes lead to actual configurable tool forms
+  ---
+  duration_ms: 0.436417
+  type: 'test'
+  ...
+# Subtest: financial parameters respect micro-token precision at the native form boundary
+ok 3 - financial parameters respect micro-token precision at the native form boundary
+  ---
+  duration_ms: 0.290042
+  type: 'test'
+  ...
+# Subtest: Claude connectivity is distinguished from merely configured credentials and offline mode
+ok 4 - Claude connectivity is distinguished from merely configured credentials and offline mode
+  ---
+  duration_ms: 0.224
+  type: 'test'
+  ...
+# Subtest: guest browser identifiers are cryptographically random even outside secure-context randomUUID
+ok 5 - guest browser identifiers are cryptographically random even outside secure-context randomUUID
+  ---
+  duration_ms: 0.367208
+  type: 'test'
+  ...
+# Subtest: the final UI keeps every main destination and protects state-changing tool confirmation
+ok 6 - the final UI keeps every main destination and protects state-changing tool confirmation
+  ---
+  duration_ms: 1.516458
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67.525542

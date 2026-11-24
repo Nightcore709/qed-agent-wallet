@@ -1,0 +1,888 @@
+{
+ "format": "qed-evidence-case/v1",
+ "id": "vault.0ff4af9f-67be-4f55-b7d6-6337ccf1b3ca",
+ "kind": "vault-job",
+ "title": "Owner withdrew 99,400.00 tINR; treasury now 100.00 tINR (100.00 free).",
+ "outcome": "executed",
+ "venue": "local-chain",
+ "workspace": "usr_1m81ffny1gh44s9946y",
+ "assembledAt": "2026-11-22T11:20:06.920Z",
+ "sections": {
+  "1": {
+   "title": "The owner's objective and the bounded authority granted earlier",
+   "objective": {
+    "text": "Withdraw 99,400.00 tINR of the treasury's free funds to the owner's own account 0x6563573A….",
+    "source": "the terms the owner was shown and signed",
+    "at": "2026-11-22T11:20:04.486Z"
+   },
+   "instruments": [
+    {
+     "kind": "owner-approval",
+     "id": "withdraw ac3dc1e8…",
+     "signedAt": "2026-11-22T11:20:04.483Z",
+     "summary": "Withdraw 99,400.00 tINR of the treasury's free funds to the owner's own account 0x6563573A….",
+     "allowedWhenPrepared": true,
+     "checksWhenPrepared": [
+      {
+       "id": "free-balance",
+       "rule": "Free treasury balance: ring-fenced money is untouchable, even by the owner",
+       "limit": "9950000",
+       "used": null,
+       "remaining": "9950000",
+       "pass": true
+      }
+     ],
+     "document": {
+      "text": "{\"action\":\"withdraw\",\"kind\":\"vault-proposal\",\"network\":\"Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts\",\"note\":\"Your passkey signs the digests listed under \\\"sign\\\", one prompt for each, and nothing else. Each commits to exactly these terms on the chain; the chain checks the signature against your vault's owner account before anything runs, and the vault service only relays. The tokens are valueless test tokens on a local test chain.\",\"proposalId\":\"ac3dc1e8-a1ad-42cf-8917-e4a3b358b786\",\"sign\":[{\"digest\":\"0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f\",\"item\":0,\"kind\":\"execute\",\"signers\":1}],\"summary\":\"Withdraw 99,400.00 tINR of the treasury's free funds to the owner's own account 0x6563573A….\",\"terms\":{\"actions\":[{\"args\":[\"0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA\",\"9940000\"],\"contract\":\"QEDVault (treasury)\",\"function\":\"withdraw\",\"to\":\"0xec0E5cA6cB66F8BA0983D9A4437757473ec20993\"}],\"amount\":\"99400\",\"amountRaw\":\"9940000\",\"chainId\":31337,\"effect\":\"Free funds leave the treasury vault for the owner's own account. Ring-fenced money cannot be withdrawn. The agent's limits follow the lower balance.\",\"genesisId\":\"23075c5c-3eb6-4090-adc9-6ecaed37da24\",\"kind\":\"withdraw\",\"to\":\"0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA\",\"toSign\":[{\"account\":\"0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA\",\"calls\":[{\"action\":\"QEDVault (treasury).withdraw\",\"data\":\"0xf3fef3a30000000000000000000000006563573a1f0510c1067db2715d6dbb325ce7fbea000000000000000000000000000000000000000000000000000000000097ac20\",\"target\":\"0xec0E5cA6cB66F8BA0983D9A4437757473ec20993\",\"value\":\"0\"}],\"chainId\":31337,\"deadline\":\"1795347604\",\"digest\":\"0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f\",\"kind\":\"execute\",\"nonce\":\"1\",\"note\":\"The passkey signs this EIP-712 digest of QEDOwnerAccount.execute(calls, nonce, deadline): exactly these calls, once, before the deadline. The rail relays it and pays gas.\",\"threshold\":1}],\"token\":\"0xd2DA23875905A1bCB3830d670B38dA9D427d2e5d\",\"vault\":\"0xec0E5cA6cB66F8BA0983D9A4437757473ec20993\"},\"termsHash\":\"sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa\",\"v\":2,\"vault\":\"qed-24d9976ecff75827bbd7f34b\"}",
+      "sha256": "0e4919bea67ca069ce38dabbe06a2e3ae8070a31d9979a2ba010345502845547"
+     },
+     "approval": {
+      "id": "apr_1m81fr53x0enc6h8fqr",
+      "docHash": "0e4919bea67ca069ce38dabbe06a2e3ae8070a31d9979a2ba010345502845547"
+     },
+     "signatures": [
+      {
+       "type": "webauthn-es256",
+       "credential": "sha256:1dfab4f758ab4a55",
+       "publicKey": {
+        "x": "0x8c27ea15f12b44ec9a9bdcdd1c32810f125aa2925ab77bd7ade18edb2c460800",
+        "y": "0xcfa2bfcfca88f8505cd571ec4fc93b198567c55b183fca454ab8eb000e0303ef"
+       },
+       "challenge": "0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f",
+       "challengeIs": "owner-account digest terms.toSign[0]",
+       "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000009",
+       "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"g1PBPUZCaxQgHPqTdrtuoHU1dkCj9xEXR6Oqrd1Qwx8\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+       "signature": "0x3046022100e24666a1610a2308607671a32c183f9c296afa413bc5b4e9d9c513afccafc7b4022100e2be7190679efe0cfa315d5590a5dff192d15261ac2944d8f8a0708dacf4e0f9",
+       "rpId": "localhost"
+      }
+     ],
+     "attestation": {
+      "aaguid": "00000000-0000-0000-0000-000000000000",
+      "attested": false
+     },
+     "terms": {
+      "actions": [
+       {
+        "args": [
+         "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+         "9940000"
+        ],
+        "contract": "QEDVault (treasury)",
+        "function": "withdraw",
+        "to": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993"
+       }
+      ],
+      "amount": "99400",
+      "amountRaw": "9940000",
+      "chainId": 31337,
+      "effect": "Free funds leave the treasury vault for the owner's own account. Ring-fenced money cannot be withdrawn. The agent's limits follow the lower balance.",
+      "genesisId": "23075c5c-3eb6-4090-adc9-6ecaed37da24",
+      "kind": "withdraw",
+      "to": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+      "toSign": [
+       {
+        "account": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+        "calls": [
+         {
+          "action": "QEDVault (treasury).withdraw",
+          "data": "0xf3fef3a30000000000000000000000006563573a1f0510c1067db2715d6dbb325ce7fbea000000000000000000000000000000000000000000000000000000000097ac20",
+          "target": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993",
+          "value": "0"
+         }
+        ],
+        "chainId": 31337,
+        "deadline": "1795347604",
+        "digest": "0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f",
+        "kind": "execute",
+        "nonce": "1",
+        "note": "The passkey signs this EIP-712 digest of QEDOwnerAccount.execute(calls, nonce, deadline): exactly these calls, once, before the deadline. The rail relays it and pays gas.",
+        "threshold": 1
+       }
+      ],
+      "token": "0xd2DA23875905A1bCB3830d670B38dA9D427d2e5d",
+      "vault": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993"
+     },
+     "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+     "digests": [
+      {
+       "kind": "execute",
+       "digest": "0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f",
+       "purpose": null,
+       "threshold": 1
+      }
+     ],
+     "decisionRecord": {
+      "n": 12,
+      "at": "2026-11-22T11:20:04.502Z",
+      "kind": "owner-withdraw",
+      "jobId": "0ff4af9f-67be-4f55-b7d6-6337ccf1b3ca",
+      "verdict": "SENT",
+      "clock": {
+       "wallTime": "2026-11-22T11:20:04.491Z",
+       "wallSeconds": 1795346404,
+       "chainSeconds": 1795346402,
+       "skewSeconds": 2,
+       "limitSeconds": 5,
+       "withinLimit": true
+      },
+      "approval": {
+       "approvalId": "apr_1m81fr53x0enc6h8fqr",
+       "docHash": "sha256:0e4919bea67ca069ce38dabbe06a2e3ae8070a31d9979a2ba010345502845547",
+       "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+       "confirmedAt": "2026-11-22T11:20:04.483Z",
+       "method": "passkey",
+       "signatures": [
+        {
+         "assertions": [
+          {
+           "publicKey": {
+            "x": "0x8c27ea15f12b44ec9a9bdcdd1c32810f125aa2925ab77bd7ade18edb2c460800",
+            "y": "0xcfa2bfcfca88f8505cd571ec4fc93b198567c55b183fca454ab8eb000e0303ef"
+           },
+           "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000009",
+           "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"g1PBPUZCaxQgHPqTdrtuoHU1dkCj9xEXR6Oqrd1Qwx8\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+           "signature": "0x3046022100e24666a1610a2308607671a32c183f9c296afa413bc5b4e9d9c513afccafc7b4022100e2be7190679efe0cfa315d5590a5dff192d15261ac2944d8f8a0708dacf4e0f9"
+          }
+         ]
+        }
+       ]
+      },
+      "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+      "record": {
+       "account": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+       "actions": [
+        {
+         "args": [
+          "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+          "9940000"
+         ],
+         "contract": "QEDVault (treasury)",
+         "function": "withdraw",
+         "to": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993"
+        }
+       ],
+       "execute": {
+        "deadline": "1795347604",
+        "digest": "0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f",
+        "nonce": "1"
+       },
+       "relayer": "0x88D8f65C2f0d3731C8BF16eF0F0F40c1350D2063",
+       "tx": {
+        "block": "61",
+        "gasUsed": "106665",
+        "hash": "0x55a01d77aa2f1853aac283cd59ca2fb05e085714df7b0b270125220e4288e9df",
+        "status": "success"
+       }
+      },
+      "evidenceHash": null,
+      "prevHash": "c7c02af6efeee03c1985fbc732f6151c430161f712136cd80a26bf66f357a7cc",
+      "hash": "6944075563e685d668ab17c3a2ab7e17c1dc6af60936de3767e04dfb77928d5e"
+     }
+    }
+   ],
+   "venues": [
+    {
+     "index": null,
+     "address": "0x90CD73Aa44F682B04215727bAFe32Ee662F0865d",
+     "name": "tINR/tUSD · 0.30% · deep"
+    },
+    {
+     "index": null,
+     "address": "0x9C8A16163fa424cc3866BE6381B33fBD6FF39806",
+     "name": "tINR/tUSD · 0.05% · thin"
+    },
+    {
+     "index": null,
+     "address": "0x90f9936E9613153B19EEbe2da399153C34b6F715",
+     "name": "tINR/tEUR · 0.30%"
+    },
+    {
+     "index": null,
+     "address": "0x182b301a8e15647007AdA10abf947332b58B93F9",
+     "name": "tUSD/tEUR · 0.30% · deep (the release's pool)"
+    },
+    {
+     "index": null,
+     "address": "0xE2964443c3EBcb9866c8CB9D7c04ae475cACa9ff",
+     "name": "tINR/tUSD · 1.00% · off-market"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 12,
+     "at": "2026-11-22T11:20:04.502Z",
+     "kind": "owner-withdraw",
+     "jobId": "0ff4af9f-67be-4f55-b7d6-6337ccf1b3ca",
+     "verdict": "SENT",
+     "clock": {
+      "wallTime": "2026-11-22T11:20:04.491Z",
+      "wallSeconds": 1795346404,
+      "chainSeconds": 1795346402,
+      "skewSeconds": 2,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m81fr53x0enc6h8fqr",
+      "docHash": "sha256:0e4919bea67ca069ce38dabbe06a2e3ae8070a31d9979a2ba010345502845547",
+      "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+      "confirmedAt": "2026-11-22T11:20:04.483Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0x8c27ea15f12b44ec9a9bdcdd1c32810f125aa2925ab77bd7ade18edb2c460800",
+           "y": "0xcfa2bfcfca88f8505cd571ec4fc93b198567c55b183fca454ab8eb000e0303ef"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000009",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"g1PBPUZCaxQgHPqTdrtuoHU1dkCj9xEXR6Oqrd1Qwx8\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x3046022100e24666a1610a2308607671a32c183f9c296afa413bc5b4e9d9c513afccafc7b4022100e2be7190679efe0cfa315d5590a5dff192d15261ac2944d8f8a0708dacf4e0f9"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+     "record": {
+      "account": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+      "actions": [
+       {
+        "args": [
+         "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+         "9940000"
+        ],
+        "contract": "QEDVault (treasury)",
+        "function": "withdraw",
+        "to": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993"
+       }
+      ],
+      "execute": {
+       "deadline": "1795347604",
+       "digest": "0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f",
+       "nonce": "1"
+      },
+      "relayer": "0x88D8f65C2f0d3731C8BF16eF0F0F40c1350D2063",
+      "tx": {
+       "block": "61",
+       "gasUsed": "106665",
+       "hash": "0x55a01d77aa2f1853aac283cd59ca2fb05e085714df7b0b270125220e4288e9df",
+       "status": "success"
+      }
+     },
+     "evidenceHash": null,
+     "prevHash": "c7c02af6efeee03c1985fbc732f6151c430161f712136cd80a26bf66f357a7cc",
+     "hash": "6944075563e685d668ab17c3a2ab7e17c1dc6af60936de3767e04dfb77928d5e"
+    }
+   ]
+  },
+  "2": {
+   "title": "What the model selected, and what it was given",
+   "involved": false,
+   "isModel": false,
+   "label": "none",
+   "statement": "No model took part: the owner asked for this, and the vault service's own code decided it.",
+   "decidedBy": "the vault service",
+   "information": [],
+   "constraints": []
+  },
+  "3": {
+   "title": "The independent enforcement decision",
+   "decision": "allowed",
+   "statement": "Each step as the vault service recorded it, with the co-signer's own checks from its hash-chained decision record.",
+   "checks": [
+    {
+     "by": "vault service",
+     "name": "owner",
+     "pass": true,
+     "detail": "Approval apr_1m81fr53x0enc6h8fqr (passkey) binds these exact terms: sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa. The owner's passkey signed QEDVault.withdraw as one batch for the owner account (QEDOwnerAccount.execute), checked on chain; the rail relays it and pays its gas, and holds no key that could sign it.",
+     "source": {
+      "step": 0
+     }
+    },
+    {
+     "by": "chain",
+     "name": "receipt",
+     "pass": true,
+     "detail": "Owner transaction in block 61.",
+     "source": {
+      "step": 1
+     }
+    },
+    {
+     "by": "reconciliation",
+     "name": "reconcile",
+     "pass": true,
+     "detail": "Treasury 99,500.00 → 100.00 tINR; the owner's account 10,000.00 → 109,400.00 tINR.",
+     "source": {
+      "step": 2
+     }
+    }
+   ],
+   "steps": [
+    {
+     "seq": 0,
+     "key": "owner",
+     "label": "Owner approves the exact terms",
+     "status": "ok",
+     "detail": "Approval apr_1m81fr53x0enc6h8fqr (passkey) binds these exact terms: sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa. The owner's passkey signed QEDVault.withdraw as one batch for the owner account (QEDOwnerAccount.execute), checked on chain; the rail relays it and pays its gas, and holds no key that could sign it.",
+     "data": {
+      "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+      "approvalId": "apr_1m81fr53x0enc6h8fqr"
+     },
+     "at": "2026-11-22T11:20:04.488Z"
+    },
+    {
+     "seq": 1,
+     "key": "receipt",
+     "label": "QEDVault.withdraw mined",
+     "status": "ok",
+     "detail": "Owner transaction in block 61.",
+     "data": {
+      "hash": "0x55a01d77aa2f1853aac283cd59ca2fb05e085714df7b0b270125220e4288e9df",
+      "status": "success",
+      "block": "61",
+      "gasUsed": "106665",
+      "from": "0x88D8f65C2f0d3731C8BF16eF0F0F40c1350D2063",
+      "to": "0x6563573a1f0510c1067db2715d6dbb325ce7fbea",
+      "error": null,
+      "errorArgs": null,
+      "events": [
+       {
+        "name": "Transfer",
+        "args": {
+         "from": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993",
+         "to": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+         "value": "9940000"
+        }
+       },
+       {
+        "name": "Withdrawn",
+        "args": {
+         "to": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+         "amount": "9940000"
+        }
+       }
+      ]
+     },
+     "at": "2026-11-22T11:20:04.502Z"
+    },
+    {
+     "seq": 2,
+     "key": "reconcile",
+     "label": "Balances reconciled",
+     "status": "ok",
+     "detail": "Treasury 99,500.00 → 100.00 tINR; the owner's account 10,000.00 → 109,400.00 tINR.",
+     "data": {
+      "before": {
+       "vault": "9950000",
+       "other": "1000000",
+       "ringFenced": "0"
+      },
+      "after": {
+       "vault": "10000",
+       "other": "10940000",
+       "ringFenced": "0"
+      }
+     },
+     "at": "2026-11-22T11:20:04.503Z"
+    }
+   ],
+   "decisionRecords": [
+    {
+     "n": 12,
+     "at": "2026-11-22T11:20:04.502Z",
+     "kind": "owner-withdraw",
+     "jobId": "0ff4af9f-67be-4f55-b7d6-6337ccf1b3ca",
+     "verdict": "SENT",
+     "clock": {
+      "wallTime": "2026-11-22T11:20:04.491Z",
+      "wallSeconds": 1795346404,
+      "chainSeconds": 1795346402,
+      "skewSeconds": 2,
+      "limitSeconds": 5,
+      "withinLimit": true
+     },
+     "approval": {
+      "approvalId": "apr_1m81fr53x0enc6h8fqr",
+      "docHash": "sha256:0e4919bea67ca069ce38dabbe06a2e3ae8070a31d9979a2ba010345502845547",
+      "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+      "confirmedAt": "2026-11-22T11:20:04.483Z",
+      "method": "passkey",
+      "signatures": [
+       {
+        "assertions": [
+         {
+          "publicKey": {
+           "x": "0x8c27ea15f12b44ec9a9bdcdd1c32810f125aa2925ab77bd7ade18edb2c460800",
+           "y": "0xcfa2bfcfca88f8505cd571ec4fc93b198567c55b183fca454ab8eb000e0303ef"
+          },
+          "authenticatorData": "0x49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97630500000009",
+          "clientDataJSON": "{\"type\":\"webauthn.get\",\"challenge\":\"g1PBPUZCaxQgHPqTdrtuoHU1dkCj9xEXR6Oqrd1Qwx8\",\"origin\":\"http://localhost:5491\",\"crossOrigin\":false}",
+          "signature": "0x3046022100e24666a1610a2308607671a32c183f9c296afa413bc5b4e9d9c513afccafc7b4022100e2be7190679efe0cfa315d5590a5dff192d15261ac2944d8f8a0708dacf4e0f9"
+         }
+        ]
+       }
+      ]
+     },
+     "termsHash": "sha256:2519cd758fb84a9779bccdb4b3d8a3872643a328a456ad033314a2e39843f7fa",
+     "record": {
+      "account": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+      "actions": [
+       {
+        "args": [
+         "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+         "9940000"
+        ],
+        "contract": "QEDVault (treasury)",
+        "function": "withdraw",
+        "to": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993"
+       }
+      ],
+      "execute": {
+       "deadline": "1795347604",
+       "digest": "0x8353c13d46426b14201cfa9376bb6ea075357640a3f7111747a3aaaddd50c31f",
+       "nonce": "1"
+      },
+      "relayer": "0x88D8f65C2f0d3731C8BF16eF0F0F40c1350D2063",
+      "tx": {
+       "block": "61",
+       "gasUsed": "106665",
+       "hash": "0x55a01d77aa2f1853aac283cd59ca2fb05e085714df7b0b270125220e4288e9df",
+       "status": "success"
+      }
+     },
+     "evidenceHash": null,
+     "prevHash": "c7c02af6efeee03c1985fbc732f6151c430161f712136cd80a26bf66f357a7cc",
+     "hash": "6944075563e685d668ab17c3a2ab7e17c1dc6af60936de3767e04dfb77928d5e"
+    }
+   ]
+  },
+  "4": {
+   "title": "Standing authority: what ran without a fresh owner signature",
+   "freshOwnerSignature": true,
+   "ranUnder": [],
+   "requestedBy": {
+    "who": "the owner, with a fresh passkey signature over these exact terms",
+    "evidence": "proposal ac3dc1e8-a1ad-42cf-8917-e4a3b358b786; approval apr_1m81fr53x0enc6h8fqr",
+    "at": "2026-11-22T11:20:04.486Z"
+   },
+   "signaturesUsed": [
+    {
+     "approvalId": "apr_1m81fr53x0enc6h8fqr",
+     "when": "2026-11-22T11:20:04.483Z",
+     "what": "owner-approval"
+    }
+   ],
+   "statement": "This needed the owner's fresh passkey signature over its exact terms."
+  },
+  "5": {
+   "title": "Balances, costs and consequence",
+   "executed": true,
+   "moved": [
+    {
+     "what": "tINR from treasury vault to owner account (step 1)",
+     "asset": "tINR",
+     "decimals": 2,
+     "amount": "9940000",
+     "from": "treasury vault",
+     "to": "owner account",
+     "text": "99400 tINR",
+     "evidence": {
+      "tx": "0x55a01d77aa2f1853aac283cd59ca2fb05e085714df7b0b270125220e4288e9df",
+      "event": "Transfer",
+      "arg": "value",
+      "index": 0
+     }
+    }
+   ],
+   "balances": [
+    {
+     "account": "treasury vault (step 2)",
+     "asset": "tINR",
+     "decimals": 2,
+     "before": "9950000",
+     "after": "10000",
+     "delta": "-9940000",
+     "source": "the vault service, re-read from the chain after the transaction"
+    },
+    {
+     "account": "owner account (step 2)",
+     "asset": "tINR",
+     "decimals": 2,
+     "before": "1000000",
+     "after": "10940000",
+     "delta": "9940000",
+     "source": "the vault service, re-read from the chain after the transaction"
+    },
+    {
+     "account": "treasury vault, ring-fenced (step 2)",
+     "asset": "tINR",
+     "decimals": 2,
+     "before": "0",
+     "after": "0",
+     "delta": "0",
+     "source": "the vault service, re-read from the chain after the transaction"
+    }
+   ],
+   "executions": null,
+   "authorityBudget": {
+    "rule": "d7",
+    "asset": {
+     "symbol": "tINR",
+     "decimals": 2
+    },
+    "base": "1000",
+    "grants": "0",
+    "granted": "1000",
+    "earned": "0",
+    "used": "296",
+    "usedBy": {
+     "payments": "0",
+     "conversions": "296",
+     "promisesPaid": "0"
+    },
+    "held": "0",
+    "reserved": "0",
+    "budget": "704",
+    "available": "704",
+    "rate": "1/2",
+    "confirmations": 2,
+    "pendingCredits": 0,
+    "notEarnings": 0,
+    "references": [
+     {
+      "symbol": "tUSD",
+      "lo": "83.58",
+      "mid": "84",
+      "hi": "84.42",
+      "divergenceBps": 0,
+      "source": "fixed in configuration: the test market's genesis rate, tINR/tUSD · 0.30% · deep at 84.00 tINR per tUSD, ± 0.5%; no trade moves it"
+     }
+    ],
+    "statement": "7.04 tINR available = granted 10.00 (base 10.00, owner grants 0.00) + earned 0.00 − used 2.96 (payments 0.00, conversion costs 2.96, promises paid 0.00) − promised and not yet paid 0.00 − reserved for certificates not yet used 0.00",
+    "limits": [
+     "Earned means paid for, through the escrow, by a client this workspace does not know to be its own: a client the wallet has never seen cannot be told apart from an unregistered address of a member (D7 assumption A-ID; a second workspace counts as the workspace's own only when it shares a member's passkey).",
+     "Conversions count only their cost against a fixed reference band, so the mandate's own limits on amounts per payment, per period and over its life are what bound how much can be converted."
+    ],
+    "note": "The co-signer's authority budget (D7), as it stands when the case is assembled."
+   },
+   "consequence": "Owner withdrew 99,400.00 tINR; treasury now 100.00 tINR (100.00 free).",
+   "guidance": null,
+   "units": "Amounts are integers in the token's smallest unit: tINR has 2 decimals, tUSD 6."
+  },
+  "6": {
+   "title": "Technical record",
+   "revision": {
+    "commit": "0d53fb1be0e0520f14431b8f43ed17b8de58c2b4",
+    "uncommittedChanges": true,
+    "derivesFromRelease": "qed-20261023-health-gate-v3",
+    "source": "server/readiness.ts: the git revision the running code was started from"
+   },
+   "venue": {
+    "kind": "local-chain",
+    "network": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts"
+   },
+   "chain": {
+    "chainId": 31337,
+    "name": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts",
+    "rpc": "127.0.0.1 (loopback only)",
+    "genesisId": "23075c5c-3eb6-4090-adc9-6ecaed37da24",
+    "versions": {
+     "node": "v26.12.0",
+     "anvil": "anvil Version: 1.7.1",
+     "release": "qed-20261023-health-gate-v3"
+    }
+   },
+   "contracts": {
+    "ownerAccount": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+    "vault": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993",
+    "reserve": "0xB9B99e747314BEf412b61021F5eD03128aa6f3d4",
+    "execution": "0xd65f7520E39007e5B7Efc68DE64BAcde9D3D22c4",
+    "treasuryPolicy": "0x28000B4c19853f55baD739891667E1AB149CFed6",
+    "lens": "0x800b6Dfb75CCfE9FBF54C7E61D9dA7C0899f1c19",
+    "tUSD": "0xa58834902b228188CF458Da751260ED18b288679",
+    "tEUR": "0x011bbF30A43111De71Aa4933933F65D47d2129C1",
+    "tETH": "0xce7d8A93451CaE48A71eb73Fc8D560b32407d470",
+    "pools": [
+     "0x90CD73Aa44F682B04215727bAFe32Ee662F0865d",
+     "0x9C8A16163fa424cc3866BE6381B33fBD6FF39806",
+     "0x90f9936E9613153B19EEbe2da399153C34b6F715",
+     "0x182b301a8e15647007AdA10abf947332b58B93F9",
+     "0xE2964443c3EBcb9866c8CB9D7c04ae475cACa9ff"
+    ],
+    "asset": "0xd2DA23875905A1bCB3830d670B38dA9D427d2e5d",
+    "reserveAsset": "0xa58834902b228188CF458Da751260ED18b288679"
+   },
+   "roles": {
+    "owner": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+    "ownerCustody": "passkey owner account (QEDOwnerAccount): its signers are the members' passkeys; the service holds no key that can satisfy it and only relays",
+    "operator": "0x408E25B82E318906F85dE5076f8b5252CA804195",
+    "cosigner": "0x8C92A223E7aDd78eD6eB0A0F011D7021f676cfaD",
+    "guardian": "0x6aE2f1e6dF655fF97eC95d22BbcbA8481A20924c",
+    "attacker": null,
+    "creditor": "0x96dF701D49243a9848d780aead7362820b7fDEc2",
+    "cosignerIsolation": "separate-process"
+   },
+   "keys": {
+    "agent": "0x408E25B82E318906F85dE5076f8b5252CA804195",
+    "guardian": "0x6aE2f1e6dF655fF97eC95d22BbcbA8481A20924c",
+    "relayer": "0x88D8f65C2f0d3731C8BF16eF0F0F40c1350D2063",
+    "derivation": "HKDF-SHA256 from this installation's master secret (mode 600); none of them is a signer of the owner account"
+   },
+   "ownerAccount": {
+    "address": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+    "kind": "passkey-account",
+    "threshold": 1,
+    "signers": [
+     {
+      "x": "0x8c27ea15f12b44ec9a9bdcdd1c32810f125aa2925ab77bd7ade18edb2c460800",
+      "y": "0xcfa2bfcfca88f8505cd571ec4fc93b198567c55b183fca454ab8eb000e0303ef",
+      "role": "member"
+     }
+    ],
+    "build": {
+     "sha256": "84566df15d0c3965fcd83672ab8522b76bdb44f281f2a77e60137c058523a5bd",
+     "solc": "0.8.38+commit.1835d247",
+     "declaredReady": true,
+     "label": "declared ready by chain/accounts/READY.json"
+    }
+   },
+   "transactions": [
+    {
+     "hash": "0x55a01d77aa2f1853aac283cd59ca2fb05e085714df7b0b270125220e4288e9df",
+     "chain": "vault",
+     "status": "success",
+     "block": "61",
+     "gasUsed": "106665",
+     "from": "0x88D8f65C2f0d3731C8BF16eF0F0F40c1350D2063",
+     "to": "0x6563573a1f0510c1067db2715d6dbb325ce7fbea",
+     "events": [
+      {
+       "name": "Transfer",
+       "address": "0xd2da23875905a1bcb3830d670b38da9d427d2e5d",
+       "args": {
+        "from": "0xec0E5cA6cB66F8BA0983D9A4437757473ec20993",
+        "to": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+        "value": "9940000"
+       }
+      },
+      {
+       "name": "Withdrawn",
+       "address": "0xec0e5ca6cb66f8ba0983d9a4437757473ec20993",
+       "args": {
+        "to": "0x6563573A1f0510c1067DB2715D6dbB325ce7FbeA",
+        "amount": "9940000"
+       }
+      }
+     ],
+     "network": "Local Anvil chain 31337 · valueless test tokens · service keys derived from this installation's secret; owners are passkey accounts",
+     "chainWhenAssembled": {
+      "status": "success",
+      "block": "61",
+      "gasUsed": "106665",
+      "from": "0x88d8f65c2f0d3731c8bf16ef0f0f40c1350d2063",
+      "to": "0x6563573a1f0510c1067db2715d6dbb325ce7fbea",
+      "logs": 3
+     }
+    }
+   ],
+   "ids": {
+    "job": "0ff4af9f-67be-4f55-b7d6-6337ccf1b3ca",
+    "kind": "withdraw",
+    "proposal": "ac3dc1e8-a1ad-42cf-8917-e4a3b358b786",
+    "vaultWorkspace": "qed-24d9976ecff75827bbd7f34b",
+    "tick": null
+   },
+   "decisionChain": {
+    "ok": true,
+    "records": 14,
+    "brokenAt": null,
+    "head": "d0a7e7efabea7d37056f5cc67529630f4b518d43a9d3f73180afdfd216ac5557",
+    "note": "The vault service re-hashed its whole decision chain when the case was assembled."
+   }
+  },
+  "7": {
+   "title": "Changed inputs and the decisions they produced",
+   "recorded": [
+    {
+     "caseId": "vault.74c26b11-4116-41c9-9abf-fd1a6618f1f3",
+     "changed": "the same kind of request with other terms",
+     "decision": "refused",
+     "summary": "Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,500.00 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation with both figures. Nothing was sent."
+    }
+   ],
+   "probes": [],
+   "note": "Recorded: other jobs of the same kind. Probes: the vault's own limit check now."
+  },
+  "8": {
+   "title": "Refusals that prevented execution",
+   "thisCase": [],
+   "related": [
+    {
+     "caseId": "vault.2ed1b085-0b44-46f8-a954-f680da80d59e",
+     "at": "2026-11-22T11:20:06.044Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "failed",
+       "detail": "No standing policy yet: the owner must sign one first."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.a47cd2d2-81ab-48d0-bac2-3cb15f35a925",
+     "at": "2026-11-22T11:20:05.024Z",
+     "what": "policy-tick",
+     "failed": [
+      {
+       "name": "decide waited",
+       "detail": "Short 4.052955 tUSD but waiting: the market is too thin: any tranche ≥ 20000 would pay more than 150 bps."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.4f8fae37-e28d-4adc-9e6a-986ae2606fbf",
+     "at": "2026-11-22T11:20:04.190Z",
+     "what": "attack",
+     "failed": [
+      {
+       "name": "receipt reverted",
+       "detail": "Status reverted in block 35 of the ephemeral chain (455,500 gas paid by the attacker). Defence: Weak duality: any price vector is a valid upper bound. Nothing moved: every balance and the spending window are unchanged."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0x2da8e53127… reverted on a throwaway chain"
+    },
+    {
+     "caseId": "vault.74c26b11-4116-41c9-9abf-fd1a6618f1f3",
+     "at": "2026-11-22T11:20:03.465Z",
+     "what": "withdraw",
+     "failed": [
+      {
+       "name": "refused",
+       "detail": "Refused before sending: a withdrawal of 150,000.00 tINR exceeds the free balance of 99,500.00 tINR. Ring-fenced money cannot be withdrawn, even by the owner; the vault would answer SolvencyViolation with both figures. Nothing was sent."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.93c736ad-9448-4751-ae5a-198b5edc0a9b",
+     "at": "2026-11-22T11:20:02.941Z",
+     "what": "convert",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "Per-conversion limit in the owner's signed mandate: 300.00 > 250.00 tINR; Left in the mandate's current period: 300.00 > 100.00 tINR. The AI cannot raise a limit; only the owner can sign a new mandate."
+      }
+     ],
+     "executed": false,
+     "proof": "no transaction was sent"
+    },
+    {
+     "caseId": "vault.8846c18f-aa17-4b2c-9a5b-cc8ad75a7c47",
+     "at": "2026-11-22T11:20:02.480Z",
+     "what": "policy-run",
+     "failed": [
+      {
+       "name": "mandate refused",
+       "detail": "250.00 tINR breaks: Left in the mandate's current period. The agent cannot raise a limit."
+      }
+     ],
+     "executed": false,
+     "proof": "transaction 0x0c12eaa5c3… success"
+    }
+   ]
+  }
+ },
+ "verification": {
+  "receiptChain": {
+   "genesis": "310d67fb4e1ea87e551575e835c5473c280360a1fbe65c5f691c7684e77a29a5",
+   "server": {
+    "ok": true,
+    "count": 2,
+    "brokenAt": null,
+    "head": "ca441aa1f28ec207e14a0790c56ea43a85a9ee506ea5fe31c05da7acb98eb7e6",
+    "checkedAt": "when the case was assembled"
+   },
+   "entries": [],
+   "note": "Every receipt up to this case's last one: its number, its predecessor's hash and its own. Bodies are carried only for this case's receipts, so a verifier recomputes those and checks the links of the rest."
+  },
+  "ledger": {
+   "breaks": [],
+   "checkedAt": "when the case was assembled"
+  },
+  "vaultDecisions": {
+   "server": {
+    "ok": true,
+    "records": 14,
+    "brokenAt": null,
+    "head": "d0a7e7efabea7d37056f5cc67529630f4b518d43a9d3f73180afdfd216ac5557"
+   },
+   "reHashedHere": 2
+  },
+  "note": "A vault job is recorded by the vault service, not in the wallet's receipt chain: its decision records are hash-chained there, and each one this case carries is re-hashed by the verifier. The wallet's receipt chain and ledger as a whole were verified too when the case was assembled."
+ },
+ "redactions": [
+  {
+   "what": "Credentials",
+   "how": "never read",
+   "why": "Password hashes, recovery codes, session tokens and the vault service's bearer token are not part of any case."
+  },
+  {
+   "what": "Session data",
+   "how": "omitted",
+   "why": "The hash of the session an approval was given in, sign-in times and user agents are not needed to judge a decision."
+  },
+  {
+   "what": "Recovery data",
+   "how": "never read",
+   "why": "Recovery codes, contacts and requests have nothing to do with a money decision."
+  },
+  {
+   "what": "Passkey credential ids",
+   "how": "replaced by \"sha256:\" and the first 16 hex digits of their SHA-256",
+   "why": "That is enough to tell passkeys apart; the public key, which a verifier needs, is kept."
+  },
+  {
+   "what": "Network addresses",
+   "how": "omitted",
+   "why": "The audit log's IP addresses are not needed to judge a decision."
+  },
+  {
+   "what": "The vault service's keys",
+   "how": "never held by this API; addresses only",
+   "why": "The agent, co-signer, guardian and relayer keys stay in the vault service."
+  }
+ ],
+ "cannotProve": [
+  "No model took part in this job. In this build a model only proposes paper instructions; nothing it outputs reaches the chain.",
+  "The transactions are on a local Anvil chain (chain id 31337) started for this installation, with valueless test tokens. Their hashes are not publicly verifiable; they can be re-read only from that chain while it runs (verify-evidence.ts --rpc).",
+  "The passkey's make is not attested (its AAGUID is all zeros): a signature proves possession of the key, not which device or software held it.",
+  "A forger who rewrites this file and recomputes every hash makes a file that is consistent in itself. Compare its root with one obtained independently (verify-evidence.ts --root), check the receipt-chain head against a fresh read (--head), or re-read the transactions from the chain (--rpc).",
+  "No one outside this work has reviewed the code that made these records (server/readiness.ts lists this as a standing blocker)."
+ ],
+ "hashes": {
+  "algorithm": "SHA-256 of the canonical JSON of each part (keys sorted, no spaces: shared/sha256.ts canonical); the root covers the envelope and every part's hash",
+  "sections": {
+   "1": "93cbf2a996859a4866148b321c7e5f68cdf170e88ed2c60430c8dae22e985a29",
+   "2": "dab73d16afb1a36a821590a67d18284a4dcd2f7e5c0ef0c3d2c79c730dfcc82a",
+   "3": "b0f1f47b7e0c8fa54171b59b4fc808e858a0068570713a524f4dcaca5476a6d4",
+   "4": "9e4b29cf9ccd1991286ec440e1de6802b654284c3adeae8073f46f25442105dd",
+   "5": "3728fdca5e681db5dba5d9432ceef3a6bf37bd25356061a28e30f0bd712b61ea",
+   "6": "2e990f0cc1c74f6d4105498ef4b47749b7b6a5999920c8a9c146b1dae1f0b2db",
+   "7": "453eca74d0dcbc608810aacb038eb7ca2ca396d5cfc4c2638dd47295afa1fae0",
+   "8": "f970a617313eab04d17fd28aa37d918c25dd58b77555aa9759235afe4fccb350"
+  },
+  "verification": "e9428dbcd32637ea602f09c27cf8d570bbb915536c44933cc53af95ca4a38f28",
+  "redactions": "1dde4be1ace84c813c6042e6a2d7bb38c062caaae268c2e7dd444caea666797f",
+  "cannotProve": "ef7e014f68bc4230a0ca9f538ccf9a5fc6d29359166020e7941d2c37ea2db382",
+  "root": "78bdd5f6b560850aaf13507cf9b11892cc96f7d5de626a7a6784210aa4530588"
+ }
+}

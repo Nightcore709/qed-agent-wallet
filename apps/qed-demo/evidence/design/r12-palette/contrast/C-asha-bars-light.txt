@@ -1,0 +1,5 @@
+/ #0 pos-h: free 16.59 | 3.84   kept 4.32   reach 5.92
+/pay #0 sum-h: free 16.39 | 3.84   kept 4.27   reach 5.8
+/save #0 reserve-h: free 16.58 | 3.83   kept 4.33   reach 5.91
+/vault #0 mbar-row: free 16.57 | 3.77   kept 4.4   reach 5.92
+worst part or span against the panel: 4.27 (light 390)

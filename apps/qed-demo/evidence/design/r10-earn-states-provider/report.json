@@ -1,0 +1,18 @@
+{
+ "/earn 1440 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/earn 390 light": {
+  "errors": [],
+  "fault": false
+ },
+ "/earn 1440 dark": {
+  "errors": [],
+  "fault": false
+ },
+ "/earn 390 dark": {
+  "errors": [],
+  "fault": false
+ }
+}

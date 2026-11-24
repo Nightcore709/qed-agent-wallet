@@ -1,0 +1,659 @@
+{
+ "base": "http://localhost:6101",
+ "at": "2026-11-23T13:45:11.765Z",
+ "routes": [
+  "/save",
+  "/safeguards",
+  "/passbook"
+ ],
+ "widths": [
+  1440,
+  390
+ ],
+ "themes": [
+  "light",
+  "dark"
+ ],
+ "results": {
+  "/save 1440 light": {
+   "words": 1346,
+   "wordsFirst": 336,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    19,
+    22,
+    22.5,
+    28,
+    40
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 7,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 43,
+   "small24": 3,
+   "under32": 7,
+   "under44": 34,
+   "smallest": "a \"Pay from your on-chain wallet\" 220x17",
+   "smallList": [
+    "button \"30 days\" 70x30",
+    "button \"60 days\" 71x30",
+    "button \"Chart\" 57x30",
+    "button \"Statement\" 85x30",
+    "a \"Pay from your on-chain wallet\" 220x17",
+    "a \"Keep the dollar reserve topped up\" 220x17",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.139,
+   "inkFirst": 0.253,
+   "blankPage": 0.27,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 3540,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 1440 light": {
+   "words": 2175,
+   "wordsFirst": 247,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    19,
+    22,
+    22.5,
+    28,
+    40
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 47,
+   "small24": 1,
+   "under32": 2,
+   "under44": 35,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "button \"if limits hold\" 66x24",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.115,
+   "inkFirst": 0.291,
+   "blankPage": 0.47,
+   "edgesFirst": 33,
+   "overflow": false,
+   "height": 4968,
+   "axe": {},
+   "fault": false
+  },
+  "/passbook 1440 light": {
+   "words": 351,
+   "wordsFirst": 226,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    19,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 7,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 30,
+   "small24": 1,
+   "under32": 3,
+   "under44": 29,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "a \"Receipt kept\" 90x32",
+    "a \"Receipt kept\" 90x32",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.139,
+   "inkFirst": 0.205,
+   "blankPage": 0.12,
+   "edgesFirst": 29,
+   "overflow": false,
+   "height": 1491,
+   "axe": {},
+   "fault": false
+  },
+  "/save 390 light": {
+   "words": 1318,
+   "wordsFirst": 182,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    16,
+    17,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 6,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 38,
+   "small24": 4,
+   "under32": 8,
+   "under44": 24,
+   "smallest": "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 326x17",
+   "smallList": [
+    "button \"30 days\" 70x30",
+    "button \"60 days\" 71x30",
+    "button \"Chart\" 57x30",
+    "button \"Statement\" 85x30",
+    "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 326x17",
+    "a \"Pay bills from 2 payees up to ₹3,000 eac\" 326x17",
+    "a \"Pay from your on-chain wallet\" 326x17",
+    "a \"Keep the dollar reserve topped up\" 326x17"
+   ],
+   "blankFirst": 0.094,
+   "inkFirst": 0.443,
+   "blankPage": 0.57,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 5742,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 390 light": {
+   "words": 2042,
+   "wordsFirst": 171,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    16,
+    17,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 37,
+   "small24": 0,
+   "under32": 1,
+   "under44": 23,
+   "smallest": "button \"if limits hold\" 66x24",
+   "smallList": [
+    "button \"if limits hold\" 66x24"
+   ],
+   "blankFirst": 0.448,
+   "inkFirst": 0.264,
+   "blankPage": 9.92,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 7777,
+   "axe": {},
+   "fault": false
+  },
+  "/passbook 390 light": {
+   "words": 364,
+   "wordsFirst": 119,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    16,
+    17,
+    19,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 7,
+   "contrastMin": 5.49,
+   "contrastFails": 0,
+   "targets": 25,
+   "small24": 0,
+   "under32": 2,
+   "under44": 15,
+   "smallest": "a \"Receipt kept\" 90x32",
+   "smallList": [
+    "a \"Receipt kept\" 90x32",
+    "a \"Receipt kept\" 90x32"
+   ],
+   "blankFirst": 0.079,
+   "inkFirst": 0.38,
+   "blankPage": 0.19,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 2169,
+   "axe": {},
+   "fault": false
+  },
+  "/save 1440 dark": {
+   "words": 1346,
+   "wordsFirst": 336,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    19,
+    22,
+    22.5,
+    28,
+    40
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 8,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 43,
+   "small24": 3,
+   "under32": 7,
+   "under44": 34,
+   "smallest": "a \"Pay from your on-chain wallet\" 220x17",
+   "smallList": [
+    "button \"30 days\" 70x30",
+    "button \"60 days\" 71x30",
+    "button \"Chart\" 57x30",
+    "button \"Statement\" 85x30",
+    "a \"Pay from your on-chain wallet\" 220x17",
+    "a \"Keep the dollar reserve topped up\" 220x17",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.139,
+   "inkFirst": 0.253,
+   "blankPage": 0.27,
+   "edgesFirst": 23,
+   "overflow": false,
+   "height": 3540,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 1440 dark": {
+   "words": 2177,
+   "wordsFirst": 248,
+   "sizes": [
+    12,
+    13,
+    15,
+    16,
+    19,
+    22,
+    22.5,
+    28,
+    40
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 8,
+   "contrastMin": 6.45,
+   "contrastFails": 0,
+   "targets": 47,
+   "small24": 1,
+   "under32": 2,
+   "under44": 35,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "button \"if limits hold\" 66x24",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.115,
+   "inkFirst": 0.291,
+   "blankPage": 0.47,
+   "edgesFirst": 33,
+   "overflow": false,
+   "height": 4968,
+   "axe": {},
+   "fault": false
+  },
+  "/passbook 1440 dark": {
+   "words": 351,
+   "wordsFirst": 226,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    19,
+    22,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 8,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 30,
+   "small24": 1,
+   "under32": 3,
+   "under44": 29,
+   "smallest": "a \"Conversations\" 99x20",
+   "smallList": [
+    "a \"Receipt kept\" 90x32",
+    "a \"Receipt kept\" 90x32",
+    "a \"Conversations\" 99x20"
+   ],
+   "blankFirst": 0.139,
+   "inkFirst": 0.205,
+   "blankPage": 0.12,
+   "edgesFirst": 29,
+   "overflow": false,
+   "height": 1491,
+   "axe": {},
+   "fault": false
+  },
+  "/save 390 dark": {
+   "words": 1318,
+   "wordsFirst": 182,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    16,
+    17,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    600,
+    620,
+    640,
+    650,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 38,
+   "small24": 4,
+   "under32": 8,
+   "under44": 24,
+   "smallest": "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 326x17",
+   "smallList": [
+    "button \"30 days\" 70x30",
+    "button \"60 days\" 71x30",
+    "button \"Chart\" 57x30",
+    "button \"Statement\" 85x30",
+    "a \"Invest ₹1,000 in UTI Nifty 50 Index Fund\" 326x17",
+    "a \"Pay bills from 2 payees up to ₹3,000 eac\" 326x17",
+    "a \"Pay from your on-chain wallet\" 326x17",
+    "a \"Keep the dollar reserve topped up\" 326x17"
+   ],
+   "blankFirst": 0.094,
+   "inkFirst": 0.443,
+   "blankPage": 0.57,
+   "edgesFirst": 12,
+   "overflow": false,
+   "height": 5742,
+   "axe": {},
+   "fault": false
+  },
+  "/safeguards 390 dark": {
+   "words": 2044,
+   "wordsFirst": 171,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    16,
+    17,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans",
+    "ui-monospace"
+   ],
+   "colours": 7,
+   "contrastMin": 6.45,
+   "contrastFails": 0,
+   "targets": 37,
+   "small24": 0,
+   "under32": 1,
+   "under44": 23,
+   "smallest": "button \"if limits hold\" 66x24",
+   "smallList": [
+    "button \"if limits hold\" 66x24"
+   ],
+   "blankFirst": 0.448,
+   "inkFirst": 0.264,
+   "blankPage": 9.92,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 7777,
+   "axe": {},
+   "fault": false
+  },
+  "/passbook 390 dark": {
+   "words": 364,
+   "wordsFirst": 119,
+   "sizes": [
+    12,
+    13,
+    15,
+    15.5,
+    16,
+    17,
+    19,
+    28
+   ],
+   "weights": [
+    400,
+    500,
+    560,
+    580,
+    600,
+    620,
+    640,
+    650,
+    660,
+    680,
+    700,
+    720,
+    760
+   ],
+   "families": [
+    "Reddit Sans"
+   ],
+   "colours": 7,
+   "contrastMin": 6,
+   "contrastFails": 0,
+   "targets": 25,
+   "small24": 0,
+   "under32": 2,
+   "under44": 15,
+   "smallest": "a \"Receipt kept\" 90x32",
+   "smallList": [
+    "a \"Receipt kept\" 90x32",
+    "a \"Receipt kept\" 90x32"
+   ],
+   "blankFirst": 0.079,
+   "inkFirst": 0.38,
+   "blankPage": 0.19,
+   "edgesFirst": 20,
+   "overflow": false,
+   "height": 2169,
+   "axe": {},
+   "fault": false
+  }
+ }
+}

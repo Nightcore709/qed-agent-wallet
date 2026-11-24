@@ -1,0 +1,143 @@
+{
+ "measuredAt": "2026-11-23T14:44:29.836Z",
+ "base": "http://localhost:5901",
+ "watchMs": 15000,
+ "note": "Lab measures on this computer (headless Chrome, 1440x900, no throttling); not field data.",
+ "results": {
+  "/": {
+   "lcpMs": 140,
+   "cls": 0.0109,
+   "shifts": [
+    {
+     "value": 0.0108,
+     "sources": [
+      "section.hm-needs",
+      "section.instrument-panel.hm-position",
+      "nav.hm-acts",
+      "a.btn",
+      "a.btn.fill"
+     ]
+    }
+   ],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/pay": {
+   "lcpMs": 132,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/save": {
+   "lcpMs": 132,
+   "cls": 0.0006,
+   "shifts": [],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/holdings": {
+   "lcpMs": 128,
+   "cls": 0.0006,
+   "shifts": [],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/earn": {
+   "lcpMs": 112,
+   "cls": 0.1931,
+   "shifts": [
+    {
+     "value": 0.1931,
+     "sources": [
+      "section.panel.ea-work",
+      "section.ea-group.chain-work",
+      "section.panel.ea-book"
+     ]
+    }
+   ],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": false
+  },
+  "/protect": {
+   "lcpMs": 140,
+   "cls": 0.1243,
+   "shifts": [
+    {
+     "value": 0.0017,
+     "sources": [
+      "nav.top-nav",
+      "span.topbar-tools",
+      "a.btn.fill",
+      "a.",
+      "a."
+     ]
+    },
+    {
+     "value": 0.1226,
+     "sources": [
+      "section.pt-band",
+      "section.pt-band"
+     ]
+    }
+   ],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": false
+  },
+  "/activity": {
+   "lcpMs": 108,
+   "cls": 0.052,
+   "shifts": [
+    {
+     "value": 0.009,
+     "sources": [
+      "div.act-filter.act-filter-who",
+      "div.act-filter.act-filter-kind",
+      "div.act-filter.act-filter-state"
+     ]
+    },
+    {
+     "value": 0.043,
+     "sources": [
+      "div.panel.act-book",
+      "div.act-filters"
+     ]
+    }
+   ],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/ask": {
+   "lcpMs": 112,
+   "cls": 0,
+   "shifts": [],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  },
+  "/vault": {
+   "lcpMs": 120,
+   "cls": 0.0001,
+   "shifts": [],
+   "interactionMs": null,
+   "jsKB": 1019,
+   "cssKB": 265,
+   "pass": true
+  }
+ }
+}

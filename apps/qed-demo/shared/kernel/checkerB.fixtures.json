@@ -1,0 +1,4341 @@
+{
+ "source": "experiments/r4/X7-independent-checker/checker.py (Interp fd_break=principal_equals_shortfall, rule v3.2)",
+ "generated_by": "apps/qed-demo/scripts/gen_x7_fixtures.py",
+ "cases": [
+  {
+   "name": "card_50k",
+   "plan": {
+    "card": 50000.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 22585.53,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "lp_plan_rounded",
+   "plan": {
+    "card": 42400.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 757600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 17440.29,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "zero",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 0.0,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "pl_40k_cash_short",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 40000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -8310.93,
+    "max_shortfall_deepening_inr": 54284.61
+   }
+  },
+  {
+   "name": "card_40k_cash_short",
+   "plan": {
+    "card": 40000.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 8332.62,
+    "max_shortfall_deepening_inr": 52703.5
+   }
+  },
+  {
+   "name": "fd_200k_cash_short",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 200000.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -884.02,
+    "max_shortfall_deepening_inr": 884.02
+   }
+  },
+  {
+   "name": "liquid_fund_100k",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 100000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 974.04,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "home_loan_100k",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 100000.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 2412.14,
+    "max_shortfall_deepening_inr": 45591.91
+   }
+  },
+  {
+   "name": "pl_100k",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 100000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 5611.67,
+    "max_shortfall_deepening_inr": 48629.6
+   }
+  },
+  {
+   "name": "mixed_card_fd_lf",
+   "plan": {
+    "card": 120000.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 300000.0,
+    "liquid_fund": 100000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 47646.33,
+    "max_shortfall_deepening_inr": 67368.95
+   }
+  },
+  {
+   "name": "card_full_120k",
+   "plan": {
+    "card": 120000.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 49513.21,
+    "max_shortfall_deepening_inr": 65843.21
+   }
+  },
+  {
+   "name": "invalid_negative_fd",
+   "plan": {
+    "card": 50000.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": -50000.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "invalid_nan_card",
+   "plan": {
+    "card": "nan",
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "invalid_overpay_rich",
+   "plan": {
+    "card": 200000.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 5000000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "invalid_conservation",
+   "plan": {
+    "card": 120000.0,
+    "personal_loan": 300000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 420000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_000",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 53600.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 2818.48,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_001",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 113800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -558.62,
+    "max_shortfall_deepening_inr": 558.62
+   }
+  },
+  {
+   "name": "random_002",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 203200.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 2500.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 17861.76,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_003",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 4500.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 236.63,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_004",
+   "plan": {
+    "card": 46800.0,
+    "personal_loan": 64300.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 23032.58,
+    "max_shortfall_deepening_inr": 58784.62
+   }
+  },
+  {
+   "name": "random_005",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 153800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -732.35,
+    "max_shortfall_deepening_inr": 732.35
+   }
+  },
+  {
+   "name": "random_006",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 278000.0,
+    "home_loan": 55200.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -85061.84,
+    "max_shortfall_deepening_inr": 361638.57
+   }
+  },
+  {
+   "name": "random_007",
+   "plan": {
+    "card": 107500.0,
+    "personal_loan": 0.0,
+    "home_loan": 30300.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 42768.94,
+    "max_shortfall_deepening_inr": 83866.87
+   }
+  },
+  {
+   "name": "random_008",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 129400.0,
+    "fd": 191200.0,
+    "liquid_fund": 318800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -3066.67,
+    "max_shortfall_deepening_inr": 77357.36
+   }
+  },
+  {
+   "name": "random_009",
+   "plan": {
+    "card": 96800.0,
+    "personal_loan": 82800.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 51013.11,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_010",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 19700.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 354900.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 2292.87,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_011",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 192600.0,
+    "liquid_fund": 100100.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -1474.69,
+    "max_shortfall_deepening_inr": 1474.69
+   }
+  },
+  {
+   "name": "random_012",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 90900.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 951.17,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_013",
+   "plan": {
+    "card": 56700.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 229400.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 10690.31,
+    "max_shortfall_deepening_inr": 75894.63
+   }
+  },
+  {
+   "name": "random_014",
+   "plan": {
+    "card": 54100.0,
+    "personal_loan": 240900.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -2734.56,
+    "max_shortfall_deepening_inr": 257679.01
+   }
+  },
+  {
+   "name": "random_015",
+   "plan": {
+    "card": 106700.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 52200.0,
+    "liquid_fund": 162400.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 18908.14,
+    "max_shortfall_deepening_inr": 144377.26
+   }
+  },
+  {
+   "name": "random_016",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 247800.0,
+    "fd": 251400.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -72549.82,
+    "max_shortfall_deepening_inr": 340917.09
+   }
+  },
+  {
+   "name": "random_017",
+   "plan": {
+    "card": 114300.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 310800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 20548.67,
+    "max_shortfall_deepening_inr": 154379.79
+   }
+  },
+  {
+   "name": "random_018",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 69400.0,
+    "home_loan": 104800.0,
+    "fd": 251400.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 19684.83,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_019",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 456200.0,
+    "fd": 400.0,
+    "liquid_fund": 307200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -91890.88,
+    "max_shortfall_deepening_inr": 430629.58
+   }
+  },
+  {
+   "name": "random_020",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 80800.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 321300.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -20115.89,
+    "max_shortfall_deepening_inr": 112982.73
+   }
+  },
+  {
+   "name": "random_021",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 225800.0,
+    "home_loan": 0.0,
+    "fd": 700600.0,
+    "liquid_fund": 498100.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_022",
+   "plan": {
+    "card": 79300.0,
+    "personal_loan": 47600.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 409000.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 45269.23,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_023",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 341900.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 982.87,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_024",
+   "plan": {
+    "card": 89200.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 40292.58,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_025",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 351900.0,
+    "fd": 176500.0,
+    "liquid_fund": 465400.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 20035.73,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_026",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 52600.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 75800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 4843.03,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_027",
+   "plan": {
+    "card": 20400.0,
+    "personal_loan": 0.0,
+    "home_loan": 233700.0,
+    "fd": 0.0,
+    "liquid_fund": 230700.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 24690.43,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_028",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 83200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1639.34,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_029",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 184600.0,
+    "home_loan": 85900.0,
+    "fd": 0.0,
+    "liquid_fund": 25900.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -76500.84,
+    "max_shortfall_deepening_inr": 381699.04
+   }
+  },
+  {
+   "name": "random_030",
+   "plan": {
+    "card": 75700.0,
+    "personal_loan": 206400.0,
+    "home_loan": 0.0,
+    "fd": 1200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 6791.6,
+    "max_shortfall_deepening_inr": 242533.94
+   }
+  },
+  {
+   "name": "random_031",
+   "plan": {
+    "card": 107800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 20318.66,
+    "max_shortfall_deepening_inr": 144605.73
+   }
+  },
+  {
+   "name": "random_032",
+   "plan": {
+    "card": 22300.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 10073.14,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_033",
+   "plan": {
+    "card": 17800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 8040.45,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_034",
+   "plan": {
+    "card": 45500.0,
+    "personal_loan": 0.0,
+    "home_loan": 405100.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 41854.43,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_035",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 156300.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 2411.37,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_036",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 53400.0,
+    "home_loan": 305900.0,
+    "fd": 0.0,
+    "liquid_fund": 323100.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -58871.32,
+    "max_shortfall_deepening_inr": 323412.92
+   }
+  },
+  {
+   "name": "random_037",
+   "plan": {
+    "card": 37300.0,
+    "personal_loan": 0.0,
+    "home_loan": 31300.0,
+    "fd": 634200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 29742.89,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_038",
+   "plan": {
+    "card": 55700.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 61400.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 11365.92,
+    "max_shortfall_deepening_inr": 73651.94
+   }
+  },
+  {
+   "name": "random_039",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 139500.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -33244.18,
+    "max_shortfall_deepening_inr": 193577.39
+   }
+  },
+  {
+   "name": "random_040",
+   "plan": {
+    "card": 36100.0,
+    "personal_loan": 131500.0,
+    "home_loan": 0.0,
+    "fd": 3300.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 13178.32,
+    "max_shortfall_deepening_inr": 118702.76
+   }
+  },
+  {
+   "name": "random_041",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 152400.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -36780.99,
+    "max_shortfall_deepening_inr": 211940.72
+   }
+  },
+  {
+   "name": "random_042",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 97200.0,
+    "home_loan": 0.0,
+    "fd": 651700.0,
+    "liquid_fund": 389300.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 16740.88,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_043",
+   "plan": {
+    "card": 29300.0,
+    "personal_loan": 181400.0,
+    "home_loan": 0.0,
+    "fd": 205200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 35784.43,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_044",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 84100.0,
+    "home_loan": 0.0,
+    "fd": 59900.0,
+    "liquid_fund": 314400.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 4877.11,
+    "max_shortfall_deepening_inr": 32391.36
+   }
+  },
+  {
+   "name": "random_045",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 145300.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 1494.24,
+    "max_shortfall_deepening_inr": 95874.89
+   }
+  },
+  {
+   "name": "random_046",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 194100.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -49563.06,
+    "max_shortfall_deepening_inr": 266358.22
+   }
+  },
+  {
+   "name": "random_047",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 64900.0,
+    "home_loan": 283800.0,
+    "fd": 0.0,
+    "liquid_fund": 33000.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -109039.09,
+    "max_shortfall_deepening_inr": 490986.65
+   }
+  },
+  {
+   "name": "random_048",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 137100.0,
+    "home_loan": 214300.0,
+    "fd": 0.0,
+    "liquid_fund": 374300.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -54335.06,
+    "max_shortfall_deepening_inr": 317367.68
+   }
+  },
+  {
+   "name": "random_049",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 31400.0,
+    "fd": 0.0,
+    "liquid_fund": 322200.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -8881.8,
+    "max_shortfall_deepening_inr": 42887.99
+   }
+  },
+  {
+   "name": "random_050",
+   "plan": {
+    "card": 76100.0,
+    "personal_loan": 0.0,
+    "home_loan": 233800.0,
+    "fd": 0.0,
+    "liquid_fund": 175300.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -59837.47,
+    "max_shortfall_deepening_inr": 432558.8
+   }
+  },
+  {
+   "name": "random_051",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 106600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -527.04,
+    "max_shortfall_deepening_inr": 527.04
+   }
+  },
+  {
+   "name": "random_052",
+   "plan": {
+    "card": 59400.0,
+    "personal_loan": 107500.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 312900.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -16056.65,
+    "max_shortfall_deepening_inr": 232899.39
+   }
+  },
+  {
+   "name": "random_053",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 156900.0,
+    "liquid_fund": 5500.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1221.85,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_054",
+   "plan": {
+    "card": 8200.0,
+    "personal_loan": 0.0,
+    "home_loan": 362600.0,
+    "fd": 0.0,
+    "liquid_fund": 201300.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -58966.85,
+    "max_shortfall_deepening_inr": 333895.42
+   }
+  },
+  {
+   "name": "random_055",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 360400.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 931.29,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_056",
+   "plan": {
+    "card": 35300.0,
+    "personal_loan": 0.0,
+    "home_loan": 332700.0,
+    "fd": 0.0,
+    "liquid_fund": 624600.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 33627.03,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_057",
+   "plan": {
+    "card": 109900.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 20673.85,
+    "max_shortfall_deepening_inr": 147471.57
+   }
+  },
+  {
+   "name": "random_058",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 690700.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -17023.1,
+    "max_shortfall_deepening_inr": 245147.44
+   }
+  },
+  {
+   "name": "random_059",
+   "plan": {
+    "card": 102900.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 43765.9,
+    "max_shortfall_deepening_inr": 48528.35
+   }
+  },
+  {
+   "name": "random_060",
+   "plan": {
+    "card": 108900.0,
+    "personal_loan": 249300.0,
+    "home_loan": 0.0,
+    "fd": 251800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_061",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 250500.0,
+    "home_loan": 0.0,
+    "fd": 123400.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -61628.58,
+    "max_shortfall_deepening_inr": 278423.74
+   }
+  },
+  {
+   "name": "random_062",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 279300.0,
+    "home_loan": 0.0,
+    "fd": 78400.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -15129.91,
+    "max_shortfall_deepening_inr": 201342.3
+   }
+  },
+  {
+   "name": "random_063",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 152200.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 315000.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 18051.33,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_064",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 36600.0,
+    "home_loan": 248200.0,
+    "fd": 250100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -85610.3,
+    "max_shortfall_deepening_inr": 396476.7
+   }
+  },
+  {
+   "name": "random_065",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 43900.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 3863.8,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_066",
+   "plan": {
+    "card": 74200.0,
+    "personal_loan": 0.0,
+    "home_loan": 710800.0,
+    "fd": 195100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -9547.13,
+    "max_shortfall_deepening_inr": 349395.93
+   }
+  },
+  {
+   "name": "random_067",
+   "plan": {
+    "card": 98800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 203200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 42407.51,
+    "max_shortfall_deepening_inr": 43865.6
+   }
+  },
+  {
+   "name": "random_068",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 6600.0,
+    "home_loan": 457900.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -92998.15,
+    "max_shortfall_deepening_inr": 439294.56
+   }
+  },
+  {
+   "name": "random_069",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 661900.0,
+    "fd": 437100.0,
+    "liquid_fund": 677000.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_070",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 189700.0,
+    "fd": 0.0,
+    "liquid_fund": 279700.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -54903.86,
+    "max_shortfall_deepening_inr": 260348.87
+   }
+  },
+  {
+   "name": "random_071",
+   "plan": {
+    "card": 59300.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 684500.0,
+    "liquid_fund": 224700.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 37030.58,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_072",
+   "plan": {
+    "card": 10000.0,
+    "personal_loan": 123200.0,
+    "home_loan": 106500.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -16149.34,
+    "max_shortfall_deepening_inr": 194074.0
+   }
+  },
+  {
+   "name": "random_073",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 475000.0,
+    "liquid_fund": 277800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -1160.0,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_074",
+   "plan": {
+    "card": 6400.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 2890.95,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_075",
+   "plan": {
+    "card": 10500.0,
+    "personal_loan": 190600.0,
+    "home_loan": 377800.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -127338.21,
+    "max_shortfall_deepening_inr": 591565.28
+   }
+  },
+  {
+   "name": "random_076",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 206000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 18040.47,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_077",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 116600.0,
+    "fd": 110000.0,
+    "liquid_fund": 173100.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -32073.0,
+    "max_shortfall_deepening_inr": 158350.74
+   }
+  },
+  {
+   "name": "random_078",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 235500.0,
+    "home_loan": 64100.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -83046.1,
+    "max_shortfall_deepening_inr": 369261.52
+   }
+  },
+  {
+   "name": "random_079",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 182200.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -5953.59,
+    "max_shortfall_deepening_inr": 135602.4
+   }
+  },
+  {
+   "name": "random_080",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 595700.0,
+    "liquid_fund": 698400.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_081",
+   "plan": {
+    "card": 100400.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 599900.0,
+    "liquid_fund": 140600.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 55130.62,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_082",
+   "plan": {
+    "card": 58900.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 335500.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 25104.98,
+    "max_shortfall_deepening_inr": 5313.19
+   }
+  },
+  {
+   "name": "random_083",
+   "plan": {
+    "card": 80900.0,
+    "personal_loan": 0.0,
+    "home_loan": 204000.0,
+    "fd": 0.0,
+    "liquid_fund": 249100.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 1673.99,
+    "max_shortfall_deepening_inr": 239583.59
+   }
+  },
+  {
+   "name": "random_084",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 14400.0,
+    "home_loan": 0.0,
+    "fd": 16100.0,
+    "liquid_fund": 72900.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 2290.4,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_085",
+   "plan": {
+    "card": 12000.0,
+    "personal_loan": 193700.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -5307.87,
+    "max_shortfall_deepening_inr": 160620.44
+   }
+  },
+  {
+   "name": "random_086",
+   "plan": {
+    "card": 95100.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 76600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 45415.31,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_087",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 229100.0,
+    "home_loan": 618700.0,
+    "fd": 193200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -58792.46,
+    "max_shortfall_deepening_inr": 427968.38
+   }
+  },
+  {
+   "name": "random_088",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 152900.0,
+    "home_loan": 9400.0,
+    "fd": 63200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -40263.93,
+    "max_shortfall_deepening_inr": 226178.52
+   }
+  },
+  {
+   "name": "random_089",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 31000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 2728.42,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_090",
+   "plan": {
+    "card": 88400.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 584700.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 45847.16,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_091",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 295100.0,
+    "home_loan": 355400.0,
+    "fd": 0.0,
+    "liquid_fund": 172000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_092",
+   "plan": {
+    "card": 95800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 41254.76,
+    "max_shortfall_deepening_inr": 41339.13
+   }
+  },
+  {
+   "name": "random_093",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 114900.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 4857.65,
+    "max_shortfall_deepening_inr": 64169.44
+   }
+  },
+  {
+   "name": "random_094",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 305100.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -1123.94,
+    "max_shortfall_deepening_inr": 1123.94
+   }
+  },
+  {
+   "name": "random_095",
+   "plan": {
+    "card": 112800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 21164.35,
+    "max_shortfall_deepening_inr": 151429.15
+   }
+  },
+  {
+   "name": "random_096",
+   "plan": {
+    "card": 30800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 354600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 5279.16,
+    "max_shortfall_deepening_inr": 41757.72
+   }
+  },
+  {
+   "name": "random_097",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 212000.0,
+    "home_loan": 0.0,
+    "fd": 143300.0,
+    "liquid_fund": 151900.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -55910.66,
+    "max_shortfall_deepening_inr": 272705.82
+   }
+  },
+  {
+   "name": "random_098",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 62500.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -333.61,
+    "max_shortfall_deepening_inr": 333.61
+   }
+  },
+  {
+   "name": "random_099",
+   "plan": {
+    "card": 2000.0,
+    "personal_loan": 190000.0,
+    "home_loan": 459300.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -123.34,
+    "max_shortfall_deepening_inr": 208510.53
+   }
+  },
+  {
+   "name": "random_100",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 296100.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -90170.37,
+    "max_shortfall_deepening_inr": 410846.52
+   }
+  },
+  {
+   "name": "random_101",
+   "plan": {
+    "card": 85500.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 38621.25,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_102",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 195500.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -423.33,
+    "max_shortfall_deepening_inr": 423.33
+   }
+  },
+  {
+   "name": "random_103",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 37300.0,
+    "fd": 0.0,
+    "liquid_fund": 102000.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -8941.49,
+    "max_shortfall_deepening_inr": 49337.37
+   }
+  },
+  {
+   "name": "random_104",
+   "plan": {
+    "card": 99800.0,
+    "personal_loan": 0.0,
+    "home_loan": 311600.0,
+    "fd": 0.0,
+    "liquid_fund": 64200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -26704.64,
+    "max_shortfall_deepening_inr": 378961.93
+   }
+  },
+  {
+   "name": "random_105",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 99700.0,
+    "liquid_fund": 169900.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1689.88,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_106",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 131800.0,
+    "fd": 471700.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 16548.19,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_107",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 250100.0,
+    "home_loan": 0.0,
+    "fd": 163200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 25375.26,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_108",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 12800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 197.48,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_109",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 693300.0,
+    "fd": 0.0,
+    "liquid_fund": 328000.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -19782.14,
+    "max_shortfall_deepening_inr": 249196.95
+   }
+  },
+  {
+   "name": "random_110",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 134900.0,
+    "home_loan": 139800.0,
+    "fd": 0.0,
+    "liquid_fund": 645900.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 21208.72,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_111",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 47400.0,
+    "home_loan": 208700.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -73868.09,
+    "max_shortfall_deepening_inr": 354368.89
+   }
+  },
+  {
+   "name": "random_112",
+   "plan": {
+    "card": 54700.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 230100.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 28258.51,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_113",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 536700.0,
+    "fd": 0.0,
+    "liquid_fund": 266400.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 19375.14,
+    "max_shortfall_deepening_inr": 82568.98
+   }
+  },
+  {
+   "name": "random_114",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 104500.0,
+    "liquid_fund": 346100.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -2674.95,
+    "max_shortfall_deepening_inr": 2674.95
+   }
+  },
+  {
+   "name": "random_115",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 358200.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -113829.59,
+    "max_shortfall_deepening_inr": 501760.01
+   }
+  },
+  {
+   "name": "random_116",
+   "plan": {
+    "card": 73400.0,
+    "personal_loan": 0.0,
+    "home_loan": 248700.0,
+    "fd": 0.0,
+    "liquid_fund": 151800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -11888.06,
+    "max_shortfall_deepening_inr": 279690.27
+   }
+  },
+  {
+   "name": "random_117",
+   "plan": {
+    "card": 58000.0,
+    "personal_loan": 0.0,
+    "home_loan": 217500.0,
+    "fd": 273200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -54652.78,
+    "max_shortfall_deepening_inr": 381294.93
+   }
+  },
+  {
+   "name": "random_118",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 102400.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -23736.13,
+    "max_shortfall_deepening_inr": 141428.75
+   }
+  },
+  {
+   "name": "random_119",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 397800.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -70447.19,
+    "max_shortfall_deepening_inr": 363387.42
+   }
+  },
+  {
+   "name": "random_120",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 145900.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 4681.06,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_121",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 167500.0,
+    "home_loan": 299100.0,
+    "fd": 344100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_122",
+   "plan": {
+    "card": 89500.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 310600.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 15429.23,
+    "max_shortfall_deepening_inr": 121496.88
+   }
+  },
+  {
+   "name": "random_123",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 107900.0,
+    "liquid_fund": 212200.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 6735.65,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_124",
+   "plan": {
+    "card": 99900.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 364100.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 42180.58,
+    "max_shortfall_deepening_inr": 45315.8
+   }
+  },
+  {
+   "name": "random_125",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 488800.0,
+    "fd": 0.0,
+    "liquid_fund": 20300.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 24018.62,
+    "max_shortfall_deepening_inr": 34150.21
+   }
+  },
+  {
+   "name": "random_126",
+   "plan": {
+    "card": 12100.0,
+    "personal_loan": 0.0,
+    "home_loan": 346300.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -108006.87,
+    "max_shortfall_deepening_inr": 502052.81
+   }
+  },
+  {
+   "name": "random_127",
+   "plan": {
+    "card": 89900.0,
+    "personal_loan": 55900.0,
+    "home_loan": 447800.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 48614.74,
+    "max_shortfall_deepening_inr": 143587.81
+   }
+  },
+  {
+   "name": "random_128",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 22200.0,
+    "fd": 258700.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1148.45,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_129",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 113400.0,
+    "home_loan": 165800.0,
+    "fd": 0.0,
+    "liquid_fund": 172500.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -82674.12,
+    "max_shortfall_deepening_inr": 392570.82
+   }
+  },
+  {
+   "name": "random_130",
+   "plan": {
+    "card": 102000.0,
+    "personal_loan": 168300.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 60887.16,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_131",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 230800.0,
+    "home_loan": 637500.0,
+    "fd": 0.0,
+    "liquid_fund": 554600.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_132",
+   "plan": {
+    "card": 105000.0,
+    "personal_loan": 242000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 7537.42,
+    "max_shortfall_deepening_inr": 314340.66
+   }
+  },
+  {
+   "name": "random_133",
+   "plan": {
+    "card": 44200.0,
+    "personal_loan": 24000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 4688.63,
+    "max_shortfall_deepening_inr": 91546.84
+   }
+  },
+  {
+   "name": "random_134",
+   "plan": {
+    "card": 5500.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 193600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 8695.88,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_135",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 27200.0,
+    "home_loan": 0.0,
+    "fd": 605200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 15209.35,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_136",
+   "plan": {
+    "card": 108300.0,
+    "personal_loan": 96800.0,
+    "home_loan": 34000.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 59227.81,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_137",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 208800.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -59067.36,
+    "max_shortfall_deepening_inr": 285197.66
+   }
+  },
+  {
+   "name": "random_138",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 135300.0,
+    "home_loan": 0.0,
+    "fd": 26600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 2744.12,
+    "max_shortfall_deepening_inr": 85569.74
+   }
+  },
+  {
+   "name": "random_139",
+   "plan": {
+    "card": 19500.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 471700.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 22609.81,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_140",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 145100.0,
+    "home_loan": 272200.0,
+    "fd": 0.0,
+    "liquid_fund": 45000.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -133479.71,
+    "max_shortfall_deepening_inr": 595041.71
+   }
+  },
+  {
+   "name": "random_141",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 305500.0,
+    "liquid_fund": 126700.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -2150.32,
+    "max_shortfall_deepening_inr": 2150.32
+   }
+  },
+  {
+   "name": "random_142",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 122000.0,
+    "home_loan": 310300.0,
+    "fd": 267800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_143",
+   "plan": {
+    "card": 42400.0,
+    "personal_loan": 0.0,
+    "home_loan": 247400.0,
+    "fd": 0.0,
+    "liquid_fund": 151000.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 34491.3,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_144",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 703600.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -20656.82,
+    "max_shortfall_deepening_inr": 259171.66
+   }
+  },
+  {
+   "name": "random_145",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 124900.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -607.31,
+    "max_shortfall_deepening_inr": 607.31
+   }
+  },
+  {
+   "name": "random_146",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 23800.0,
+    "fd": 429400.0,
+    "liquid_fund": 289000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -793.26,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_147",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 9700.0,
+    "home_loan": 0.0,
+    "fd": 175700.0,
+    "liquid_fund": 180200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1408.35,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_148",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 126700.0,
+    "liquid_fund": 40700.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 4692.96,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_149",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 13700.0,
+    "home_loan": 74100.0,
+    "fd": 330300.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -22884.22,
+    "max_shortfall_deepening_inr": 118880.47
+   }
+  },
+  {
+   "name": "random_150",
+   "plan": {
+    "card": 75400.0,
+    "personal_loan": 22400.0,
+    "home_loan": 124100.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -26101.68,
+    "max_shortfall_deepening_inr": 304663.86
+   }
+  },
+  {
+   "name": "random_151",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 14000.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 5.88,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_152",
+   "plan": {
+    "card": 5600.0,
+    "personal_loan": 146200.0,
+    "home_loan": 162200.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -90981.7,
+    "max_shortfall_deepening_inr": 443472.9
+   }
+  },
+  {
+   "name": "random_153",
+   "plan": {
+    "card": 55300.0,
+    "personal_loan": 0.0,
+    "home_loan": 317300.0,
+    "fd": 140500.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -92682.95,
+    "max_shortfall_deepening_inr": 523168.07
+   }
+  },
+  {
+   "name": "random_154",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 113100.0,
+    "fd": 0.0,
+    "liquid_fund": 208800.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -30529.74,
+    "max_shortfall_deepening_inr": 153016.99
+   }
+  },
+  {
+   "name": "random_155",
+   "plan": {
+    "card": 70400.0,
+    "personal_loan": 43800.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 5099.92,
+    "max_shortfall_deepening_inr": 155132.9
+   }
+  },
+  {
+   "name": "random_156",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 170900.0,
+    "fd": 0.0,
+    "liquid_fund": 141200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -8288.27,
+    "max_shortfall_deepening_inr": 117809.9
+   }
+  },
+  {
+   "name": "random_157",
+   "plan": {
+    "card": 66300.0,
+    "personal_loan": 274700.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 179200.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 52616.36,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_158",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 65300.0,
+    "home_loan": 415000.0,
+    "fd": 0.0,
+    "liquid_fund": 290100.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -99360.69,
+    "max_shortfall_deepening_inr": 460869.44
+   }
+  },
+  {
+   "name": "random_159",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 142600.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -37660.98,
+    "max_shortfall_deepening_inr": 192096.71
+   }
+  },
+  {
+   "name": "random_160",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 336700.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -1239.17,
+    "max_shortfall_deepening_inr": 1239.17
+   }
+  },
+  {
+   "name": "random_161",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 6400.0,
+    "home_loan": 0.0,
+    "fd": 25300.0,
+    "liquid_fund": 285500.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1910.66,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_162",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 253500.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 20212.98,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_163",
+   "plan": {
+    "card": 70700.0,
+    "personal_loan": 0.0,
+    "home_loan": 454200.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -81690.48,
+    "max_shortfall_deepening_inr": 509563.88
+   }
+  },
+  {
+   "name": "random_164",
+   "plan": {
+    "card": 58900.0,
+    "personal_loan": 0.0,
+    "home_loan": 81600.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 23058.36,
+    "max_shortfall_deepening_inr": 86600.8
+   }
+  },
+  {
+   "name": "random_165",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 360900.0,
+    "fd": 419500.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 20596.99,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_166",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 453200.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -88841.0,
+    "max_shortfall_deepening_inr": 425873.8
+   }
+  },
+  {
+   "name": "random_167",
+   "plan": {
+    "card": 28900.0,
+    "personal_loan": 64200.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 171000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 16934.77,
+    "max_shortfall_deepening_inr": 40022.35
+   }
+  },
+  {
+   "name": "random_168",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 80400.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -412.12,
+    "max_shortfall_deepening_inr": 412.12
+   }
+  },
+  {
+   "name": "random_169",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 212700.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 245800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -12439.19,
+    "max_shortfall_deepening_inr": 168828.87
+   }
+  },
+  {
+   "name": "random_170",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 276100.0,
+    "fd": 153200.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -82923.99,
+    "max_shortfall_deepening_inr": 381940.15
+   }
+  },
+  {
+   "name": "random_171",
+   "plan": {
+    "card": 60800.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 69700.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 26939.19,
+    "max_shortfall_deepening_inr": 6252.4
+   }
+  },
+  {
+   "name": "random_172",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 7400.0,
+    "fd": 325400.0,
+    "liquid_fund": 270000.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_173",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 675000.0,
+    "fd": 0.0,
+    "liquid_fund": 54700.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -12730.91,
+    "max_shortfall_deepening_inr": 228084.18
+   }
+  },
+  {
+   "name": "random_174",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 275800.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -63909.73,
+    "max_shortfall_deepening_inr": 280704.89
+   }
+  },
+  {
+   "name": "random_175",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 151600.0,
+    "fd": 73000.0,
+    "liquid_fund": 226500.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -42230.54,
+    "max_shortfall_deepening_inr": 206413.27
+   }
+  },
+  {
+   "name": "random_176",
+   "plan": {
+    "card": 100200.0,
+    "personal_loan": 0.0,
+    "home_loan": 255700.0,
+    "fd": 0.0,
+    "liquid_fund": 105600.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 60264.67,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_177",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 438200.0,
+    "fd": 366300.0,
+    "liquid_fund": 229000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_178",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 206100.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 607800.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 21636.54,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_179",
+   "plan": {
+    "card": 8200.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 3704.03,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_180",
+   "plan": {
+    "card": 48400.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 10082.47,
+    "max_shortfall_deepening_inr": 63771.24
+   }
+  },
+  {
+   "name": "random_181",
+   "plan": {
+    "card": 109600.0,
+    "personal_loan": 0.0,
+    "home_loan": 329100.0,
+    "fd": 159800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -91336.72,
+    "max_shortfall_deepening_inr": 619880.09
+   }
+  },
+  {
+   "name": "random_182",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 6500.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 572.09,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_183",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 255300.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 8191.06,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_184",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 70100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -366.94,
+    "max_shortfall_deepening_inr": 366.94
+   }
+  },
+  {
+   "name": "random_185",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 117500.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -124.93,
+    "max_shortfall_deepening_inr": 124.93
+   }
+  },
+  {
+   "name": "random_186",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 8400.0,
+    "liquid_fund": 178500.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -429.79,
+    "max_shortfall_deepening_inr": 429.79
+   }
+  },
+  {
+   "name": "random_187",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 244700.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 7850.97,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_188",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 25600.0,
+    "home_loan": 0.0,
+    "fd": 265300.0,
+    "liquid_fund": 209400.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -7924.65,
+    "max_shortfall_deepening_inr": 37347.8
+   }
+  },
+  {
+   "name": "random_189",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 483100.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 7102.7,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_190",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 298000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -64568.19,
+    "max_shortfall_deepening_inr": 281363.35
+   }
+  },
+  {
+   "name": "random_191",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 389000.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 20455.0,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_192",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 228400.0,
+    "fd": 0.0,
+    "liquid_fund": 100700.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -66315.41,
+    "max_shortfall_deepening_inr": 313672.5
+   }
+  },
+  {
+   "name": "random_193",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 53300.0,
+    "home_loan": 0.0,
+    "fd": 406100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 17529.98,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_194",
+   "plan": {
+    "card": 45000.0,
+    "personal_loan": 0.0,
+    "home_loan": 100900.0,
+    "fd": 97300.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -16990.85,
+    "max_shortfall_deepening_inr": 196938.59
+   }
+  },
+  {
+   "name": "random_195",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 69400.0,
+    "fd": 109000.0,
+    "liquid_fund": 358300.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -19784.5,
+    "max_shortfall_deepening_inr": 94944.67
+   }
+  },
+  {
+   "name": "random_196",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 131200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1052.44,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_197",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 286300.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 62200.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 21278.21,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_198",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 214500.0,
+    "home_loan": 0.0,
+    "fd": 407400.0,
+    "liquid_fund": 597900.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_199",
+   "plan": {
+    "card": 4700.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 979.08,
+    "max_shortfall_deepening_inr": 6192.66
+   }
+  },
+  {
+   "name": "random_200",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 286200.0,
+    "home_loan": 644000.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -75005.68,
+    "max_shortfall_deepening_inr": 476446.76
+   }
+  },
+  {
+   "name": "random_201",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 65400.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -14253.7,
+    "max_shortfall_deepening_inr": 89420.67
+   }
+  },
+  {
+   "name": "random_202",
+   "plan": {
+    "card": 46600.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 21049.71,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_203",
+   "plan": {
+    "card": 111200.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 715100.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 55353.11,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_204",
+   "plan": {
+    "card": 76300.0,
+    "personal_loan": 92800.0,
+    "home_loan": 0.0,
+    "fd": 12900.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -6574.77,
+    "max_shortfall_deepening_inr": 233063.86
+   }
+  },
+  {
+   "name": "random_205",
+   "plan": {
+    "card": 74700.0,
+    "personal_loan": 0.0,
+    "home_loan": 182400.0,
+    "fd": 556600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 48195.4,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_206",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 365400.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 911.26,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_207",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 37100.0,
+    "home_loan": 542300.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 11845.84,
+    "max_shortfall_deepening_inr": 128097.51
+   }
+  },
+  {
+   "name": "random_208",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 262800.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -794.12,
+    "max_shortfall_deepening_inr": 794.12
+   }
+  },
+  {
+   "name": "random_209",
+   "plan": {
+    "card": 43000.0,
+    "personal_loan": 0.0,
+    "home_loan": 226800.0,
+    "fd": 0.0,
+    "liquid_fund": 199000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -12059.85,
+    "max_shortfall_deepening_inr": 222808.98
+   }
+  },
+  {
+   "name": "random_210",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 142100.0,
+    "home_loan": 313000.0,
+    "fd": 147300.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -86737.53,
+    "max_shortfall_deepening_inr": 433353.51
+   }
+  },
+  {
+   "name": "random_211",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 296700.0,
+    "home_loan": 473800.0,
+    "fd": 0.0,
+    "liquid_fund": 243200.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_212",
+   "plan": {
+    "card": 46600.0,
+    "personal_loan": 0.0,
+    "home_loan": 197800.0,
+    "fd": 0.0,
+    "liquid_fund": 334900.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -49993.23,
+    "max_shortfall_deepening_inr": 337396.44
+   }
+  },
+  {
+   "name": "random_213",
+   "plan": {
+    "card": 15600.0,
+    "personal_loan": 130400.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 8547.2,
+    "max_shortfall_deepening_inr": 96131.06
+   }
+  },
+  {
+   "name": "random_214",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 86700.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 6500.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -19727.98,
+    "max_shortfall_deepening_inr": 119375.93
+   }
+  },
+  {
+   "name": "random_215",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 254700.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -74397.55,
+    "max_shortfall_deepening_inr": 350237.53
+   }
+  },
+  {
+   "name": "random_216",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 145800.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 304800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 736.81,
+    "max_shortfall_deepening_inr": 96424.89
+   }
+  },
+  {
+   "name": "random_217",
+   "plan": {
+    "card": 96900.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 43770.75,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_218",
+   "plan": {
+    "card": 47000.0,
+    "personal_loan": 0.0,
+    "home_loan": 274300.0,
+    "fd": 65100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -24020.07,
+    "max_shortfall_deepening_inr": 278618.47
+   }
+  },
+  {
+   "name": "random_219",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 198700.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -50931.45,
+    "max_shortfall_deepening_inr": 267726.6
+   }
+  },
+  {
+   "name": "random_220",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 1000.0,
+    "home_loan": 0.0,
+    "fd": 273800.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -1306.14,
+    "max_shortfall_deepening_inr": 2455.49
+   }
+  },
+  {
+   "name": "random_221",
+   "plan": {
+    "card": 36600.0,
+    "personal_loan": 183000.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 3137.27,
+    "max_shortfall_deepening_inr": 174867.45
+   }
+  },
+  {
+   "name": "random_222",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 53600.0,
+    "fd": 395900.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 15520.55,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_223",
+   "plan": {
+    "card": 58300.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 161200.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 28821.69,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_224",
+   "plan": {
+    "card": 101600.0,
+    "personal_loan": 296200.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 147900.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 3362.32,
+    "max_shortfall_deepening_inr": 313573.85
+   }
+  },
+  {
+   "name": "random_225",
+   "plan": {
+    "card": 59400.0,
+    "personal_loan": 0.0,
+    "home_loan": 158900.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 35187.13,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_226",
+   "plan": {
+    "card": 36100.0,
+    "personal_loan": 243600.0,
+    "home_loan": 0.0,
+    "fd": 5000.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -6680.86,
+    "max_shortfall_deepening_inr": 239839.3
+   }
+  },
+  {
+   "name": "random_227",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 229000.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1136.61,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_228",
+   "plan": {
+    "card": 27700.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 5770.34,
+    "max_shortfall_deepening_inr": 36497.17
+   }
+  },
+  {
+   "name": "random_229",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 172000.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 1152.78,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_230",
+   "plan": {
+    "card": 92100.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 0.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": 39899.63,
+    "max_shortfall_deepening_inr": 37592.64
+   }
+  },
+  {
+   "name": "random_231",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 329500.0,
+    "fd": 90600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -49320.35,
+    "max_shortfall_deepening_inr": 287594.69
+   }
+  },
+  {
+   "name": "random_232",
+   "plan": {
+    "card": 46500.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 498500.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 33631.27,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_233",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 145900.0,
+    "home_loan": 116400.0,
+    "fd": 343100.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": true,
+    "tier_D": false,
+    "min_exact_improvement_inr": null,
+    "max_shortfall_deepening_inr": null
+   }
+  },
+  {
+   "name": "random_234",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 208800.0,
+    "home_loan": 0.0,
+    "fd": 72100.0,
+    "liquid_fund": 7900.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 20665.31,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_235",
+   "plan": {
+    "card": 88800.0,
+    "personal_loan": 0.0,
+    "home_loan": 258700.0,
+    "fd": 0.0,
+    "liquid_fund": 44800.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -10985.24,
+    "max_shortfall_deepening_inr": 307011.22
+   }
+  },
+  {
+   "name": "random_236",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 217200.0,
+    "fd": 0.0,
+    "liquid_fund": 324300.0
+   },
+   "s0": 800000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -20465.07,
+    "max_shortfall_deepening_inr": 167259.91
+   }
+  },
+  {
+   "name": "random_237",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 242100.0,
+    "fd": 221300.0,
+    "liquid_fund": 119300.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -70668.29,
+    "max_shortfall_deepening_inr": 332862.47
+   }
+  },
+  {
+   "name": "random_238",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 514600.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 1200000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": true,
+    "min_exact_improvement_inr": 14292.93,
+    "max_shortfall_deepening_inr": 0.0
+   }
+  },
+  {
+   "name": "random_239",
+   "plan": {
+    "card": 0.0,
+    "personal_loan": 0.0,
+    "home_loan": 0.0,
+    "fd": 185500.0,
+    "liquid_fund": 0.0
+   },
+   "s0": 600000.0,
+   "expect": {
+    "rejected": false,
+    "tier_D": false,
+    "min_exact_improvement_inr": -836.42,
+    "max_shortfall_deepening_inr": 836.42
+   }
+  }
+ ]
+}

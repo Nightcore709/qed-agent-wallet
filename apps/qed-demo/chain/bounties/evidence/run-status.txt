@@ -1,0 +1,9 @@
+# scripts/run.sh step statuses and guards, 2026-11-23T22:46:48Z; sources sha256 043d9e7871f0f004
+forge test (main) exit 0
+artifacts check exit 0
+forge test (seeded twins and canaries, expected to fail) exit 1
+forge test (deep) exit 0
+slither exit 255 (255 = findings reported)
+tracked changes under chain/vendor (must be none): 0
+~/.solc-select/global-version present (must be no): no
+solc-select versions installed (unchanged by this run): solc-0.8.38 

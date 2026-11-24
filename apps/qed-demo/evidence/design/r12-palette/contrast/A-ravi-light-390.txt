@@ -1,0 +1,2 @@
+620 text runs measured on /,/pay,/save,/vault (light, 390x844); 1 below threshold
+  4.50 < 4.5  /save  span.paise  ".00" (16.8px)

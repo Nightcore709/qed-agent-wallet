@@ -1,0 +1,28 @@
+{
+  "name": "qed-chain-rail",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QED chain rail: the approved release's contracts, unmodified, on a local Anvil chain behind a durable adapter. Local only; valueless test tokens; development keys.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "start": "node serve.ts",
+    "test": "PATH=\"$HOME/.foundry/bin:$PATH\" node --import tsx --test --test-concurrency=1 --test-timeout=600000 test/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint:erasable": "node scripts/check-erasable.mjs",
+    "verify:vendored": "node scripts/verify-vendored.mjs",
+    "gate": "node scripts/parity-gate.mjs --tier default",
+    "gate:report": "node scripts/parity-report.mjs"
+  },
+  "dependencies": {
+    "tsx": "4.23.15",
+    "viem": "2.57.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "typescript": "5.6.3"
+  }
+}

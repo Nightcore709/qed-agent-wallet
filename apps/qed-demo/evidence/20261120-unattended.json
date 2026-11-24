@@ -1,0 +1,412 @@
+{
+ "what": "QED paper engine watched with no interface open",
+ "from": "2026-11-20 09:42:15.729 IST",
+ "to": "2026-11-20 10:35:15.781 IST",
+ "minutes": 53,
+ "interface": {
+  "samples": 637,
+  "samplesWithAnInterfaceOpen": 333,
+  "verdict": "An interface was open in 333 of 637 samples.",
+  "everyMinute": [
+   {
+    "at": "2026-11-20 09:42:15.759 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:43:15.788 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:44:15.796 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:45:15.806 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:46:15.841 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:47:15.857 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:48:15.871 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:49:15.889 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:50:15.903 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:51:15.922 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:52:15.942 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:53:15.973 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:54:15.985 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:55:15.997 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:56:16.021 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:57:16.037 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:58:16.045 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 09:59:16.054 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:00:16.063 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:01:16.082 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:02:16.093 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:03:16.118 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:04:16.213 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:05:16.229 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:06:16.230 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:07:16.254 IST",
+    "interfacePortOpen": false,
+    "interfaceConnections": 0,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:08:16.269 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:09:16.282 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 2,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:10:16.295 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:11:16.306 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:12:16.319 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:13:16.331 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:14:16.342 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:15:16.354 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:16:16.364 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:17:16.374 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:18:16.387 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:19:16.398 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:20:16.409 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:21:16.423 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:22:16.445 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 3,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:23:16.456 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:24:16.465 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:25:16.477 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:26:16.488 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:27:16.498 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:28:16.511 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:29:16.523 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:30:16.535 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:31:16.547 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:32:16.558 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:33:16.570 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:34:16.579 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   },
+   {
+    "at": "2026-11-20 10:35:15.778 IST",
+    "interfacePortOpen": true,
+    "interfaceConnections": 1,
+    "engineRunning": true
+   }
+  ]
+ },
+ "engineRunningThroughout": true,
+ "runs": [
+  {
+   "id": "run_1m7vk4wgtvgwkkw69yh",
+   "instruction": "Invest ₹200 in Bitcoin in rupees",
+   "kind": "invest",
+   "due": "2026-11-20 09:54:00.000 IST",
+   "claimed": "2026-11-20 09:54:00.794 IST",
+   "started": "2026-11-20 09:54:00.796 IST",
+   "finished": "2026-11-20 09:54:00.824 IST",
+   "outcome": "done",
+   "waitingUntil": null,
+   "reason": null
+  },
+  {
+   "id": "run_1m7vmvsjdtneshj6qz2",
+   "instruction": "Invest ₹200 in Bitcoin in rupees",
+   "kind": "invest",
+   "due": "2026-11-20 10:24:00.000 IST",
+   "claimed": "2026-11-20 10:24:00.013 IST",
+   "started": "2026-11-20 10:24:00.019 IST",
+   "finished": "2026-11-20 10:24:00.088 IST",
+   "outcome": "done",
+   "waitingUntil": null,
+   "reason": null
+  },
+  {
+   "id": "run_1m7vn6sbt5b2kwz5ywd",
+   "instruction": "Invest ₹1,000 in UTI Nifty 50 Index Fund",
+   "kind": "invest",
+   "due": "2026-11-20 10:30:00.000 IST",
+   "claimed": "2026-11-20 10:30:00.250 IST",
+   "started": null,
+   "finished": null,
+   "outcome": "awaiting_approval",
+   "waitingUntil": "2026-11-21 10:30:00.254 IST",
+   "reason": null
+  }
+ ],
+ "actions": [
+  {
+   "id": "act_1m7vk4wgw82e02bbcar",
+   "run": "run_1m7vk4wgtvgwkkw69yh",
+   "origin": "program",
+   "kind": "order",
+   "outcome": "done",
+   "reference": "prg_1m7tsbabac5td62az7d#2026-11-20T04:24:00.000Z#0",
+   "asked": "2026-11-20 09:54:00.796 IST",
+   "decided": "2026-11-20 09:54:00.799 IST",
+   "submitted": "2026-11-20 09:54:00.800 IST",
+   "executed": "2026-11-20 09:54:00.822 IST",
+   "finished": "2026-11-20 09:54:00.822 IST",
+   "reconciled": "2026-11-20 09:54:00.822 IST",
+   "comparedWithVenue": "reconciled",
+   "receipt": "rcp_1m7vk4whpwyxps2157f",
+   "error": null
+  },
+  {
+   "id": "act_1m7vmvsjk11rbqdzxvc",
+   "run": "run_1m7vmvsjdtneshj6qz2",
+   "origin": "program",
+   "kind": "order",
+   "outcome": "done",
+   "reference": "prg_1m7tsbabac5td62az7d#2026-11-20T04:54:00.000Z#0",
+   "asked": "2026-11-20 10:24:00.019 IST",
+   "decided": "2026-11-20 10:24:00.024 IST",
+   "submitted": "2026-11-20 10:24:00.026 IST",
+   "executed": "2026-11-20 10:24:00.084 IST",
+   "finished": "2026-11-20 10:24:00.085 IST",
+   "reconciled": "2026-11-20 10:24:00.085 IST",
+   "comparedWithVenue": "reconciled",
+   "receipt": "rcp_1m7vmvsmn3wsd9qw8fh",
+   "error": null
+  }
+ ]
+}

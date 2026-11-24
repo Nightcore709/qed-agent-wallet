@@ -1,0 +1,18 @@
+{
+  "name": "qed-owner-account",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QEDOwnerAccount: passkey owner account for the release's QEDVault (R7 D3). Local research code; no dependencies.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "build": "SOLC_VERSION=0.8.38 forge build",
+    "test:forge": "SOLC_VERSION=0.8.38 forge test",
+    "test:seeded": "FOUNDRY_PROFILE=seeded SOLC_VERSION=0.8.38 forge test",
+    "test:ts": "node --test --test-concurrency=1 test-ts/",
+    "typecheck": "node ../node_modules/typescript/bin/tsc -p tsconfig.json"
+  }
+}

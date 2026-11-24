@@ -1,0 +1,41 @@
+/* Tax statement (.tx) and Your data in Protect (.yd), Meridian (DESIGN.md M4): panels of text and tables, one figure leading
+   each tile, labels in ink-2, every rule scoped to its page. Tables scroll inside their own focusable region on a phone. */
+.tx { display: grid; gap: var(--s5); min-width: 0; }
+.tx-years { display: grid; gap: var(--s2); }
+.tx-note { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; max-width: 88ch; }
+.tx-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: var(--s4); }
+.tx-tile { padding: var(--s5); border-radius: var(--r-md); background: var(--sheet); box-shadow: var(--lift-1); min-width: 0; }
+.tx-tile .k { font-size: var(--t-small); color: var(--ink-2); }
+.tx-tile .v { font-size: var(--t-h2); font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 2px; overflow-wrap: anywhere; }
+.tx-tile .s { font-size: var(--t-small); color: var(--ink-3); margin-top: 4px; line-height: 1.45; }
+.tx-sec { display: grid; gap: var(--s3); min-width: 0; }
+.tx-sec h2 { font-size: var(--t-h2); }
+.tx-sec h3 { font-size: var(--t-h3); margin-top: var(--s2); }
+.tx-scroll, .yd-scroll { overflow-x: auto; max-width: 100%; }
+.tx-scroll:focus-visible, .yd-scroll:focus-visible { outline: 2px solid var(--focus, currentColor); outline-offset: 2px; }
+.tx-table, .yd-table { min-width: 560px; width: 100%; }
+.tx-table th[scope="row"], .yd-table th[scope="row"] { text-align: left; font-weight: 600; }
+.tx-sub { display: block; font-weight: 400; font-size: var(--t-small); color: var(--ink-3); }
+.tx-list, .yd-list { display: grid; gap: var(--s2); padding-left: 1.2em; font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; max-width: 96ch; }
+.tx-list b, .yd-list b { color: var(--ink); font-weight: 600; }
+.tx-list { overflow-wrap: anywhere; }
+.tx-list a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.yd { display: grid; gap: var(--s5); min-width: 0; scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+.yd-head h2 { font-size: var(--t-h2); }
+.yd-head p, .yd-note { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; max-width: 88ch; }
+.yd-block { display: grid; gap: var(--s3); justify-items: start; min-width: 0; }
+.yd-block h3 { font-size: var(--t-h3); }
+.yd-block .field { width: min(100%, 360px); }
+.yd-schedule { display: block; } /* a details box laid out as a grid shrank its text to a sliver on a phone once opened; its content stacks as blocks */
+.yd-body { display: grid; gap: var(--s3); grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.yd-schedule summary { cursor: pointer; }
+.yd-schedule summary h3 { display: inline; }
+.yd-schedule[open] > summary { margin-bottom: var(--s3); }
+.yd-schedule .yd-scroll { width: 100%; margin-top: var(--s3); }
+.yd-src { color: var(--ink-3); }
+@media (max-width: 520px) { .tx-table, .yd-table { min-width: 480px; } }
+
+/* Text enlarged to 200% on a 320 px screen (R13 leftovers, checked with the root size at 200%): what grows with the text gives way to the width. */
+@media (max-width: 479px) {
+  .yd-list > *, .yd-src { min-width: 0; overflow-wrap: anywhere; }
+}

@@ -1,0 +1,177 @@
+/* The score (src/ui/score.tsx; DESIGN.md M6): the bank's balance at worst as true steps on a lit line, what falls due
+   marked on its day, a what-if drawn dashed over it, and what each standing authority may do on the same days under it.
+   On a wide screen a rail (Save's what-if) stands beside the chart and the instructions; on a narrow one it follows the
+   chart, before the instructions. The what-if has one colour, c6, and nothing else in the chart uses it. */
+
+.sc { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "chart" "rail" "lanes" "foot"; gap: var(--s5); }
+@media (min-width: 1100px) {
+  .sc.with-rail { grid-template-columns: minmax(0, 1fr) minmax(320px, 368px); grid-template-rows: auto auto 1fr auto; grid-template-areas: "head head" "chart rail" "lanes rail" "foot foot"; column-gap: var(--s6); }
+}
+.sc-head { grid-area: head; display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s5); flex-wrap: wrap; }
+.sc-title h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.018em; }
+.sc-title p { margin-top: 4px; font-size: var(--t-small); color: var(--ink-3); max-width: 66ch; }
+.sc-tools { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.sc-chart { grid-area: chart; min-width: 0; display: grid; gap: var(--s3); align-content: start; }
+.sc-rail { grid-area: rail; min-width: 0; }
+.sc-lanes { grid-area: lanes; min-width: 0; }
+
+/* the what-if's flag: said in words above the chart whenever it is drawn */
+.sc-flag { justify-self: start; display: inline-flex; align-items: center; gap: var(--s2); padding: 5px 14px; border-radius: var(--r-pill); font-size: var(--t-small); font-weight: 600; color: var(--ink);
+  background: color-mix(in oklab, var(--pane-2) 80%, transparent); border: 1px solid var(--rim); box-shadow: var(--lift-1); }
+.sc-flag i { width: 18px; height: 0; border-top: 2.5px dashed var(--c6); flex: none; }
+
+/* ------------------------------------------------------------------------------------------------ the plot */
+/* the axis column in rem, so its labels fit at any text size the browser is set to (R13: 58 px held "₹8.5 lakh" only at
+   16 px text); each lane row has the same column, so its days stand under the chart's */
+.sc-frame { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 3.625rem; gap: var(--s2); }
+.sc-axis { position: relative; order: 2; font-size: var(--t-micro); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.sc-axis span { position: absolute; left: 0; transform: translateY(-50%); white-space: nowrap; }
+.sc-plot { position: relative; min-width: 0; cursor: crosshair; touch-action: pan-y; border-radius: var(--r-sm); }
+.sc-plot:focus-visible { outline-offset: 6px; }
+.sc-svg { display: block; overflow: visible; }
+.sc-svg text { font: 560 var(--t-micro)/1 var(--font); fill: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.sc-grid { stroke: var(--rule); stroke-dasharray: 2 6; }
+.sc-month { stroke: var(--rule-2); stroke-dasharray: 1 4; }
+.sc-fill-top { stop-color: var(--c2); stop-opacity: .24; } .sc-fill-bottom { stop-color: var(--c2); stop-opacity: 0; }
+.sc-hatch { stroke: var(--part-kept); stroke-width: 1.2; }
+.sc-kept { opacity: .55; }
+.sc-glow { fill: none; stroke: var(--c2); stroke-width: 6; opacity: .5; }
+.sc-line { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+/* with a what-if drawn, the recorded line steps back to be the reference and the what-if leads */
+.is-whatif .sc-line { stroke: var(--ink-2); stroke-width: 1.8; }
+.is-whatif .sc-glow { opacity: .2; }
+.is-whatif .sc-area { opacity: .4; }
+.sc-wline { fill: none; stroke: var(--c6); stroke-width: 2.6; stroke-dasharray: 7 4; stroke-linejoin: round; }
+.sc-gap-tint { fill: color-mix(in oklab, var(--c6) 8%, transparent); }
+.sc-wif-hatch { stroke: color-mix(in oklab, var(--c6) 42%, transparent); stroke-width: 1.1; }
+.sc-short { fill: color-mix(in oklab, var(--loss) 24%, transparent); }
+.sc-zero { stroke: var(--loss); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.sc-svg .sc-zero-text { fill: var(--loss); font-weight: 650; paint-order: stroke; stroke: color-mix(in oklab, var(--ground) 70%, transparent); stroke-width: 4px; stroke-linejoin: round; }
+.sc-mark { stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; }
+.sc-mark.in { stroke: var(--gain); }
+.sc-mark.wif { stroke: var(--c6); }
+.sc-svg .sc-mark-text { fill: var(--ink-2); font-weight: 600; paint-order: stroke; stroke: var(--ground); stroke-width: 5px; stroke-linejoin: round; }
+.sc-svg .sc-mark-text.in { fill: var(--gain); }
+.sc-svg .sc-mark-text.wif { fill: var(--c6); }
+.sc-svg .sc-kept-text { fill: var(--ink-2); font-weight: 650; paint-order: stroke; stroke: var(--ground); stroke-width: 6px; stroke-linejoin: round; }
+.sc-low-line { stroke: var(--due); stroke-width: 1; stroke-dasharray: 2 4; opacity: .8; }
+.sc-low-halo { fill: color-mix(in oklab, var(--due-mark) 26%, transparent); animation: sc-halo 2.6s var(--ease-move) infinite; transform-box: fill-box; transform-origin: center; }
+.sc-low-dot { fill: var(--due-mark); stroke: var(--sheet); stroke-width: 2.5; }
+.sc-low.was .sc-low-dot { fill: var(--sheet); stroke: var(--ink-2); stroke-width: 2; }
+.sc-wlow-halo { fill: color-mix(in oklab, var(--c6) 26%, transparent); animation: sc-halo 2.6s var(--ease-move) infinite; transform-box: fill-box; transform-origin: center; }
+.sc-wlow-dot { fill: var(--c6); stroke: var(--sheet); stroke-width: 2.5; }
+@keyframes sc-halo { 50% { transform: scale(1.35); opacity: .4; } }
+.sc-svg .sc-today { fill: var(--brand); font-weight: 700; }
+.sc-cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
+.sc-dot { fill: var(--sheet); stroke: var(--ink); stroke-width: 2.5; }
+.sc-dot.wif { stroke: var(--c6); }
+.sc-dot.was { stroke: var(--ink-3); stroke-width: 2; }
+/* the line draws from today to the right as the chart arrives; every value is there from the first frame */
+.sc-reveal { animation: sc-draw var(--d-scene) var(--ease-out) both; }
+@keyframes sc-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* the reading: a glass label over the plot, above the point (or under it near the top) */
+.sc-tip { position: absolute; z-index: 4; pointer-events: none; transform: translate(-50%, -100%); min-width: 184px; max-width: 292px; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
+  background: var(--pane-3); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); font-size: var(--t-small); line-height: 1.35; display: grid; gap: 2px; }
+.sc-tip.below { transform: translate(-50%, 0); }
+.sc-tip-day { font-size: var(--t-micro); color: var(--ink-3); font-weight: 600; }
+.sc-tip b { font-size: var(--t-lead); font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; }
+.sc-tip b.short { color: var(--loss); }
+.sc-tip-sub { font-size: var(--t-micro); color: var(--ink-3); }
+.sc-tip ul { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--rule); display: grid; gap: 2px; }
+.sc-tip li { display: flex; justify-content: space-between; gap: var(--s3); font-size: var(--t-micro); }
+.sc-tip li span:last-child { font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sc-tip li .in { color: var(--gain); }
+.sc-tip li.wif span:first-child { color: var(--ink); font-weight: 600; }
+.sc-tip .sc-tip-runs li span:last-child { font-weight: 560; color: var(--ink-3); }
+
+/* the key, and where the figures come from */
+.sc-key { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-micro); color: var(--ink-3); }
+.sc-key > span { display: inline-flex; align-items: center; gap: 6px; }
+.sc-key b { color: var(--ink-2); font-weight: 650; }
+.sc-key i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; flex: none; }
+.sc-key .k-line { height: 2px; background: var(--ink); box-shadow: 0 0 6px var(--c2); }
+.sc-key .k-kept { background: repeating-linear-gradient(135deg, var(--part-kept) 0 1.5px, transparent 1.5px 5px); box-shadow: inset 0 0 0 1px var(--part-kept); }
+.sc-key .k-low { width: 10px; border-radius: 50%; background: var(--due-mark); }
+.sc-key .k-wif { width: 18px; height: 0; border-radius: 0; border-top: 2.5px dashed var(--c6); }
+.sc-key .k-gap { background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--c6) 55%, transparent) 0 1.5px, transparent 1.5px 5px), color-mix(in oklab, var(--c6) 14%, transparent); }
+.sc-key .k-was { width: 10px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--ink-2); }
+.sc-key .k-wlow { width: 10px; border-radius: 50%; background: var(--c6); }
+.sc-source { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.5; max-width: 96ch; }
+
+/* ------------------------------------------------------------------------------------------------ the instructions, on the same days */
+.sc-lanes { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); align-content: start; padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.sc-lanes-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: var(--s2) var(--s4); }
+.sc-lanes-head h3 { font-size: var(--t-body); font-weight: 650; letter-spacing: -.01em; }
+.sc-lanes-key { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); font-size: var(--t-micro); color: var(--ink-3); }
+.sc-lanes-key > span { display: inline-flex; align-items: center; gap: 6px; }
+.sc-lanes-key i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.sc-lanes-key .k-acts { background: var(--qed); }
+.sc-lanes-key .k-asks { box-shadow: inset 0 0 0 1.5px var(--qed); }
+.sc-lanes-key .k-waits { border-radius: 2px; background: var(--due-mark); }
+.sc-lanes-key .k-ends { width: 2px; height: 12px; border-radius: 1px; background: var(--ink-2); }
+.sc-lane-list { display: grid; grid-template-columns: minmax(0, 1fr); }
+.sc-lane { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: var(--s3) 0 var(--s2); border-top: 1px solid var(--rule); }
+.sc-lane:first-child { border-top: 0; padding-top: 0; }
+.sc-lane-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--s3); font-size: var(--t-small); line-height: 1.35; }
+/* the title is the lane's link: its box reaches 24 px tall (WCAG 2.5.8) without moving the row */
+.sc-lane-t { color: var(--ink); font-weight: 620; text-decoration: none; padding-block: 4px; margin-block: -4px; }
+.sc-lane-t:hover { text-decoration: underline; text-underline-offset: .2em; }
+.sc-mode { font-size: var(--t-micro); font-weight: 650; color: var(--qed); white-space: nowrap; }
+.sc-mode.m-approve { color: var(--due); } .sc-mode.m-watch { color: var(--hold); } .sc-mode.m-paused { color: var(--ink-3); } .sc-mode.m-chain { color: color-mix(in oklab, var(--c4) 72%, var(--ink)); }
+.sc-left { margin-left: auto; font-size: var(--t-micro); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; text-align: right; }
+.sc-left b { color: var(--ink-2); font-weight: 650; }
+.sc-lane-row { display: grid; grid-template-columns: minmax(0, 1fr) 3.625rem; gap: var(--s2); }
+.sc-track { position: relative; min-width: 0; touch-action: pan-y; cursor: crosshair; }
+.sc-track svg { display: block; overflow: visible; }
+.sc-rail-line { stroke: var(--rule-2); stroke-width: 1; }
+.sc-watch { stroke: var(--hold); stroke-width: 2; stroke-dasharray: 1 6; stroke-linecap: round; }
+.sc-watch.dense { stroke-dasharray: 1 3; }
+.sc-chain { stroke: var(--c4); stroke-width: 4; opacity: .35; stroke-linecap: round; }
+.sc-run.acts { fill: var(--qed); }
+.sc-run.asks { fill: var(--sheet); stroke: var(--qed); stroke-width: 1.5; }
+.sc-run.paused { fill: var(--ink-4); }
+.sc-wait { fill: var(--due-mark); stroke: var(--sheet); stroke-width: 1; }
+.sc-end { stroke: var(--ink-2); stroke-width: 2; }
+.sc-none { font-size: var(--t-small); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------------------------------------ the same days as a statement */
+.sc-table { max-height: 460px; overflow: auto; overscroll-behavior: contain; border-radius: var(--r-md); }
+.sc-table:focus-visible { outline-offset: 2px; }
+.sc-table thead th { position: sticky; top: 0; z-index: 1; background: var(--sheet-2); }
+.sc-table tr.lowest td { color: var(--due); font-weight: 650; }
+.sc-table tr.start td { color: var(--ink-2); }
+.sc-table small, .sc-table .sub { color: var(--ink-3); }
+.sc-table td.in { color: var(--gain); }
+.sc-table td.bal { color: var(--ink); font-weight: 600; }
+.sc-wtable td.bal.short { color: var(--loss); }
+.sc-wtable td.sc-was { color: var(--ink-3); }
+.sc-wtable tr.whatif td:first-child { box-shadow: inset 3px 0 0 var(--c6); }
+.sc-wtable td .sub { display: block; font-size: var(--t-small); margin-top: 2px; }
+.sc-when-in, .sc-was-in, .sc-amt-in { display: none; }
+
+.sc-foot { grid-area: foot; display: flex; flex-wrap: wrap; gap: var(--s2) var(--s6); padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.sc-foot a { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; font-weight: 600; font-size: var(--t-small); color: var(--ink); text-decoration: none; }
+.sc-foot a:hover { text-decoration: underline; text-underline-offset: .2em; }
+.sc-foot svg { width: 15px; height: 15px; color: var(--ink-3); }
+
+@media (max-width: 759px) {
+  .sc { gap: var(--s4); }
+  .sc-tools { width: 100%; }
+  .sc-tools .seg { display: flex; flex-wrap: nowrap; width: 100%; }
+  .sc-tools .seg button { flex: 1 1 0; justify-content: center; padding: 0 8px; white-space: nowrap; }
+  .sc-frame, .sc-lane-row { grid-template-columns: minmax(0, 1fr) 2.875rem; }
+  .sc-lane-t { flex-basis: 100%; }
+  .sc-mode { white-space: normal; }
+  .sc-left { text-align: right; }
+  .sc-tip { min-width: 164px; max-width: 236px; }
+}
+@media (max-width: 560px) {
+  .sc-wtable .sc-when, .sc-wtable .sc-was, .sc-wtable .sc-amt { display: none; }
+  .sc-when-in { display: block; font-size: var(--t-micro); color: var(--ink-3); }
+  .sc-amt-in { display: block; font-weight: 500; color: var(--ink-2); }
+  .sc-amt-in.in { color: var(--gain); }
+  .sc-bal { display: block; }
+  .sc-was-in { display: block; margin-top: 2px; font-size: var(--t-micro); font-weight: 400; color: var(--ink-3); }
+  .sc-wtable td.num { font-size: var(--t-small); }
+}

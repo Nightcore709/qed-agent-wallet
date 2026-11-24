@@ -1,0 +1,16 @@
+✔ non-monetary pitch-deck numbers never become financial proposals (2.834375ms)
+✔ pitch-deck mechanisms are explained honestly and link to real product pages (0.329875ms)
+✔ convert maximum permitted canonicalizes exact on-chain spendable amount (0.777042ms)
+✔ maximum amount question does not propose or broadcast (0.099041ms)
+✔ unsupported financial instructions cannot acquire a new execution tool (0.11175ms)
+✔ questions about historic financial amounts never create proposals (0.275709ms)
+✔ large authorized-format amounts stay exact and are refused by live limits (0.4005ms)
+✔ maximum spend respects the independent reserve-buffer limit (0.112834ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 71.783583

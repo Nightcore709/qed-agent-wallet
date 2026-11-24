@@ -1,0 +1,15 @@
+/* ------------------------------------------------------------------------------------------------ against a benchmark; risk estimates (R13)
+   Added beside grow.css, not in it: Grow's own rules are as they were. Only existing tokens are used. */
+.gr-compare { display: grid; gap: var(--s3); }
+.gc-pick { max-width: 34rem; }
+.gc-windows { display: grid; gap: var(--s3); }
+.gc-win { padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 60%, transparent); display: grid; gap: var(--s2); }
+.gc-win h3 { font-size: var(--t-body); font-weight: 650; margin: 0; }
+.gc-win dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); gap: var(--s2) var(--s4); margin: 0; }
+.gc-win dt { font-size: var(--t-small); color: var(--ink-3); }
+.gc-win dd { margin: 0; font-variant-numeric: tabular-nums lining-nums; font-weight: 620; color: var(--ink); }
+.gc-win .sub { font-size: var(--t-small); color: var(--ink-3); }
+.gc-risk { display: grid; gap: var(--s2); }
+.gc-risk dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--s2) var(--s4); margin: 0; }
+.gc-risk dt { font-size: var(--t-small); color: var(--ink-3); }
+.gc-risk dd { margin: 0; font-variant-numeric: tabular-nums lining-nums; font-weight: 620; color: var(--ink); }

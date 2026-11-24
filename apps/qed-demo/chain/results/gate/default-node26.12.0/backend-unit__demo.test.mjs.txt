@@ -1,0 +1,18 @@
+(node:46985) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ job errors keep the revert reason but not the internal RPC request dump (0.431792ms)
+✔ different amounts within the actual signed mandate are accepted (0.886875ms)
+✔ larger than mandate cap is refused with an intelligible security reason (0.157709ms)
+✔ duplicate, missing, or ambiguous amounts never reach a signer (0.071458ms)
+✔ privilege escalation is refused (0.059583ms)
+✔ arbitrary scripts or scenario names are refused (0.03875ms)
+✔ only explicit policy impact configurations are allowed (0.052375ms)
+✔ request type and instruction length are enforced (0.047ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 326.591417

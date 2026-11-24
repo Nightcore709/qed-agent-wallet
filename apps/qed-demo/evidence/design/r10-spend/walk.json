@@ -1,0 +1,720 @@
+{
+ "at": "2026-11-23T14:02:15.127Z",
+ "routes": [
+  "/pay",
+  "/pay?bill=bil_1m846aa06anqj4r4gdr",
+  "/instructions",
+  "/instructions/new",
+  "/instructions/new?kind=invest",
+  "/instructions/prg_1m846aa0sknfqv01ak9",
+  "/instructions/prg_1m846aa0caatdw0b8hj",
+  "/instructions/prg_1m846aa13bpfnzwgn1k"
+ ],
+ "sizes": [
+  "320x640",
+  "375x812",
+  "1280x720"
+ ],
+ "overflow": [],
+ "hidden": [],
+ "noRing": [],
+ "small24": [],
+ "under44": [
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Overview",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Instructions",
+   "w": 94,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "On-chain wallet",
+   "w": 116,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Security and recovery",
+   "w": 152,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Workspace",
+   "w": 89,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Safeguards",
+   "w": 90,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "This build",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Overview",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Instructions",
+   "w": 94,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "On-chain wallet",
+   "w": 116,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Security and recovery",
+   "w": 152,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Workspace",
+   "w": 89,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Safeguards",
+   "w": 90,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "This build",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new",
+   "cls": "A",
+   "parent": "crumb",
+   "text": "Instructions",
+   "w": 88,
+   "h": 36,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Overview",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Instructions",
+   "w": 94,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "On-chain wallet",
+   "w": 116,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Security and recovery",
+   "w": 152,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Workspace",
+   "w": 89,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Safeguards",
+   "w": 90,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "This build",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "A",
+   "parent": "crumb",
+   "text": "Instructions",
+   "w": 88,
+   "h": 36,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "if limits hold",
+   "w": 66,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "an estimate",
+   "w": 63,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/new?kind=invest",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Overview",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Instructions",
+   "w": 94,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "On-chain wallet",
+   "w": 116,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Security and recovery",
+   "w": 152,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Workspace",
+   "w": 89,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Safeguards",
+   "w": 90,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "This build",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "A",
+   "parent": "crumb",
+   "text": "Instructions",
+   "w": 88,
+   "h": 36,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0sknfqv01ak9",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Overview",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Instructions",
+   "w": 94,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "On-chain wallet",
+   "w": 116,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Security and recovery",
+   "w": 152,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Workspace",
+   "w": 89,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Safeguards",
+   "w": 90,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "This build",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "A",
+   "parent": "crumb",
+   "text": "Instructions",
+   "w": 88,
+   "h": 36,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "if limits hold",
+   "w": 66,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "if limits hold",
+   "w": 66,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa0caatdw0b8hj",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "live price",
+   "w": 49,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Overview",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Instructions",
+   "w": 94,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "On-chain wallet",
+   "w": 116,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Security and recovery",
+   "w": 152,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Workspace",
+   "w": 89,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "Safeguards",
+   "w": 90,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "secnav",
+   "text": "This build",
+   "w": 80,
+   "h": 40,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "A",
+   "parent": "crumb",
+   "text": "Instructions",
+   "w": 88,
+   "h": 36,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "if limits hold",
+   "w": 66,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "an estimate",
+   "w": 63,
+   "h": 24,
+   "inline": false
+  },
+  {
+   "route": "/instructions/prg_1m846aa13bpfnzwgn1k",
+   "cls": "basis",
+   "parent": "basis-wrap",
+   "text": "from your records",
+   "w": 97,
+   "h": 24,
+   "inline": false
+  }
+ ],
+ "stops": 456,
+ "keyboard": [
+  {
+   "w": 390,
+   "step": "arrow keys move the choice of payee",
+   "ok": true,
+   "detail": "checked index 1"
+  },
+  {
+   "w": 390,
+   "step": "what stays free updates as the amount is typed",
+   "ok": true,
+   "detail": "₹6,93,722.26"
+  },
+  {
+   "w": 390,
+   "step": "Enter prepares the terms and focus goes into the sheet",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "w": 390,
+   "step": "Tab never reaches the page behind the sheet",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "w": 390,
+   "step": "the sheet shows the same leaving figure and route",
+   "ok": true,
+   "detail": "One action, by your handNot signed yetPay ₹1,500 to Fibre Broadband.Fibre Broadband has a ₹999 bill "
+  },
+  {
+   "w": 390,
+   "step": "Escape closes the sheet and focus returns to where it was",
+   "ok": true,
+   "detail": "focus on: input How much"
+  },
+  {
+   "w": 1280,
+   "step": "arrow keys move the choice of payee",
+   "ok": true,
+   "detail": "checked index 1"
+  },
+  {
+   "w": 1280,
+   "step": "what stays free updates as the amount is typed",
+   "ok": true,
+   "detail": "₹6,93,722.26"
+  },
+  {
+   "w": 1280,
+   "step": "Enter prepares the terms and focus goes into the sheet",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "w": 1280,
+   "step": "Tab never reaches the page behind the sheet",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "w": 1280,
+   "step": "the sheet shows the same leaving figure and route",
+   "ok": true,
+   "detail": "One action, by your handNot signed yetPay ₹1,500 to Fibre Broadband.Fibre Broadband has a ₹999 bill "
+  },
+  {
+   "w": 1280,
+   "step": "Escape closes the sheet and focus returns to where it was",
+   "ok": true,
+   "detail": "focus on: input How much"
+  }
+ ]
+}

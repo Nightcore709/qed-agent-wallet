@@ -1,0 +1,113 @@
+# slither . --exclude-dependencies --json evidence/r13-owner/slither.json   (exit 255 = findings reported)
+# recorded 2026-11-24T18:42:55Z; forge Version: 1.7.1; src/QEDOwnerAccount.sol sha256 3230a781d34c7b07f353ed164411a3784b982f8c9873faa73780079b1b2f6e29
+
+
+Detector: arbitrary-send-eth
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#1051-1056) sends eth to arbitrary user
+	Dangerous calls:
+	- (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#1053)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Detector: calls-loop
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#1051-1056) has external calls inside a loop: (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#1053)
+	Calls stack containing the loop:
+		QEDOwnerAccount.execute(QEDOwnerAccount.Call[],uint256,uint64,QEDOwnerAccount.Assertion[])
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#1051-1056) has external calls inside a loop: (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#1053)
+	Calls stack containing the loop:
+		QEDOwnerAccount.protect(QEDOwnerAccount.Call[],uint256,uint64,QEDOwnerAccount.Assertion)
+QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#1051-1056) has external calls inside a loop: (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#1053)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyCalls(bytes32,QEDOwnerAccount.Call[])
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Detector: timestamp
+QEDOwnerAccount.execute(QEDOwnerAccount.Call[],uint256,uint64,QEDOwnerAccount.Assertion[]) (src/QEDOwnerAccount.sol#433-456) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > deadline (src/QEDOwnerAccount.sol#438)
+QEDOwnerAccount.protect(QEDOwnerAccount.Call[],uint256,uint64,QEDOwnerAccount.Assertion) (src/QEDOwnerAccount.sol#486-506) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > deadline (src/QEDOwnerAccount.sol#491)
+QEDOwnerAccount.applyCalls(bytes32,QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#668-677) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < c.readyAt (src/QEDOwnerAccount.sol#672)
+QEDOwnerAccount.applyChange(bytes32) (src/QEDOwnerAccount.sol#682-732) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < c.readyAt (src/QEDOwnerAccount.sol#687)
+QEDOwnerAccount._startRecovery(bytes32,uint256,uint256,uint64,bytes32,bytes32,bool) (src/QEDOwnerAccount.sol#812-841) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > deadline (src/QEDOwnerAccount.sol#821)
+QEDOwnerAccount.finishRecovery(bytes32) (src/QEDOwnerAccount.sol#845-854) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < p.readyAt (src/QEDOwnerAccount.sol#848)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+Detector: assembly
+QEDOwnerAccount._verifyAssertion(bytes32,QEDOwnerAccount.Assertion,uint256,uint256) (src/QEDOwnerAccount.sol#996-1017) uses assembly
+	- INLINE ASM (src/QEDOwnerAccount.sol#1004-1006)
+QEDOwnerAccount._hasField(bytes,uint256,bytes32,uint256) (src/QEDOwnerAccount.sol#1020-1027) uses assembly
+	- INLINE ASM (src/QEDOwnerAccount.sol#1023-1025)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+Detector: pragma
+3 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Base64.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Errors.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/Panic.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/cryptography/P256.sol#3)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/Math.sol#4)
+		-^0.8.20 (lib/openzeppelin-contracts-5.6.1/utils/math/SafeCast.sol#5)
+	- Version constraint ^0.8.24 is used by:
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/ReentrancyGuardTransient.sol#4)
+		-^0.8.24 (lib/openzeppelin-contracts-5.6.1/utils/TransientSlot.sol#5)
+	- Version constraint 0.8.38 is used by:
+		-0.8.38 (src/QEDOwnerAccount.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+
+Detector: costly-loop
+QEDOwnerAccount._insertSigner(uint256,uint256,QEDOwnerAccount.Role) (src/QEDOwnerAccount.sol#1068-1080) has costly operations inside a loop:
+	- serial = ++ _serial (src/QEDOwnerAccount.sol#1075)
+	Calls stack containing the loop:
+		QEDOwnerAccount.constructor(bytes32,string,QEDOwnerAccount.SignerInit[],uint256,uint256,uint64,uint64,QEDOwnerAccount.Guard[],QEDOwnerAccount.Guard[],address,QEDOwnerAccount.Guard[],bool)
+		QEDOwnerAccount._addSigner(uint256,uint256,QEDOwnerAccount.Role)
+QEDOwnerAccount._insertSigner(uint256,uint256,QEDOwnerAccount.Role) (src/QEDOwnerAccount.sol#1068-1080) has costly operations inside a loop:
+	- ++ memberCount (src/QEDOwnerAccount.sol#1078)
+	Calls stack containing the loop:
+		QEDOwnerAccount.constructor(bytes32,string,QEDOwnerAccount.SignerInit[],uint256,uint256,uint64,uint64,QEDOwnerAccount.Guard[],QEDOwnerAccount.Guard[],address,QEDOwnerAccount.Guard[],bool)
+		QEDOwnerAccount._addSigner(uint256,uint256,QEDOwnerAccount.Role)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#1082-1104) has costly operations inside a loop:
+	- _signerIds.pop() (src/QEDOwnerAccount.sol#1092)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#1082-1104) has costly operations inside a loop:
+	- delete _signers[id] (src/QEDOwnerAccount.sol#1093)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#1082-1104) has costly operations inside a loop:
+	- -- memberCount (src/QEDOwnerAccount.sol#1094)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#1082-1104) has costly operations inside a loop:
+	- delete _recoveries[pending] (src/QEDOwnerAccount.sol#1098)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+QEDOwnerAccount._removeSigner(bytes32) (src/QEDOwnerAccount.sol#1082-1104) has costly operations inside a loop:
+	- delete pendingRecoveryOf[id] (src/QEDOwnerAccount.sol#1099)
+	Calls stack containing the loop:
+		QEDOwnerAccount.applyChange(bytes32)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+Detector: cyclomatic-complexity
+QEDOwnerAccount.constructor(bytes32,string,QEDOwnerAccount.SignerInit[],uint256,uint256,uint64,uint64,QEDOwnerAccount.Guard[],QEDOwnerAccount.Guard[],address,QEDOwnerAccount.Guard[],bool) (src/QEDOwnerAccount.sol#328-413) has a high cyclomatic complexity (19).
+QEDOwnerAccount.applyChange(bytes32) (src/QEDOwnerAccount.sol#682-732) has a high cyclomatic complexity (18).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+Detector: low-level-calls
+Low level call in QEDOwnerAccount._run(QEDOwnerAccount.Call[]) (src/QEDOwnerAccount.sol#1051-1056):
+	- (ok,reason) = calls[i].target.call{value: calls[i].value}(calls[i].data) (src/QEDOwnerAccount.sol#1053)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+. analyzed (9 contracts with 102 detectors), 23 result(s) found
+'forge clean' running (wd: <repo>/apps/qed-demo/chain/accounts)
+'forge config --json' running
+'forge build --build-info --deny never --skip ./test/** ./script/** --force' running (wd: <repo>/apps/qed-demo/chain/accounts)
+# exit status: 255

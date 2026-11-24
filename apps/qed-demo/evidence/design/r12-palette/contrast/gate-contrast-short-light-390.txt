@@ -1,0 +1,1 @@
+831 text runs measured on /,/pay,/save,/protect,/vault (light, 390x844); 0 below threshold

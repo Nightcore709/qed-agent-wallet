@@ -1,0 +1,30 @@
+{
+ "1440-light": {
+  "point": "23 Nov, 18:31 ₹64,33,907.9 +0.01% since the start of the line",
+  "gap": "No record from 18:03 to 18:07 on 23 Nov: QED was not running, or the source was silent.",
+  "keyboard": "23 Nov, 18:49 ₹64,26,700.1 −0.10% since the start of the line",
+  "live": "23 Nov, 18:49: ₹64,26,700.1.",
+  "overflow": 0
+ },
+ "390-light": {
+  "point": "23 Nov, 18:39 ₹64,39,829.2 +0.10% since the start of the line",
+  "gap": "No record from 18:03 to 18:07 on 23 Nov: QED was not running, or the source was silent.",
+  "keyboard": "23 Nov, 18:02 ₹64,36,630.7 +0.05% since the start of the line",
+  "live": "23 Nov, 18:02: ₹64,36,630.7.",
+  "overflow": 0
+ },
+ "1440-dark": {
+  "point": "23 Nov, 18:31 ₹64,33,907.9 +0.01% since the start of the line",
+  "gap": "No record from 18:03 to 18:07 on 23 Nov: QED was not running, or the source was silent.",
+  "keyboard": "23 Nov, 18:49 ₹64,26,700.1 −0.10% since the start of the line",
+  "live": "23 Nov, 18:49: ₹64,26,700.1.",
+  "overflow": 0
+ },
+ "390-dark": {
+  "point": "23 Nov, 18:39 ₹64,35,222.8 +0.03% since the start of the line",
+  "gap": "No record from 18:03 to 18:07 on 23 Nov: QED was not running, or the source was silent.",
+  "keyboard": "23 Nov, 18:02 ₹64,36,630.7 +0.05% since the start of the line",
+  "live": "23 Nov, 18:02: ₹64,36,630.7.",
+  "overflow": 0
+ }
+}

@@ -1,0 +1,40 @@
+{
+  "profile": "desktop: 1440 x 900, no throttling",
+  "runs": 3,
+  "measured": "2026-11-24T10:41:56.792Z",
+  "note": "Lab figures on one computer under load from other work; not field data.",
+  "results": {
+    "/protect": {
+      "runs": [
+        {
+          "head": 83.59999999403954,
+          "figure": 169.19999998807907,
+          "control": 83.59999999403954,
+          "lcp": 148,
+          "response": 64
+        },
+        {
+          "head": 91.89999997615814,
+          "figure": 123.39999997615814,
+          "control": 91.89999997615814,
+          "lcp": 100,
+          "response": 56
+        },
+        {
+          "head": 85.5,
+          "figure": 103.10000002384186,
+          "control": 85.5,
+          "lcp": 88,
+          "response": 64
+        }
+      ],
+      "median": {
+        "head": 86,
+        "figure": 123,
+        "control": 86,
+        "lcp": 100,
+        "response": 64
+      }
+    }
+  }
+}

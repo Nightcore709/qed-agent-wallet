@@ -1,0 +1,188 @@
+/*
+ * QED design system "Meridian" (R11, 24 November 2026; replaces the rejected "Bounds", D-108). Rationale, roles and
+ * checks: apps/qed-demo/DESIGN.md, section "Meridian".
+ *
+ * Idea: money seen through clear glass, lit from one horizon. Every screen sits over a living atmosphere (a horizon of
+ * light whose hue follows the section) and is read through layers of glass: the stage, the panels on it, the sheets
+ * over them. Glass is the product's promise made material (what QED does is visible and inspectable); the light is
+ * the one place colour is spent freely. Figures, risks, permissions and actions stay opaque-legible on every layer.
+ *
+ * Colour roles (each has one job; night and day both defined):
+ *   ground                                the page under the atmosphere
+ *   pane / pane-2 / pane-3                glass: resting panels, raised and interactive, sheets and menus
+ *   sheet / sheet-2 / well                opaque surfaces for what must never show the page through it; inset fields
+ *   rim / gloss / edge-hi / edge-lo       the glass's border, its diagonal sheen, its lit and shaded inner edges
+ *   ink / ink-2 / ink-3 / ink-4           figures and names, explanations, metadata (all 4.5:1 or more), disabled only
+ *   act / on-act / act-2                  the one primary action of a view (champagne at night, espresso by day)
+ *   brand / brand-bg / brand-line         links and the selected state; the focus ring is --focus
+ *   qed / qed-bg                          QED's own hand: what it did, proposes or may do (the orb's tide colour)
+ *   gain / loss / hold / due (+ -bg)      money in, a passed check / refused, failed, short / in progress / waits on you
+ *   rule / rule-2 / edge                  hairlines, stronger rules, the 3:1 boundary of anything typed or chosen
+ *   c1 to c6                              chart series, in order
+ *   part-free / -kept / -kept-line /      the money bar's parts (kit.tsx MoneyBar, DESIGN.md M14): free to use, kept
+ *     -held / -pay / -over / -short       for what is due (with its hatch), committed, this payment, taken from what
+ *   part-reach                            is kept, short; and the span of what QED may move. Each 3:1 on the panel.
+ *                                         No yellow in a bar (R13): this payment is true bronze, not gold, and the
+ *                                         span and the meters of QED's authority are a calm steel-tide, not cyan
+ *   glow-a / glow-b / glow-c              the atmosphere's three lights (set per section in base.css)
+ */
+
+@font-face {
+  font-family: "Inter Tight";
+  src: url("../fonts/inter-tight/inter-tight-latin-wght-normal.woff2") format("woff2-variations");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter Tight";
+  src: url("../fonts/inter-tight/inter-tight-latin-ext-wght-normal.woff2") format("woff2-variations");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Registered so the atmosphere's lights can be animated between sections (base.css). */
+@property --glow-a { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --glow-b { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --glow-c { syntax: "<color>"; inherits: true; initial-value: transparent; }
+
+:root {
+  /* type: one family, Inter Tight; figures tabular and lining wherever they change */
+  --font: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --wide: 100%; --text: 100%; --narrow: 100%;  /* one width; kept so older rules still resolve */
+  /* text 12 13 15 17, headings 16 20 30, display 36 to 64, figures 22 30 44 64 and the hero 48 to 88 (px at the default
+     16 px root). In rem, so a person who sets a larger text size in their browser gets larger text everywhere. */
+  --t-micro: .75rem; --t-small: .8125rem; --t-body: .9375rem; --t-lead: 1.0625rem; --t-h3: 1rem; --t-h2: 1.25rem; --t-h1: 1.875rem;
+  --t-display: clamp(2.25rem, 4.4vw, 4rem);
+  --t-fig-s: 1.375rem; --t-fig-m: 1.875rem; --t-fig-l: 2.75rem; --t-fig-xl: 4rem;
+  --t-fig-hero: clamp(3rem, 6vw, 5.5rem); --t-fig-hero-sm: clamp(2.5rem, 12.5vw, 3.5rem);
+  --t-statement: clamp(2.75rem, 5.2vw, 5.25rem); --t-statement-sm: clamp(1.875rem, 9vw, 2.75rem);
+  /* a figure that never outgrows its panel at any text size the browser is set to (R12): the panel must be a container */
+  --t-fig-hero-fit: min(var(--t-fig-hero-sm), 15.5cqi); --t-fig-l-fit: min(var(--t-fig-l), 15.5cqi); --t-fig-m-fit: min(var(--t-fig-m), 11cqi);
+  /* tracking: tighter as type grows */
+  --track-hero: -.05em; --track-fig: -.035em; --track-h: -.028em; --track-body: -.006em; --track-label: .004em;
+
+  /* space: a 4px grid */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s7: 28px; --s8: 32px; --s10: 40px; --s12: 48px; --s16: 64px;
+  /* shape: stage 32, panels 24, tiles 18, fields 14, tags 8; controls and chips are pills */
+  --r-xs: 8px; --r-sm: 14px; --r-md: 18px; --r-lg: 24px; --r-xl: 32px; --r-pill: 999px;
+  /* motion: expo-out for what arrives and answers, in-out for what travels, a spring for what is picked up and let go */
+  --ease-out: cubic-bezier(.16, 1, .3, 1); --ease-move: cubic-bezier(.65, 0, .35, 1); --ease-in: cubic-bezier(.4, 0, 1, 1);
+  /* damped springs sampled into linear(): zeta .72 (4% overshoot, settles in ~600 ms) and zeta .5 (16%, for a pop) */
+  --ease-spring: linear(0, .059, .194, .359, .524, .672, .793, .886, .952, .996, 1.022, 1.035, 1.038, 1.036, 1.031, 1.025, 1.019, 1.013, 1.008, 1.005, 1.002, 1);
+  --ease-pop: linear(0, .098, .321, .582, .819, .998, 1.109, 1.157, 1.159, 1.131, 1.09, 1.049, 1.014, .99, .977, .973, .976, .982, .989, .995, 1, 1.003, 1.004, 1.002, 1);
+  --d-spring: 620ms;
+  --d1: 140ms; --d2: 240ms; --d3: 420ms; --d4: 720ms; --d-scene: 1100ms;
+  --page: 1320px; --rail: 0px; --top: 72px;
+  --z-atmos: -1; --z-bar: 30; --z-dock: 35; --z-menu: 40; --z-sheet: 50; --z-toast: 60;
+  --blur: 24px; --blur-2: 16px; --sat: 1.5;
+
+  /* night (the default when the system asks for dark) is below; this block is day */
+  --ground: oklch(95.2% .012 78);
+  --stage: oklch(99.4% .005 85 / .3);
+  --pane: oklch(99.6% .004 85 / .58); --pane-2: oklch(99.8% .003 85 / .74); --pane-3: oklch(99.8% .003 85 / .9);
+  --sheet: oklch(99.4% .004 85); --sheet-2: oklch(97.6% .007 80); --well: oklch(93.4% .011 76);
+  --rim: oklch(100% 0 0 / .7); --rim-out: oklch(38% .03 60 / .12); --gloss: oklch(100% 0 0 / .55);
+  --edge-hi: oklch(100% 0 0 / .95); --edge-lo: oklch(40% .03 60 / .10);
+  --ink: oklch(21.5% .018 52); --ink-2: oklch(36% .018 54); --ink-3: oklch(44.5% .016 56); --ink-4: oklch(66% .012 60);
+  --rule: oklch(30% .02 55 / .10); --rule-2: oklch(30% .02 55 / .17); --edge: oklch(30% .02 55 / .5);
+  --act: oklch(23% .02 50); --act-2: oklch(31% .022 50); --on-act: oklch(97.5% .012 85); --act-hover: oklch(32% .024 50);
+  --brand: oklch(42% .1 58); --brand-2: var(--act); --brand-3: var(--act-2);
+  --brand-bg: oklch(42% .1 58 / .1); --brand-line: oklch(42% .1 58 / .32); --on-brand: var(--on-act);
+  --qed: oklch(46% .11 222); --qed-bg: oklch(46% .11 222 / .1); --qed-line: oklch(46% .11 222 / .3);
+  --gain: oklch(45% .11 160); --gain-bg: oklch(45% .11 160 / .11);
+  --loss: oklch(49% .17 28); --loss-bg: oklch(49% .17 28 / .1); --on-loss: #fff;
+  --hold: oklch(46% .1 245); --hold-bg: oklch(46% .1 245 / .1);
+  --due: oklch(49% .12 66); --due-bg: oklch(68% .14 75 / .16); --due-mark: oklch(68% .15 70);
+  --focus: oklch(42% .12 58);
+  --c1: oklch(28% .02 55); --c2: oklch(62% .12 75); --c3: oklch(62% .13 70); --c4: oklch(55% .12 160); --c5: oklch(56% .16 30); --c6: oklch(48% .03 250);
+  /* the money bar's parts: a lightness ramp of one warm metal, one slate, and red only for what is missing or taken */
+  --part-free: oklch(30% .02 55); --part-kept: oklch(62% .025 68); --part-kept-line: oklch(47% .02 62); --part-held: oklch(52% .06 245);
+  --part-pay: oklch(56% .08 55); --part-over: var(--loss); --part-short: var(--loss); --part-reach: oklch(47% .075 228);
+  --lift-1: inset 0 1px 0 var(--edge-hi), inset 0 -1px 0 var(--edge-lo), 0 0 0 1px var(--rim-out), 0 8px 24px -14px oklch(35% .04 55 / .22);
+  --lift-2: inset 0 1px 0 var(--edge-hi), 0 0 0 1px var(--rim-out), 0 2px 6px oklch(35% .04 55 / .06), 0 22px 48px -20px oklch(35% .04 55 / .3);
+  --lift-3: inset 0 1px 0 var(--edge-hi), 0 0 0 1px var(--rim-out), 0 40px 90px -30px oklch(30% .04 55 / .45);
+  --hatch: repeating-linear-gradient(135deg, oklch(30% .02 55 / .28) 0 1.5px, transparent 1.5px 5px);
+  --backdrop: oklch(25% .02 55 / .32);
+  --shadow-btn: 0 1px 0 oklch(100% 0 0 / .35) inset, 0 6px 16px -8px oklch(25% .03 50 / .55);
+  --shadow-loss: 0 6px 16px -8px oklch(45% .15 28 / .5);
+  --grain-opacity: .035;
+  /* the atmosphere: a warm key light low on the horizon, a cool counter light, a high haze */
+  --glow-a: oklch(84% .1 58 / .62); --glow-b: oklch(87% .06 62 / .5); --glow-c: oklch(99% .02 85 / .7);
+  --meridian: oklch(70% .12 62 / .55);
+  color-scheme: light;
+
+  /* transitional aliases: names older screen rules still use, resolved to Meridian roles until those rules are rebuilt */
+  --peacock: var(--sheet); --peacock-ink: var(--ink); --peacock-ink-2: var(--ink-2);
+  --teal: var(--brand); --teal-bg: var(--brand-bg);
+  --marigold: var(--due-mark); --marigold-ink: var(--due); --marigold-select: var(--brand-bg);
+  --on-field-wash: var(--well); --shadow-field: var(--lift-1); --shadow-accent: var(--shadow-btn);
+}
+
+/* night: the system asks for dark and the person has not chosen day; or the person chose night */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: oklch(12.2% .006 68);
+    --stage: oklch(14% .007 68 / .32); --pane: oklch(21.5% .009 70 / .54); --pane-2: oklch(25.5% .01 72 / .62); --pane-3: oklch(21% .009 70 / .9);
+    --sheet: oklch(18% .008 70); --sheet-2: oklch(21.5% .009 70); --well: oklch(10.5% .005 68);
+    --rim: oklch(96% .02 78 / .12); --rim-out: oklch(0% 0 0 / .35); --gloss: oklch(98% .02 82 / .09);
+    --edge-hi: oklch(98% .02 82 / .17); --edge-lo: oklch(0% 0 0 / .42);
+    --ink: oklch(95.5% .012 84); --ink-2: oklch(84.5% .013 80); --ink-3: oklch(74.5% .013 78); --ink-4: oklch(56% .012 66);
+    --rule: oklch(96% .02 78 / .085); --rule-2: oklch(96% .02 78 / .15); --edge: oklch(96% .02 78 / .44);
+    --act: oklch(88.5% .072 86); --act-2: oklch(79% .095 78); --on-act: oklch(19% .02 58); --act-hover: oklch(92.5% .06 88);
+    --brand: oklch(85% .09 84); --brand-2: var(--act); --brand-3: var(--act-2);
+    --brand-bg: oklch(85% .09 84 / .12); --brand-line: oklch(85% .09 84 / .34); --on-brand: var(--on-act);
+    --qed: oklch(83% .1 212); --qed-bg: oklch(83% .1 212 / .12); --qed-line: oklch(83% .1 212 / .32);
+    --gain: oklch(83% .135 162); --gain-bg: oklch(83% .135 162 / .12);
+    --loss: oklch(75% .155 28); --loss-bg: oklch(75% .155 28 / .13); --on-loss: oklch(17% .02 30);
+    --hold: oklch(81% .09 238); --hold-bg: oklch(81% .09 238 / .12);
+    --due: oklch(86% .125 80); --due-bg: oklch(86% .125 80 / .12); --due-mark: oklch(82% .14 74);
+    --focus: oklch(91% .07 84);
+    --c1: oklch(93% .012 78); --c2: oklch(82% .1 82); --c3: oklch(84% .12 76); --c4: oklch(79% .13 162); --c5: oklch(73% .15 30); --c6: oklch(78% .025 250);
+    --part-free: oklch(90% .024 84); --part-kept: oklch(58% .03 70); --part-kept-line: oklch(43% .025 66); --part-held: oklch(60% .045 245);
+    --part-pay: oklch(62% .075 58); --part-over: var(--loss); --part-short: var(--loss); --part-reach: oklch(74% .055 220);
+    --lift-1: inset 1px 1px 0 var(--edge-hi), inset -1px -1px 0 var(--edge-lo), 0 0 0 1px var(--rim-out), 0 18px 40px -26px oklch(0% 0 0 / .75);
+    --lift-2: inset 1px 1px 0 var(--edge-hi), 0 0 0 1px var(--rim-out), 0 28px 64px -28px oklch(0% 0 0 / .8);
+    --lift-3: inset 1px 1px 0 var(--edge-hi), 0 0 0 1px var(--rim-out), 0 48px 120px -36px oklch(0% 0 0 / .9);
+    --hatch: repeating-linear-gradient(135deg, oklch(96% .02 78 / .3) 0 1.5px, transparent 1.5px 5px);
+    --backdrop: oklch(5% .01 58 / .55);
+    --shadow-btn: 0 1px 0 oklch(100% 0 0 / .5) inset, 0 10px 28px -10px oklch(76% .12 76 / .55);
+    --shadow-loss: 0 10px 28px -10px oklch(65% .17 28 / .5);
+    --grain-opacity: .05;
+    --glow-a: oklch(64% .13 66 / .5); --glow-b: oklch(52% .1 46 / .42); --glow-c: oklch(40% .05 80 / .5);
+    --meridian: oklch(85% .1 80 / .55);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: oklch(12.2% .006 68);
+  --stage: oklch(14% .007 68 / .32); --pane: oklch(21.5% .009 70 / .54); --pane-2: oklch(25.5% .01 72 / .62); --pane-3: oklch(21% .009 70 / .9);
+  --sheet: oklch(18% .008 70); --sheet-2: oklch(21.5% .009 70); --well: oklch(10.5% .005 68);
+  --rim: oklch(96% .02 78 / .12); --rim-out: oklch(0% 0 0 / .35); --gloss: oklch(98% .02 82 / .09);
+  --edge-hi: oklch(98% .02 82 / .17); --edge-lo: oklch(0% 0 0 / .42);
+  --ink: oklch(95.5% .012 84); --ink-2: oklch(84.5% .013 80); --ink-3: oklch(74.5% .013 78); --ink-4: oklch(56% .012 66);
+  --rule: oklch(96% .02 78 / .085); --rule-2: oklch(96% .02 78 / .15); --edge: oklch(96% .02 78 / .44);
+  --act: oklch(88.5% .072 86); --act-2: oklch(79% .095 78); --on-act: oklch(19% .02 58); --act-hover: oklch(92.5% .06 88);
+  --brand: oklch(85% .09 84); --brand-2: var(--act); --brand-3: var(--act-2);
+  --brand-bg: oklch(85% .09 84 / .12); --brand-line: oklch(85% .09 84 / .34); --on-brand: var(--on-act);
+  --qed: oklch(83% .1 212); --qed-bg: oklch(83% .1 212 / .12); --qed-line: oklch(83% .1 212 / .32);
+  --gain: oklch(83% .135 162); --gain-bg: oklch(83% .135 162 / .12);
+  --loss: oklch(75% .155 28); --loss-bg: oklch(75% .155 28 / .13); --on-loss: oklch(17% .02 30);
+  --hold: oklch(81% .09 238); --hold-bg: oklch(81% .09 238 / .12);
+  --due: oklch(86% .125 80); --due-bg: oklch(86% .125 80 / .12); --due-mark: oklch(82% .14 74);
+  --focus: oklch(91% .07 84);
+  --c1: oklch(93% .012 78); --c2: oklch(82% .1 82); --c3: oklch(84% .12 76); --c4: oklch(79% .13 162); --c5: oklch(73% .15 30); --c6: oklch(78% .025 250);
+  --part-free: oklch(90% .024 84); --part-kept: oklch(58% .03 70); --part-kept-line: oklch(43% .025 66); --part-held: oklch(60% .045 245);
+  --part-pay: oklch(62% .075 58); --part-over: var(--loss); --part-short: var(--loss); --part-reach: oklch(74% .055 220);
+  --lift-1: inset 1px 1px 0 var(--edge-hi), inset -1px -1px 0 var(--edge-lo), 0 0 0 1px var(--rim-out), 0 18px 40px -26px oklch(0% 0 0 / .75);
+  --lift-2: inset 1px 1px 0 var(--edge-hi), 0 0 0 1px var(--rim-out), 0 28px 64px -28px oklch(0% 0 0 / .8);
+  --lift-3: inset 1px 1px 0 var(--edge-hi), 0 0 0 1px var(--rim-out), 0 48px 120px -36px oklch(0% 0 0 / .9);
+  --hatch: repeating-linear-gradient(135deg, oklch(96% .02 78 / .3) 0 1.5px, transparent 1.5px 5px);
+  --backdrop: oklch(5% .01 58 / .55);
+  --shadow-btn: 0 1px 0 oklch(100% 0 0 / .5) inset, 0 10px 28px -10px oklch(76% .12 76 / .55);
+  --shadow-loss: 0 10px 28px -10px oklch(65% .17 28 / .5);
+  --grain-opacity: .05;
+  --glow-a: oklch(64% .13 66 / .5); --glow-b: oklch(52% .1 46 / .42); --glow-c: oklch(40% .05 80 / .5);
+  --meridian: oklch(85% .1 80 / .55);
+  color-scheme: dark;
+}

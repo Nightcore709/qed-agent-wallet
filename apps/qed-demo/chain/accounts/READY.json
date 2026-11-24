@@ -1,0 +1,86 @@
+{
+  "status": "ready",
+  "artifact": "out/QEDOwnerAccount.sol/QEDOwnerAccount.json",
+  "artifactSha256": "8b0beb8ee67ee9adf63c7885d77877015dba331f12b995659274a2ec8108f5d9",
+  "solc": "0.8.38",
+  "date": "2026-11-25T03:30:00+05:30",
+  "tests": {
+    "forge": {
+      "passed": 227,
+      "failed": 0,
+      "skipped": 0,
+      "suites": 17,
+      "fuzzTests": 23,
+      "fuzzRuns": 1000,
+      "invariants": 17,
+      "invariantRuns": 256,
+      "invariantDepth": 48,
+      "log": "evidence/r13-h1/forge-test.txt"
+    },
+    "seededTwin": {
+      "expectedToFail": true,
+      "twins": [
+        "seeded/BuggyQuorum.t.sol (invariant_quorum)",
+        "seeded/BuggyFreeze.t.sol (invariant_frozen_member_never_approves)",
+        "seeded/BuggyGuardian.t.sol (invariant_recovery_needs_the_guardian)",
+        "seeded/BuggyCosignCancel.t.sol (invariant_frozen_cannot_cancel_cosigned_recovery)",
+        "seeded/BuggyTimeLock.t.sol (invariant_time_locked_call_never_runs_immediately)",
+        "seeded/BuggyAllFrozenFinish.t.sol (invariant_cosigned_recovery_needs_a_whole_unfrozen_window)",
+        "seeded/BuggyNoRestart.t.sol (invariant_cosigned_recovery_needs_a_whole_unfrozen_window)",
+        "seeded/BuggyRemovalCanceller.t.sol (invariant_removal_leaves_a_canceller)",
+        "seeded/BuggyStaleSetting.t.sol (invariant_no_stale_setting_change_applies)",
+        "seeded/BuggyRecoveryDeadline.t.sol (invariant_recovery_deadline_capped)",
+        "seeded/BuggySentinelEpoch.t.sol (invariant_cosigned_recovery_needs_a_whole_unfrozen_window)"
+      ],
+      "invariantsFailed": 11,
+      "invariantsPassed": 176,
+      "log": "evidence/r13-h1/forge-seeded-twin.txt"
+    },
+    "invariantsFailOnRevert": {
+      "passed": 17,
+      "handlerReverts": 0,
+      "log": "evidence/r13-h1/forge-invariants-fail-on-revert.txt",
+      "ghosts": "evidence/r13-h1/invariant-ghosts-summary.txt"
+    },
+    "differential": {
+      "against": "OpenZeppelin 5.6.1 WebAuthn.verify, unmodified",
+      "fuzzRuns": 1000,
+      "flagBytes": 256,
+      "test": "test/WebAuthnDiff.t.sol"
+    },
+    "node": {
+      "passed": 24,
+      "failed": 0,
+      "offline": 10,
+      "anvil": 14,
+      "log": "evidence/r13-h1/node-test.txt"
+    },
+    "typecheck": {
+      "errors": 0,
+      "log": "evidence/r13-h1/tsc.txt"
+    },
+    "slither": {
+      "findings": 26,
+      "high": 1,
+      "medium": 0,
+      "low": 11,
+      "informational": 14,
+      "dispositioned": 26,
+      "log": "evidence/r13-h1/slither.json"
+    }
+  },
+  "sizes": {
+    "runtimeBytes": 24332,
+    "initcodeBytes": 30413,
+    "eip170MarginBytes": 244,
+    "log": "evidence/r13-h1/forge-build-sizes.txt"
+  },
+  "r13": "Sentinel freeze and protect (R13): containment of a passkey QED has suspended; see README \"R13: containing a suspended passkey\".",
+  "r13OwnerOptions": "Guardian (co-signed recoveries, set behind the delay), optional time-lock of withdraw/ringFence/unpause/setGuardian, WebAuthn checks in the account (differential test against OpenZeppelin's WebAuthn.verify); see README \"R13: owner options\". Evidence: evidence/r13-owner/ (scripts/run-evidence.sh).",
+  "reproducibleBuild": {
+    "command": "SOLC_VERSION=0.8.38 FORGE_OFFLINE=1 sh scripts/deploy/build-owner-account.sh",
+    "log": "evidence/r13-h1/reproducible-build.txt"
+  },
+  "r13ReviewFixes": "Review fixes of 25 Nov 2026 (F1 to F5): a co-signed recovery finishes only after a whole recoveryDelay with a Member unfrozen (none unfrozen: it waits; a thaw restarts it in full); the guardian can withdraw its co-signature; recovery deadlines at most one day ahead; a removal leaves more than adminThreshold settled Members it does not name; stale time-lock, sentinel and guardian changes never apply; a recovery started without the guardian does not finish while one is set. See README \"R13 review fixes\". Evidence: evidence/r13-secfix/.",
+  "r13H1": "Independent review H1 (25 Nov 2026): with every Member frozen, the sentinel (QED) may stop a pending co-signed recovery (stopRecovery), and such a recovery finishes after its whole delay only if that sentinel was set and unchanged throughout (else NoUnfrozenMember); a restart is never earlier (L1). See README \"R13 H1\". Evidence: evidence/r13-h1/."
+}

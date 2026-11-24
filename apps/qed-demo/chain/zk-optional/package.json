@@ -1,0 +1,17 @@
+{
+  "name": "qed-chain-rail-zk-optional",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0",
+  "engines": { "node": ">=22.12.0" },
+  "dependencies": {
+    "circomlibjs": "0.1.7",
+    "snarkjs": "0.7.5"
+  },
+  "overrides": {
+    "@ethersproject/providers": {
+      "ws": "8.22.0"
+    }
+  }
+}

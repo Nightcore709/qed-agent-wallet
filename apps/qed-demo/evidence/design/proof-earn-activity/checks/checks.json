@@ -1,0 +1,31 @@
+{
+ "what": "Design regression checks from the owner's rejection of the five directions (D-069)",
+ "at": "2026-11-22T19:17:06.023Z",
+ "screens": 30,
+ "findings": [
+  {
+   "route": "/",
+   "width": 1440,
+   "check": "identifiers",
+   "detail": "1 raw identifier(s), e.g. 0x39F2cE71e85A…"
+  },
+  {
+   "route": "/",
+   "width": 1440,
+   "check": "token-jargon",
+   "detail": "15 × tINR, tUSD"
+  },
+  {
+   "route": "/",
+   "width": 390,
+   "check": "identifiers",
+   "detail": "1 raw identifier(s), e.g. 0x39F2cE71e85A…"
+  },
+  {
+   "route": "/",
+   "width": 390,
+   "check": "token-jargon",
+   "detail": "15 × tINR, tUSD"
+  }
+ ]
+}

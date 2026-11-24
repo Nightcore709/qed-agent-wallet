@@ -1,0 +1,4 @@
+/ #0 pos-h: kept 3.49 | 2.19   short 7.65
+/pay #0 sum-h: kept 3.41
+/save #0 reserve-h: kept 3.23 | 2.18   short 7.06
+worst part or span against the panel: 3.23 (dark 1440)

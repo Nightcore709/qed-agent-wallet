@@ -1,0 +1,16 @@
+(node:46210) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ isqrt is the exact floor square root on 2,000 random inputs up to 2^250 (2.52975ms)
+✔ path deficiency: repeated swaps on one pool never beat a single swap (3,000 random cases) (1.70325ms)
+✔ weak duality: no route, at any prices, beats the bound (400 markets × 10 routes × 3 price vectors) (680.208125ms)
+✔ strong duality in practice: the solver's route is within 1 ppm of its bound, or within one raw unit per hop, on 300 random markets (460.374ms)
+✔ the certified route beats every baseline policy on 200 random markets (168.902875ms)
+✔ the committed Solidity fixture is the engine's current output (no drift) (2.505875ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1404.426041

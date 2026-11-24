@@ -1,0 +1,77 @@
+/* Money in other currencies (R13; src/screens/Abroad.tsx): Home's holdings by currency, Save's balances by currency, the
+   paper desk and a goal in another currency, and Spend's payments abroad. Meridian (DESIGN.md M4): tokens only; one
+   figure leads each panel; figures sit in tiles of one row language; a currency's code is said before its figure. */
+
+/* ------------------------------------------------------------------------------------------------ balances by currency */
+.ccy-total { display: grid; gap: 2px; margin-bottom: var(--s4); }
+.ccy-total-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.ccy-total-v { font-size: var(--t-fig-m); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; color: var(--ink); }
+.ccy-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.ccy-row { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 2px var(--s3); align-items: baseline; padding: var(--s3) var(--s4); border-radius: var(--r-md);
+  background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim); }
+.ccy-code { font-weight: 700; color: var(--ink); letter-spacing: .02em; }
+.ccy-name { min-width: 0; font-size: var(--t-small); color: var(--ink-2); }
+.ccy-name small, .ccy-val small, .fx-facts dd small { display: block; font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
+.ccy-bal { font-weight: 650; text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; color: var(--ink); }
+.ccy-val { grid-column: 2 / -1; font-size: var(--t-small); color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.ccy-rule { margin-top: var(--s3); }
+.ccy-src { margin-top: var(--s2); font-size: var(--t-small); color: var(--ink-2); }
+.ccy-src ul { margin: var(--s2) 0 0; padding-left: 1.1em; display: grid; gap: 4px; }
+/* on a phone the balance goes under the currency's name, so the name keeps its width */
+.ccy { container-type: inline-size; }
+@container (max-width: 440px) {
+  .ccy-row { grid-template-columns: 3.4em minmax(0, 1fr); }
+  .ccy-bal { grid-column: 2; text-align: start; }
+}
+
+/* Save: the three panels of this part in two independent columns, one on a phone */
+.ccy-save { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
+.ccy-save > .ccy { grid-column: 1; grid-row: 1 / span 2; }
+@media (max-width: 900px) { .ccy-save { grid-template-columns: minmax(0, 1fr); } .ccy-save > .ccy { grid-row: auto; } }
+
+/* ------------------------------------------------------------------------------------------------ the paper desk */
+.fx-form, .fxg-form, .ab-add, .ab-pay { display: grid; gap: var(--s3); align-items: end; }
+.fx-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fx-form > .btn { grid-column: 1 / -1; justify-self: start; }
+.fx-form + .note, .fx-form ~ .small { margin-top: var(--s3); }
+.fx-fill, .ab-sent { margin-top: var(--s4); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 78%, transparent); border: 1px solid var(--rim); }
+.fx-fill-head, .ab-sent-head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2) var(--s3); margin-bottom: var(--s3); }
+.fx-facts { display: grid; gap: var(--s2); margin: 0; }
+.fx-facts > div { display: grid; grid-template-columns: minmax(7.5em, 10em) minmax(0, 1fr); gap: 2px var(--s3); align-items: baseline; }
+.fx-facts dt { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.fx-facts dd { margin: 0; min-width: 0; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
+/* a narrow card says each fact's label above its value, never in a column too thin to read */
+.fx-fill, .ab-sent, .ab-facts { container-type: inline-size; }
+@container (max-width: 520px) { .fx-facts > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.fx-past, .ab-past { margin-top: var(--s4); font-size: var(--t-small); color: var(--ink-2); }
+.fx-past ul, .ab-past ul { list-style: none; margin: var(--s2) 0 0; padding: 0; display: grid; gap: var(--s2); }
+.fx-past li, .ab-past li { display: flex; flex-wrap: wrap; gap: 2px var(--s3); align-items: baseline; }
+
+/* ------------------------------------------------------------------------------------------------ a goal in another currency */
+.fxg-list { list-style: none; margin: 0 0 var(--s4); padding: 0; display: grid; gap: var(--s4); }
+.fxg { display: grid; gap: var(--s2); }
+.fxg-top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px var(--s3); color: var(--ink); }
+.fxg-top span { color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.fxg-bar { height: 10px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--well) 70%, transparent); border: 1px solid var(--rim); overflow: hidden; }
+.fxg-bar i { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
+.fxg-fig { font-variant-numeric: tabular-nums lining-nums; }
+.fxg-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fxg-acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s2); }
+.fxg > .btn { justify-self: start; }
+
+/* ------------------------------------------------------------------------------------------------ payments abroad (Spend) */
+.ab-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s5); align-items: start; }
+@media (max-width: 900px) { .ab-grid { grid-template-columns: minmax(0, 1fr); } .fx-form, .fxg-form { grid-template-columns: minmax(0, 1fr); } }
+.ab-form { display: grid; gap: var(--s4); min-width: 0; }
+.ab-payees { border: 0; margin: 0; padding: 0; display: grid; gap: var(--s2); min-width: 0; }
+.ab-payee { display: flex; align-items: flex-start; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); cursor: pointer;
+  background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim); }
+.ab-payee.on { border-color: color-mix(in oklab, var(--brand) 55%, var(--rim)); }
+.ab-payee input { margin-top: .3em; accent-color: var(--brand); }
+.ab-payee span { display: grid; min-width: 0; }
+.ab-payee small { font-size: var(--t-small); color: var(--ink-2); overflow-wrap: anywhere; }
+.ab-payees > .btn { justify-self: start; }
+.ab-add, .ab-pay { padding: var(--s4); border-radius: var(--r-md); border: 1px dashed var(--rim); }
+.ab-add > .btn, .ab-pay > .btn { justify-self: start; }
+.ab-held-acts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
+.ab-facts { display: grid; gap: var(--s3); min-width: 0; }

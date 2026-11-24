@@ -1,0 +1,3 @@
+1280x720: 44 stops backwards, 0 at least half hidden
+390x844: 43 stops backwards, 0 at least half hidden
+640x360: 44 stops backwards, 0 at least half hidden

@@ -1,0 +1,10 @@
+# SOLC_VERSION=0.8.38 FORGE_OFFLINE=1 sh scripts/deploy/build-owner-account.sh   (R13 review fixes)
+# recorded 2026-11-24T20:40:49Z; forge Version: 1.7.1; src/QEDOwnerAccount.sol sha256 81730fdf44f2563474a148029245826db8227c5177659a7e33a0df36e4025f2e
+
+1. this worktree, after removing out/ and cache/:
+   owner-account artifact built; SHA-256 4ee53bada25d6d26ebe977c59ee08580326e5f30038960bd35f29dd02100a045 matches READY.json
+   run again: owner-account artifact already built and matches READY.json (4ee53bada25d6d26ebe977c59ee08580326e5f30038960bd35f29dd02100a045)
+2. a copy of chain/accounts (without out/, cache/, evidence/), chain/vendor and the script at another path (<scratch>/secfix/repro):
+   owner-account artifact built; SHA-256 4ee53bada25d6d26ebe977c59ee08580326e5f30038960bd35f29dd02100a045 matches READY.json
+3. after the evidence run (whose whole-project builds overwrite the artifact), rebuilt with the script:
+   owner-account artifact built; SHA-256 4ee53bada25d6d26ebe977c59ee08580326e5f30038960bd35f29dd02100a045 matches READY.json

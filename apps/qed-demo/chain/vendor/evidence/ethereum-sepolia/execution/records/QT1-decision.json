@@ -1,0 +1,21 @@
+{
+  "reserveFree": "45000000",
+  "available": "26629485",
+  "decision": {
+    "shortfall": "10000000",
+    "mid": 0.8463417198099906,
+    "candidates": {
+      "need": "11943294",
+      "impact": "19800521",
+      "policyCap": "25000000",
+      "mandateCap": "25000000",
+      "freeFunds": "26629485"
+    },
+    "action": "convert",
+    "amountIn": "11943294",
+    "expectedOut": "10000000",
+    "impactBps": 106.95175034318271,
+    "limitedBy": "need",
+    "reason": "convert 11943294 now (limited by need); expected 10000000 at 107.0 bps execution cost"
+  }
+}

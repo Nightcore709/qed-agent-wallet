@@ -1,0 +1,136 @@
+{
+  "about": "Replies of the scripted test double used by the browser suite's isolated stack (QED_AI_PROVIDER=scripted, QED_TEST_STACK=1). Not a model: the interface says so. The first entry whose pattern matches the question supplies the reply; $open:KIND is the newest open proposal of that kind in the conversation, $payee:CATEGORY the token of the payee of that category.",
+  "turns": [
+    {
+      "match": "dollar reserve",
+      "reply": {
+        "answer": "Here is a standing policy for the vault: keep at least 10 test dollars free in the dollar reserve. Once you sign it, QED's engine tops the reserve up from the treasury in tranches, each within your mandate and checked by the co-signer and the contract. The trade-off: test rupees leave the treasury whenever the reserve is short.",
+        "proposals": [
+          {
+            "kind": "wallet-policy",
+            "title": "Keep 10 test dollars in the dollar reserve",
+            "rationale": "A standing policy that keeps the reserve topped up from the treasury. Each tranche stays within the signed mandate; the co-signer re-checks every one.",
+            "paramsJson": "{\"targetFree\":\"10\"}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [
+          "wallet.reserve",
+          "wallet.mandate"
+        ],
+        "links": []
+      }
+    },
+    {
+      "match": "make it|instead",
+      "reply": {
+        "answer": "Changed: ₹3,000 into the UTI Nifty 50 Index Fund on the 5th of each month. The proposal to park idle cash is unchanged.",
+        "proposals": [
+          {
+            "kind": "invest",
+            "title": "Invest every month in the Nifty 50 index fund",
+            "rationale": "The same monthly purchase, at the amount you corrected it to.",
+            "paramsJson": "{\"instrumentId\":\"amfi:120716\",\"amount\":300000,\"schedule\":{\"type\":\"monthly\",\"day\":5,\"at\":\"10:00\"}}",
+            "runMode": "approve",
+            "supersedes": "$open:invest",
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [],
+        "links": [
+          "instructions"
+        ]
+      }
+    },
+    {
+      "match": "a week, but never more than",
+      "reply": {
+        "answer": "A weekly purchase of ₹2,000 in the Nifty 50 index fund, with the monthly limit you stated.",
+        "proposals": [
+          {
+            "kind": "invest",
+            "title": "Invest every week in the Nifty 50 index fund",
+            "rationale": "A fixed weekly purchase of the amount you named, within the monthly limit you named.",
+            "paramsJson": "{\"instrumentId\":\"amfi:120716\",\"amount\":200000,\"schedule\":{\"type\":\"weekly\",\"weekday\":1,\"at\":\"10:00\"}}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": 200000,
+              "maxPerMonth": 500000,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [],
+        "links": [
+          "instructions"
+        ]
+      }
+    },
+    {
+      "match": "invest|park",
+      "reply": {
+        "answer": "You asked for two things, so there are two standing instructions: investing ₹2,000 a month, and parking idle cash in a liquid fund. Keep ₹7,77,777 aside for emergencies.",
+        "proposals": [
+          {
+            "kind": "invest",
+            "title": "Invest every month in the Nifty 50 index fund",
+            "rationale": "A fixed monthly purchase of the amount you named.",
+            "paramsJson": "{\"instrumentId\":\"amfi:120716\",\"amount\":200000,\"schedule\":{\"type\":\"monthly\",\"day\":5,\"at\":\"10:00\"}}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          },
+          {
+            "kind": "sweep",
+            "title": "Park idle cash in a liquid fund",
+            "rationale": "Moves bank money above a buffer into a liquid fund, and never what something due will need.",
+            "paramsJson": "{\"instrumentId\":\"amfi:118701\",\"keep\":10000000,\"minMove\":500000,\"topUp\":false}",
+            "runMode": "approve",
+            "supersedes": null,
+            "limits": {
+              "maxPerRun": null,
+              "maxPerMonth": null,
+              "maxRuns": null,
+              "endsInDays": null
+            }
+          }
+        ],
+        "questions": [],
+        "withdraw": [],
+        "cites": [
+          "position.bank",
+          "profile.monthlyIncome"
+        ],
+        "links": [
+          "instructions",
+          "safeguards"
+        ]
+      }
+    }
+  ]
+}

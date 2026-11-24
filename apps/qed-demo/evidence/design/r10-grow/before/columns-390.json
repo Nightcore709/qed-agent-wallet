@@ -1,0 +1,44 @@
+{
+ "route": "/holdings",
+ "width": 390,
+ "seconds": 20,
+ "at": "2026-11-23T12:41:16.148Z",
+ "report": [
+  {
+   "table": "table 0",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 38
+  },
+  {
+   "table": "Digital asset prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 44
+  },
+  {
+   "table": "Fund NAVs; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 24
+  },
+  {
+   "table": "Reference prices; scroll sideways on a narrow screen",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 49
+  },
+  {
+   "table": "Holdings rows",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 19
+  },
+  {
+   "table": "Ticket quote",
+   "samples": 40,
+   "largestShiftPx": 0,
+   "distinctFigureTexts": 2
+  }
+ ]
+}

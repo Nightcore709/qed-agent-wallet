@@ -1,0 +1,13 @@
+(node:63364) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ deterministic idle time: conversions, multiple resets, 22.50 tUSD, attack, policy and workbench stay on time (4508.680417ms)
+✔ certificate validity window: inclusive bounds, expired, not yet active, forged and replayed certificates are refused on-chain (1245.235875ms)
+✔ genuine inactivity: the server's own idle reset, then 22.50 tUSD through the browser API (121737.104083ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 128125.678458

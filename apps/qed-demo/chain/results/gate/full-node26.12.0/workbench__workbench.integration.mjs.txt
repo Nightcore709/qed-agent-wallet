@@ -1,0 +1,18 @@
+(node:63947) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+▶ configurable contracts: escrow/KKT, clearing, delegated payment, protected liability, Groth16, execution bounty
+  ✔ portfolio (158.182292ms)
+  ✔ clearing (220.96575ms)
+  ✔ payment (92.701708ms)
+  ✔ liability (2942.031542ms)
+  ✔ private_portfolio (1457.074625ms)
+  ✔ execution_bounty (66.271667ms)
+✔ configurable contracts: escrow/KKT, clearing, delegated payment, protected liability, Groth16, execution bounty (6375.9545ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11480.9415

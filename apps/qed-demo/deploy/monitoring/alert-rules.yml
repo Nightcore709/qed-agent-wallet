@@ -1,0 +1,43 @@
+# QED alert rules, ready to copy into whichever monitor the owner chooses (docs/DEPLOY.md section 21). Nothing here is
+# installed anywhere: it is the list of signals, thresholds and first actions. Log matches are substrings of the JSON log
+# lines the services already write (server/log.ts redacts them). NOT VERIFIED on a live deployment.
+version: 1
+probes:                                  # an outside monitor, from outside Railway's network
+  - name: ready
+    url: "${QED_PUBLIC_ORIGIN}/api/ready"
+    expect: { status: 200, body_contains: '"ready":true' }
+    every: 60s
+    alert_after: 2 consecutive failures
+    severity: page                       # whoever the owner names
+    first_action: "DEPLOY.md section 9, table row for the failing check name in the body"
+  - name: live
+    url: "${QED_PUBLIC_ORIGIN}/api/live"
+    expect: { status: 200 }
+    every: 60s
+    alert_after: 3 consecutive failures
+    severity: page
+  - name: tls-certificate
+    check: certificate days to expiry
+    host: "${QED_PUBLIC_HOST}"
+    alert_below: 14 days
+    severity: ticket
+  - name: hsts
+    url: "${QED_PUBLIC_ORIGIN}/"
+    expect: { header_present: Strict-Transport-Security }
+    every: 1h
+    severity: ticket
+logs:                                    # a match in a log search or a drain's filter (service "qed")
+  - { name: any-error,            match: '"level":"error"',                       severity: ticket }
+  - { name: child-crashed,        match: 'exited unexpectedly',                   severity: page }
+  - { name: engine-fenced,        match: 'stopped acting',                        severity: page, note: "exit 75: another engine wrote the heartbeat" }
+  - { name: backup-failed,        match: 'scheduled backup failed',               severity: page }
+  - { name: offsite-failed,       match: 'scheduled off-host',                    severity: page, note: "push or prune failed" }
+  - { name: offsite-incomplete,   match: 'off-host copy incomplete',              severity: page }
+  - { name: restore-drill-failed, match: 'restore drill FAILED',                  severity: page, note: "also: off-host restore drill FAILED" }
+  - { name: wallet-not-ready,     match: 'wallet service did not become ready',   severity: ticket }
+  - { name: config-refused,       match: 'configuration refused',                 severity: page }
+  - { name: missing-heartbeat,    absent: 'scheduled backup sealed', for: 3h,     severity: page, note: "needs QED_BACKUP_EVERY_MIN=60; a drain or monitor that can alert on absence" }
+  - { name: missing-drill,        absent: 'scheduled restore drill passed', for: 8d, severity: ticket, note: "needs QED_DRILL_EVERY_HOURS=168" }
+platform:                                # Railway's own (docs.railway.com/observability, read 24 Nov 2026)
+  - { name: deploy-failed-or-crashed, kind: "Webhooks (platform events: deploy succeeded or failed, crashes)", target: "the owner's webhook or chat" }
+  - { name: resources,  kind: "Monitors (Pro plan: CPU, RAM, disk, egress thresholds; e-mail, in-app or webhook)", suggested: { ram_above: "80% of the limit you chose", disk_above: "75% of the volume" } }

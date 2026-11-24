@@ -1,0 +1,745 @@
+# SOLC_VERSION=0.8.26 forge test -vv   (after forge clean)
+# recorded 2026-11-24T15:48:35Z by scripts/run.sh; sources sha256 13ca7b8e22f650ea
+# forge Version: 1.7.1, Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+# solc 0.8.26 from Foundry's compiler cache (offline = true); SOLC_VERSION=0.8.26
+
+Compiling 59 files with Solc 0.8.26
+Solc 0.8.26 finished in 21.51s
+Compiler run successful!
+
+Ran 1 test for test/RealVerifier.t.sol:RealVerifierTest
+[PASS] test_TheReleaseVerifier_RefusesTheLazyPortfolioAndSettlesTheCertifiedOneIntoTheDisputeEscrow() (gas: 1130619)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 15.65ms (5.88ms CPU time)
+
+Ran 32 tests for test/QEDDisputeEscrow.t.sol:QEDDisputeEscrowTest
+[PASS] testFuzz_DecideAnyAmountWithinThePowers(uint256,uint256,uint8) (runs: 1000, μ: 769564, ~: 753389)
+Logs:
+  Bound result 477835515501159
+  Bound result 17000466653
+  Bound result 7
+
+[PASS] testFuzz_EveryJobCanBeClosedInTime(uint8,uint256) (runs: 1000, μ: 735139, ~: 761458)
+Logs:
+  Bound result 1
+  Bound result 15
+
+[PASS] testFuzz_SplitAddsUpAndRoundsTheClientDown(uint256,uint16,uint16) (runs: 1000, μ: 17968, ~: 18068)
+Logs:
+  Bound result 3229741789493356082228363097127257672858666002939
+  Bound result 6
+  Bound result 132
+
+[PASS] testFuzz_TheDisputeWindowsDoNotOverlap(uint256) (runs: 1000, μ: 768422, ~: 765319)
+Logs:
+  Bound result 808914
+
+[PASS] testFuzz_TheReviewHasNoGapAndNoOverlap(uint256) (runs: 1000, μ: 747703, ~: 744904)
+Logs:
+  Bound result 198870
+
+[PASS] test_Accept_PaysTheProviderInFullAtOnce() (gas: 765451)
+[PASS] test_Decide_ASplitPaysBothAndTheDeciderNothing() (gas: 789199)
+[PASS] test_Decide_OnlyTheDeciderAfterTheEvidenceAndByTheDeadline() (gas: 783049)
+[PASS] test_Decide_OnlyWithAnOutcomeTheTermsAllow() (gas: 737737)
+[PASS] test_DecisionTimeout_HalfEachByDefaultWithTheClientRoundedDown() (gas: 786498)
+[PASS] test_Delivery_ACounterfeitIsRefusedByTheVerifier() (gas: 629338)
+[PASS] test_Delivery_IsHeldHereNotPaidToTheProvider() (gas: 743370)
+[PASS] test_Dispute_AtTheLastSecondOfTheReview() (gas: 747412)
+[PASS] test_Dispute_OnlyTheClientAndOnlyDuringTheReview() (gas: 744044)
+[PASS] test_Evidence_FromEitherSideUntilTheEvidencePeriodEnds() (gas: 756836)
+[PASS] test_GiveWay_EitherSideDuringADispute() (gas: 1400776)
+[PASS] test_Jobs_AreIsolated_APayoutNeverReachesAnotherJobsMoney() (gas: 1358755)
+[PASS] test_Open_AQuoteOpensOneJobOnly() (gas: 901971)
+[PASS] test_Open_AlteredTermsAreRefused() (gas: 90538)
+[PASS] test_Open_MovesThePriceToTheProofEscrowAndRecordsTheTerms() (gas: 644539)
+[PASS] test_Open_OnlyTheNamedClient() (gas: 102679)
+[PASS] test_Open_PowersPeriodsAndSharesWithinBounds() (gas: 207966)
+[PASS] test_Open_RefusesATokenThatChargesOnTransfer() (gas: 866329)
+[PASS] test_Open_TheProviderSignatureCoversTheTermsThroughTheQuoteId() (gas: 377243)
+[PASS] test_Open_TheQuoteMustNameThisEscrowAsClientAndPayee() (gas: 59545)
+[PASS] test_Open_ThreeDistinctSides() (gas: 139650)
+[PASS] test_Reclaim_ADeliveredJobCannotBeReclaimed() (gas: 725043)
+[PASS] test_Reclaim_AfterTheProviderReleasedTheClientEarly() (gas: 667796)
+[PASS] test_Reclaim_OnlyAfterTheDeadlineThenAnyone() (gas: 751192)
+[PASS] test_ReviewTimeout_AppliesOnlyAfterTheReviewEnds() (gas: 761476)
+[PASS] test_ReviewTimeout_CanBeASplitTheTermsChose() (gas: 774387)
+[PASS] test_UnknownJob() (gas: 17083)
+Suite result: ok. 32 passed; 0 failed; 0 skipped; finished in 6.16s (3.34s CPU time)
+
+Ran 7 tests for test/invariant/DisputeInvariants.t.sol:DisputeInvariants
+[PASS] invariant_AClosedJobIsFinal() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15878
+  Bound result 2770
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+[PASS] invariant_EachStepOnlyByItsSide() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15860
+  Bound result 2772
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+[PASS] invariant_EveryClosedJobAddsUpToItsPrice() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15891
+  Bound result 2771
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+[PASS] invariant_HeldIsExactAndCovered() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15893
+  Bound result 235372
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+[PASS] invariant_MoneyGoesOnlyToTheParties() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15891
+  Bound result 2775
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+[PASS] invariant_MoneyIsConserved() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15878
+  Bound result 244461
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+[PASS] invariant_TheDeadlinesHold() (runs: 256, calls: 16384, reverts: 0)
+
+╭----------------+-----------------+-------+---------+----------╮
+| Contract       | Selector        | Calls | Reverts | Discards |
++===============================================================+
+| DisputeHandler | accept          | 1131  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | addEvidence     | 1068  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decide          | 1095  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | decideInWindow  | 1132  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | deliver         | 1066  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | dispute         | 1099  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | disputeInReview | 1090  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | finish          | 1097  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | giveWay         | 1122  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | noteDelivered   | 1088  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | open            | 2139  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | reclaim         | 1119  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | releaseEarly    | 1056  | 0       | 0        |
+|----------------+-----------------+-------+---------+----------|
+| DisputeHandler | warp            | 1082  | 0       | 0        |
+╰----------------+-----------------+-------+---------+----------╯
+
+Logs:
+  Bound result 255607
+  Bound result 17255
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 3600
+  Bound result 63354
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 67387
+  Bound result 88947
+  Bound result 342434
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+  Bound result 15893
+  Bound result 235370
+  Bound result 164422
+  Bound result 35272
+  Bound result 70228
+  Bound result 5462
+  Bound result 1291
+  Bound result 63268
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 3600
+  Bound result 0
+  Bound result 0
+  Bound result 1
+  Bound result 3600
+
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 6.16s (39.81s CPU time)
+
+Ran 3 test suites in 6.18s (12.34s CPU time): 40 tests passed, 0 failed, 0 skipped (40 total tests)
+# exit status: 0

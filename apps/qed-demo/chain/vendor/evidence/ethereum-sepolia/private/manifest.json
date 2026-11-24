@@ -1,0 +1,815 @@
+{
+  "schema": "qed.evidence/v1",
+  "run": "private",
+  "network": {
+    "chainId": 11155111,
+    "name": "Ethereum Sepolia",
+    "explorer": "https://sepolia.etherscan.io"
+  },
+  "startedAt": "2026-10-19T22:38:22.879Z",
+  "actors": {
+    "deployer": "0x94C938E642BbC657D5F45546E35268a70c936448",
+    "client": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+    "qed": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+    "helix": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+    "sponsor": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+    "mallory": "0x56D161255Ced6863698eA3c6a886982088fa30a8"
+  },
+  "contracts": {
+    "groth16": "0xc04329693c7b464ab636107b31dcf6746e204e7b",
+    "privateVerifier": "0x1270287aaf21f6cc939c255fc1ba294d9268b453",
+    "optimalityBounty": "0xfc2129f0432538d034c5307299022b3d369eb677",
+    "maximalityBounty": "0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69",
+    "token": "0x7adb609421e30b3df3063ff2de9d425564893f35",
+    "escrow": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+    "verifier": "0x1d3eced4bd1cef7edc315315b9fd6acae283dd05",
+    "vault": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6",
+    "deployBlock": "11951192"
+  },
+  "final": {
+    "jobs": {
+      "qed": "3",
+      "mallory": "4",
+      "selfDealt": "5"
+    },
+    "privateJob": {
+      "price": "12000000",
+      "payee": "0x441f71f12a1f8a3b7d432851d4d4244fc33e8ca6",
+      "dataCommitment": "0x0ec573bb27cdf14ac24c1b83c44d49cd3badd9dc65cde3dcb50a0b23acc86983",
+      "weightsCommitment": "0x057717d386e492ea77774abb8a362eee1e1e8f2d097031119bea626702ccba68",
+      "variance": "1570268872480973219535505240000000",
+      "provingMs": 1483,
+      "constraints": 12569,
+      "support": [
+        "Private Credit",
+        "Core Infrastructure",
+        "EM Sovereign Debt",
+        "Farmland",
+        "Catastrophe Bonds"
+      ]
+    },
+    "bounties": {
+      "optimality": "1000000000",
+      "maximality": "1000000000"
+    },
+    "malloryFromEscrowOrBounties": "0"
+  },
+  "finishedAt": "2026-10-19T22:38:34.637Z",
+  "steps": [
+    {
+      "phase": "deploy",
+      "title": "Deploy the Groth16 verifier generated from circuits/private_minvar.circom",
+      "narrative": "12,569 constraints: the KKT certificate, the convexity witness, exact budget, range checks and Poseidon commitments.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "K3",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0xe7edce9a4a9bf89fc6d1046fef3579319a827d7f755832a38a7d4ab78f9685ea",
+        "status": "success",
+        "blockNumber": "11951192",
+        "gasUsed": "2635710",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "2",
+          "gasUsed": "392710"
+        },
+        "timestamp": 1792449624
+      },
+      "events": [],
+      "at": "2026-10-19T22:38:23.005Z"
+    },
+    {
+      "phase": "deploy",
+      "title": "Deploy PrivateMinVarianceVerifier (registered data vendor: Helix)",
+      "narrative": "An IProofVerifier the existing ProofEscrow can use without any change: vendor attestation, provider binding, Groth16 check.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O2",
+        "O4"
+      ],
+      "id": "K4",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0xf28684ac08a96aff82cfedb22957504a1197368053bc3ccd6ccadec423509868",
+        "status": "success",
+        "blockNumber": "11951193",
+        "gasUsed": "3420169",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "3",
+          "gasUsed": "504099"
+        },
+        "timestamp": 1792449636
+      },
+      "events": [],
+      "at": "2026-10-19T22:38:23.024Z"
+    },
+    {
+      "phase": "deploy",
+      "title": "Deploy OptimalityBounty on the verifier that settled job #1",
+      "narrative": "Pays its whole balance to anyone who refutes Theorem 4.4 on-chain: an accepted certificate plus a strictly better portfolio.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "id": "K5",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0x2e91dbe5950868d02f37b43b039e14ae28c7dbb026bed903e93de53d7e26cc1b",
+        "status": "success",
+        "blockNumber": "11951194",
+        "gasUsed": "3393875",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "4",
+          "gasUsed": "506937"
+        },
+        "timestamp": 1792449648
+      },
+      "events": [],
+      "at": "2026-10-19T22:38:23.042Z"
+    },
+    {
+      "phase": "deploy",
+      "title": "Deploy MaximalityBounty on the clearing house's acceptance rule",
+      "narrative": "Pays its whole balance to anyone who exhibits a netting larger than one QEDClearing would accept as proven maximal.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O3",
+        "O4"
+      ],
+      "id": "K6",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0x487d5e0b70d56cafb5937ee57467d8ab649cebdcd7853ba0fa3e08a0eec0138a",
+        "status": "success",
+        "blockNumber": "11951195",
+        "gasUsed": "4400401",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": null,
+        "replica": {
+          "blockNumber": "5",
+          "gasUsed": "647513"
+        },
+        "timestamp": 1792449660
+      },
+      "events": [],
+      "at": "2026-10-19T22:38:23.067Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "QED funds the optimality bounty: 1,000 tUSD",
+      "narrative": "Money on a theorem. If our verifier ever accepts a portfolio that a better one beats by more than the proven bound, anyone can take it.",
+      "actor": "Deployer",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "B1",
+      "expect": "success",
+      "actorAddress": "0x94C938E642BbC657D5F45546E35268a70c936448",
+      "tx": {
+        "hash": "0x616b0fb1d9b09f0ff736eeeb36e50d6bc6a6c381f0eff9bc527c43a6b4303775",
+        "status": "success",
+        "blockNumber": "11951197",
+        "gasUsed": "128918",
+        "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+        "to": "0x7adb609421e30b3df3063ff2de9d425564893f35",
+        "replica": {
+          "blockNumber": "7",
+          "gasUsed": "46514"
+        },
+        "timestamp": 1792449684
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x94C938E642BbC657D5F45546E35268a70c936448",
+            "to": "0xfC2129f0432538D034C5307299022B3d369Eb677",
+            "value": "1000000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        }
+      ],
+      "at": "2026-10-19T22:38:23.108Z"
+    },
+    {
+      "phase": "bounty",
+      "title": "Atlas funds the maximality bounty: 1,000 tUSD",
+      "narrative": "Money on the clearing house: a netting larger than a proven-maximal one would collect it.",
+      "actor": "Atlas",
+      "outcomes": [
+        "O4"
+      ],
+      "id": "B2",
+      "expect": "success",
+      "actorAddress": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+      "tx": {
+        "hash": "0xdf74e4c85864f21000f822c2e9b1c42f964e2b89e2ed8079529c525a66bfd614",
+        "status": "success",
+        "blockNumber": "11951199",
+        "gasUsed": "128918",
+        "from": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+        "to": "0x7adb609421e30b3df3063ff2de9d425564893f35",
+        "replica": {
+          "blockNumber": "9",
+          "gasUsed": "46514"
+        },
+        "timestamp": 1792449708
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF",
+            "to": "0xD767782fC47eEFDfc2D764dba1b2EC0A0B557d69",
+            "value": "1000000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        }
+      ],
+      "at": "2026-10-19T22:38:23.143Z"
+    },
+    {
+      "phase": "private",
+      "title": "Helix attests its Private Markets model by commitment only",
+      "narrative": "Poseidon commitment 0xec573bb27cdf14ac… signed by Helix's key. The 21 covariance entries never leave Helix and QED.",
+      "actor": "Helix (data vendor)",
+      "actorAddress": "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+      "outcomes": [
+        "O2"
+      ],
+      "id": "V0",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-19T22:38:23.498Z"
+    },
+    {
+      "phase": "private",
+      "title": "QED quotes 12 tUSD for the provably optimal private portfolio; Mallory undercuts at 8",
+      "narrative": "Each quote names the escrow verifier and a spec that binds the proof to its own provider. The client accepts only specs that name the quoting provider.",
+      "actor": "QED agent / Mallory",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "outcomes": [
+        "O2"
+      ],
+      "id": "Q1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-19T22:38:23.503Z"
+    },
+    {
+      "phase": "private",
+      "title": "Northwind funds job #3 in the same ProofEscrow: 12 tUSD, verifier = zero-knowledge",
+      "narrative": "The escrow deployed for job #1 now settles a private job against a verifier written later. No upgrade, no admin: the verifier is part of the signed terms.",
+      "actor": "Northwind (client)",
+      "outcomes": [
+        "O2"
+      ],
+      "id": "Z1",
+      "expect": "success",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0xed610de8e55518f91a3a8bb7dd3704a217b7146f5ad0d0a157d6cb265a7470b3",
+        "status": "success",
+        "blockNumber": "11951202",
+        "gasUsed": "1291592",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "12",
+          "gasUsed": "307436"
+        },
+        "timestamp": 1792449756
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "to": "0x2e3362D6dc88c40Cf95f885c44fE8fFF9979bA9F",
+            "value": "12000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "JobOpened",
+          "args": {
+            "jobId": "3",
+            "client": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "provider": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+            "payee": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+            "token": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+            "price": "12000000",
+            "verifier": "0x1270287AAF21f6Cc939C255Fc1bA294D9268B453",
+            "specHash": "0x6bea6ec6d31a6cc871edb963aa06615e82a204d8da8c1d6cd26d9429c959c5dd",
+            "deliverBy": "1793054303",
+            "quoteHash": "0xd570149931ee5beb1d9059a4e2e8e2ea26cee16d7cb3a11b4235e84c807e68c7"
+          },
+          "address": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f"
+        }
+      ],
+      "at": "2026-10-19T22:38:23.558Z"
+    },
+    {
+      "phase": "private",
+      "title": "Northwind also funds Mallory's cheaper job #4: 8 tUSD",
+      "narrative": "Shopping around is safe when payment needs a proof: the client risks nothing on a provider that cannot deliver one.",
+      "actor": "Northwind (client)",
+      "outcomes": [
+        "O2"
+      ],
+      "id": "Z2",
+      "expect": "success",
+      "actorAddress": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+      "tx": {
+        "hash": "0x8f0fe4d279d8a6f0ce031eb7ddf39dfbf853c116d734e2d7bac77ca91080bf01",
+        "status": "success",
+        "blockNumber": "11951203",
+        "gasUsed": "1193672",
+        "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "13",
+          "gasUsed": "290336"
+        },
+        "timestamp": 1792449768
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "to": "0x2e3362D6dc88c40Cf95f885c44fE8fFF9979bA9F",
+            "value": "8000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "JobOpened",
+          "args": {
+            "jobId": "4",
+            "client": "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+            "provider": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "payee": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "token": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+            "price": "8000000",
+            "verifier": "0x1270287AAF21f6Cc939C255Fc1bA294D9268B453",
+            "specHash": "0x2f6caf4014938b52b6a8c2cc3424f2d2bdfb145d26bb533288d40616fd793f64",
+            "deliverBy": "1793054303",
+            "quoteHash": "0xccfe01248ab9c0b22a19442a172bce8efbccc91059fd001844ef2104aed2493b"
+          },
+          "address": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f"
+        }
+      ],
+      "at": "2026-10-19T22:38:23.585Z"
+    },
+    {
+      "phase": "private",
+      "title": "QED proves the portfolio optimal in zero knowledge (1.5 s on one CPU)",
+      "narrative": "Groth16 over 12,569 constraints: KKT stationarity, dual feasibility, complementary slackness (gap 0), convexity witness, exact budget. Public: two commitments, variance 0.00157027 and QED's address. Private: everything else.",
+      "actor": "QED agent",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "outcomes": [
+        "O2"
+      ],
+      "id": "P1",
+      "offchain": true,
+      "expect": "success",
+      "at": "2026-10-19T22:38:25.072Z"
+    },
+    {
+      "phase": "private",
+      "title": "QED delivers the zero-knowledge proof: the escrow verifies it and pays 12 tUSD into QED's vault",
+      "narrative": "The chain checked that the portfolio is optimal for Helix's attested model, and never saw the model or the portfolio. Northwind receives the weights and salt off-chain and checks them against the commitment.",
+      "actor": "QED agent",
+      "outcomes": [
+        "O2"
+      ],
+      "id": "Z3",
+      "expect": "success",
+      "actorAddress": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+      "tx": {
+        "hash": "0xbb619bf09eebacd240514eab5ec4a03c189612954101b07c59a11fa56f612ec7",
+        "status": "success",
+        "blockNumber": "11951204",
+        "gasUsed": "530050",
+        "from": "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "14",
+          "gasUsed": "354510"
+        },
+        "timestamp": 1792449780
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x2e3362D6dc88c40Cf95f885c44fE8fFF9979bA9F",
+            "to": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+            "value": "12000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "JobSettled",
+          "args": {
+            "jobId": "3",
+            "payee": "0x441F71F12A1F8a3B7d432851d4d4244Fc33e8ca6",
+            "price": "12000000",
+            "solutionHash": "0xb62f7a29b028aef9804a923971b80de797b1f15329d626915c4d198d3c1a8699",
+            "resultDigest": "0xa5f68f76dda1fcf075ddf47ddfa5ebe12f879c985d1b72bb9a4b280d664d434d"
+          },
+          "address": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f"
+        }
+      ],
+      "at": "2026-10-19T22:38:25.230Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "Mallory copies QED's proof from the public calldata into her own job",
+      "narrative": "Replay someone else's valid proof → The proof is bound to QED's address as a public input: ProofRejected",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "proof_theft",
+        "threat": "Replay someone else's valid proof",
+        "defence": "The proof is bound to QED's address as a public input: ProofRejected",
+        "layer": "PrivateMinVarianceVerifier"
+      },
+      "expect": "revert",
+      "id": "ZA1",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xbe69abd9db0d21661c45e34dcbb8351363917c534b180196eaaae1a607e6d28e",
+        "status": "reverted",
+        "blockNumber": "11951205",
+        "gasUsed": "269489",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "15",
+          "gasUsed": "267489"
+        },
+        "timestamp": 1792449792
+      },
+      "events": [],
+      "error": {
+        "name": "ProofRejected",
+        "args": []
+      },
+      "at": "2026-10-19T22:38:29.253Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "Mallory claims a lower variance than any portfolio can achieve",
+      "narrative": "Overstate the quality of the work → The variance is a public signal of the proof: ProofRejected",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "fake_work",
+        "threat": "Overstate the quality of the work",
+        "defence": "The variance is a public signal of the proof: ProofRejected",
+        "layer": "PrivateMinVarianceVerifier"
+      },
+      "expect": "revert",
+      "id": "ZA2",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x95426566e07412babb0c55ffa3d8668e7fd1f02c80d69308bfa714755c599431",
+        "status": "reverted",
+        "blockNumber": "11951206",
+        "gasUsed": "269501",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "16",
+          "gasUsed": "267501"
+        },
+        "timestamp": 1792449804
+      },
+      "events": [],
+      "error": {
+        "name": "ProofRejected",
+        "args": []
+      },
+      "at": "2026-10-19T22:38:33.275Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "Mallory opens a self-dealt job #5 on a data set she attested herself",
+      "narrative": "A valid proof on made-up data would mint a fake certified track record.",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "id": "ZM",
+      "expect": "success",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xd721136c063be24cf99eda2ead3c9d36686eea44d0e2543c17912a117eb59a44",
+        "status": "success",
+        "blockNumber": "11951209",
+        "gasUsed": "1190784",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "19",
+          "gasUsed": "287848"
+        },
+        "timestamp": 1792449840
+      },
+      "events": [
+        {
+          "name": "Transfer",
+          "args": {
+            "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "to": "0x2e3362D6dc88c40Cf95f885c44fE8fFF9979bA9F",
+            "value": "1000000"
+          },
+          "address": "0x7adb609421e30b3df3063ff2de9d425564893f35"
+        },
+        {
+          "name": "JobOpened",
+          "args": {
+            "jobId": "5",
+            "client": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "provider": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "payee": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+            "token": "0x7AdB609421E30b3dF3063FF2De9d425564893F35",
+            "price": "1000000",
+            "verifier": "0x1270287AAF21f6Cc939C255Fc1bA294D9268B453",
+            "specHash": "0x3ded91759a9850ad90180c297230f173ac01e60c460b016cb2e0a46e9c327c1e",
+            "deliverBy": "1793054303",
+            "quoteHash": "0xcd3411198ff8191867db278491bcad1a951e9be1490a0dfff0042b65aae9ce4b"
+          },
+          "address": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f"
+        }
+      ],
+      "at": "2026-10-19T22:38:34.516Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "Mallory delivers a genuine proof about self-attested data",
+      "narrative": "Prove optimality on fabricated data → Only the registered vendor's attestation counts: UntrustedDataAttestation",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "data_poisoning",
+        "threat": "Prove optimality on fabricated data",
+        "defence": "Only the registered vendor's attestation counts: UntrustedDataAttestation",
+        "layer": "PrivateMinVarianceVerifier"
+      },
+      "expect": "revert",
+      "id": "ZA3",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x35bbaa47631852c780312e00431e77d28decb6bce43b5d8621f22fb2582625b7",
+        "status": "reverted",
+        "blockNumber": "11951210",
+        "gasUsed": "62360",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0x2e3362d6dc88c40cf95f885c44fe8fff9979ba9f",
+        "replica": {
+          "blockNumber": "20",
+          "gasUsed": "54523"
+        },
+        "timestamp": 1792449852
+      },
+      "events": [],
+      "error": {
+        "name": "UntrustedDataAttestation",
+        "args": [
+          "0x56D161255Ced6863698eA3c6a886982088fa30a8"
+        ]
+      },
+      "at": "2026-10-19T22:38:34.530Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "Mallory claims the 1,000 tUSD bounty with the equal-weight portfolio against QED's job #1 certificate",
+      "narrative": "Show the paid portfolio was not optimal → The bounty recomputes both variances and the bound: TheoremHolds",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Show the paid portfolio was not optimal",
+        "defence": "The bounty recomputes both variances and the bound: TheoremHolds",
+        "layer": "OptimalityBounty"
+      },
+      "expect": "revert",
+      "id": "BA1",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x6a5849455a07b9fcf279d197b1ad2fe0de8d8b7d260328f54150c138b028d19d",
+        "status": "reverted",
+        "blockNumber": "11951211",
+        "gasUsed": "219644",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0xfc2129f0432538d034c5307299022b3d369eb677",
+        "replica": {
+          "blockNumber": "21",
+          "gasUsed": "218044"
+        },
+        "timestamp": 1792449864
+      },
+      "events": [],
+      "error": {
+        "name": "TheoremHolds",
+        "args": [
+          "-17427890834445872562219109117693616905377777777777792",
+          "30005320910997774926000000000000000000000000000"
+        ]
+      },
+      "at": "2026-10-19T22:38:34.548Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "…and with QED's own optimum shifted by 0.1%",
+      "narrative": "Find any portfolio that beats the certified one → Every feasible portfolio is no better than the bound allows: TheoremHolds",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Find any portfolio that beats the certified one",
+        "defence": "Every feasible portfolio is no better than the bound allows: TheoremHolds",
+        "layer": "OptimalityBounty"
+      },
+      "expect": "revert",
+      "id": "BA2",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xb9fbcad2715fa9675736bae047f69823abb1bbb1def5d0d973a0c0cb9fd9e059",
+        "status": "reverted",
+        "blockNumber": "11951212",
+        "gasUsed": "219344",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0xfc2129f0432538d034c5307299022b3d369eb677",
+        "replica": {
+          "blockNumber": "22",
+          "gasUsed": "217744"
+        },
+        "timestamp": 1792449876
+      },
+      "events": [],
+      "error": {
+        "name": "TheoremHolds",
+        "args": [
+          "-33039999999997790320000000000000000000000000000",
+          "30005320910997774926000000000000000000000000000"
+        ]
+      },
+      "at": "2026-10-19T22:38:34.563Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "…and with the forged 1/N certificate the chain refused in job #2 (X17)",
+      "narrative": "Use a certificate the verifier never accepted → The bounty first re-runs the deployed verifier: DualityGapTooLarge",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Use a certificate the verifier never accepted",
+        "defence": "The bounty first re-runs the deployed verifier: DualityGapTooLarge",
+        "layer": "OptimalityBounty"
+      },
+      "expect": "revert",
+      "id": "BA3",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x68e498bb76868c4caa1d48b98c0c8c1f5fdb0213122e73c37f24af7de2501c35",
+        "status": "reverted",
+        "blockNumber": "11951213",
+        "gasUsed": "205720",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0xfc2129f0432538d034c5307299022b3d369eb677",
+        "replica": {
+          "blockNumber": "23",
+          "gasUsed": "113688"
+        },
+        "timestamp": 1792449888
+      },
+      "events": [],
+      "error": {
+        "name": "DualityGapTooLarge",
+        "args": [
+          "19113333333333332"
+        ]
+      },
+      "at": "2026-10-19T22:38:34.591Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "Mallory claims the clearing bounty with the naive netting (162 tUSD)",
+      "narrative": "Exhibit a larger netting than the proven-maximal 169 → Weak LP duality: TheoremHolds(169, 162)",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Exhibit a larger netting than the proven-maximal 169",
+        "defence": "Weak LP duality: TheoremHolds(169, 162)",
+        "layer": "MaximalityBounty"
+      },
+      "expect": "revert",
+      "id": "BM1",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0x47ef93bf3c1a6eea445dc7f0c1b6ccc4c013105c49da0b508130db38f06562bb",
+        "status": "reverted",
+        "blockNumber": "11951214",
+        "gasUsed": "195480",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69",
+        "replica": {
+          "blockNumber": "24",
+          "gasUsed": "103882"
+        },
+        "timestamp": 1792449900
+      },
+      "events": [],
+      "error": {
+        "name": "TheoremHolds",
+        "args": [
+          "169000000",
+          "162000000"
+        ]
+      },
+      "at": "2026-10-19T22:38:34.612Z"
+    },
+    {
+      "phase": "private-attack",
+      "title": "…and with a 170 tUSD netting that cancels 1 tUSD more of Northwind's debt to QED",
+      "narrative": "Beat the bound by moving value → A netting must leave every net position unchanged: NetPositionChanged",
+      "actor": "Mallory",
+      "outcomes": [
+        "O3"
+      ],
+      "attack": {
+        "class": "theorem_refutation",
+        "threat": "Beat the bound by moving value",
+        "defence": "A netting must leave every net position unchanged: NetPositionChanged",
+        "layer": "MaximalityBounty"
+      },
+      "expect": "revert",
+      "id": "BM2",
+      "actorAddress": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+      "tx": {
+        "hash": "0xd5124345468035c6409bcde3792f11ed994c062ba019d18bcb40744f8685af2a",
+        "status": "reverted",
+        "blockNumber": "11951215",
+        "gasUsed": "195480",
+        "from": "0x56D161255Ced6863698eA3c6a886982088fa30a8",
+        "to": "0xd767782fc47eefdfc2d764dba1b2ec0a0b557d69",
+        "replica": {
+          "blockNumber": "25",
+          "gasUsed": "103340"
+        },
+        "timestamp": 1792449912
+      },
+      "events": [],
+      "error": {
+        "name": "NetPositionChanged",
+        "args": [
+          "0",
+          "1000000"
+        ]
+      },
+      "at": "2026-10-19T22:38:34.632Z"
+    }
+  ],
+  "sepolia": {
+    "firstBlock": 11951192,
+    "lastBlock": 11951215,
+    "transactions": 24,
+    "reverted": 8,
+    "receipts": "receipts.json",
+    "relayComparison": "24/24 receipts matched the replica (status + logs; EIP-7708 system logs excluded)"
+  },
+  "executionNote": "Signed in a build sandbox without RPC egress against a wall-clock-synchronised replica of Sepolia (same chain id, nonces, balances); the identical signed bytes were broadcast via a browser relay and every public receipt compared with the replica (status + logs)."
+}

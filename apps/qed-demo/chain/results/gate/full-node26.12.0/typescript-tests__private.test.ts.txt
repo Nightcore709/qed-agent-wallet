@@ -1,0 +1,25 @@
+(node:62616) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ certificate for the private model satisfies every circuit constraint, with zero duality gap (0.47125ms)
+✔ fixed-point optimum matches the exact solver to 1e-12 per weight (0.180291ms)
+✔ Groth16 proof verifies, and its public signals commit to the data, the portfolio and the provider (1117.129167ms)
+✔ a tampered public signal fails verification (788.282792ms)
+ERROR:  4 Error in template Num2Bits_8 line: 38
+Error in template AbsAtMost_9 line: 52
+Error in template PrivateMinVariance_233 line: 123
+
+ERROR:  4 Error in template Num2Bits_8 line: 38
+Error in template AbsAtMost_9 line: 52
+Error in template PrivateMinVariance_233 line: 123
+
+ERROR:  4 Error in template PrivateMinVariance_233 line: 160
+
+✔ no proof exists for a lazy 1/N portfolio, a nudged optimum, or a different data set (138.635334ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3349.350292

@@ -1,0 +1,152 @@
+{
+  "members": [
+    "Northwind",
+    "QED",
+    "CloudCo",
+    "Helix",
+    "Atlas"
+  ],
+  "memberAddresses": [
+    "0x053DCBCaEF06A44feAeFd94A2DbE9F160E789816",
+    "0x0460e0d0753E487b3a5E26FE8cf16A4baC6C918d",
+    "0x0418CfE812572f01535Fb260b6a77dAb5704D737",
+    "0xE21F926030fd77Ad4EFEbd1b22D6633cda3499C7",
+    "0x13958b9C4154996E6Db79f9a86c5765e0D6048AF"
+  ],
+  "obligations": [
+    {
+      "id": "1",
+      "debtor": "Northwind",
+      "creditor": "QED",
+      "amount": "40000000",
+      "memo": "portfolio subscription",
+      "cancelled": "22000000",
+      "remaining": "18000000",
+      "y": "0",
+      "greedyCancelled": "22000000"
+    },
+    {
+      "id": "2",
+      "debtor": "QED",
+      "creditor": "CloudCo",
+      "amount": "30000000",
+      "memo": "GPU compute",
+      "cancelled": "30000000",
+      "remaining": "0",
+      "y": "3",
+      "greedyCancelled": "30000000"
+    },
+    {
+      "id": "3",
+      "debtor": "CloudCo",
+      "creditor": "Helix",
+      "amount": "25000000",
+      "memo": "data licence",
+      "cancelled": "25000000",
+      "remaining": "0",
+      "y": "0",
+      "greedyCancelled": "22000000"
+    },
+    {
+      "id": "4",
+      "debtor": "Helix",
+      "creditor": "Northwind",
+      "amount": "20000000",
+      "memo": "advisory fees",
+      "cancelled": "20000000",
+      "remaining": "0",
+      "y": "1",
+      "greedyCancelled": "20000000"
+    },
+    {
+      "id": "5",
+      "debtor": "QED",
+      "creditor": "Helix",
+      "amount": "15000000",
+      "memo": "risk model",
+      "cancelled": "15000000",
+      "remaining": "0",
+      "y": "2",
+      "greedyCancelled": "15000000"
+    },
+    {
+      "id": "6",
+      "debtor": "Helix",
+      "creditor": "QED",
+      "amount": "15000000",
+      "memo": "model validation",
+      "cancelled": "11000000",
+      "remaining": "4000000",
+      "y": "0",
+      "greedyCancelled": "15000000"
+    },
+    {
+      "id": "7",
+      "debtor": "CloudCo",
+      "creditor": "Northwind",
+      "amount": "12000000",
+      "memo": "volume rebate",
+      "cancelled": "12000000",
+      "remaining": "0",
+      "y": "0",
+      "greedyCancelled": "12000000"
+    },
+    {
+      "id": "8",
+      "debtor": "Northwind",
+      "creditor": "CloudCo",
+      "amount": "10000000",
+      "memo": "hosting",
+      "cancelled": "10000000",
+      "remaining": "0",
+      "y": "2",
+      "greedyCancelled": "10000000"
+    },
+    {
+      "id": "9",
+      "debtor": "Atlas",
+      "creditor": "QED",
+      "amount": "18000000",
+      "memo": "backtests",
+      "cancelled": "12000000",
+      "remaining": "6000000",
+      "y": "0",
+      "greedyCancelled": "8000000"
+    },
+    {
+      "id": "10",
+      "debtor": "Helix",
+      "creditor": "Atlas",
+      "amount": "9000000",
+      "memo": "data cleaning",
+      "cancelled": "9000000",
+      "remaining": "0",
+      "y": "1",
+      "greedyCancelled": "2000000"
+    },
+    {
+      "id": "11",
+      "debtor": "CloudCo",
+      "creditor": "Atlas",
+      "amount": "6000000",
+      "memo": "labelling",
+      "cancelled": "3000000",
+      "remaining": "3000000",
+      "y": "0",
+      "greedyCancelled": "6000000"
+    }
+  ],
+  "potential": [
+    "-1",
+    "-2",
+    "0",
+    "-1",
+    "-1"
+  ],
+  "cleared": "169000000",
+  "bound": "169000000",
+  "greedyCleared": "162000000",
+  "gross": "200000000",
+  "cash": "28000000",
+  "solveMs": 1.0973509999998896
+}

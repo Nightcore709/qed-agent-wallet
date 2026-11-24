@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: execution cost is non-decreasing in size (F* concave), so the impact search is well defined
+ok 1 - execution cost is non-decreasing in size (F* concave), so the impact search is well defined
+  ---
+  duration_ms: 1260.764625
+  type: 'test'
+  ...
+# Subtest: the tranche never exceeds any of its limits, and covers the shortfall when need is the binding one
+ok 2 - the tranche never exceeds any of its limits, and covers the shortfall when need is the binding one
+  ---
+  duration_ms: 4943.434292
+  type: 'test'
+  ...
+# Subtest: no shortfall → no action; a market too thin for the minimum tranche → wait, never a forced trade
+ok 3 - no shortfall → no action; a market too thin for the minimum tranche → wait, never a forced trade
+  ---
+  duration_ms: 22.51275
+  type: 'test'
+  ...
+# Subtest: the decision is deterministic: the co-signer recomputes exactly what the agent decided
+ok 4 - the decision is deterministic: the co-signer recomputes exactly what the agent decided
+  ---
+  duration_ms: 3125.245417
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9893.505541

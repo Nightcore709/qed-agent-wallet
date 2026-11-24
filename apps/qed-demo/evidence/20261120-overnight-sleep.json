@@ -1,0 +1,699 @@
+{
+ "what": "QED paper engine: recorded background execution",
+ "producedAt": "2026-11-20 09:38:42.213 IST",
+ "windowHours": 12,
+ "database": "<repo>/apps/qed-demo/data/qed.db",
+ "howToReproduce": "node scripts/evidence.ts <file> <hours>, against the same database. Every figure below is read from, or recomputed from, recorded rows.",
+ "engine": {
+  "running": true,
+  "pid": 56006,
+  "startedAt": "2026-11-20 09:25:48.919 IST",
+  "lastBeat": "2026-11-20 09:38:39.544 IST",
+  "ageMs": 2669,
+  "ticks": 771,
+  "lastTickMs": 2
+ },
+ "gaps": {
+  "count": 26,
+  "totalMinutes": 339,
+  "list": [
+   {
+    "from": "2026-11-20 03:38:07.141 IST",
+    "to": "2026-11-20 03:53:41.434 IST",
+    "minutes": 15.6,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 03:53:45.439 IST",
+    "to": "2026-11-20 04:08:58.107 IST",
+    "minutes": 15.2,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 04:09:02.112 IST",
+    "to": "2026-11-20 04:15:31.860 IST",
+    "minutes": 6.5,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 04:15:38.870 IST",
+    "to": "2026-11-20 04:33:32.340 IST",
+    "minutes": 17.9,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 04:33:36.347 IST",
+    "to": "2026-11-20 04:40:06.840 IST",
+    "minutes": 6.5,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 04:40:13.853 IST",
+    "to": "2026-11-20 04:51:25.635 IST",
+    "minutes": 11.2,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 04:51:31.645 IST",
+    "to": "2026-11-20 05:07:22.759 IST",
+    "minutes": 15.9,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 05:07:27.764 IST",
+    "to": "2026-11-20 05:18:44.467 IST",
+    "minutes": 11.3,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 05:18:51.478 IST",
+    "to": "2026-11-20 05:35:04.892 IST",
+    "minutes": 16.2,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 05:35:08.889 IST",
+    "to": "2026-11-20 05:38:20.792 IST",
+    "minutes": 3.2,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 05:38:42.797 IST",
+    "to": "2026-11-20 05:54:07.625 IST",
+    "minutes": 15.4,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 05:54:12.632 IST",
+    "to": "2026-11-20 06:09:25.849 IST",
+    "minutes": 15.2,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 06:09:38.718 IST",
+    "to": "2026-11-20 06:25:27.199 IST",
+    "minutes": 15.8,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 06:25:41.827 IST",
+    "to": "2026-11-20 06:39:20.654 IST",
+    "minutes": 13.6,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 06:39:27.664 IST",
+    "to": "2026-11-20 06:54:59.161 IST",
+    "minutes": 15.5,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 06:55:03.162 IST",
+    "to": "2026-11-20 07:01:33.758 IST",
+    "minutes": 6.5,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 07:01:40.755 IST",
+    "to": "2026-11-20 07:18:23.293 IST",
+    "minutes": 16.7,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 07:18:27.306 IST",
+    "to": "2026-11-20 07:34:23.983 IST",
+    "minutes": 15.9,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 07:34:27.999 IST",
+    "to": "2026-11-20 07:40:20.645 IST",
+    "minutes": 5.9,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 07:40:30.677 IST",
+    "to": "2026-11-20 07:58:05.982 IST",
+    "minutes": 17.6,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 07:58:09.992 IST",
+    "to": "2026-11-20 08:15:15.696 IST",
+    "minutes": 17.1,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 08:15:20.708 IST",
+    "to": "2026-11-20 08:30:19.823 IST",
+    "minutes": 15,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 08:30:23.835 IST",
+    "to": "2026-11-20 08:41:20.612 IST",
+    "minutes": 10.9,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 08:41:27.628 IST",
+    "to": "2026-11-20 08:56:27.131 IST",
+    "minutes": 15,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 1
+   },
+   {
+    "from": "2026-11-20 08:56:31.145 IST",
+    "to": "2026-11-20 09:11:30.696 IST",
+    "minutes": 15,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   },
+   {
+    "from": "2026-11-20 09:11:35.711 IST",
+    "to": "2026-11-20 09:19:37.335 IST",
+    "minutes": 8,
+    "note": "The engine process was alive but did not run: the machine was asleep or the process was stalled. Detected from the gap between two ticks.",
+    "runsRecordedMissedInside": 0
+   }
+  ]
+ },
+ "runs": {
+  "byOutcome": {
+   "done": 4,
+   "missed": 8,
+   "blocked": 3
+  },
+  "startedMoreThanTwoMinutesLate": 0,
+  "list": [
+   {
+    "id": "run_1m7tscwye6dd3nyd5kf",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 02:24:00.000 IST",
+    "claimed": "2026-11-20 02:24:00.398 IST",
+    "started": "2026-11-20 02:24:00.403 IST",
+    "finished": "2026-11-20 02:24:00.457 IST",
+    "outcome": "done",
+    "reason": null
+   },
+   {
+    "id": "run_1m7tv3tzzh1ns83hx8b",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 02:54:00.000 IST",
+    "claimed": "2026-11-20 02:54:00.639 IST",
+    "started": "2026-11-20 02:54:00.641 IST",
+    "finished": "2026-11-20 02:54:00.680 IST",
+    "outcome": "done",
+    "reason": null
+   },
+   {
+    "id": "run_1m7twtrhvqs0ddhkkjt",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 03:24:00.000 IST",
+    "claimed": "2026-11-20 03:24:00.379 IST",
+    "started": "2026-11-20 03:24:00.383 IST",
+    "finished": "2026-11-20 03:24:00.419 IST",
+    "outcome": "done",
+    "reason": null
+   },
+   {
+    "id": "run_1m7tzd31xhynr32xthm",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 03:54:00.000 IST",
+    "claimed": "2026-11-20 04:08:58.109 IST",
+    "started": null,
+    "finished": "2026-11-20 04:08:58.109 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 03:54 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7v0t2qnat1d9bbqa3",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 04:24:00.000 IST",
+    "claimed": "2026-11-20 04:33:32.341 IST",
+    "started": null,
+    "finished": "2026-11-20 04:33:32.341 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 04:24 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7v2r1j8zh7vpskh0m",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 04:54:00.000 IST",
+    "claimed": "2026-11-20 05:07:22.760 IST",
+    "started": null,
+    "finished": "2026-11-20 05:07:22.760 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 04:54 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7v4arqwkrzgtxka0t",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 05:24:00.000 IST",
+    "claimed": "2026-11-20 05:35:04.892 IST",
+    "started": null,
+    "finished": "2026-11-20 05:35:04.892 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 05:24 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7v5dmrp253d52h1qp",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 05:54:00.000 IST",
+    "claimed": "2026-11-20 05:54:07.702 IST",
+    "started": "2026-11-20 05:54:07.706 IST",
+    "finished": "2026-11-20 05:54:07.716 IST",
+    "outcome": "blocked",
+    "reason": "Ask received 925.6 s ago (limit 15 s)."
+   },
+   {
+    "id": "run_1m7v7707272kmk0pswq",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 06:24:00.000 IST",
+    "claimed": "2026-11-20 06:25:27.202 IST",
+    "started": "2026-11-20 06:25:27.208 IST",
+    "finished": "2026-11-20 06:25:27.217 IST",
+    "outcome": "blocked",
+    "reason": "Ask received 949.9 s ago (limit 15 s)."
+   },
+   {
+    "id": "run_1m7v8x2mzhgjz2srr1q",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 06:54:00.000 IST",
+    "claimed": "2026-11-20 06:54:59.167 IST",
+    "started": "2026-11-20 06:54:59.170 IST",
+    "finished": "2026-11-20 06:54:59.174 IST",
+    "outcome": "blocked",
+    "reason": "Ask received 932.7 s ago (limit 15 s)."
+   },
+   {
+    "id": "run_1m7vb581get359yjj1b",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 07:24:00.000 IST",
+    "claimed": "2026-11-20 07:34:23.984 IST",
+    "started": null,
+    "finished": "2026-11-20 07:34:23.984 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 07:24 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7vcgmpz27p53z3q86",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 07:54:00.000 IST",
+    "claimed": "2026-11-20 07:58:05.983 IST",
+    "started": null,
+    "finished": "2026-11-20 07:58:05.983 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 07:54 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7vebn7gstna4ycftn",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 08:24:00.000 IST",
+    "claimed": "2026-11-20 08:30:19.824 IST",
+    "started": null,
+    "finished": "2026-11-20 08:30:19.824 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 08:24 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7vfvfsw3wnxtav0vz",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 08:54:00.000 IST",
+    "claimed": "2026-11-20 08:56:27.132 IST",
+    "started": null,
+    "finished": "2026-11-20 08:56:27.132 IST",
+    "outcome": "missed",
+    "reason": "QED's engine was not running at 20 Nov 2026, 08:54 IST. Nothing was executed for this occurrence, and it will not be executed late."
+   },
+   {
+    "id": "run_1m7vhdyjt40dqrfk2q4",
+    "instruction": "prg_1m7tsbabac5td62az7d",
+    "kind": "invest",
+    "version": 1,
+    "due": "2026-11-20 09:24:00.000 IST",
+    "claimed": "2026-11-20 09:24:00.666 IST",
+    "started": "2026-11-20 09:24:00.670 IST",
+    "finished": "2026-11-20 09:24:00.735 IST",
+    "outcome": "done",
+    "reason": null
+   }
+  ]
+ },
+ "actions": {
+  "byOutcome": {
+   "done": 7,
+   "working": 1,
+   "failed": 1,
+   "blocked": 3
+  },
+  "list": [
+   {
+    "id": "act_1m7tsb59k80d3axf6tj",
+    "run": null,
+    "origin": "owner",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "done",
+    "reference": "man_1m7tsb525mwqkfc3ah7",
+    "asked": "2026-11-20 02:23:03.411 IST",
+    "decided": "2026-11-20 02:23:04.367 IST",
+    "submitted": "2026-11-20 02:23:04.369 IST",
+    "executed": "2026-11-20 02:23:04.406 IST",
+    "finished": "2026-11-20 02:23:04.406 IST",
+    "reconciled": "2026-11-20 02:23:04.406 IST",
+    "msFromAskedToExecuted": 995,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7tsb68pkxtrrr6jem",
+    "error": null
+   },
+   {
+    "id": "act_1m7tsb5f9kshvd4r7ns",
+    "run": null,
+    "origin": "owner",
+    "kind": "order",
+    "venue": "paper-mf",
+    "outcome": "working",
+    "reference": "man_1m7tsb59ntgx721nt1e",
+    "asked": "2026-11-20 02:23:03.593 IST",
+    "decided": "2026-11-20 02:23:04.373 IST",
+    "submitted": "2026-11-20 02:23:04.375 IST",
+    "executed": null,
+    "finished": null,
+    "reconciled": null,
+    "msFromAskedToExecuted": null,
+    "comparedWithVenue": "open",
+    "receipt": null,
+    "error": null
+   },
+   {
+    "id": "act_1m7tsb5n4f55ha7m7ws",
+    "run": null,
+    "origin": "owner",
+    "kind": "payment",
+    "venue": "paper-rail",
+    "outcome": "done",
+    "reference": "man_1m7tsb5fdjbd16xvw0d",
+    "asked": "2026-11-20 02:23:03.780 IST",
+    "decided": "2026-11-20 02:23:04.376 IST",
+    "submitted": "2026-11-20 02:23:04.377 IST",
+    "executed": "2026-11-20 02:23:07.368 IST",
+    "finished": "2026-11-20 02:23:07.368 IST",
+    "reconciled": "2026-11-20 02:23:07.369 IST",
+    "msFromAskedToExecuted": 3588,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7tsb959xzm5g0fhmy",
+    "error": null
+   },
+   {
+    "id": "act_1m7tsb5ttjkmgmhea7b",
+    "run": null,
+    "origin": "owner",
+    "kind": "payment",
+    "venue": "paper-rail",
+    "outcome": "failed",
+    "reference": "man_1m7tsb5n5m7jb1663p6",
+    "asked": "2026-11-20 02:23:03.962 IST",
+    "decided": "2026-11-20 02:23:04.379 IST",
+    "submitted": "2026-11-20 02:23:04.380 IST",
+    "executed": null,
+    "finished": "2026-11-20 02:23:04.380 IST",
+    "reconciled": "2026-11-20 02:23:04.381 IST",
+    "msFromAskedToExecuted": null,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7tsb67x3w35n7n3b1",
+    "error": "Declined by the payee bank (test payee decline@paper)."
+   },
+   {
+    "id": "act_1m7tsb60h5t78vjv5z9",
+    "run": null,
+    "origin": "owner",
+    "kind": "payment",
+    "venue": "paper-rail",
+    "outcome": "done",
+    "reference": "man_1m7tsb5tvd64ezc5mmc",
+    "asked": "2026-11-20 02:23:04.145 IST",
+    "decided": "2026-11-20 02:23:04.384 IST",
+    "submitted": "2026-11-20 02:23:04.384 IST",
+    "executed": "2026-11-20 02:24:34.419 IST",
+    "finished": "2026-11-20 02:24:34.419 IST",
+    "reconciled": "2026-11-20 02:24:34.420 IST",
+    "msFromAskedToExecuted": 90274,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7tsdy5mbz8c6rwb80",
+    "error": null
+   },
+   {
+    "id": "act_1m7tscwykg2zymzaza1",
+    "run": "run_1m7tscwye6dd3nyd5kf",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "done",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-19T20:54:00.000Z#0",
+    "asked": "2026-11-20 02:24:00.403 IST",
+    "decided": "2026-11-20 02:24:00.407 IST",
+    "submitted": "2026-11-20 02:24:00.408 IST",
+    "executed": "2026-11-20 02:24:00.454 IST",
+    "finished": "2026-11-20 02:24:00.454 IST",
+    "reconciled": "2026-11-20 02:24:00.455 IST",
+    "msFromAskedToExecuted": 51,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7tscx07phb41wketn",
+    "error": null
+   },
+   {
+    "id": "act_1m7tv3v01zf77k94n5h",
+    "run": "run_1m7tv3tzzh1ns83hx8b",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "done",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-19T21:24:00.000Z#0",
+    "asked": "2026-11-20 02:54:00.641 IST",
+    "decided": "2026-11-20 02:54:00.642 IST",
+    "submitted": "2026-11-20 02:54:00.642 IST",
+    "executed": "2026-11-20 02:54:00.679 IST",
+    "finished": "2026-11-20 02:54:00.679 IST",
+    "reconciled": "2026-11-20 02:54:00.680 IST",
+    "msFromAskedToExecuted": 38,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7tv3v18qvxq9wshrk",
+    "error": null
+   },
+   {
+    "id": "act_1m7twtrhzgr1m3xf6tx",
+    "run": "run_1m7twtrhvqs0ddhkkjt",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "done",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-19T21:54:00.000Z#0",
+    "asked": "2026-11-20 03:24:00.383 IST",
+    "decided": "2026-11-20 03:24:00.388 IST",
+    "submitted": "2026-11-20 03:24:00.389 IST",
+    "executed": "2026-11-20 03:24:00.416 IST",
+    "finished": "2026-11-20 03:24:00.416 IST",
+    "reconciled": "2026-11-20 03:24:00.417 IST",
+    "msFromAskedToExecuted": 33,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7twtrk1etcz5xd32a",
+    "error": null
+   },
+   {
+    "id": "act_1m7v5dmrt6t74wk9g8b",
+    "run": "run_1m7v5dmrp253d52h1qp",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "blocked",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-20T00:24:00.000Z#0",
+    "asked": "2026-11-20 05:54:07.706 IST",
+    "decided": "2026-11-20 05:54:07.709 IST",
+    "submitted": null,
+    "executed": null,
+    "finished": null,
+    "reconciled": "2026-11-20 05:54:07.709 IST",
+    "msFromAskedToExecuted": null,
+    "comparedWithVenue": "not_applicable",
+    "receipt": "rcp_1m7v5dmrxtddvc1xm31",
+    "error": "Ask received 925.6 s ago (limit 15 s)."
+   },
+   {
+    "id": "act_1m7v77078dr3d4wqa72",
+    "run": "run_1m7v7707272kmk0pswq",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "blocked",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-20T00:54:00.000Z#0",
+    "asked": "2026-11-20 06:25:27.208 IST",
+    "decided": "2026-11-20 06:25:27.212 IST",
+    "submitted": null,
+    "executed": null,
+    "finished": null,
+    "reconciled": "2026-11-20 06:25:27.214 IST",
+    "msFromAskedToExecuted": null,
+    "comparedWithVenue": "not_applicable",
+    "receipt": "rcp_1m7v7707ecc8zdme455",
+    "error": "Ask received 949.9 s ago (limit 15 s)."
+   },
+   {
+    "id": "act_1m7v8x2n2yg1g21h6kj",
+    "run": "run_1m7v8x2mzhgjz2srr1q",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "blocked",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-20T01:24:00.000Z#0",
+    "asked": "2026-11-20 06:54:59.170 IST",
+    "decided": "2026-11-20 06:54:59.172 IST",
+    "submitted": null,
+    "executed": null,
+    "finished": null,
+    "reconciled": "2026-11-20 06:54:59.172 IST",
+    "msFromAskedToExecuted": null,
+    "comparedWithVenue": "not_applicable",
+    "receipt": "rcp_1m7v8x2n497m9yzd1ww",
+    "error": "Ask received 932.7 s ago (limit 15 s)."
+   },
+   {
+    "id": "act_1m7vhdyjy522jqmffxj",
+    "run": "run_1m7vhdyjt40dqrfk2q4",
+    "origin": "program",
+    "kind": "order",
+    "venue": "paper-crypto",
+    "outcome": "done",
+    "reference": "prg_1m7tsbabac5td62az7d#2026-11-20T03:54:00.000Z#0",
+    "asked": "2026-11-20 09:24:00.670 IST",
+    "decided": "2026-11-20 09:24:00.675 IST",
+    "submitted": "2026-11-20 09:24:00.677 IST",
+    "executed": "2026-11-20 09:24:00.732 IST",
+    "finished": "2026-11-20 09:24:00.732 IST",
+    "reconciled": "2026-11-20 09:24:00.732 IST",
+    "msFromAskedToExecuted": 62,
+    "comparedWithVenue": "reconciled",
+    "receipt": "rcp_1m7vhdymwaz7dhv7fgh",
+    "error": null
+   }
+  ]
+ },
+ "duplicates": {
+  "occurrencesClaimedTwice": 0,
+  "referencesUsedTwice": 0,
+  "venueOrdersPerReferenceAboveOne": 0
+ },
+ "integrity": [
+  {
+   "owner": "usr_1m7tsb4p6112vpdcd5p",
+   "ledgerBreaks": [],
+   "receiptChain": {
+    "intact": true,
+    "receipts": 11,
+    "brokenAt": null,
+    "head": "461bdce69042e5ecb8c720d20627912273f9affd129a898fabd4270884ee0c3a"
+   }
+  }
+ ],
+ "sources": [
+  {
+   "provider": "amfi",
+   "state": "live",
+   "last_ok": "2026-11-20 09:25:49.609 IST",
+   "messages": 8,
+   "reconnects": 0
+  },
+  {
+   "provider": "binance",
+   "state": "live",
+   "last_ok": "2026-11-20 09:38:39.096 IST",
+   "messages": 3187329,
+   "reconnects": 24
+  },
+  {
+   "provider": "coinbase",
+   "state": "live",
+   "last_ok": "2026-11-20 09:38:39.096 IST",
+   "messages": 232846,
+   "reconnects": 17
+  },
+  {
+   "provider": "coindcx",
+   "state": "live",
+   "last_ok": "2026-11-20 09:38:41.034 IST",
+   "messages": 16362,
+   "reconnects": 9
+  },
+  {
+   "provider": "frankfurter",
+   "state": "live",
+   "last_ok": "2026-11-20 09:25:49.300 IST",
+   "messages": 562,
+   "reconnects": 0
+  },
+  {
+   "provider": "nyfed",
+   "state": "live",
+   "last_ok": "2026-11-20 09:25:49.944 IST",
+   "messages": 62,
+   "reconnects": 0
+  }
+ ],
+ "clock": {
+  "ts": 1795147550408,
+  "reference": "binance server time",
+  "offset_ms": 115.030517578125,
+  "uncertainty_ms": 71.96943749999627
+ }
+}

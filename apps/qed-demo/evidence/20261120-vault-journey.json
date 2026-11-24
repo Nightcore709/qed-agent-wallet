@@ -1,0 +1,171 @@
+{
+ "what": "QED on-chain vault journey through the backend API",
+ "producedAt": "2026-11-20 15:50:08.633 IST",
+ "api": "http://127.0.0.1:5195",
+ "howToReproduce": "node scripts/vault-journey.ts <report.json>, with the engine, API and vault service running",
+ "passed": 23,
+ "failed": 0,
+ "steps": [
+  {
+   "name": "the vault service answers through QED's API",
+   "expected": "available, and nobody's or yours",
+   "observed": "available true; held by nobody; Local Anvil chain 31337 · valueless test tokens · development keys",
+   "pass": true,
+   "at": "2026-11-20 15:46:31.892 IST"
+  },
+  {
+   "name": "wiring the contracts: two owner transactions under one approval",
+   "expected": "executed",
+   "observed": "done: executed",
+   "pass": true,
+   "at": "2026-11-20 15:46:32.685 IST"
+  },
+  {
+   "name": "signing a mandate",
+   "expected": "executed; an active mandate of 25 a payment, 60 a day, 200 in all",
+   "observed": "done: executed; version 1, 25 / 60 / 200, status active",
+   "pass": true,
+   "at": "2026-11-20 15:46:33.493 IST"
+  },
+  {
+   "name": "the approval that signed it is on the mandate",
+   "expected": "the mandate carries this approval's id",
+   "observed": "mandate approval apr_1m7w7acneepfk4; used apr_1m7w7acneepfk4",
+   "pass": true,
+   "at": "2026-11-20 15:46:33.493 IST"
+  },
+  {
+   "name": "a payment to the one approved outside payee",
+   "expected": "executed; 3 tUSD leaves the treasury",
+   "observed": "done: executed; treasury 100 to 97",
+   "pass": true,
+   "at": "2026-11-20 15:46:34.339 IST"
+  },
+  {
+   "name": "a payment to a name that is not in the owner's book",
+   "expected": "refused before any terms exist",
+   "observed": "422 unknown_payee",
+   "pass": true,
+   "at": "2026-11-20 15:46:34.342 IST"
+  },
+  {
+   "name": "a payment promised for a later day, and money the owner sets aside for a creditor",
+   "expected": "both executed; two open promises of 2 and 4 tUSD; 6 tUSD no longer free; nothing has left",
+   "observed": "done: executed; done: executed; open #1 2 by agent, #2 4 by owner; set aside 6; balance 97",
+   "pass": true,
+   "at": "2026-11-20 15:46:35.954 IST"
+  },
+  {
+   "name": "what a payment may be, read without preparing anything",
+   "expected": "5 of the co-signer's 10 tUSD left; 5 is the most payable; one unit more is refused; reading uses none of the service's budget",
+   "observed": "left 5 of 10, used 5; most payable 5; 5.000001 allowed false, failing earned-autonomy; budget 5,5,0 then 5,5,0",
+   "pass": true,
+   "at": "2026-11-20 15:46:36.008 IST"
+  },
+  {
+   "name": "paying a promise before it is due",
+   "expected": "refused; nothing sent",
+   "observed": "done: refused",
+   "pass": true,
+   "at": "2026-11-20 15:46:36.523 IST"
+  },
+  {
+   "name": "the owner's own money out and back in; more than is free is refused",
+   "expected": "5 tUSD out, 5 back, and the oversized withdrawal sends nothing",
+   "observed": "withdraw done: executed (97 to 92); deposit done: executed (97); oversized done: refused",
+   "pass": true,
+   "at": "2026-11-20 15:46:39.043 IST"
+  },
+  {
+   "name": "naming a smaller venue set and then the full one again",
+   "expected": "three named; an attack cannot start meanwhile; five named again",
+   "observed": "done: executed, named 0,1,2; attack proposal 409 venue_set_changed; done: executed, 5 named",
+   "pass": true,
+   "at": "2026-11-20 15:46:40.715 IST"
+  },
+  {
+   "name": "the vault service keeps its own budget",
+   "expected": "a count of what was used in the rolling hour, per class",
+   "observed": "proposals 10/240; operations 11/240; economies 0/4",
+   "pass": true,
+   "at": "2026-11-20 15:46:40.718 IST"
+  },
+  {
+   "name": "a limit check and a quote read without signing anything",
+   "expected": "allowed; expected output and the provable bound",
+   "observed": "allowed true; expected 9.107516 tEUR, bound 9.107519, 0.329 ppm apart; source QEDExecution.quoteBound and pool reserves on the local Anvil chain",
+   "pass": true,
+   "at": "2026-11-20 15:46:40.763 IST"
+  },
+  {
+   "name": "a conversion inside the limits",
+   "expected": "executed in eight steps; the reserve gains what the receipt says",
+   "observed": "done: executed; 8 steps (interpret, mandate, owner, cosigner, plan, submit, receipt, reconcile); reserve +9.107516 tEUR; last trade 9.107516",
+   "pass": true,
+   "at": "2026-11-20 15:46:41.607 IST"
+  },
+  {
+   "name": "sending the same approved conversion again",
+   "expected": "the same job, and no second conversion",
+   "observed": "200; duplicate true; job the same; reserve still +9.107516",
+   "pass": true,
+   "at": "2026-11-20 15:46:41.626 IST"
+  },
+  {
+   "name": "a conversion above the mandate's limit for one payment",
+   "expected": "refused with the rule named; no transaction",
+   "observed": "done: refused; proposal allowed false; failing rule: Per-conversion limit in the owner's signed mandate; transaction none",
+   "pass": true,
+   "at": "2026-11-20 15:46:42.449 IST"
+  },
+  {
+   "name": "an attack that skims the output of a genuine order",
+   "expected": "mined as a revert; balances unchanged",
+   "observed": "done: reverted; reverted NotBestExecution; treasury unchanged",
+   "pass": true,
+   "at": "2026-11-20 15:46:43.265 IST"
+  },
+  {
+   "name": "the engine ticks the standing policy by itself, with no request from an interface",
+   "expected": "within one five-minute slot a tick appears that nothing but the engine asked for; it converts a tranche, waits, or finds the target met",
+   "observed": "after 200 s: tick 1 done: executed; decision \"convert\" convert 12149472 now (limited by need); expected 10892484 at 81.4 bps execution ",
+   "pass": true,
+   "at": "2026-11-20 15:50:04.453 IST"
+  },
+  {
+   "name": "a standing policy, then one tick under it without a new signature",
+   "expected": "policy active; the tick converts a tranche, waits, or finds the target met",
+   "observed": "done: executed; policy active target 20; tick done: no-action; decision \"none\" reserve is at or above its target: nothing to do",
+   "pass": true,
+   "at": "2026-11-20 15:50:04.971 IST"
+  },
+  {
+   "name": "pause, try to convert, resume",
+   "expected": "paused; the conversion does not go through; resumed",
+   "observed": "pause done: executed; conversion while paused done: refused; resume done: executed",
+   "pass": true,
+   "at": "2026-11-20 15:50:07.364 IST"
+  },
+  {
+   "name": "a payment after conversions have used the earned allowance",
+   "expected": "the read says nothing can be paid; sent anyway it is refused, naming the co-signer's allowance; nothing leaves",
+   "observed": "most payable 0, allowance left 0; done: refused; Refused before signing: a payment of 3.00 tUSD to CloudCo is more than is left of the co-signer's earned allowance. No transaction was sent.",
+   "pass": true,
+   "at": "2026-11-20 15:50:08.118 IST"
+  },
+  {
+   "name": "the vault service re-hashes its decision records",
+   "expected": "chain intact",
+   "observed": "ok true; 19 records",
+   "pass": true,
+   "at": "2026-11-20 15:50:08.122 IST"
+  },
+  {
+   "name": "another owner of this installation cannot read or use the vault",
+   "expected": "told it is another's; no state; reads and actions refused",
+   "observed": "whose another; state withheld; read 403 rail_not_yours; action 403 rail_not_yours",
+   "pass": true,
+   "at": "2026-11-20 15:50:08.633 IST"
+  }
+ ]
+}

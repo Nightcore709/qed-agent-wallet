@@ -1,0 +1,7 @@
+Compiling 30 files with Solc 0.8.26
+Compiling 50 files with Solc 0.8.38
+Compiler run successful!
+| Contract                                                                                                                                                                              | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
+| AccountHarness                                                                                                                                                                        | 23,203           | 27,796            | 1,373              | 21,356              |
+| QEDOwnerAccount                                                                                                                                                                       | 23,112           | 27,705            | 1,464              | 21,447              |
+| QEDVault                                                                                                                                                                              | 9,102            | 9,932             | 15,474             | 39,220              |

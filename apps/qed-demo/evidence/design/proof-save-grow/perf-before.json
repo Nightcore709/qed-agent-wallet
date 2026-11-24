@@ -1,0 +1,54 @@
+{
+ "measuredAt": "2026-11-22T18:24:53.410Z",
+ "base": "http://localhost:5701",
+ "watchMs": 15000,
+ "note": "Lab measures on this computer (headless Chrome, 1440x900, no throttling); not field data.",
+ "results": {
+  "/holdings": {
+   "lcpMs": 164,
+   "cls": 0.0313,
+   "shifts": [
+    {
+     "value": 0.0072,
+     "sources": [
+      "div.side-foot",
+      "h3."
+     ]
+    },
+    {
+     "value": 0.0032,
+     "sources": [
+      "section."
+     ]
+    },
+    {
+     "value": 0.0208,
+     "sources": [
+      "section."
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 719,
+   "cssKB": 103,
+   "pass": true
+  },
+  "/save": {
+   "lcpMs": 112,
+   "cls": 0.0924,
+   "shifts": [
+    {
+     "value": 0.092,
+     "sources": [
+      "div.stack",
+      "p.small.muted"
+     ]
+    }
+   ],
+   "interactionMs": 16,
+   "jsKB": 719,
+   "cssKB": 103,
+   "pass": true
+  }
+ }
+}
