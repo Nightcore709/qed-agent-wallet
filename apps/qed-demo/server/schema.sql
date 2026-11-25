@@ -21,8 +21,56 @@ CREATE TABLE IF NOT EXISTS users (
   policy_json TEXT NOT NULL DEFAULT '{}', -- a business workspace's approval policy (signers required, maker-checker)
   authority_hold_at INTEGER,    -- v7: set by a password reset or an account recovery; until a passkey's approval authority is
                                 -- restored, a passkey added with the password signs in only (server/recovery.ts)
-  password_reset_at INTEGER     -- v7: when a reset link last set the password; for the protection delay after it, that password
+  password_reset_at INTEGER,    -- v7: when a reset link last set the password; for the protection delay after it, that password
                                 -- confirms no change to how the account gets back in (passkeys.ts passwordHeldUntil)
+  email TEXT,                   -- v10 (a): the address the account was created with, as typed; a sign-in name beside the handle
+  email_key TEXT                -- v10 (a): the same, lower-cased, for lookup. Not unique: unconfirmed, it reserves nothing
+) STRICT;
+CREATE INDEX IF NOT EXISTS users_email_key ON users(email_key);
+
+-- v10 (a): what lets an account's address and its password sign in (server/access.ts). `tag` is scrypt of the password
+-- under a salt made from the address and this installation's own random salt (meta 'email_login_salt'), so a sign-in by
+-- address costs one derivation whether no account, one or several use that address. `pw_ref` is the SHA-256 of
+-- users.pw_hash when the tag was made: a tag made for an earlier password matches nothing.
+CREATE TABLE IF NOT EXISTS email_logins (
+  person_id TEXT PRIMARY KEY REFERENCES users(id),
+  email_key TEXT NOT NULL,
+  tag TEXT NOT NULL,
+  pw_ref TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+) STRICT;
+CREATE INDEX IF NOT EXISTS email_logins_key ON email_logins(email_key);
+
+-- v10 (a): an identity at an OpenID Connect provider (Google) that signs in to one QED account (server/google.ts). It is
+-- named by the provider's issuer and subject, never by its email address: an address alone links nothing.
+CREATE TABLE IF NOT EXISTS federated_identities (
+  id TEXT PRIMARY KEY,
+  person_id TEXT NOT NULL REFERENCES users(id),
+  provider TEXT NOT NULL,       -- 'google'
+  issuer TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  email TEXT,                   -- as the provider stated it when the identity was linked; shown, never matched on
+  created_at INTEGER NOT NULL,
+  last_used_at INTEGER,
+  removed_at INTEGER
+) STRICT;
+CREATE UNIQUE INDEX IF NOT EXISTS federated_identities_subject ON federated_identities(issuer, subject) WHERE removed_at IS NULL;
+CREATE INDEX IF NOT EXISTS federated_identities_person ON federated_identities(person_id);
+
+-- v10 (a): one OpenID Connect sign-in under way, for ten minutes at most: the state (kept as its SHA-256), the nonce the
+-- ID token must carry, the PKCE verifier, and the SHA-256 of a value only the browser that began it holds in a cookie.
+-- The nonce and the verifier are blanked when the state is used.
+CREATE TABLE IF NOT EXISTS oauth_states (
+  state_hash TEXT PRIMARY KEY,
+  purpose TEXT NOT NULL,        -- 'signin' | 'link' | 'confirm'
+  person_id TEXT,               -- 'link' and 'confirm': the person signed in when it began
+  session_hash TEXT,            -- ... and the session
+  nonce TEXT NOT NULL,
+  verifier TEXT NOT NULL,
+  binding_hash TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL,
+  used_at INTEGER
 ) STRICT;
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -35,10 +83,10 @@ CREATE TABLE IF NOT EXISTS sessions (
   ua TEXT,
   stepup_at INTEGER,            -- last time the owner re-authenticated in this session (passkey, or a legacy password)
   revoked_at INTEGER,
-  auth_method TEXT NOT NULL DEFAULT 'password', -- how the session was opened: 'passkey' | 'password' (legacy accounts)
+  auth_method TEXT NOT NULL DEFAULT 'password', -- how the session was opened: 'passkey' | 'password' | 'google' (v10)
   credential_id TEXT,           -- the passkey that opened it
   workspace_id TEXT,            -- the workspace the session is acting in (a users row the person is a member of)
-  stepup_method TEXT,           -- how the last re-authentication was made: 'passkey' | 'password'
+  stepup_method TEXT,           -- how the last re-authentication was made: 'passkey' | 'password' | 'google' (v10)
   stepup_credential_id TEXT     -- v8 (r): the passkey that gave the latest confirmation (NULL: a password, or not known)
 ) STRICT;
 CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id);

@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { login, sessionFor, STEPUP_MS, stepUp } from './auth.ts'
 import { openDb } from './core.ts'
-import { beginAddPasskey, beginReauth, beginRecoveryPasskey, cancelRecovery, finishAddPasskey, RECOVERY_DELAY_MS, regenerateRecoveryCodes, type RelyingParty, signUpWithPassword, startRecovery } from './passkeys.ts'
+import { beginAddPasskey, beginReauth, beginRecoveryPasskey, cancelRecovery, finishAddPasskey, makeRecoveryCodes, RECOVERY_DELAY_MS, regenerateRecoveryCodes, type RelyingParty, signUpWithPassword, startRecovery } from './passkeys.ts'
 import { SoftAuthenticator } from './softauthn.ts'
 import { needsYou } from './views.ts'
 
@@ -18,7 +18,7 @@ const T0 = Date.UTC(2026, 10, 22, 10, 0)
 const PW = 'a long and private phrase 7'
 
 describe('sign-up with a password', () => {
-  it('opens an account with its own workspace, a hashed password and ten recovery codes, and signs in with the password', async () => {
+  it('opens an account with its own workspace and a hashed password, makes no saved codes (R14), and signs in with the password', async () => {
     const db = openDb(':memory:')
     const r = await signUpWithPassword(db, { handle: 'Meera', password: PW, displayName: 'Meera Nair' }, META, T0)
     const u = db.get<{ handle: string; display_name: string; pw_hash: string; kind: string }>('SELECT handle, display_name, pw_hash, kind FROM users WHERE id = ?', r.personId)!
@@ -26,8 +26,9 @@ describe('sign-up with a password', () => {
     expect(u.pw_hash.startsWith('scrypt$')).toBe(true)
     expect(u.pw_hash).not.toContain(PW)
     expect(db.get('SELECT role FROM memberships WHERE workspace_id = ? AND person_id = ?', r.personId, r.personId)).toEqual({ role: 'owner' })
-    expect(r.recoveryCodes).toHaveLength(10)
-    expect(new Set(r.recoveryCodes).size).toBe(10)
+    // R14: the forced codes step is gone; none is made until the person asks, or adds a second device
+    expect(r).not.toHaveProperty('recoveryCodes')
+    expect(db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ?', r.personId)!.n).toBe(0)
     const s = await login(db, { handle: 'meera', password: PW }, META, T0 + 1000)
     expect(s.userId).toBe(r.personId)
   }, 20_000)
@@ -81,10 +82,12 @@ describe('sign-up with a password', () => {
   it('starts a recovery with a saved code and the password, which then waits out its delay and can be cancelled', async () => {
     const db = openDb(':memory:')
     const r = await signUpWithPassword(db, { handle: 'meera', password: PW }, META, T0)
+    // R14: the codes are made when the person asks, here with the password just typed (the account has no passkey)
+    const codes = regenerateRecoveryCodes(db, sessionFor(db, r.session.token, T0 + 100)!, T0 + 100)
     // a wrong password starts nothing (and answers alike)
-    const wrong = await startRecovery(db, { handle: 'meera', code: r.recoveryCodes[1], password: 'not the password at all' }, META.ip, T0 + 500)
+    const wrong = await startRecovery(db, { handle: 'meera', code: codes[1], password: 'not the password at all' }, META.ip, T0 + 500)
     expect(db.get('SELECT 1 FROM recovery_requests WHERE id = ?', wrong.requestId)).toBeUndefined()
-    const rec = await startRecovery(db, { handle: 'meera', code: r.recoveryCodes[0], password: PW }, META.ip, T0 + 1000)
+    const rec = await startRecovery(db, { handle: 'meera', code: codes[0], password: PW }, META.ip, T0 + 1000)
     // the request is recorded with its method and its delay, and the saved code it used is spent
     expect(db.get('SELECT person_id, method, available_at, cancelled_at, completed_at FROM recovery_requests WHERE id = ?', rec.requestId))
       .toEqual({ person_id: r.personId, method: 'saved+password', available_at: rec.availableAt, cancelled_at: null, completed_at: null })
@@ -109,7 +112,8 @@ describe('sign-up with a password', () => {
     const r = await signUpWithPassword(db, { handle: 'meera', password: PW }, META, T0)
     // the password is checked with an asynchronous hash; meanwhile the owner removes it (written here directly: the
     // route itself is tested over HTTP in password-change-routes.test.ts)
-    const pending = startRecovery(db, { handle: 'meera', code: r.recoveryCodes[0], password: PW }, META.ip, T0 + 1000)
+    const codes = makeRecoveryCodes(db, r.personId, T0)
+    const pending = startRecovery(db, { handle: 'meera', code: codes[0], password: PW }, META.ip, T0 + 1000)
     db.run(`UPDATE users SET pw_hash = '!' WHERE id = ?`, r.personId)
     const rec = await pending
     expect(db.get('SELECT 1 FROM recovery_requests WHERE id = ?', rec.requestId)).toBeUndefined()

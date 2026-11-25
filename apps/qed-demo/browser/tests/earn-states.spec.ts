@@ -81,7 +81,13 @@ test('Earn\'s states in the browser: a step waiting for your signature (and sign
   test.setTimeout(600_000)
   const P = await household(browser, s.base, s.query), C = await household(browser, s.base, s.query)
   const errors: string[] = []
-  for (const x of [P, C]) x.page.on('console', (m) => { if (m.type() === 'error') errors.push(`${m.text()} ${m.location().url}`) })
+  // While the wallet's service is stopped (step 4), a page still following a job it sent earlier (Vault.tsx watches a job
+  // every 1.2 s until it is done, and keeps asking when an answer does not come) gets 503 from /api/vault/jobs/<id>, which
+  // Chrome logs as a failed resource load whatever the page does with it. That one line, from here to the end, is the
+  // outage and not a fault; anything else in the window, and anything at all outside it, still fails the journey.
+  let outage = false
+  const stoppedService = /Failed to load resource: the server responded with a status of 503 .*\/api\/vault\/jobs\/[^/\s?]+$/
+  for (const x of [P, C]) x.page.on('console', (m) => { if (m.type() !== 'error') return; const line = `${m.text()} ${m.location().url}`; if (!(outage && stoppedService.test(line))) errors.push(line) })
   const [client] = s.query<{ handle: string }>('SELECT handle FROM users WHERE id = ?', C.personId)
   const [provider] = s.query<{ display_name: string }>('SELECT display_name FROM users WHERE id = ?', P.personId)
 
@@ -179,6 +185,7 @@ test('Earn\'s states in the browser: a step waiting for your signature (and sign
   expect(errors).toEqual([])
 
   // 4 · the on-chain wallet's service not answering
+  outage = true
   await s.railDown()
   await P.page.reload()
   const down = work.getByText('The on-chain wallet\'s service is not answering', { exact: true })

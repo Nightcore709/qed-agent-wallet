@@ -277,6 +277,14 @@ a.brand:hover .logo-meridian { animation: meridian-turn 1.2s var(--ease-move); }
 /* more room after the group than inside it, so the sentence reads as the button's and not as the next block's */
 .stack > .access-act:not(:last-child) { margin-block-end: var(--s3); }
 .access-explain { max-width: 40ch; margin: 0; padding-inline: var(--s2); text-align: center; text-wrap: balance; font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }
+/* the letter that stands for Google on its button: a plain mark in the ink colour, sized as the icons are */
+.g-mark { display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; margin-inline-end: .45em; border-radius: 50%; border: 1.5px solid currentColor; font-size: var(--t-micro); font-weight: 700; line-height: 1; vertical-align: -.15em; }
+/* an optional part of a form, closed until asked for (the handle at sign-up) */
+.access-more { display: grid; gap: var(--s3); }
+.access-more > summary { min-height: 32px; padding-block: 6px; font-size: var(--t-small); font-weight: 560; color: var(--ink-2); cursor: pointer; }
+.access-more[open] > summary { color: var(--ink); margin-bottom: var(--s2); }
+/* the one sentence that says what a step of setting up is for */
+.onboard-lead { font-size: var(--t-h3); line-height: 1.45; color: var(--ink); text-wrap: balance; max-width: 52ch; }
 .choice.method label { padding: 12px 14px; }
 
 @media (max-width: 979px) {

@@ -2,7 +2,18 @@
  * Passkeys (WebAuthn) for sign-in, re-authentication and approval of exact terms; recovery codes; the changes that
  * reduce protection and therefore wait out a delay. R7 decisions D2 and D3 (docs/r7/00-ARCHITECTURE-DECISIONS.md).
  *
- *   Sign-up       a new account is created only after its first passkey verifies; it has no password.
+ *   Five operations  (R14) entering the account, enrolling a device, approving a protected action, recovering access and
+ *                 recovering authority over the wallet are separate and never stand in for one another
+ *                 (shared/access-operations.ts). Here: a passkey with full authority is the only thing that confirms a
+ *                 change or approves; a password, Google, an emailed code or a session alone never does.
+ *   Sign-up       a new account is created only after its first passkey verifies; it has no password. (Or with a
+ *                 password, D-094 and server/access.ts; or by Google, server/google.ts.)
+ *   Saved codes   (R14, review F1) no forced step at sign-up, but made in the same transaction as the account's FIRST
+ *                 device, whichever way it comes (finishSignup, or finishAddPasskey for an address, password or Google
+ *                 account, and the one made inside the wallet's set-up), and shown once on the next screen. H2 lets the only
+ *                 usable passkey make codes at once; so if codes were optional, the first holder of a device (a thief with
+ *                 a synced passkey) could mint the tie-breaker and lock the owner out. A second device and a completed
+ *                 recovery make none, as before R14.
  *   Sign-in       discoverable credentials, user verification required (the authenticator checks the fingerprint, face
  *                 or device PIN; the server only ever sees a signature).
  *   Approval      the challenge is derived from the approval's id and the hash of its exact terms, so the signature is
@@ -41,7 +52,7 @@ import {
   verifyAuthenticationResponse, verifyRegistrationResponse,
 } from '@simplewebauthn/server'
 import { cose, decodeCredentialPublicKey } from '@simplewebauthn/server/helpers'
-import { ABSOLUTE_MS, capSessions, checkRetyped, dummyHash, hashPassword, IDLE_MS, rateLimit, STEPUP_MS, validateCredentials, verifyPassword, type NewSession, type Session } from './auth.ts'
+import { ABSOLUTE_MS, capSessions, checkNewPassword, checkRetyped, dummyHash, emailTagFor, endPresented, hashPassword, IDLE_MS, rateLimit, STEPUP_MS, storeEmailLogin, validateCredentials, verifyPassword, type NewSession, type Session } from './auth.ts'
 import { AppError, audit, bad, type Config, type Db, emit, j, layerDigest, LEGACY_LAYER, legacyLayerSalt, newId, parse, whenIst } from './core.ts'
 import { sha256hex } from './receipts.ts'
 import { notice } from './execute.ts'
@@ -158,11 +169,23 @@ export const resetHeldError = (until: number, what: string): AppError => new App
  * way back in (cancelling a recovery, new saved codes, its addresses, stepping down as someone else's recovery contact).
  */
 export function strongConfirm(db: Db, s: Session, now: number): boolean {
-  return s.stepUpFresh || (!hasPasskey(db, s.userId) && s.passwordStepUpFresh && passwordHeldUntil(db, s.userId, now) === null)
+  if (s.stepUpFresh) return true
+  if (hasPasskey(db, s.userId)) return false
+  // No passkey yet: the way the account signs in, given again in the last five minutes. Its password (unless a reset set it
+  // within the protection delay), or, R14, Google confirmed again by an account that Google signs in to (google.ts).
+  return (s.passwordStepUpFresh && passwordHeldUntil(db, s.userId, now) === null) || googleConfirms(db, s)
 }
+/**
+ * Google confirmed again counts only for an account with no password to type (review F5): on an account that has a
+ * password, a Google sign-in is an ordinary sign-in and the password stays its confirmation.
+ */
+export const googleConfirms = (db: Db, s: Session): boolean => s.googleStepUpFresh === true && !hasPassword(db, s.userId)
+/** Whether the account has a password to type: one opened by Google alone, or with a passkey, has none ('!'). */
+export const hasPassword = (db: Db, personId: string): boolean => !!db.get<{ pw_hash: string }>('SELECT pw_hash FROM users WHERE id = ?', personId)?.pw_hash.startsWith('scrypt$')
 export function confirmNeeded(db: Db, s: Session, what: string, now: number): AppError {
   if (hasApprovingPasskey(db, s.userId)) return new AppError(401, 'stepup_required', `Confirm with one of your passkeys to ${what}.`)
   if (hasPasskey(db, s.userId)) return restrictedError()
+  if (!hasPassword(db, s.userId)) return new AppError(401, 'stepup_required', `Confirm with Google again to ${what}.`)
   const held = passwordHeldUntil(db, s.userId, now)
   return held !== null ? resetHeldError(held, what) : new AppError(401, 'stepup_required', `Enter your password again to ${what}.`)
 }
@@ -222,7 +245,9 @@ export function securityEvent(db: Db, personId: string, kind: string, detail: un
   // One event, one notice: the codes a completed recovery replaces are told in the recovery's own notice.
   const told = SENSITIVE[kind]
   const partOfRecovery = kind === 'recovery-codes-replaced' && (detail as { reason?: string } | null)?.reason === 'recovery'
-  if (told && !partOfRecovery) {
+  // ... and the codes the first device brings (R14, F1) are told in that device's own notice ('first-passkey-added')
+  const withDevice = kind === 'recovery-codes-made' && ['first-device'].includes((detail as { reason?: string } | null)?.reason ?? '')
+  if (told && !partOfRecovery && !withDevice) {
     notice(db, personId, { level: 'action', kind: 'security-change', title: told[0], body: told[1], subject: kind, dedupe: `security:${kind}:${now}` }, now)
     // And on every address the person has confirmed, outside QED (R12; NIST SP 800-63B-4 sections 4.2.3 and 4.6).
     notifyChannels(db, personId, { kind, title: told[0], body: told[1] }, now)
@@ -232,10 +257,10 @@ export function securityEvent(db: Db, personId: string, kind: string, detail: un
 const IF_NOT_YOU = 'If this was not you, open Security and recovery now: suspend a passkey you do not recognise from another of yours, end sessions you do not recognise, and cancel a recovery you did not start.'
 /** The security events a person is told of at once, as an urgent notice: title, then what it means and what to do. */
 const SENSITIVE: Record<string, [string, string]> = {
-  'passkey-added': ['A passkey was added to your account', `A new passkey can now sign in for you. For its first 24 hours it cannot approve payments above ₹10,000, loosen a protection or add a signer, and any of your older passkeys can remove it at once under Security and recovery. ${IF_NOT_YOU}`],
-  'first-passkey-added': ['A passkey was added to your account', `It is the account's first passkey: it now signs in and approves for you. ${IF_NOT_YOU}`],
+  'passkey-added': ['A passkey was added to your account', `A new passkey can now sign in for you. For its first 24 hours it cannot approve payments above ₹10,000, loosen a protection or add a signer, and one of your older passkeys can remove it at once under Security and recovery, with one of your saved recovery codes. ${IF_NOT_YOU}`],
+  'first-passkey-added': ['A passkey was added to your account', `It is the account's first passkey: it now signs in and approves for you. If the account had no saved recovery codes, ten were made with it and shown once to the session that added it. ${IF_NOT_YOU}`],
   'passkey-removed-in-cool-off': ['A newly added passkey was removed from your account', `It was removed at once, during its first 24 hours, by one of your older passkeys, and can no longer sign in or sign for you. ${IF_NOT_YOU}`],
-  'signin-locked': ['Wrong passwords were typed for your account', 'Five wrong passwords in a row were typed with your handle, so signing in with the password is locked for 15 minutes. Your passkeys still sign you in. If this was not you, someone knows your handle and is guessing your password: remove the password under Security and recovery, or change it to a long one you use nowhere else.'],
+  'signin-locked': ['Wrong passwords were typed for your account', 'Five wrong passwords in a row were typed with your handle or your email address, so signing in with the password is locked for 15 minutes. Your passkeys still sign you in. If this was not you, someone knows your handle or address and is guessing your password: remove the password under Security and recovery, or change it to a long one you use nowhere else.'],
   'member-grant-scheduled': ['A member is to be given authority in a shared workspace', `It takes effect only when its delay ends, and any member who may sign can cancel it before then, under Workspace. If you did not expect it, cancel it and ask who asked for it. ${IF_NOT_YOU}`],
   'member-granted': ['A member was given authority in a shared workspace', `No member who may sign cancelled it while it waited. Workspace shows every member and their role. ${IF_NOT_YOU}`],
   'contact-grant-scheduled': ['Someone you are a recovery contact for is giving a member authority', 'In a shared workspace of theirs, a member is to be given authority to act. It takes effect only after a delay, and any member who may sign can cancel it. If they did not tell you about it, call them on a number you already have.'],
@@ -252,14 +277,19 @@ const SENSITIVE: Record<string, [string, string]> = {
   'loosening-cancelled': ['A change that would have loosened your protections was stopped', 'One of your recovery contacts stopped it before its delay ended, so nothing was loosened. If you asked for it yourself, ask again; it waits its delay again. If you did not, someone may have your sign-in: check Security and recovery.'],
   'authority-restore-cancelled': ['A request for approval authority was stopped', 'The passkey that asked still signs in only. If it was yours, ask again; if not, suspend it under Security and recovery.'],
   'password-reset': ['Your password was reset', `Every session was signed out. A passkey added with the new password signs in only, until it is given approval authority after a wait. ${IF_NOT_YOU}`],
+  'email-confirmed': ['Your email address was confirmed', `It is the address this account was opened with. It receives your security notices now. Like every address it can start a password reset or a recovery only after the protection delay (Security and recovery shows when). ${IF_NOT_YOU}`],
   'email-added': ['An email address was confirmed for your account', `It receives your security notices now, and can start a password reset or a recovery after the protection delay. ${IF_NOT_YOU}`],
   'email-removed': ['An email address was removed from your account', `It no longer receives notices and cannot start a reset or a recovery. ${IF_NOT_YOU}`],
   'phone-added': ['A phone number was confirmed for your account', `It receives short security notices by text message. It cannot start a reset or a recovery. ${IF_NOT_YOU}`],
   'phone-removed': ['A phone number was removed from your account', `It no longer receives security notices. ${IF_NOT_YOU}`],
   'contact-authority-requested': ['Someone you are a recovery contact for asked for approval authority', 'After a recovery, their new passkey asked to approve payments. If they did not tell you about it, cancel it under Security and recovery.'],
   'recovery-codes-replaced': ['Your saved recovery codes were replaced', `The earlier codes no longer work. ${IF_NOT_YOU}`],
+  'recovery-codes-made': ['Saved recovery codes were made for your account', `They were shown once, to the session that made them. One of them is needed to suspend another device, to make new codes, and beside a second proof to recover the account. ${IF_NOT_YOU}`],
+  'payee-added-in-google-session': ['A payee was added in a session opened with Google', `Signing in with Google is not your device's approval: check the payee before you pay it. ${IF_NOT_YOU}`],
+  'google-linked': ['A Google account can now sign in to your account', `It signs in, as a password does: it approves nothing and changes no protection. ${IF_NOT_YOU}`],
+  'google-unlinked': ['A Google account can no longer sign in to your account', `It was removed from your ways of signing in. ${IF_NOT_YOU}`],
   // a pause nobody signed in to make (review of R12, M4): told at once, with what it means if it was not the person
-  'paused-with-saved-code': ['QED was paused with one of your saved recovery codes', 'Someone typed your handle and a saved code on the sign-in page. Everything QED does on its own is paused, except protective selling that runs without asking (a protective instruction set to ask first still waits for your passkey before each sale); no money moved and no one was signed in. Resume it from the status control with a passkey. If this was not you, someone has one of your saved codes: make new ones under Security and recovery, which stops the old ones working.'],
+  'paused-with-saved-code': ['QED was paused with one of your saved recovery codes', 'Someone typed your handle and a saved code on the sign-in page. Everything QED does on its own is paused, except protective selling that runs without asking (a protective instruction set to ask first still waits for your passkey before each sale); no money moved and no one was signed in. Resume it from the status control with a passkey. If this was not you, someone has one of your saved codes: under Security and recovery, make new ones with another unused code of yours, which stops the old ones working. With no unused code left, or with more than one passkey and none, new codes cannot be made at once: name a recovery contact, or recover the account.'],
   'pause-code-failures': ['Wrong saved codes were tried for your account', 'Three or more codes that do not match were typed with your handle on the sign-in page today, to pause QED. Nothing was paused by them. If this was not you, someone knows your handle; your saved codes are still safe unless you shared them.'],
   'paused-by-contact': ['Your recovery contact paused QED for you', 'Everything QED does on its own is paused, except protective selling that runs without asking (a protective instruction set to ask first still waits for your passkey before each sale); no money moved. Resume it from the status control with a passkey. If you did not ask them to, ask them why, and choose another recovery contact under Security and recovery if you need to.'],
   'vault-recovery-started': ['A recovery of your on-chain wallet has started', `It can be completed only after its delay, and any signer can cancel it. ${IF_NOT_YOU}`],
@@ -283,7 +313,7 @@ const SENSITIVE: Record<string, [string, string]> = {
 }
 
 /** A session opened by a passkey. The re-authentication time starts now, because the person has just verified. */
-export function openSession(db: Db, personId: string, meta: { ua: string; method: 'passkey' | 'password'; credentialId: string | null; signinOnly?: boolean; ip?: string }, now: number): NewSession {
+export function openSession(db: Db, personId: string, meta: { ua: string; method: 'passkey' | 'password' | 'google'; credentialId: string | null; signinOnly?: boolean; ip?: string }, now: number): NewSession {
   const token = randomBytes(32).toString('base64url'), csrf = randomBytes(24).toString('base64url')
   const expiresAt = now + ABSOLUTE_MS
   // A passkey that signs in only (R12) opens a session with no confirmation in it: it confirms nothing.
@@ -317,7 +347,7 @@ export async function beginSignup(db: Db, rp: RelyingParty, input: { handle: unk
   return { challengeId: issueChallenge(db, 'register', null, options.challenge, { personId, ...c }, now), options }
 }
 
-export async function finishSignup(db: Db, rp: RelyingParty, input: { challengeId: unknown; response: unknown; passkeyName?: unknown }, meta: { ip: string; ua: string }, now: number): Promise<{ session: NewSession; recoveryCodes: string[]; personId: string }> {
+export async function finishSignup(db: Db, rp: RelyingParty, input: { challengeId: unknown; response: unknown; passkeyName?: unknown }, meta: { ip: string; ua: string; replaces?: string }, now: number): Promise<{ session: NewSession; recoveryCodes: string[]; personId: string }> {
   const ch = takeChallenge(db, input.challengeId, ['register'], null, now)
   const v = await verifyRegistrationResponse({ response: input.response as RegistrationResponseJSON, expectedChallenge: ch.challenge, expectedOrigin: rp.origins, expectedRPID: rp.id, requireUserVerification: true, supportedAlgorithmIDs: [ES256] }).catch(() => null)
   if (!v?.verified || !v.registrationInfo) throw fail('The passkey could not be created. Try again.')
@@ -328,8 +358,11 @@ export async function finishSignup(db: Db, rp: RelyingParty, input: { challengeI
     db.run(`INSERT INTO users (id, handle, display_name, pw_hash, created_at, kind) VALUES (?, ?, ?, '!', ?, 'person')`, personId, handle, displayName, now)
     db.run(`INSERT INTO memberships (workspace_id, person_id, role, created_at, added_by) VALUES (?, ?, 'owner', ?, ?)`, personId, personId, now, personId)
     const cred = storeCredential(db, personId, info.credential, { deviceType: info.credentialDeviceType, backedUp: info.credentialBackedUp, aaguid: info.aaguid, name: nameOf(input.passkeyName, meta.ua) }, now)
+    // R14 (review F1): no forced step, but the codes are made with the first device, here, and shown once on the next screen
     const recoveryCodes = makeRecoveryCodes(db, personId, now)
+    endPresented(db, meta.replaces, meta.ip, now)
     const session = openSession(db, personId, { ua: meta.ua, method: 'passkey', credentialId: cred.id, ip: meta.ip }, now)
+    armJustMade(db, personId, sha256hex(session.token), now)
     securityEvent(db, personId, 'account-created', { passkey: cred.name, synced: cred.backed_up === 1 }, now)
     audit(db, now, personId, 'owner', 'account.create', personId, { method: 'passkey', credentialId: cred.id }, meta.ip)
     return { session, recoveryCodes, personId }
@@ -340,11 +373,11 @@ export async function finishSignup(db: Db, rp: RelyingParty, input: { challengeI
  * Sign-up with a handle and a password (D-094, 22 Nov 2026; replaces D2's "passkey only" for opening an account, not for
  * approving anything). Such an account can read everything and set up its household, and approves nothing until it adds
  * a passkey: every approval is a passkey signature over the exact terms (D3), and the approval route has no password
- * path. The new session counts as a fresh password entry, which unlocks only adding the first passkey. Recovery codes
- * are made now, as for a passkey account: with the password they start a recovery that waits out its delay and that any
- * of the account's passkeys can cancel.
+ * path. The new session counts as a fresh password entry, which unlocks only adding the first passkey. No saved recovery
+ * codes are made now (R14: they were a forced step at sign-up); the first passkey brings them (finishAddPasskey, review F1). The ordinary sign-up, with an email address, is
+ * server/access.ts signUpWithEmail; this one, with a handle alone, is kept for the accounts and programs that use it.
  */
-export async function signUpWithPassword(db: Db, input: { handle: unknown; password: unknown; displayName?: unknown }, meta: { ip: string; ua: string }, now: number): Promise<{ session: NewSession; recoveryCodes: string[]; personId: string }> {
+export async function signUpWithPassword(db: Db, input: { handle: unknown; password: unknown; displayName?: unknown }, meta: { ip: string; ua: string; replaces?: string }, now: number): Promise<{ session: NewSession; personId: string }> {
   const c = validateCredentials(input.handle, input.password, input.displayName)
   if (!rateLimit(db, `signup:${meta.ip}`, 20, 3600_000, now)) throw new AppError(429, 'too_many', 'Too many new accounts from this address. Try again later.')
   if (db.get('SELECT 1 FROM users WHERE handle = ?', c.handle)) throw new AppError(409, 'handle_taken', 'That handle is already in use.', { handle: 'That handle is already in use.' })
@@ -354,12 +387,12 @@ export async function signUpWithPassword(db: Db, input: { handle: unknown; passw
     if (db.get('SELECT 1 FROM users WHERE handle = ?', c.handle)) throw new AppError(409, 'handle_taken', 'That handle is already in use.', { handle: 'That handle is already in use.' })
     db.run(`INSERT INTO users (id, handle, display_name, pw_hash, created_at, kind) VALUES (?, ?, ?, ?, ?, 'person')`, personId, c.handle, c.displayName, hash, now)
     db.run(`INSERT INTO memberships (workspace_id, person_id, role, created_at, added_by) VALUES (?, ?, 'owner', ?, ?)`, personId, personId, now, personId)
-    const recoveryCodes = makeRecoveryCodes(db, personId, now)
+    endPresented(db, meta.replaces, meta.ip, now)
     const session = openSession(db, personId, { ua: meta.ua, method: 'password', credentialId: null, ip: meta.ip }, now)
     db.run(`UPDATE sessions SET stepup_at = ?, stepup_method = 'password' WHERE id_hash = ?`, now, sha256hex(session.token))
     securityEvent(db, personId, 'account-created', { method: 'password' }, now)
     audit(db, now, personId, 'owner', 'account.create', personId, { method: 'password' }, meta.ip)
-    return { session, recoveryCodes, personId }
+    return { session, personId }
   })
 }
 
@@ -446,7 +479,12 @@ export async function beginAddPasskey(db: Db, rp: RelyingParty, s: Session, now:
   // A legacy account (password, no passkey yet) adds its first passkey after re-entering its password; that is the
   // only thing a password re-entry unlocks.
   const first = !hasPasskey(db, s.userId)
-  if (!(s.stepUpFresh || (first && s.passwordStepUpFresh))) throw new AppError(401, 'stepup_required', first ? 'Enter your password, then create your passkey.' : 'Confirm with one of your passkeys first.')
+  // Enrolling a device is its own operation (shared/access-operations.ts). The first: after the account's ordinary sign-in
+  // given again in the last five minutes, its password or, R14, Google confirmed again on an account with no password (F5). Every further one: only after a
+  // confirmation by a passkey that can approve. A session alone enrols nothing.
+  if (!(s.stepUpFresh || (first && (s.passwordStepUpFresh || googleConfirms(db, s))))) {
+    throw new AppError(401, 'stepup_required', !first ? 'Confirm with one of your passkeys first.' : hasPassword(db, s.userId) ? 'Enter your password, then create your passkey.' : 'Confirm with Google again, then set up your device.')
+  }
   const u = db.get<{ handle: string; display_name: string }>('SELECT handle, display_name FROM users WHERE id = ?', s.userId)!
   const options = await generateRegistrationOptions({
     rpName: rp.name, rpID: rp.id, userName: u.handle, userDisplayName: u.display_name, userID: utf8(s.userId), attestationType: 'none',
@@ -457,7 +495,14 @@ export async function beginAddPasskey(db: Db, rp: RelyingParty, s: Session, now:
   return { challengeId: issueChallenge(db, 'add', s.userId, options.challenge, { viaPassword: !s.stepUpFresh }, now), options }
 }
 
-export async function finishAddPasskey(db: Db, rp: RelyingParty, s: Session, input: { challengeId: unknown; response: unknown; passkeyName?: unknown }, ua: string, now: number): Promise<Credential> {
+/**
+ * `recoveryCodes` on the answer: the saved codes, made now and shown once, when this is the account's FIRST device and it
+ * holds no unused code (R14, review F1). They are made in the same transaction as the passkey. A second device makes none:
+ * H2 lets the only usable passkey make codes at once, so if the first device did not bring them, whoever first held a
+ * device (a thief with a synced passkey) could mint the tie-breaker and lock the owner out. Not made for a first passkey
+ * added after a password reset (it signs in only: a reset proves the mailbox, not the owner).
+ */
+export async function finishAddPasskey(db: Db, rp: RelyingParty, s: Session, input: { challengeId: unknown; response: unknown; passkeyName?: unknown }, ua: string, now: number): Promise<Credential & { recoveryCodes?: string[]; replacedEarlier?: boolean }> {
   const ch = takeChallenge(db, input.challengeId, ['add'], s.userId, now)
   const v = await verifyRegistrationResponse({ response: input.response as RegistrationResponseJSON, expectedChallenge: ch.challenge, expectedOrigin: rp.origins, expectedRPID: rp.id, requireUserVerification: true, supportedAlgorithmIDs: [ES256] }).catch(() => null)
   if (!v?.verified || !v.registrationInfo) throw fail('The passkey could not be added. Try again.')
@@ -471,11 +516,24 @@ export async function finishAddPasskey(db: Db, rp: RelyingParty, s: Session, inp
     // cannot at once approve large payments, loosen a protection or add a signer, and the older one can remove it at once.
     // The account's first passkey has none: there is no older passkey to remove it (one added by an account that had only a
     // password follows D-094's rule, a password re-entry, and its risk is RISK-076's).
-    const coolOffUntil = usableCredentials(db, s.userId).length > 0 ? now + COOL_OFF_MS : undefined
+    const before = usableCredentials(db, s.userId).length
+    const coolOffUntil = before > 0 ? now + COOL_OFF_MS : undefined
+    // The first device brings the saved codes (R14, F1; H2): in this transaction, when the account holds none and the
+    // passkey is not a reset's sign-in-only one.
+    // R1 (second review): ALWAYS a fresh set for the first usable device, replacing every unused code made before it. Codes
+    // made while the account had no device (with only the password, or Google) were made by whoever held that credential,
+    // who would otherwise keep the tie-breaker for good.
+    const earlier = unusedCodes(db, s.userId)
+    const makeCodes = before === 0 && !held
     const cred = storeCredential(db, s.userId, info.credential, { deviceType: info.credentialDeviceType, backedUp: info.credentialBackedUp, aaguid: info.aaguid, name: nameOf(input.passkeyName, ua), coolOffUntil, ...(held ? { authority: 'signin' as const, reason: 'after-password-reset' } : {}) }, now)
     securityEvent(db, s.userId, coolOffUntil ? 'passkey-added' : 'first-passkey-added', { passkey: cred.name, ...(coolOffUntil ? { coolOffUntil } : {}), ...(held ? { signinOnly: true } : {}) }, now)
     audit(db, now, s.userId, 'owner', 'passkey.add', cred.id, {})
-    return cred
+    if (!makeCodes) return cred
+    const recoveryCodes = makeRecoveryCodes(db, s.userId, now)
+    armJustMade(db, s.userId, s.sessionHash, now)
+    securityEvent(db, s.userId, 'recovery-codes-made', { reason: 'first-device', ...(earlier ? { replacedEarlier: earlier } : {}) }, now)
+    audit(db, now, s.userId, 'owner', 'recovery-codes.make', s.userId, { reason: 'first-device', replacedEarlier: earlier })
+    return { ...cred, recoveryCodes, ...(earlier ? { replacedEarlier: true } : {}) }
   })
 }
 
@@ -542,6 +600,39 @@ export async function matchCodeAsync<T extends CodeRow>(rows: T[], code: string)
   return hit
 }
 
+/**
+ * A set of codes shown only once can be lost before it is saved (a reload, a dropped response), and then nobody holds the
+ * tie-breaker and no route makes new codes without one (second review, R3). So the session that RECEIVED a first-device set
+ * may ask for a fresh set without a code, for 30 minutes, while the account still has exactly one usable passkey and no
+ * code of that set has been used. The window is kept on the server, bound to the receiving session's id (meta; no table).
+ */
+export const JUST_MADE_WINDOW_MS = 30 * 60_000
+const windowKey = (personId: string): string => `codes-window:${personId}`
+function armJustMade(db: Db, personId: string, sessionHash: string, now: number): void {
+  db.run('INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', windowKey(personId), j({ session: sessionHash, at: now }))
+}
+/** Until when this session may ask for a fresh set, or null. (Asking also needs the session's fresh passkey confirmation.) */
+export function justMadeUntil(db: Db, s: Pick<Session, 'userId' | 'sessionHash'>, now: number): number | null {
+  const w = parse<{ session: string; at: number } | null>(db.get<{ value: string }>('SELECT value FROM meta WHERE key = ?', windowKey(s.userId))?.value, null)
+  if (!w || w.session !== s.sessionHash || now >= w.at + JUST_MADE_WINDOW_MS || now < w.at) return null
+  if (usableCredentials(db, s.userId).length !== 1) return null
+  if (db.get('SELECT 1 FROM recovery_codes WHERE person_id = ? AND created_at = ? AND used_at IS NOT NULL', s.userId, w.at)) return null
+  if (!db.get('SELECT 1 FROM recovery_codes WHERE person_id = ? AND created_at = ? AND used_at IS NULL AND replaced_at IS NULL', s.userId, w.at)) return null
+  return w.at + JUST_MADE_WINDOW_MS
+}
+/** A fresh set for the session that received the last first-device set and did not save it (see justMadeUntil). */
+export function regenerateJustMadeCodes(db: Db, s: Session, now: number): string[] {
+  if (!s.stepUpFresh) throw stepUpNeeded()
+  if (justMadeUntil(db, s, now) === null) throw new AppError(409, 'codes_window_closed', 'New codes can be made without one of the old ones only by the session that was shown them, within 30 minutes, while you have one passkey and have used none of them. Use one of your saved codes, or recover the account.')
+  return db.tx(() => {
+    const codes = makeRecoveryCodes(db, s.userId, now)
+    armJustMade(db, s.userId, s.sessionHash, now)
+    securityEvent(db, s.userId, 'recovery-codes-replaced', { reason: 'not-saved' }, now)
+    audit(db, now, s.userId, 'owner', 'recovery-codes.make', s.userId, { reason: 'not-saved' })
+    return codes
+  })
+}
+
 /** Ten new codes, shown once; earlier unused codes stop working. */
 export function makeRecoveryCodes(db: Db, personId: string, now: number): string[] {
   db.run('UPDATE recovery_codes SET replaced_at = ? WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', now, personId)
@@ -565,7 +656,9 @@ export function regenerateRecoveryCodes(db: Db, s: Session, now: number, spentCo
   if (unused === 0 && usableCredentials(db, s.userId).length > 1) throw new AppError(409, 'codes_none', 'You have no unused saved codes and more than one usable passkey, so new codes cannot be made at once: anyone holding one of your devices could otherwise make them. Remove the passkeys you no longer hold (each waits the protection delay), or recover the account with your recovery contact.')
   return db.tx(() => {
     if (unused > 0) spendSavedCode(db, s.userId, spentCodeId!, now)
-    const codes = makeRecoveryCodes(db, s.userId, now); securityEvent(db, s.userId, 'recovery-codes-replaced', {}, now); return codes
+    // an account's first codes are made, not replaced (R14: none is made at sign-up); the history and the notice say which
+    const first = !db.get('SELECT 1 FROM recovery_codes WHERE person_id = ?', s.userId)
+    const codes = makeRecoveryCodes(db, s.userId, now); securityEvent(db, s.userId, first ? 'recovery-codes-made' : 'recovery-codes-replaced', first ? { reason: 'asked' } : {}, now); return codes
   })
 }
 
@@ -1054,12 +1147,6 @@ function passwordAttempt(db: Db, s: Session, route: 'change' | 'remove', ip: str
   }
 }
 
-/** The new password, checked by the sign-up's own rules (validateCredentials, guessable); reported on its own field. */
-function newPassword(handle: string, password: unknown): string {
-  try { return validateCredentials(handle, password).password }
-  catch (e) { if (e instanceof AppError && e.fields?.password) throw bad('Check the highlighted field.', { password: e.fields.password }); throw e }
-}
-
 /**
  * Ends every session of the person except this one, so whoever signed in with the old password is signed out. Returns
  * how many were still in use; rows of sessions that had already lapsed are closed too, and not counted (review L4).
@@ -1077,7 +1164,8 @@ function endOtherSessions(db: Db, s: Session, now: number, opts: { weakOnly?: bo
  * passkey sessions again and again, and keep the owner from every remedy that needs a session (R13 review, R03).
  */
 const WEAK_SESSION = `(s.auth_method <> 'passkey' OR s.credential_id IS NULL OR EXISTS (SELECT 1 FROM webauthn_credentials c WHERE c.id = s.credential_id AND c.authority = 'signin'))`
-const mayEndStrong = (s: Session): boolean => s.stepUpFresh || !(s.authMethod === 'password' || s.signinOnly === true)
+// only a session opened with a passkey that can approve is strong: a password, Google (R14) or anything else is not
+const mayEndStrong = (s: Session): boolean => s.stepUpFresh || (s.authMethod === 'passkey' && s.signinOnly !== true)
 /** Reset and recovery links not yet used stop working: they were sent before this change, perhaps to an address that is no longer the person's (R13 review, R05). */
 export function endLinks(db: Db, personId: string, now: number): number {
   const n = db.run(`UPDATE one_time_tokens SET replaced_at = ? WHERE person_id = ? AND purpose IN ('password-reset', 'recovery-email') AND used_at IS NULL AND replaced_at IS NULL`, now, personId).changes
@@ -1112,15 +1200,18 @@ export async function changePassword(db: Db, s: Session, input: { current?: unkn
   const passkey = hasPasskey(db, s.userId)
   if (passkey ? !s.stepUpFresh : typeof input.current !== 'string' || input.current === '') throw confirmNeeded(db, s, 'change your password', now)
   if (passkey) refuseCoolingOff(db, s, 'change your password', now)
-  const password = newPassword(u.handle, input.password)
+  const password = checkNewPassword(db, s.userId, input.password)
   passwordAttempt(db, s, 'change', ip, now)
   if (!passkey) await checkRetyped(db, s.userId, input.current, ip, now, { action: 'password.change-failed', fields: { current: 'That is not the password this account has now.' } })
   if (await verifyPassword(password, u.pw_hash)) throw bad('Check the highlighted field.', { password: 'That is the password this account has now. Choose a different one.' })
   const hash = await hashPassword(password)
+  // an account opened with an address signs in with that address and the new password from now (auth.ts storeEmailLogin)
+  const tag = await emailTagFor(db, s.userId, password)
   return db.tx(() => {
     stillAsChecked(db, s, passkey, 'change your password', now)
     // Written only over the password checked above: one changed or removed meanwhile, in another tab, is not overwritten.
     if (db.run('UPDATE users SET pw_hash = ? WHERE id = ? AND pw_hash = ?', hash, s.userId, u.pw_hash).changes !== 1) throw new AppError(409, 'retry', 'The password was changed or removed meanwhile. Reload the page and try again.')
+    storeEmailLogin(db, s.userId, tag, hash, now)
     const ended = endOtherSessions(db, s, now)
     endLinks(db, s.userId, now)
     securityEvent(db, s.userId, 'password-changed', { ended }, now)
@@ -1144,7 +1235,11 @@ function wayBackWithoutPassword(db: Db, personId: string, now: number): string |
       : 'Name a recovery contact first. Without the password, a recovery needs one of your saved codes and a code from a recovery contact, so with no contact, losing every passkey would lose this account.'
   }
   const codes = db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', personId)?.n ?? 0
-  return codes ? null : 'Make new saved codes first. None of yours is left unused, and without the password a recovery needs one of them and a code from your recovery contact.'
+  if (codes) return null
+  // R14: none is made at sign-up, so an account may never have had any
+  return db.get('SELECT 1 FROM recovery_codes WHERE person_id = ?', personId)
+    ? 'Make new saved codes first. None of yours is left unused, and without the password a recovery needs one of them and a code from your recovery contact.'
+    : 'Save recovery codes first, under Security. Without the password a recovery needs one of them and a code from your recovery contact, and this account has none yet.'
 }
 
 /**
@@ -1166,6 +1261,7 @@ export function removePassword(db: Db, s: Session, ip: string, now: number): { e
     const lacking = wayBackWithoutPassword(db, s.userId, now)
     if (lacking) throw new AppError(409, 'no_way_back', lacking)
     db.run(`UPDATE users SET pw_hash = '!', failed_logins = 0, locked_until = NULL WHERE id = ?`, s.userId)
+    storeEmailLogin(db, s.userId, null, '!', now) // the address no longer signs in: there is no password for it to go with
     const ended = endOtherSessions(db, s, now)
     endLinks(db, s.userId, now)
     securityEvent(db, s.userId, 'password-removed', { ended }, now)
@@ -1239,6 +1335,7 @@ export function securityView(db: Db, s: Session, now: number): unknown {
       .map((c) => ({ contact: handleOf(db, c.contact_id), issuedAt: c.created_at, expiresAt: c.expires_at })),
     sessions: db.all<{ id_hash: string; created_at: number; last_seen_at: number; ua: string | null; auth_method: string }>('SELECT id_hash, created_at, last_seen_at, ua, auth_method FROM sessions WHERE user_id = ? AND revoked_at IS NULL AND expires_at > ? ORDER BY last_seen_at DESC', s.userId, now)
       .map((x) => ({ id: x.id_hash.slice(0, 12), current: x.id_hash === s.sessionHash, createdAt: x.created_at, lastSeenAt: x.last_seen_at, device: x.ua, method: x.auth_method })),
+    codesAgainUntil: justMadeUntil(db, s, now),
     recoveryCodesLeft: db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', s.userId)?.n ?? 0,
     recoveries: db.all<Record<string, unknown>>('SELECT id, started_at, available_at, cancelled_at, completed_at, via, method FROM recovery_requests WHERE person_id = ? ORDER BY started_at DESC LIMIT 10', s.userId),
     scheduled: pending,

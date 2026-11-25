@@ -40,6 +40,15 @@ export function portClashes(files: { name: string; text: string }[]): string[] {
   return out
 }
 
+/** Specs whose own stack starts in beforeAll with more than one test and no serial mode: under fullyParallel two workers would each start that stack on one port. */
+export function sharedStackNotSerial(files: { name: string; text: string }[]): string[] {
+  return files.filter((f) => /beforeAll\([^\n]*startExtraStack/.test(f.text) && (f.text.match(/^test\(/gm) ?? []).length > 1 && !/describe\.configure\(\{ mode: 'serial' \}\)/.test(f.text)).map((f) => f.name)
+}
+/** Machine-specific folders a spec or its support must not name (the CI runner is Linux and has none of them). */
+export function machineSpecificPaths(files: { name: string; text: string }[]): string[] {
+  return files.filter((f) => /['"`](\/private\/tmp|\/Users\/|\/home\/[a-z])/.test(f.text)).map((f) => f.name)
+}
+
 describe('the browser suite', () => {
   it('gives every journey with a stack of its own a pair of ports no other journey uses', () => {
     const files = readdirSync(SPECS).filter((n) => n.endsWith('.spec.ts')).map((name) => ({ name, text: readFileSync(join(SPECS, name), 'utf8') }))
@@ -54,6 +63,19 @@ describe('the browser suite', () => {
     expect(specs.length).toBeGreaterThanOrEqual(34)
     expect(directPlaywrightImports(specs)).toEqual([])
     expect(specs.filter((s) => !/^import \{[^}]*\btest\b[^}]*\} from '\.\.\/support\/test\.ts'$/m.test(s.text)).map((s) => s.name)).toEqual([])
+  })
+
+  it('runs a spec that starts one stack for several tests on one worker only (CI run: two workers met on one port)', () => {
+    expect(sharedStackNotSerial(specs)).toEqual([])
+    const bad = "test.beforeAll(async () => { s = await startExtraStack(PORT, {}) })\ntest('a', async () => {})\ntest('b', async () => {})"
+    expect(sharedStackNotSerial([{ name: 'x.spec.ts', text: bad }])).toEqual(['x.spec.ts'])
+    expect(sharedStackNotSerial([{ name: 'x.spec.ts', text: `test.describe.configure({ mode: 'serial' })\n${bad}` }])).toEqual([])
+  })
+
+  it('names no machine-specific folder in a spec or in the support code (CI run: a macOS path failed with EACCES on Linux)', () => {
+    const support = readdirSync(join(SPECS, '..', 'support')).filter((n) => n.endsWith('.ts')).map((name) => ({ name, text: readFileSync(join(SPECS, '..', 'support', name), 'utf8') }))
+    expect(machineSpecificPaths([...specs, ...support])).toEqual([])
+    expect(machineSpecificPaths([{ name: 'x.ts', text: "const A = '/private/tmp/claude-501/shots'" }])).toEqual(['x.ts'])
   })
 
   it('reports a spec that takes test or expect from Playwright directly (the check can fail)', () => {

@@ -18,7 +18,7 @@ import { openKeyring } from './key-config.ts'
 import { testKeys } from './key-fixture.ts'
 import { MigrationRefused, sealMigrationCopy } from './migration-copy.ts'
 import { archivePlaintext } from './plaintext-archive.ts'
-import { toSchemaV8 } from './schema-fixture.ts'
+import { toSchemaV9 } from './schema-fixture.ts'
 import { createBackup, listManifests, verifySealed } from './sealed.ts'
 import { sweepOne, sweepScratch } from './scratch.ts'
 
@@ -79,7 +79,7 @@ function world(o: { padMb?: number; older?: boolean; keys?: boolean } = {}) {
     raw.exec('COMMIT')
   }
   raw.close()
-  if (o.older) toSchemaV8(db)
+  if (o.older) toSchemaV9(db)
   const keys = o.keys === false ? undefined : testKeys(root)
   const env = { PATH: process.env.PATH ?? '', HOME: root, QED_DB: db, QED_KEY_DIR: join(root, 'keys'), QED_BACKUP_DIR: join(root, 'backups'), TMPDIR: join(root, 'tmp') }
   mkdirSync(env.TMPDIR, { mode: 0o700 })

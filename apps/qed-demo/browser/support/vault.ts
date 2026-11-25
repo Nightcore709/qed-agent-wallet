@@ -15,18 +15,19 @@ const unique = (p: string) => `${p}${Date.now().toString(36)}${Math.floor(Math.r
 /** With QED_SHOTS=<folder>, the screens a journey passes through are saved there for reading (evidence, review). */
 export const shot = async (page: Page, name: string): Promise<void> => { if (process.env.QED_SHOTS) await page.screenshot({ path: join(process.env.QED_SHOTS, `${name}.png`), fullPage: true, animations: 'disabled' }) }
 
-/** The saved codes each account made by newOwner was shown at sign-up, by handle (H2 needs one for some actions). */
+/** The saved codes each account made by newOwner saved when they were offered after sign-up, by handle (H2 needs one for some actions). */
 export const signupCodes = new Map<string, string[]>()
 export async function newOwner(page: Page, base = ''): Promise<string> {
   const handle = unique('vlt')
   await page.goto(`${base}/`)
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill(`Owner ${handle}`)
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
+  // R14 (F1): the codes are made with the first device and shown once on the screen after it
   await expect(page.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10)
   signupCodes.set(handle, await page.getByRole('list', { name: 'Recovery codes' }).locator('li').allInnerTexts())
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)

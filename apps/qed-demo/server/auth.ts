@@ -10,10 +10,18 @@
  *               password typed again (stepUp) unlocks only what server/passkeys.ts allows it (a first passkey, and on an
  *               account with no passkey, the strongest confirmation it has).
  *   Throttling  five wrong passwords lock the account for fifteen minutes; attempts are also limited per address.
+ *   Email       (R14) an account opened with an email address signs in with that address or its handle. An address
+ *               nobody has confirmed reserves nothing, so several accounts may have been opened with one address, and
+ *               the address and the password together name the account. A sign-in by address costs one password
+ *               derivation whoever uses the address (emailTag), counts as a wrong password against every account it did
+ *               not open, and answers an address nobody uses exactly as a wrong password, a lock included.
  *
- * Errors for sign-in are deliberately identical whether the handle exists or not.
+ * Errors for sign-in are deliberately identical whether the handle or the address exists or not.
+ *
+ * Signing in is one of five separate operations (shared/access-operations.ts): a session opened here with a password
+ * (or by Google, server/google.ts) looks and prepares. It approves nothing and is never authority over the wallet.
  */
-import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
+import { createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { AppError, audit, bad, type Db, newId } from './core.ts'
 import { logAccess } from './records.ts'
 import { sha256hex } from './receipts.ts'
@@ -109,16 +117,41 @@ export function contextual(pw: string, own: string[] = []): boolean {
   for (const w of words) if (letters.includes(w)) { letters = letters.split(w).join(''); took = true }
   return took && letters.length < 4
 }
+/**
+ * What is wrong with a password, in words for its field; null when nothing is. `inside`: names of the person the password
+ * must not contain whole (the handle; the name before the @ of the address the account is opened with); `own`: the words
+ * it must not be built from (those, and the person's name). One rule for every way a password is set.
+ */
+export function passwordProblem(pw: string, inside: string[], own: string[]): string | null {
+  if (pw.length < 10) return 'Use at least 10 characters.'
+  if (pw.length > 200) return 'Use at most 200 characters.'
+  if (guessable(pw) || inside.some((w) => w.length >= 3 && pw.toLowerCase().includes(w.toLowerCase()))) return 'That password is too easy to guess.'
+  if (contextual(pw, own)) return 'That password is made from the name of this service or your own name or handle. Choose one that is not.'
+  return null
+}
+/**
+ * A new password for an existing account (a change, a reset), held to the rules the sign-up applied (review F11): not
+ * made from the handle, the name before the @ of the address the account was opened with, or the person's name. Throws
+ * the field error; returns the password.
+ */
+export function checkNewPassword(db: Db, personId: string, password: unknown): string {
+  const u = db.get<{ handle: string; display_name: string; email_key: string | null }>('SELECT handle, display_name, email_key FROM users WHERE id = ?', personId)
+  const local = u?.email_key ? u.email_key.slice(0, u.email_key.lastIndexOf('@')) : ''
+  const handle = u?.handle ?? ''
+  const pw = typeof password === 'string' ? password : ''
+  const problem = passwordProblem(pw, [handle, ...(local ? [local] : [])], [handle, local, u?.display_name ?? ''])
+  if (problem) throw bad('Check the highlighted field.', { password: problem })
+  return pw
+}
+export const HANDLE_RE = /^[a-z0-9][a-z0-9._-]{2,31}$/
 export function validateCredentials(handle: unknown, password: unknown, displayName?: unknown): { handle: string; password: string; displayName: string } {
   const fields: Record<string, string> = {}
   const h = typeof handle === 'string' ? handle.trim().toLowerCase() : ''
-  if (!/^[a-z0-9][a-z0-9._-]{2,31}$/.test(h)) fields.handle = 'Use 3 to 32 letters, digits, dots, dashes or underscores.'
+  if (!HANDLE_RE.test(h)) fields.handle = 'Use 3 to 32 letters, digits, dots, dashes or underscores.'
   const pw = typeof password === 'string' ? password : ''
   const named = typeof displayName === 'string' ? displayName : ''
-  if (pw.length < 10) fields.password = 'Use at least 10 characters.'
-  else if (pw.length > 200) fields.password = 'Use at most 200 characters.'
-  else if (guessable(pw) || (h && pw.toLowerCase().includes(h))) fields.password = 'That password is too easy to guess.'
-  else if (contextual(pw, [h, named])) fields.password = 'That password is made from the name of this service or your own name or handle. Choose one that is not.'
+  const problem = passwordProblem(pw, h ? [h] : [], [h, named])
+  if (problem) fields.password = problem
   const dn = typeof displayName === 'string' && displayName.trim() ? displayName.trim().slice(0, 60) : h
   if (Object.keys(fields).length) throw bad('Check the highlighted fields.', fields)
   return { handle: h, password: pw, displayName: dn }
@@ -169,13 +202,117 @@ export async function register(db: Db, input: { handle: unknown; password: unkno
 
 export interface NewSession { token: string; csrf: string; userId: string; expiresAt: number }
 const FAIL = new AppError(401, 'bad_credentials', 'That handle and password do not match.')
+const FAIL_EMAIL = new AppError(401, 'bad_credentials', 'That email and password do not match.')
+const locked = (): AppError => new AppError(429, 'locked', 'Too many wrong passwords. This account is locked for a few minutes.')
 
+// ---------------------------------------------------------------------------------------------- signing in by address
+
+/** Counted by the tests: how many password derivations sign-ins by address have run (one each, whoever uses the address). */
+export const work = { emailDerivations: 0 }
+/**
+ * This installation's own random salt for the sign-in tags, made at first use and kept in the database beside the hashes
+ * it salts (as every salt is): nobody can prepare guesses for an address before they hold the database.
+ */
+function installSalt(db: Db): Buffer {
+  const have = db.get<{ value: string }>(`SELECT value FROM meta WHERE key = 'email_login_salt'`)?.value
+  if (have) return Buffer.from(have, 'hex')
+  db.run(`INSERT OR IGNORE INTO meta (key, value) VALUES ('email_login_salt', ?)`, randomBytes(32).toString('hex'))
+  return Buffer.from(db.get<{ value: string }>(`SELECT value FROM meta WHERE key = 'email_login_salt'`)!.value, 'hex')
+}
+/**
+ * The sign-in tag of an address and a password: scrypt at the password hash's own cost, under a salt made from the address
+ * and the installation's salt. Every account opened with one address keeps its tag under the same salt, so one derivation
+ * answers for all of them: the time a sign-in by address takes says nothing about how many accounts use the address.
+ */
+export async function emailTag(db: Db, emailKey: string, password: string): Promise<string> {
+  work.emailDerivations++
+  const salt = createHmac('sha256', installSalt(db)).update(`qed/email-login/v1\n${emailKey}`).digest().subarray(0, 16)
+  return (await derive(password, salt)).toString('hex')
+}
+/** The tag for a person's own address and this password, to store beside a password hash; null when the account has no address. */
+export async function emailTagFor(db: Db, personId: string, password: string): Promise<{ emailKey: string; tag: string } | null> {
+  const emailKey = db.get<{ email_key: string | null }>('SELECT email_key FROM users WHERE id = ?', personId)?.email_key
+  return emailKey ? { emailKey, tag: await emailTag(db, emailKey, password) } : null
+}
+/**
+ * Keep a tag, bound to the password hash it was made for (pw_ref). Called in the transaction that writes that hash. A tag
+ * whose hash is no longer the account's matches nothing (loginWithEmail), so a path that changed the password without
+ * calling this stops the address signing in; it never leaves an old password working.
+ */
+export function storeEmailLogin(db: Db, personId: string, t: { emailKey: string; tag: string } | null, pwHash: string, now: number): void {
+  if (!t) { db.run('DELETE FROM email_logins WHERE person_id = ?', personId); return }
+  db.run('INSERT INTO email_logins (person_id, email_key, tag, pw_ref, created_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(person_id) DO UPDATE SET email_key = excluded.email_key, tag = excluded.tag, pw_ref = excluded.pw_ref, created_at = excluded.created_at', personId, t.emailKey, t.tag, sha256hex(pwHash), now)
+}
+
+/** A session opened with the password, its record and the person's access log. */
+function openPasswordSession(db: Db, userId: string, meta: { ip: string; ua: string }, by: 'handle' | 'email', now: number): NewSession {
+  const token = randomBytes(32).toString('base64url'), csrf = randomBytes(24).toString('base64url')
+  const expiresAt = now + ABSOLUTE_MS
+  db.tx(() => {
+    db.run('INSERT INTO sessions (id_hash, user_id, created_at, last_seen_at, expires_at, csrf, ua, stepup_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', sha256hex(token), userId, now, now, expiresAt, csrf, meta.ua.slice(0, 200), now)
+    capSessions(db, userId, now)
+    audit(db, now, userId, 'owner', 'login', userId, by === 'email' ? { method: 'password', by: 'email' } : { method: 'password' }, meta.ip)
+  })
+  logAccess(db, userId, 'sign-in', { method: 'password', ip: meta.ip, ua: meta.ua.slice(0, 200) }, now)
+  return { token, csrf, userId, expiresAt }
+}
+
+/** A wrong password counted against an account reached the allowance: lock it, record it, and tell its owner (ASVS 5.0 V6.3.5). */
+async function lockAndTell(db: Db, userId: string, isLocked: boolean, ip: string, now: number): Promise<void> {
+  const { securityEvent } = await import('./passkeys.ts')
+  db.tx(() => {
+    if (isLocked) db.run('UPDATE users SET failed_logins = 0, locked_until = ? WHERE id = ?', now + LOCK_MS, userId)
+    audit(db, now, userId, 'system', 'login.failed', userId, { locked: isLocked }, ip)
+    if (isLocked) securityEvent(db, userId, 'signin-locked', { until: now + LOCK_MS, failures: MAX_FAILS }, now)
+  })
+}
+
+/**
+ * Sign in with the address an account was opened with, and its password (R14).
+ *
+ *   - Five tries in fifteen minutes for one address, counted before any password is checked and whether or not any account
+ *     uses the address, so the sixth is refused the same way for an address nobody uses. A sign-in clears the count.
+ *   - One derivation (emailTag), then a comparison with the tag of every account opened with that address whose tag was made
+ *     for its present password and that is not locked. The oldest that matches is signed in.
+ *   - Every such account the try did not open counts it as a wrong password, before the password is checked, exactly as a
+ *     wrong password with its handle is counted, and locks at the same five: the address gives no guesses the handle does
+ *     not. That holds for a try that opened another account of the same address too, since it tested this one's password.
+ */
+async function loginWithEmail(db: Db, typed: string, password: string, meta: { ip: string; ua: string }, now: number): Promise<NewSession> {
+  const key = typed.toLowerCase().slice(0, 254)
+  const idKey = `login-email:${sha256hex(key)}`
+  if (!rateLimit(db, idKey, MAX_FAILS, LOCK_MS, now)) throw locked()
+  const rows = db.all<{ id: string; pw_hash: string; locked_until: number | null; tag: string; pw_ref: string }>(`SELECT u.id, u.pw_hash, u.locked_until, e.tag, e.pw_ref FROM email_logins e JOIN users u ON u.id = e.person_id
+    WHERE e.email_key = ? AND u.email_key = ? AND u.kind = 'person' ORDER BY u.created_at, u.id`, key, key)
+  const tried: { id: string; tag: string; attempt: number }[] = []
+  for (const r of rows) {
+    if (!r.pw_hash.startsWith('scrypt$') || r.pw_ref !== sha256hex(r.pw_hash) || (r.locked_until && r.locked_until > now)) continue
+    const c = db.get<{ failed_logins: number }>('UPDATE users SET failed_logins = failed_logins + 1 WHERE id = ? AND (locked_until IS NULL OR locked_until <= ?) RETURNING failed_logins', r.id, now)
+    if (!c) continue
+    if (c.failed_logins > MAX_FAILS) { db.run('UPDATE users SET failed_logins = 0, locked_until = ? WHERE id = ? AND (locked_until IS NULL OR locked_until <= ?)', now + LOCK_MS, r.id, now); continue }
+    tried.push({ id: r.id, tag: r.tag, attempt: c.failed_logins })
+  }
+  const tag = Buffer.from(await emailTag(db, key, password), 'hex')
+  let hit: string | undefined
+  // every tag is compared, so the time does not depend on which one matched
+  for (const t of tried) { const have = Buffer.from(t.tag, 'hex'); if (have.length === tag.length && timingSafeEqual(have, tag) && !hit) hit = t.id }
+  for (const t of tried) if (t.id !== hit) await lockAndTell(db, t.id, t.attempt >= MAX_FAILS, meta.ip, now)
+  if (!hit) throw FAIL_EMAIL
+  db.run('UPDATE users SET failed_logins = 0, locked_until = NULL WHERE id = ?', hit)
+  db.run('DELETE FROM rate_limits WHERE key = ?', idKey)
+  return openPasswordSession(db, hit, meta, 'email', now)
+}
+
+/** Sign in with a handle, or the address the account was opened with, and the password. */
 export async function login(db: Db, input: { handle: unknown; password: unknown }, meta: { ip: string; ua: string }, now: number): Promise<NewSession> {
-  const handle = typeof input.handle === 'string' ? input.handle.trim().toLowerCase() : ''
+  const typed = typeof input.handle === 'string' ? input.handle.trim() : ''
+  const handle = typed.toLowerCase()
   const password = typeof input.password === 'string' ? input.password : ''
   if (!rateLimit(db, `login:${meta.ip}`, 30, 15 * 60_000, now)) throw new AppError(429, 'too_many', 'Too many sign-in attempts. Wait a few minutes.')
+  // a handle never holds an @ (HANDLE_RE): what holds one is an address
+  if (typed.includes('@') && !typed.startsWith('@')) return loginWithEmail(db, typed, password, meta, now)
   const u = db.get<{ id: string; pw_hash: string; failed_logins: number; locked_until: number | null }>('SELECT id, pw_hash, failed_logins, locked_until FROM users WHERE handle = ?', handle)
-  if (u?.locked_until && u.locked_until > now) { await verifyPassword(password, await dummyHash()); throw new AppError(429, 'locked', 'Too many wrong passwords. This account is locked for a few minutes.') }
+  if (u?.locked_until && u.locked_until > now) { await verifyPassword(password, await dummyHash()); throw locked() }
   // An account made with a passkey has no password ('!'). It is answered exactly as an unknown handle is: the same
   // hash is computed, and no failure is counted, so neither the time taken nor a lock-out reveals that it exists.
   const hasPassword = !!u && u.pw_hash.startsWith('scrypt$')
@@ -189,45 +326,38 @@ export async function login(db: Db, input: { handle: unknown; password: unknown 
     if (!c || c.failed_logins > MAX_FAILS) {
       if (c) db.run('UPDATE users SET failed_logins = 0, locked_until = ? WHERE id = ? AND (locked_until IS NULL OR locked_until <= ?)', now + LOCK_MS, u.id, now)
       await verifyPassword(password, await dummyHash())
-      throw new AppError(429, 'locked', 'Too many wrong passwords. This account is locked for a few minutes.')
+      throw locked()
     }
     attempt = c.failed_logins
   }
   const matched = await verifyPassword(password, hasPassword ? u!.pw_hash : await dummyHash())
   const ok = hasPassword && matched
   if (!u || !ok) {
-    if (u && hasPassword) {
-      const locked = attempt >= MAX_FAILS
-      // The person is told, at once and on every confirmed address, that their password is being guessed (ASVS 5.0 V6.3.5):
-      // the lock holds the password only; their passkeys still sign in. The lock, its record and the notice together.
-      const { securityEvent } = await import('./passkeys.ts')
-      db.tx(() => {
-        if (locked) db.run('UPDATE users SET failed_logins = 0, locked_until = ? WHERE id = ?', now + LOCK_MS, u.id)
-        audit(db, now, u.id, 'system', 'login.failed', u.id, { locked }, meta.ip)
-        if (locked) securityEvent(db, u.id, 'signin-locked', { until: now + LOCK_MS, failures: MAX_FAILS }, now)
-      })
-    }
+    // The person is told, at once and on every confirmed address, that their password is being guessed (ASVS 5.0 V6.3.5):
+    // the lock holds the password only; their passkeys still sign in. The lock, its record and the notice together.
+    if (u && hasPassword) await lockAndTell(db, u.id, attempt >= MAX_FAILS, meta.ip, now)
     throw FAIL
   }
   db.run('UPDATE users SET failed_logins = 0, locked_until = NULL WHERE id = ?', u.id)
-  const token = randomBytes(32).toString('base64url'), csrf = randomBytes(24).toString('base64url')
-  const expiresAt = now + ABSOLUTE_MS
-  db.tx(() => {
-    db.run('INSERT INTO sessions (id_hash, user_id, created_at, last_seen_at, expires_at, csrf, ua, stepup_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', sha256hex(token), u.id, now, now, expiresAt, csrf, meta.ua.slice(0, 200), now)
-    capSessions(db, u.id, now)
-    audit(db, now, u.id, 'owner', 'login', u.id, { method: 'password' }, meta.ip)
-  })
-  logAccess(db, u.id, 'sign-in', { method: 'password', ip: meta.ip, ua: meta.ua.slice(0, 200) }, now)
-  return { token, csrf, userId: u.id, expiresAt }
+  // An account opened with an address whose tag is missing, or was made for an earlier password, gets it back now that the
+  // password is known to be right: the address signs in again from the next time.
+  const tagged = db.get<{ email_key: string | null; pw_ref: string | null }>('SELECT u.email_key, e.pw_ref FROM users u LEFT JOIN email_logins e ON e.person_id = u.id AND e.email_key = u.email_key WHERE u.id = ?', u.id)
+  if (tagged?.email_key && tagged.pw_ref !== sha256hex(u.pw_hash)) {
+    const t = await emailTagFor(db, u.id, password)
+    db.tx(() => { if (db.get<{ pw_hash: string }>('SELECT pw_hash FROM users WHERE id = ?', u.id)?.pw_hash === u.pw_hash) storeEmailLogin(db, u.id, t, u.pw_hash, now) })
+  }
+  return openPasswordSession(db, u.id, meta, 'handle', now)
 }
 
 /**
- * stepUpFresh: re-authenticated with a passkey within STEPUP_MS. A password re-entry (legacy accounts only) sets
- * passwordStepUpFresh instead, which unlocks nothing but adding a first passkey.
+ * stepUpFresh: re-authenticated with a passkey within STEPUP_MS. A password re-entry sets passwordStepUpFresh instead,
+ * and a confirmation with Google again (R14, server/google.ts) googleStepUpFresh: either unlocks nothing but adding a
+ * first passkey and, on an account with no passkey, what its strongest confirmation may change (passkeys.ts strongConfirm).
+ * Neither is ever a passkey confirmation: nothing that needs stepUpFresh accepts them.
  * signinOnly: opened with a passkey that signs in only (one a recovery registered, or one added after a password reset,
  * R12), read from that passkey now: such a session confirms nothing, like a password session (review H2).
  */
-export interface Session { userId: string; csrf: string; sessionHash: string; stepUpFresh: boolean; passwordStepUpFresh: boolean; expiresAt: number; authMethod: string; credentialId: string | null; workspaceId: string; signinOnly?: boolean
+export interface Session { userId: string; csrf: string; sessionHash: string; stepUpFresh: boolean; passwordStepUpFresh: boolean; googleStepUpFresh?: boolean; expiresAt: number; authMethod: string; credentialId: string | null; workspaceId: string; signinOnly?: boolean
   /** The passkey that gave the fresh confirmation (stepUpFresh); null when none is fresh, or for a session from before v8 (r). */
   confirmedBy?: string | null }
 export function sessionFor(db: Db, token: string | undefined, now: number): Session | null {
@@ -239,8 +369,19 @@ export function sessionFor(db: Db, token: string | undefined, now: number): Sess
   if (now - s.last_seen_at > 60_000) db.run('UPDATE sessions SET last_seen_at = ? WHERE id_hash = ?', now, h)
   const fresh = s.stepup_at !== null && now - s.stepup_at <= STEPUP_MS
   const passkeyFresh = fresh && s.stepup_method === 'passkey'
-  return { userId: s.user_id, csrf: s.csrf, sessionHash: h, stepUpFresh: passkeyFresh, passwordStepUpFresh: fresh && s.stepup_method === 'password', expiresAt: s.expires_at, authMethod: s.auth_method, credentialId: s.credential_id, workspaceId: s.workspace_id ?? s.user_id, signinOnly: s.credential_id !== null && s.authority === 'signin',
+  return { userId: s.user_id, csrf: s.csrf, sessionHash: h, stepUpFresh: passkeyFresh, passwordStepUpFresh: fresh && s.stepup_method === 'password', googleStepUpFresh: fresh && s.stepup_method === 'google', expiresAt: s.expires_at, authMethod: s.auth_method, credentialId: s.credential_id, workspaceId: s.workspace_id ?? s.user_id, signinOnly: s.credential_id !== null && s.authority === 'signin',
     confirmedBy: passkeyFresh ? s.stepup_credential_id : null }
+}
+
+/**
+ * Inside the transaction that opens an account: the session the browser presented ends with it (ASVS 5.0 V7.2.4), or
+ * neither happens. Done after the account's own transaction (api.ts signedIn), a store that refused this one write (a
+ * full disk) left an account made behind an answer that said nothing was changed (R14: found when sign-up stopped
+ * writing ten saved codes, which had been the write that failed first).
+ */
+export function endPresented(db: Db, token: string | undefined, ip: string, now: number): void {
+  const who = logout(db, token, now)
+  if (who) audit(db, now, who, 'system', 'session.replaced-by-sign-in', who, {}, ip)
 }
 
 /** Ends the session of this token, if it is live; returns its person, so that the end can be recorded. */

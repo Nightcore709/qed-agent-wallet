@@ -111,8 +111,30 @@ export const V8_TABLES: readonly string[] = ['dispute_pauses', 'channel_terms', 
 /** What schema v9 added (R14, server/core.ts): part (d), Grow's watchlist, made by schema.sql at every open. */
 export const V9_TABLES: readonly string[] = ['watchlist_items']
 
-/** Take what schema v9 added out of a closed database file this build made, and set the version to 8: the shape v8 left. */
+/**
+ * What schema v10 added (R14 account access, part (a); server/core.ts): two columns on users with their index, and three
+ * tables of their own (their indexes go with them).
+ */
+export const V10_COLUMNS: readonly [string, string][] = [['users', 'email'], ['users', 'email_key']]
+export const V10_INDEXES: readonly string[] = ['users_email_key']
+export const V10_TABLES: readonly string[] = ['email_logins', 'federated_identities', 'oauth_states']
+
+/** Take what schema v10 added out of a closed database file this build made, and set the version to 9: the shape production has after the watchlist's release. */
+export function toSchemaV9(path: string): void {
+  const raw = new DatabaseSync(path)
+  try {
+    raw.exec('BEGIN IMMEDIATE')
+    for (const t of V10_TABLES) raw.exec(`DROP TABLE IF EXISTS ${t}`)
+    for (const i of V10_INDEXES) raw.exec(`DROP INDEX IF EXISTS ${i}`)
+    for (const [t, c] of V10_COLUMNS) raw.exec(`ALTER TABLE ${t} DROP COLUMN ${c}`)
+    raw.exec(`UPDATE meta SET value = '9' WHERE key = 'schema_version'`)
+    raw.exec('COMMIT')
+  } catch (e) { if (raw.isTransaction) raw.exec('ROLLBACK'); throw e } finally { raw.close() }
+}
+
+/** Take what schemas v9 and v10 added out of a closed database file this build made, and set the version to 8: the shape v8 left. */
 export function toSchemaV8(path: string): void {
+  toSchemaV9(path)
   const raw = new DatabaseSync(path)
   try {
     raw.exec('BEGIN IMMEDIATE')
@@ -122,7 +144,7 @@ export function toSchemaV8(path: string): void {
   } catch (e) { if (raw.isTransaction) raw.exec('ROLLBACK'); throw e } finally { raw.close() }
 }
 
-/** Take what schema v8 added out of a closed database file this build made, and set the version to 7: the shape v7 left. */
+/** Take what schemas v8, v9 and v10 added out of a closed database file this build made, and set the version to 7: the shape v7 left. */
 export function toSchemaV7(path: string): void {
   toSchemaV8(path)
   const raw = new DatabaseSync(path)

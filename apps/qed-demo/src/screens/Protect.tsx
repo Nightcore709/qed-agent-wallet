@@ -182,6 +182,8 @@ interface SecurityBrief {
   contacts: { handle: string; active: boolean; acceptedAt: number | null; hasPasskey?: boolean }[]
   sessions: { current: boolean; method: string; device: string | null }[]
   recoveryCodesLeft: number
+  /** R14: whether saved codes were ever made (none is at sign-up), so "none yet" is not said as "none left". */
+  codesMade?: boolean
   recoveries: { started_at: number; available_at: number; cancelled_at: number | null; completed_at: number | null }[]
   scheduled: { kind: string; effective_at: number }[]
   secondMethod: { contacts: number; password: boolean }
@@ -225,7 +227,7 @@ function verdict(sec: SecurityBrief | null): { text: string; tone: Tone; facts: 
     : keys === 0 ? ['No passkey can sign for you yet', 'void']
     : keys === 1 && noSecond ? ['One lost device would lose this account', 'wait']
     : noSecond ? ['A saved code alone cannot recover this account', 'wait']
-    : sec.recoveryCodesLeft === 0 ? ['No saved recovery codes are left', 'wait']
+    : sec.recoveryCodesLeft === 0 ? [sec.codesMade === false ? 'No saved recovery codes yet' : 'No saved recovery codes are left', 'wait']
     : keys === 1 ? ['You can get back in if you lose your device', 'ok']
     : ['Every safeguard here is in place', 'ok']
   const second = issuer ? `@${issuer.handle} can help you recover` : sec.secondMethod.password ? 'your password stands in for a recovery contact' : 'no recovery contact'
@@ -244,7 +246,7 @@ function needsOf({ sec, engine, home, chain, recoveryKeys }: { sec: SecurityBrie
     if (open) out.push({ to: 'pr-recovery', text: 'A recovery has started: stop it if it was not you', tone: 'void' })
     if (keys === 0) out.push({ to: 'pr-passkeys', text: 'Add a passkey: nothing can be approved yet', tone: 'void' })
     else if (keys === 1) out.push({ to: 'pr-passkeys', text: 'Add a second passkey', tone: 'wait' })
-    if (!open && !(sec.recoveryCodesLeft > 0 && (issuer || sec.secondMethod.password))) out.push({ to: 'pr-recovery', text: sec.recoveryCodesLeft === 0 ? 'Make new recovery codes' : 'Name a recovery contact', tone: 'wait' })
+    if (!open && !(sec.recoveryCodesLeft > 0 && (issuer || sec.secondMethod.password))) out.push({ to: 'pr-recovery', text: sec.recoveryCodesLeft === 0 ? (sec.codesMade === false ? 'Save recovery codes' : 'Make new recovery codes') : 'Name a recovery contact', tone: 'wait' })
     if (sec.scheduled.length) out.push({ to: 'pr-waiting', text: `Check ${sec.scheduled.length === 1 ? 'the change' : `the ${sec.scheduled.length} changes`} waiting to take effect`, tone: 'wait' })
     const byPassword = sec.sessions.filter((x) => x.method === 'password').length
     if (byPassword && sec.sessions.length > 1) out.push({ to: 'pr-sessions', text: `Check ${byPassword === 1 ? 'the session' : `the ${byPassword} sessions`} opened with a password`, tone: 'wait' })

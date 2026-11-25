@@ -19,10 +19,10 @@ test.afterAll(async () => { await s?.stop() })
 async function signUp(page: Page, handle: string): Promise<void> {
   await page.goto(`${s.base}/`)
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Meera Iyer')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
   await page.getByRole('button', { name: 'Continue' }).click()
 }
 const bodyText = (page: Page): Promise<string> => page.locator('body').innerText()

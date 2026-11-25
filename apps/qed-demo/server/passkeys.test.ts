@@ -22,6 +22,7 @@ async function signup(db: ReturnType<typeof openDb>, handle = 'asha', now = T0) 
   const auth = new SoftAuthenticator({ origin: RP.origins[0]! })
   const b = await beginSignup(db, RP, { handle, displayName: 'Asha' }, META.ip, now)
   const r = await finishSignup(db, RP, { challengeId: b.challengeId, response: auth.create(b.options as never) }, META, now)
+  // R14 (F1): the sign-up makes the account's saved codes with its first device, and returns them
   return { auth, ...r }
 }
 async function signin(db: ReturnType<typeof openDb>, auth: SoftAuthenticator, now: number, overrides: { origin?: string } = {}) {
@@ -39,9 +40,11 @@ describe('passkeys: sign-up and sign-in', () => {
     await beginSignup(db, RP, { handle: 'nexthour', displayName: 'P' }, '203.0.113.7', T0 + 3600_000)
   })
 
-  it('creates an account only from a verified passkey, with no password, its own workspace and ten single-use recovery codes', async () => {
+  it('creates an account only from a verified passkey, with no password and its own workspace; saved codes, once made, are ten and single-use in form', async () => {
     const db = openDb(':memory:')
     const { personId, recoveryCodes, session } = await signup(db)
+    // R14 (F1): the ten are made with the first device, in the sign-up's own transaction (server/access-codes.test.ts)
+    expect(db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ?', personId)!.n).toBe(10)
     expect(db.get<{ kind: string; pw_hash: string }>('SELECT kind, pw_hash FROM users WHERE id = ?', personId)).toEqual({ kind: 'person', pw_hash: '!' })
     expect(db.get('SELECT role FROM memberships WHERE workspace_id = ? AND person_id = ?', personId, personId)).toEqual({ role: 'owner' })
     expect(recoveryCodes).toHaveLength(10)

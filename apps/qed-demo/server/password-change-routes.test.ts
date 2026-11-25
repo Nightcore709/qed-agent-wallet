@@ -62,6 +62,8 @@ describe('changing and removing a password', () => {
   async function passwordAccountWithPasskey(handle: string, password: string) {
     const owner = client(), key = authenticatorFor(PORT)
     const made = await owner.ok('POST', '/api/auth/signup', { handle, password, displayName: `Person ${handle}` })
+    // R14: sign-up makes no saved codes; this account makes its set first (the password just typed confirms it), as these tests rely on them
+    await owner.ok('POST', '/api/security/recovery-codes', {})
     const b = await owner.ok('POST', '/api/security/passkeys/begin')
     await owner.ok('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response: key.create(b.options) })
     return { owner, key, made }

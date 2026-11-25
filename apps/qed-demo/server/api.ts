@@ -30,10 +30,12 @@ import { stopPreview } from './stop-preview.ts'
 import { pauseWithCode } from './stop-with-code.ts'
 import { actor, changeRole, createBusiness, enforcementOf, listWorkspaces, members, membership, pendingGrants, policyOf, type PolicyPatch, removeMember, requestMember, type Role, setPolicy, switchWorkspace } from './workspaces.ts'
 import { IDLE_MS, login, logout, logoutEverywhere, rateLimit, type Session, sessionFor, STEPUP_MS, stepUp } from './auth.ts'
+import { emailState, resendEmailConfirmation, signUpWithEmail } from './access.ts'
+import { beginGoogle, finishGoogle, googleIdentities, unlinkGoogle } from './google.ts'
 import {
   acceptContact, approvalChallenge, authorityOf, beginAddPasskey, beginLogin, beginReauth, beginRecoveryPasskey, beginSignup, cancelRecovery, cancelScheduledChange, changePassword,
-  finishAddPasskey, finishLogin, finishReauth, finishRecoveryPasskey, finishSignup, hasApprovingPasskey, hasPasskey, issueContactCode, nominateContact, regenerateRecoveryCodesWithCode,
-  PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, refuseCoolingOff, relyingParty, removeContact, removePassword, restrictedError, revokeSession, signOutOtherSessions, scheduleRemovePasskey, scheduleUnsuspend, securityView, signUpWithPassword, startRecovery, suspendPasskeyWithCode, removePasskeyWithCode,
+  finishAddPasskey, finishLogin, regenerateJustMadeCodes, finishReauth, finishRecoveryPasskey, finishSignup, hasApprovingPasskey, hasPasskey, issueContactCode, nominateContact, regenerateRecoveryCodesWithCode,
+  PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, refuseCoolingOff, relyingParty, hasPassword, removeContact, removePassword, restrictedError, revokeSession, signOutOtherSessions, scheduleRemovePasskey, scheduleUnsuspend, securityView, signUpWithPassword, startRecovery, suspendPasskeyWithCode, removePasskeyWithCode,
 } from './passkeys.ts'
 import {
   addAddress, beginAuthorityRequest, beginRecoveryFromLink, cancelAuthorityRequest, confirmAddressByCode, confirmAddressByLink, contactCancel, contactCancelLoosening, contactPause, finishAuthorityRequest,
@@ -172,11 +174,12 @@ const requireStepUp = (r: Req): void => {
  */
 const requireSettled = (r: Req, what: string): void => { requireStepUp(r); refuseCoolingOff(r.db, r.session, what, r.now) }
 /**
- * A session that cannot confirm anything by itself: opened with a password (D-094: a password can be phished), or with a
- * passkey that signs in only (R12: one a recovery registered, or one added after a password reset). Every rule written
- * for a password session holds for both (review H2).
+ * A session that cannot confirm anything by itself: opened with a password (D-094: a password can be phished), by Google
+ * (R14: an ordinary sign-in, like a password), or with a passkey that signs in only (R12: one a recovery registered, or
+ * one added after a password reset). Every rule written for a password session holds for all three (review H2). Written
+ * as "anything but a passkey", so a way of signing in added later is weak until someone decides otherwise.
  */
-const weakSession = (s: Session): boolean => s.authMethod === 'password' || s.signinOnly === true
+const weakSession = (s: Session): boolean => s.authMethod !== 'passkey' || s.signinOnly === true
 /** How the acting session was opened, as work it prepares records it (prepared.ts): a sign-in-only passkey is said apart. */
 const preparedMethod = (s: Session): string => (s.signinOnly ? 'signin-passkey' : s.authMethod)
 /**
@@ -256,15 +259,25 @@ const requireSetup = (r: Req): void => { if (!getProfile(r.db, r.userId).setup) 
 // A new account is created with a passkey, or with a handle and a password (D-094). A password session can read
 // everything, set up the household and add its first passkey; it approves nothing, because every approval below is a
 // passkey signature over the exact terms.
+// R14: the ordinary sign-up is an email address and a password (server/access.ts). The answer is the same whether or not
+// another account uses the address. A request with a handle and no address opens an account as before R14 (the accounts and
+// programs that sign up that way keep working). Neither makes saved recovery codes (there is no device yet): the first device does (F1), and no forced codes step follows.
 route('POST', '/api/auth/signup', async (r) => {
-  const out = await signUpWithPassword(r.db, { handle: r.body.handle, password: r.body.password, displayName: r.body.displayName }, { ip: r.ip, ua: ua(r) }, r.now)
-  signedIn(r, out.session.token, out.session.expiresAt)
-  return { userId: out.personId, csrf: out.session.csrf, recoveryCodes: out.recoveryCodes }
+  // replaces: the session this browser presented ends in the account's own transaction (auth.ts endPresented), not after it
+  const meta = { ip: r.ip, ua: ua(r), replaces: cookieOf(r.req, r.cfg.cookieName) }
+  if (r.body.email !== undefined && r.body.email !== null && r.body.email !== '') {
+    const out = await signUpWithEmail(r.db, { email: r.body.email, password: r.body.password, displayName: r.body.displayName, handle: r.body.handle }, meta, r.now)
+    setCookie(r, out.session.token, out.session.expiresAt)
+    return { userId: out.personId, csrf: out.session.csrf, handle: out.handle, email: out.email }
+  }
+  const out = await signUpWithPassword(r.db, { handle: r.body.handle, password: r.body.password, displayName: r.body.displayName }, meta, r.now)
+  setCookie(r, out.session.token, out.session.expiresAt)
+  return { userId: out.personId, csrf: out.session.csrf }
 }, false)
 route('POST', '/api/auth/passkey/signup/begin', (r) => beginSignup(r.db, rp(r), { handle: r.body.handle, displayName: r.body.displayName }, r.ip, r.now), false)
 route('POST', '/api/auth/passkey/signup/finish', async (r) => {
-  const out = await finishSignup(r.db, rp(r), { challengeId: r.body.challengeId, response: r.body.response, passkeyName: r.body.passkeyName }, { ip: r.ip, ua: ua(r) }, r.now)
-  signedIn(r, out.session.token, out.session.expiresAt)
+  const out = await finishSignup(r.db, rp(r), { challengeId: r.body.challengeId, response: r.body.response, passkeyName: r.body.passkeyName }, { ip: r.ip, ua: ua(r), replaces: cookieOf(r.req, r.cfg.cookieName) }, r.now)
+  setCookie(r, out.session.token, out.session.expiresAt)
   return { userId: out.personId, csrf: out.session.csrf, recoveryCodes: out.recoveryCodes }
 }, false)
 route('POST', '/api/auth/passkey/login/begin', (r) => beginLogin(r.db, rp(r), r.now), false)
@@ -308,6 +321,36 @@ route('POST', '/api/auth/recovery/link/passkey/finish', async (r) => {
 }, false)
 // Confirming an email address with the link sent to it: the link proves the mailbox, so no session is needed.
 route('POST', '/api/auth/email/confirm', (r) => confirmAddressByLink(r.db, r.body.token, r.ip, r.now), false)
+// --- R14: sign-in with Google (server/google.ts). The routes exist only while it is configured (both client settings set);
+// otherwise they answer as any unknown address does, and the interface renders no button. ---
+const google = (r: Req) => { if (!r.cfg.google) throw notFound('Sign-in with Google'); return r.cfg.google }
+const OAUTH_COOKIE = (r: Req): string => (r.cfg.cookieName.startsWith('__Host-') ? '__Host-qed_oauth' : 'qed_oauth')
+/** The value only the browser that began a Google sign-in holds: HttpOnly, this site only, ten minutes (login CSRF). */
+const bindBrowser = (r: Req, binding: string, expiresAt: number): void => { r.res.appendHeader('Set-Cookie', `${OAUTH_COOKIE(r)}=${binding}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${Math.floor((expiresAt - r.now) / 1000)}${r.cfg.secureCookies ? '; Secure' : ''}`) }
+const unbindBrowser = (r: Req): void => { r.res.appendHeader('Set-Cookie', `${OAUTH_COOKIE(r)}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${r.cfg.secureCookies ? '; Secure' : ''}`) }
+// Entering the account with Google: opens a session that looks and prepares, like a password session, and nothing more.
+route('POST', '/api/auth/google/begin', (r) => { const b = beginGoogle(r.db, google(r), 'signin', null, r.ip, r.now); bindBrowser(r, b.binding, b.expiresAt); return { url: b.url } }, false)
+route('POST', '/api/auth/google/finish', async (r) => {
+  const g = google(r), binding = cookieOf(r.req, OAUTH_COOKIE(r))
+  // the binding cookie is spent either way; on success it is cleared after the session cookie is set (which replaces the header)
+  // replaces: the session this browser presented ends inside the account's transaction (F12), as at sign-up
+  const out = await finishGoogle(r.db, g, { code: r.body.code, state: r.body.state, iss: r.body.iss, binding, only: 'signin' }, null, { ip: r.ip, ua: ua(r), replaces: cookieOf(r.req, r.cfg.cookieName) }, r.now).catch((e: unknown) => { unbindBrowser(r); throw e })
+  setCookie(r, out.session!.token, out.session!.expiresAt)
+  unbindBrowser(r)
+  return { purpose: out.purpose, userId: out.personId, csrf: out.session!.csrf, created: out.created === true }
+}, false)
+// From a signed-in session: add Google to this account ('link': the account's strongest confirmation, at the start and
+// again when Google answers), or confirm with Google again ('confirm': for an account that Google signs in to).
+route('POST', '/api/security/google/begin', (r) => { const b = beginGoogle(r.db, google(r), r.body.purpose === 'confirm' ? 'confirm' : 'link', r.session, r.ip, r.now); bindBrowser(r, b.binding, b.expiresAt); return { url: b.url } })
+route('POST', '/api/security/google/finish', async (r) => {
+  const g = google(r), binding = cookieOf(r.req, OAUTH_COOKIE(r))
+  unbindBrowser(r)
+  const out = await finishGoogle(r.db, g, { code: r.body.code, state: r.body.state, iss: r.body.iss, binding, only: 'session' }, r.session, { ip: r.ip, ua: ua(r) }, r.now)
+  return { purpose: out.purpose, ok: true }
+})
+route('POST', '/api/security/google/:id/remove', (r) => { google(r); unlinkGoogle(r.db, r.session, r.params[0]!, r.ip, r.now); return { ok: true } })
+// The confirmation of the address the account was opened with, sent again. Refused in words where nothing can be sent.
+route('POST', '/api/security/email/resend', (r) => ({ email: resendEmailConfirmation(r.db, r.personId, r.now) }))
 // The local test outbox's developer page (server/delivery.ts): only while the outbox is the delivery, which a public
 // origin refuses. Every message in it is simulated; the answer says so first.
 route('GET', '/api/dev/outbox', (r) => { if (r.cfg.delivery !== 'outbox') throw notFound('The developer outbox'); return outboxView(r.db, Number(r.query.get('limit')) || 60) }, false)
@@ -316,9 +359,16 @@ route('GET', '/api/dev/outbox', (r) => { if (r.cfg.delivery !== 'outbox') throw 
 // `wallet`: whether the workspace this session acts in has an on-chain wallet, read from the record GET /api/vault/signers
 // needs (and GET /api/vault already reports to any member), so that Security asks for signers only when there are some
 // (EV-071: it asked anyway, and each 409 was logged in the browser as an error).
-route('GET', '/api/security', (r) => ({ ...(securityView(r.db, r.session, r.now) as Json), wallet: { setUp: vaultOf(r.db, r.userId) !== null } }))
+route('GET', '/api/security', (r) => ({ ...(securityView(r.db, r.session, r.now) as Json), wallet: { setUp: vaultOf(r.db, r.userId) !== null },
+  // R14: the address the account was opened with, and the Google accounts that sign in to it (none where it is not configured)
+  // codesMade: whether saved codes were ever made (none is at sign-up now), so the page says "none yet", not "none left"
+  codesMade: !!r.db.get('SELECT 1 FROM recovery_codes WHERE person_id = ?', r.session.userId),
+  email: emailState(r.db, r.session.userId, r.now), google: { enabled: !!r.cfg.google, standIn: r.cfg.google?.standIn === true, identities: googleIdentities(r.db, r.session.userId) } }))
 route('POST', '/api/security/passkeys/begin', (r) => beginAddPasskey(r.db, rp(r), r.session, r.now))
-route('POST', '/api/security/passkeys/finish', async (r) => { const c = await finishAddPasskey(r.db, rp(r), r.session, { challengeId: r.body.challengeId, response: r.body.response, passkeyName: r.body.passkeyName }, ua(r), r.now); return { passkey: { id: c.id, name: c.name } } })
+// recoveryCodes: the saved codes, made with the account's first device when it held none, shown once (R14, F1; H2)
+route('POST', '/api/security/passkeys/finish', async (r) => { const c = await finishAddPasskey(r.db, rp(r), r.session, { challengeId: r.body.challengeId, response: r.body.response, passkeyName: r.body.passkeyName }, ua(r), r.now); return { passkey: { id: c.id, name: c.name }, ...(c.recoveryCodes ? { recoveryCodes: c.recoveryCodes } : {}), ...(c.replacedEarlier ? { replacedEarlier: true } : {}) } })
+// R3: the session that was shown a first-device set and did not save it may ask for a fresh one, once, within 30 minutes (passkeys.ts)
+route('POST', '/api/security/recovery-codes/again', (r) => ({ codes: regenerateJustMadeCodes(r.db, r.session, r.now) }))
 route('POST', '/api/security/passkeys/:id/remove', (r) => removePasskeyWithCode(r.db, r.session, r.params[0]!, (r.body as { code?: unknown } | undefined)?.code, r.now))
 // R13: suspending a passkey also freezes it at once on every on-chain wallet it signs for (server/rail-signers.ts
 // containPerson; retried on the engine's vault round when the vault service cannot be reached).
@@ -375,14 +425,20 @@ route('GET', '/api/session', (r) => {
   const delays = { recoveryMs: RECOVERY_DELAY_MS, protectionMs: PROTECTION_DELAY_MS, newPayeeHoldTestMs: testHoldMs() }
   // Signed out, the reply names no backend component (ASVS 5.0 V13.4.6): which model provider is configured is told only
   // to a signed-in person.
-  if (!s) return { authenticated: false, presentation: r.cfg.presentation, delivery: r.cfg.delivery, delays, defaults: { opening: DEFAULT_OPENING, profile: DEFAULT_PROFILE } }
+  // signIn.google: whether sign-in with Google is configured here (the button is rendered only then); 'stand-in' on a test
+  // stack whose issuer is the local stand-in, which the button then says. Phone sign-in has no provider: nothing is offered.
+  const signIn = { google: r.cfg.google ? (r.cfg.google.standIn ? 'stand-in' as const : true) : false }
+  if (!s) return { authenticated: false, presentation: r.cfg.presentation, delivery: r.cfg.delivery, delays, signIn, defaults: { opening: DEFAULT_OPENING, profile: DEFAULT_PROFILE } }
   const u = r.db.get<{ id: string; handle: string; display_name: string; created_at: number }>('SELECT id, handle, display_name, created_at FROM users WHERE id = ?', s.userId)!
   const m = membership(r.db, s.workspaceId, s.userId)
   const wsId = m ? s.workspaceId : s.userId
   const w = r.db.get<{ id: string; display_name: string; kind: string; stop_at: number | null; stop_reason: string | null; stop_protective: number }>('SELECT id, display_name, kind, stop_at, stop_reason, stop_protective FROM users WHERE id = ?', wsId)!
   const profile = getProfile(r.db, wsId)
   return {
-    authenticated: true, presentation: r.cfg.presentation, delivery: r.cfg.delivery, delays, csrf: s.csrf, stepUpFresh: s.stepUpFresh, sessionExpiresAt: s.expiresAt, authMethod: s.authMethod, hasPasskey: hasPasskey(r.db, s.userId),
+    authenticated: true, presentation: r.cfg.presentation, delivery: r.cfg.delivery, delays, signIn, csrf: s.csrf, stepUpFresh: s.stepUpFresh, sessionExpiresAt: s.expiresAt, authMethod: s.authMethod, hasPasskey: hasPasskey(r.db, s.userId),
+    // R14: the address the account was opened with and whether it is confirmed; whether it has a password; and how many
+    // unused saved codes it holds (none are made at sign-up now, so the screens lead to them at the right moment)
+    email: emailState(r.db, s.userId, r.now), hasPassword: hasPassword(r.db, s.userId), recoveryCodesLeft: r.db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', s.userId)?.n ?? 0,
     // R12: 'restricted' while every passkey signs in only (after a recovery); the request for authority, if one waits.
     authority: authorityOf(r.db, s.userId),
     // The authority of the passkey this session was opened with: 'signin' when it was registered by a recovery (or after a

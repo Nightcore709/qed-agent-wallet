@@ -155,7 +155,7 @@ const LOG = (why: string) => ({ period: 'log' as const, why })
 
 export const TABLES: Record<string, Rule> = {
   // identity and sign-in
-  users: { scope: 'person', where: 'id = ?', withhold: ['pw_hash'], onDelete: 'scrub', scrub: { handle: `'erased-' || id`, display_name: `'Erased account'`, pw_hash: `'!'`, profile_json: `'{}'`, stop_reason: 'NULL' }, note: 'The row stays, under a pseudonymous id, because the records kept point to it' },
+  users: { scope: 'person', where: 'id = ?', withhold: ['pw_hash'], onDelete: 'scrub', scrub: { handle: `'erased-' || id`, display_name: `'Erased account'`, pw_hash: `'!'`, profile_json: `'{}'`, stop_reason: 'NULL', email: 'NULL', email_key: 'NULL' }, note: 'The row stays, under a pseudonymous id, because the records kept point to it' },
   sessions: { scope: 'person', where: OWN_WS, withhold: ['id_hash', 'csrf'], onDelete: 'delete' },
   webauthn_credentials: { scope: 'person', where: 'person_id = ?', withhold: ['public_key', 'x', 'y'], onDelete: 'delete' },
   webauthn_challenges: { scope: 'person', where: 'person_id = ?', withhold: ['challenge'], onDelete: 'delete' },
@@ -164,6 +164,11 @@ export const TABLES: Record<string, Rule> = {
   recovery_contacts: { scope: 'person', where: 'person_id = ? OR contact_id = ?', onDelete: 'delete' },
   contact_codes: { scope: 'person', where: 'person_id = ? OR contact_id = ?', withhold: ['salt', 'code_hash'], onDelete: 'delete' },
   contact_points: { scope: 'person', where: 'person_id = ?', onDelete: 'delete' },
+  // v9 (a), account access: the sign-in tag is a password-equivalent hash and is never exported; a Google identity is the
+  // person's (its issuer and subject name them at Google); an OpenID Connect state lives ten minutes and holds only secrets
+  email_logins: { scope: 'person', where: 'person_id = ?', withhold: ['tag', 'pw_ref'], onDelete: 'delete' },
+  federated_identities: { scope: 'person', where: 'person_id = ?', onDelete: 'delete' },
+  oauth_states: { scope: 'person', where: 'person_id = ?', withhold: ['state_hash', 'nonce', 'verifier', 'binding_hash', 'session_hash'], onDelete: 'delete' },
   one_time_tokens: { scope: 'person', where: 'person_id = ?', withhold: ['token_hash', 'code_salt', 'code_hash'], onDelete: 'delete' },
   outbound_messages: { scope: 'person', where: 'person_id = ?', onDelete: 'delete' },
   scheduled_changes: { scope: 'person', where: 'person_id = ? OR workspace_id = ?', onDelete: 'delete' },

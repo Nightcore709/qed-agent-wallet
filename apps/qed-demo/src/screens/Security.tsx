@@ -14,12 +14,14 @@ import { Clock, KeyRound, Laptop, LifeBuoy, LogIn, Mail, MessageSquare, MonitorS
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import type { Job } from '../../chain/types.ts'
 import { api, ApiError, beginSignOut, endSignOut, fmt, navigate, useData, useNow } from '../lib/core.ts'
-import { addPasskey, confirmWithPasskey, cosignRecovery, withdrawCosignature, deviceWords, newRecoveryCode, recoverWallet, recoveryKeyFrom, recoveryKeyRequest, requestAuthority } from '../lib/passkey.ts'
+import { addPasskey, beginGoogle, confirmWithPasskey, cosignRecovery, withdrawCosignature, deviceWords, newRecoveryCode, recoverWallet, recoveryKeyFrom, recoveryKeyRequest, requestAuthority } from '../lib/passkey.ts'
 import { Btn, Field, Link, Loading, Note, PasswordField, Problem, Sheet, Stamp, useAction, useMasonry, useSession } from '../ui/kit.tsx'
 import { delayWords, durationWords as dur, listed, Mark, NORMAL_DELAY_MS, sessionDevice } from './Protect.tsx'
 import { useVaultApproval } from './Vault.tsx'
 import { profileChangeLines } from '../lib/words.ts'
 import { noDeliveryWords } from '../../shared/delivery-words.ts'
+import { OPERATIONS } from '../../shared/access-operations.ts'
+import { SavedCodes } from '../ui/SavedCodes.tsx'
 
 // Safeguards and the words test read these from here; they live with the other Protect pages' helpers.
 export { delayWords, sessionDevice }
@@ -38,6 +40,8 @@ interface SecurityView {
   addresses: Address[]
   sessions: { id: string; current: boolean; createdAt: number; lastSeenAt: number; device: string | null; method: string }[]
   recoveryCodesLeft: number
+  /** R3: until when this session may ask for a fresh set of the codes it was shown, or null. */
+  codesAgainUntil?: number | null
   recoveries: { id: string; started_at: number; available_at: number; cancelled_at: number | null; completed_at: number | null; via?: string; method?: string }[]
   scheduled: { id: string; kind: string; subject: string; requested_at: number; effective_at: number; workspace_id?: string | null; workspace_name?: string | null; requested_by_handle?: string | null; detail?: { policy?: Record<string, unknown>; before?: Record<string, number>; after?: Record<string, number>; reserve?: { before: number; after: number } } }[]
   contacts: Contact[]
@@ -50,6 +54,10 @@ interface SecurityView {
   delays: { recoveryMs: number; protectionMs: number; testMode: boolean }
   /** Whether the workspace this session acts in has an on-chain wallet: its signers are asked for only if so (EV-071). */
   wallet: { setUp: boolean }
+  /** R14: whether saved codes were ever made (none is at sign-up); the address the account was opened with; Google, where configured. */
+  codesMade: boolean
+  email: { address: string | null; verified: boolean; pending: boolean; canVerify: boolean; simulated: boolean }
+  google: { enabled: boolean; standIn: boolean; identities: { id: string; email: string | null; addedAt: number; lastUsedAt: number | null }[] }
 }
 
 const EVENT: Record<string, string> = {
@@ -62,7 +70,9 @@ const EVENT: Record<string, string> = {
   'passkey-removal-scheduled': 'Removal of a passkey scheduled', 'passkey-removed': 'Passkey removed', 'change-cancelled': 'Scheduled change cancelled',
   'passkey-suspended': 'Passkey suspended', 'passkey-unsuspend-scheduled': 'Allowing a suspended passkey again scheduled', 'passkey-unsuspended': 'Suspended passkey allowed again',
   'recovery-started': 'Recovery started', 'recovery-cancelled': 'Recovery stopped', 'recovery-completed': 'Recovery completed: a new passkey that signs in only was added',
-  'recovery-codes-replaced': 'Recovery codes replaced', 'session-ended': 'A session was ended', 'sessions-ended-others': 'Every other session was signed out, from one of your sessions', 'paused-with-saved-code': 'QED was paused with a saved recovery code, from the signed-out page (protective selling kept running)', 'pause-code-failures': 'Wrong saved codes were typed with your handle to pause QED (three today); nothing was paused by them',
+  'recovery-codes-replaced': 'Recovery codes replaced', 'recovery-codes-made': 'Saved recovery codes made',
+  'email-confirmed': 'The email address this account was opened with was confirmed', 'google-linked': 'A Google account was added as a way to sign in', 'google-unlinked': 'A Google account was removed from the ways to sign in',
+  'payee-added-in-google-session': 'A payee was added in a session opened with Google, not with a passkey', 'session-ended': 'A session was ended', 'sessions-ended-others': 'Every other session was signed out, from one of your sessions', 'paused-with-saved-code': 'QED was paused with a saved recovery code, from the signed-out page (protective selling kept running)', 'pause-code-failures': 'Wrong saved codes were typed with your handle to pause QED (three today); nothing was paused by them',
   'paused-by-contact': 'Your recovery contact paused QED for you (protective selling kept running)', 'you-paused-for-them': 'You paused QED for someone who trusts you',
   'recovery-contact-named': 'Recovery contact named', 'recovery-contact-accepted': 'Recovery contact accepted', 'recovery-contact-ended': 'Recovery contact ended',
   'contact-issued-recovery-code': 'Your recovery contact issued a recovery code for this account',
@@ -96,6 +106,10 @@ const METHOD_WORDS: Record<string, string> = { 'email+saved': 'an email link and
  */
 export function eventWords(e: { kind: string; detail: Record<string, unknown> }): string {
   if (e.kind === 'account-created' && e.detail.method === 'password') return 'Account created with a password'
+  if (e.kind === 'account-created' && e.detail.method === 'google') return 'Account created with Google'
+  if (e.kind === 'signed-in' && e.detail.method === 'google') return 'Signed in with Google'
+  if (e.kind === 'recovery-codes-made' && (e.detail.reason === 'first-device' || e.detail.reason === 'second-device')) return 'Saved recovery codes made, with your first device'
+  if (e.kind === 'recovery-codes-made' && e.detail.reason === 'recovery') return 'Saved recovery codes made, with the recovery'
   // a confirmation the local test outbox kept was not sent, and is not said to be (R13; recorded since then)
   if (e.detail.simulated === true && (e.kind === 'email-confirmation-sent' || e.kind === 'phone-confirmation-sent')) return `A confirmation for ${e.kind === 'email-confirmation-sent' ? 'an email address' : 'a phone number'} was kept in the simulated outbox, not sent`
   if ((e.kind === 'paused-with-saved-code' || e.kind === 'paused-by-contact') && e.detail.already === true) {
@@ -169,19 +183,36 @@ export function SecurityScreen() {
   // field of the note above (the server asks the same; review of D-094, M1).
   const strongly = async (): Promise<void> => {
     if (session.hasPasskey) { if (!session.stepUpFresh) await confirmWithPasskey(); return }
+    // an account Google signs in to, with no password and no device yet: the server asks for Google again when it must
+    if (session.hasPassword === false) return
     if (!legacyPw) throw new ApiError(401, 'stepup_required', 'Type your password in the field above first: this account has no passkey to confirm with.')
     await api('POST', '/api/auth/stepup', { password: legacyPw })
   }
+  // R14 (F1): the saved codes the account's first device brings, shown once, where it was added
+  const [deviceCodes, setDeviceCodes] = useState<string[] | null>(null), [deviceReplaced, setDeviceReplaced] = useState(false)
+  // R3: the codes made a moment ago were not saved: a fresh set, by the session that was shown them, within 30 minutes
+  const codesAgain = useAction(async () => { await strongly(); const r = await api<{ codes: string[] }>('POST', '/api/security/recovery-codes/again'); setDeviceCodes(r.codes); setDeviceReplaced(true); v.reload() })
   const add = useAction(async () => {
-    if (!session.hasPasskey) await api('POST', '/api/auth/stepup', { password: legacyPw })
-    else if (!session.stepUpFresh) await confirmWithPasskey()
-    await addPasskey(keyName.trim() || undefined); setLegacyPw(''); setKeyName(''); await reload(); v.reload()
+    // the first device: after the password typed again, or (an account Google signs in to) Google confirmed again
+    if (!session.hasPasskey && session.hasPassword !== false) await api('POST', '/api/auth/stepup', { password: legacyPw })
+    else if (session.hasPasskey && !session.stepUpFresh) await confirmWithPasskey()
+    let made: Awaited<ReturnType<typeof addPasskey>>
+    try { made = await addPasskey(keyName.trim() || undefined) }
+    catch (e) { if (!session.hasPasskey && session.hasPassword === false && e instanceof ApiError && e.code === 'stepup_required') await beginGoogle('confirm', '/security#passkeys'); throw e }
+    if (made.recoveryCodes) { setDeviceCodes(made.recoveryCodes); setDeviceReplaced(made.replacedEarlier === true) }
+    setLegacyPw(''); setKeyName(''); await reload(); v.reload()
   })
+  const confirmGoogle = useAction(async () => { await beginGoogle('confirm', '/security#passkeys') })
+  const linkGoogle = useAction(async () => { await strongly(); await beginGoogle('link', '/security#sign-in') })
+  const unlinkGoogle = useAction(async (id: string) => { await strongly(); await api('POST', `/api/security/google/${id}/remove`); v.reload() })
+  const resend = useAction(async () => { await api('POST', '/api/security/email/resend'); await reload(); v.reload() })
   const remove = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/passkeys/${id}/remove`, { code: savedCode.trim() || undefined })); setSavedCode(''); v.reload() })
   const suspend = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/passkeys/${id}/suspend`, { code: savedCode.trim() || undefined })); setSavedCode(''); v.reload() })
   const unsuspend = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/passkeys/${id}/unsuspend`)); v.reload() })
   const cancel = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/changes/${id}/cancel`)); v.reload() })
-  const regen = useAction(async () => { await strongly(); const r = await api<{ codes: string[] }>('POST', '/api/security/recovery-codes', { code: savedCode.trim() || undefined }); setSavedCode(''); setCodes(r.codes); v.reload() })
+  // whether the codes shown are the account's first (R14: none is made at sign-up), so the page does not speak of "earlier codes"
+  const [codesFirst, setCodesFirst] = useState(false)
+  const regen = useAction(async () => { await strongly(); const first = v.data?.codesMade === false; const r = await api<{ codes: string[] }>('POST', '/api/security/recovery-codes', { code: savedCode.trim() || undefined }); setSavedCode(''); setCodesFirst(first); setCodes(r.codes); await reload(); v.reload() })
   // Cancelling spends the saved code the recovery used, so the server issues a new set; it is shown once, below. It
   // needs the account's strongest confirmation, so a phished password cannot cancel the owner's own recovery.
   // A recovery started by email may have spent no saved code: then no new set comes back, and none is shown.
@@ -233,7 +264,7 @@ export function SecurityScreen() {
       {s.delays.testMode ? <p className="sy-test"><Clock aria-hidden="true" /><span><b>Test mode: shortened delays.</b> Recovery waits {dur(s.delays.recoveryMs)} and protection-reducing changes {dur(s.delays.protectionMs)} on this installation, for testing; the on-chain wallet's own delays are said where they apply. The normal delay is {dur(NORMAL_DELAY_MS)}.</span></p> : null}
 
       <SecuritySummary sessions={s.sessions.length} password={s.password.set} usable={usable.length} hasPasskey={!!session.hasPasskey}
-        recoveryReady={(usableEmail && (s.recoveryCodesLeft > 0 || !noSecond)) || (!noSecond && s.recoveryCodesLeft > 0)} codesLeft={s.recoveryCodesLeft} contact={activeContact ? `@${activeContact.handle}` : null} email={usableEmail} waiting={needs} />
+        recoveryReady={(usableEmail && (s.recoveryCodesLeft > 0 || !noSecond)) || (!noSecond && s.recoveryCodesLeft > 0)} codesLeft={s.recoveryCodesLeft} codesMade={s.codesMade} contact={activeContact ? `@${activeContact.handle}` : null} email={usableEmail} waiting={needs} />
 
       {needs ? (
         <section className="sy-needs" aria-labelledby="sy-needs-h">
@@ -281,14 +312,52 @@ export function SecurityScreen() {
 
       <div className="sy-board board" ref={board}>
       <section data-col="1" className="pg-sec" id="sign-in" aria-labelledby="sy-in-h">
-        <PartHead id="sy-in-h" title="Signing in" aside={s.password.set ? 'With a passkey or the password' : 'With a passkey'}>How you get in, and every place you are signed in now. Signing in lets you look and prepare; approving anything takes a passkey.</PartHead>
+        <PartHead id="sy-in-h" title="Signing in" aside={`With ${[session.hasPasskey ? 'your device' : null, s.password.set ? 'your password' : null, s.google.identities.length ? 'Google' : null].filter(Boolean).join(', ') || 'nothing yet'}`}>How you get in, and every place you are signed in now. Signing in lets you look and prepare; approving anything takes your device.</PartHead>
         <div className="pg-sheet">
+          <section id="ways" className="sy-part" aria-labelledby="ops-h">
+            <PartHead id="ops-h" level={3} title="Five separate things">Getting into your account is not the same as approving money, and neither is the same as getting back in. QED keeps them apart, so that a stolen password, a Google account or an email inbox can never move your money.</PartHead>
+            <ol className="sy-ops">{OPERATIONS.map((o, i) => <li key={o.id}><span className="n" aria-hidden="true">{i + 1}</span><div><p className="sy-t">{o.title}</p><p className="sy-d">{o.plain}</p></div></li>)}</ol>
+          </section>
+          {s.email.address || s.google.enabled ? (
+            <section id="ordinary" className="sy-part" aria-labelledby="ord-h">
+              <PartHead id="ord-h" level={3} title="Email and Google">The ordinary ways in. They open your account; they approve nothing.</PartHead>
+              <ul className="sy-rows">
+                {s.email.address ? (
+                  <li>
+                    <span className="sy-glyph" aria-hidden="true"><Mail /></span>
+                    <div className="sy-main">
+                      <p className="sy-t"><span>{s.email.address}</span><span className="sy-tag">{s.email.verified ? 'verified' : 'not verified'}</span></p>
+                      <p className="sy-d">The address this account was opened with. {s.password.set ? 'With your password, it signs you in.' : 'It is shown here; this account has no password for it to sign in with.'}</p>
+                      {s.email.verified ? null : !s.email.canVerify
+                        ? <p className="sy-s wait">Not verified. This build of QED cannot send email, so verifying is unavailable here; nothing was sent to this address. Your account works without it.</p>
+                        : s.email.pending
+                          ? <p className="sy-s wait">Not verified yet. {s.email.simulated ? <>Its confirmation is kept in the <a href="/dev/outbox" target="_blank" rel="noopener">simulated outbox</a> on this computer; nothing was sent.</> : 'Open the link in the message QED sent to it.'}</p>
+                          : <p className="sy-s wait">Not verified. Its confirmation expired or was replaced.</p>}
+                    </div>
+                    {!s.email.verified && s.email.canVerify ? <span className="sy-acts"><Btn small busy={resend.busy} onClick={() => void resend.run()}>{s.email.pending ? 'Send it again' : 'Send a confirmation'}</Btn></span> : null}
+                  </li>
+                ) : null}
+                {s.google.identities.map((g) => (
+                  <li key={g.id}>
+                    <span className="sy-glyph" aria-hidden="true"><LogIn /></span>
+                    <div className="sy-main">
+                      <p className="sy-t"><span>Google{s.google.standIn ? ' (test stand-in)' : ''}</span>{g.email ? <span className="sy-d">{g.email}</span> : null}</p>
+                      <p className="sy-d">Signs you in. Added {fmt.dayTime(g.addedAt)}{g.lastUsedAt ? `; last used ${fmt.dayTime(g.lastUsedAt)}` : ''}.</p>
+                    </div>
+                    <span className="sy-acts"><Btn small busy={unlinkGoogle.busy} onClick={() => void unlinkGoogle.run(g.id)}>Remove<span className="sr"> Google sign-in{g.email ? ` (${g.email})` : ''}</span></Btn></span>
+                  </li>
+                ))}
+              </ul>
+              {s.google.enabled && !s.google.identities.length ? <div><Btn small busy={linkGoogle.busy} onClick={() => void linkGoogle.run()}>Add Google sign-in{s.google.standIn ? ' (test stand-in)' : ''}</Btn><p className="sy-hint">QED never adds a Google account because its address matches yours: you add it here, after confirming it is you.</p></div> : null}
+              <Problem error={resend.error ?? linkGoogle.error ?? unlinkGoogle.error} />
+            </section>
+          ) : null}
           <section id="sessions" className="sy-part" aria-labelledby="ss-h">
             <PartHead id="ss-h" level={3} title="Where you are signed in" aside={`${s.sessions.length} session${s.sessions.length === 1 ? '' : 's'}${byPassword ? `, ${byPassword} with a password` : ''}`}>Every browser, or program, signed in to this account. Ending one signs it out at once. Signing out does not pause QED: instructions in force keep running.</PartHead>
             <ul className="sy-rows">{s.sessions.map((x) => (
               <li key={x.id}>
                 <span className="sy-glyph" aria-hidden="true"><MonitorSmartphone /></span>
-                <div className="sy-main"><p className="sy-t">{sessionDevice(x.device)}{x.current ? <span className="sy-tag">this one</span> : null}</p><p className="sy-d">Opened {fmt.dayTime(x.createdAt)} with {x.method === 'passkey' ? 'a passkey' : 'a password'}; last used {fmt.dayTime(x.lastSeenAt)}</p></div>
+                <div className="sy-main"><p className="sy-t">{sessionDevice(x.device)}{x.current ? <span className="sy-tag">this one</span> : null}</p><p className="sy-d">Opened {fmt.dayTime(x.createdAt)} with {x.method === 'passkey' ? 'a passkey' : x.method === 'google' ? 'Google' : 'a password'}; last used {fmt.dayTime(x.lastSeenAt)}</p></div>
                 {!x.current ? <span className="sy-acts"><Btn small busy={end.busy} onClick={() => void end.run(x.id)}>End it<span className="sr"> ({sessionDevice(x.device)}, opened {fmt.dayTime(x.createdAt)})</span></Btn></span> : null}
               </li>
             ))}</ul>
@@ -309,9 +378,13 @@ export function SecurityScreen() {
           and why removing one waits, as two labelled lines beside the list rather than inside one long paragraph; then adding
           one, named for what it does (a second passkey when there is one), with the browser's own choice of where it is kept */}
       <section data-col="1" className="pg-sec sy-pk" id="passkeys" aria-labelledby="pk-h">
-        <PartHead id="pk-h" title="Passkeys" aside={`${usable.length} can sign for you`}>A passkey is kept on a device and unlocked there by that device's own check. It signs you in and approves what you pay; QED receives only its signatures, never your face, fingerprint or PIN.</PartHead>
+        <PartHead id="pk-h" title="Passkeys" aside={`${usable.length} can sign for you`}>A passkey is your device's own check, your fingerprint, Face ID or device PIN, kept for QED. It signs you in and approves what you pay; QED receives only its signatures, never your face, fingerprint or PIN.</PartHead>
         <div className="pg-sheet">
-          {!session.hasPasskey ? <div className="sy-part"><Note tone="wait" title="This account has no passkey">It signs in with a password and has no passkey yet. Until it has one it can look at everything but approve nothing, and its password is its only key. Enter its password, then create a passkey; your browser asks where to keep it, and for {deviceWords()}.<div className="stack" style={{ marginTop: 8 }}><input className="input" type="password" aria-label="Password" autoComplete="current-password" value={legacyPw} onChange={(e) => setLegacyPw(e.target.value)} /><div><Btn tone="fill" busy={add.busy} disabled={!legacyPw} onClick={() => void add.run()}>Create a passkey</Btn></div></div></Note></div> : null}
+          {!session.hasPasskey ? <div className="sy-part">{session.hasPassword === false
+            ? <Note tone="wait" title="This account has no passkey">It signs in with Google and no device is set up yet. Until one is, it can look at everything but approve nothing. Setting one up needs Google confirmed again, a moment before; your browser then asks where to keep the passkey, and for {deviceWords()}.<div className="stack" style={{ marginTop: 8 }}><div className="row"><Btn tone="fill" busy={add.busy} onClick={() => void add.run()}>Create a passkey</Btn><Btn busy={confirmGoogle.busy} onClick={() => void confirmGoogle.run()}>Confirm with Google again</Btn></div><p className="small">Until a device is set up, a change on this page (saved codes, an address) also asks for Google confirmed again in the last five minutes.</p></div></Note>
+            : <Note tone="wait" title="This account has no passkey">It signs in with a password and no device is set up yet. Until one is, it can look at everything but approve nothing, and its password is its only key. Enter its password, then create a passkey; your browser asks where to keep it, and for {deviceWords()}.<div className="stack" style={{ marginTop: 8 }}><input className="input" type="password" aria-label="Password" autoComplete="current-password" value={legacyPw} onChange={(e) => setLegacyPw(e.target.value)} /><div><Btn tone="fill" busy={add.busy} disabled={!legacyPw} onClick={() => void add.run()}>Create a passkey</Btn></div></div></Note>}</div> : null}
+          {deviceCodes ? <div className="sy-part" role="status"><Note tone="wait" title="Save these recovery codes now"><SavedCodes codes={deviceCodes} replaced={deviceReplaced} onContinue={() => setDeviceCodes(null)} /></Note></div> : null}
+          {!deviceCodes && s.codesAgainUntil ? <div className="sy-part"><Btn small busy={codesAgain.busy} onClick={() => void codesAgain.run()}>Show me new codes (the ones made a moment ago were not saved)</Btn><p className="small muted">Until {fmt.dayTime(s.codesAgainUntil)}, from this session only, while you have one passkey and have used none of them. The old set stops working.</p><Problem error={codesAgain.error} /></div> : null}
           {s.passkeys.length ? (
             <ul className="sy-rows sy-part sy-keys">
               {s.passkeys.map((p) => {
@@ -327,7 +400,7 @@ export function SecurityScreen() {
                       <p className="sy-t"><span>{p.name}</span>{p.current ? <span className="sy-tag">this session</span> : null}</p>
                       <p className="sy-d">{unlockWords(p.name) ?? 'Unlocked by the device or security key that holds it'}. {p.synced ? 'Synced by your platform to your other devices.' : 'Not synced to other devices.'}</p>
                       <p className="sy-d">Added {fmt.dayTime(p.createdAt)}{p.lastUsedAt ? `; last used ${fmt.dayTime(p.lastUsedAt)}` : ''}.</p>
-                      {!p.removedAt && !p.suspendedAt && p.coolOffUntil ? <p className="sy-s wait"><Stamp tone="wait">New</Stamp> Until {fmt.full(p.coolOffUntil)} it cannot approve payments above ₹10,000, loosen a protection or add a signer.{p.current ? '' : ' Any older passkey of yours can remove it now, at once.'}</p> : null}
+                      {!p.removedAt && !p.suspendedAt && p.coolOffUntil ? <p className="sy-s wait"><Stamp tone="wait">New</Stamp> Until {fmt.full(p.coolOffUntil)} it cannot approve payments above ₹10,000, loosen a protection or add a signer.{p.current ? '' : ' One of your older passkeys can remove it at once, with one of your saved recovery codes.'}</p> : null}
                       {!p.removedAt && !p.suspendedAt && p.authority === 'signin' ? <p className="sy-s wait"><Stamp tone="wait">Signs in only</Stamp> {p.authorityReason === 'after-password-reset' ? 'Added after a password reset' : 'Added by a recovery'}: it approves nothing yet.{p.restoreScheduledFor ? ` It can approve from ${fmt.full(p.restoreScheduledFor)}, unless stopped.` : ''}</p> : null}
                       {p.removedAt ? <p className="sy-s"><Stamp tone="void">Removed {fmt.dayTime(p.removedAt)}</Stamp></p>
                         : p.suspendedAt ? <p className="sy-s void">Suspended {fmt.dayTime(p.suspendedAt)}: it cannot sign in, confirm or approve.{p.unsuspendScheduledFor ? ` It will be allowed again ${fmt.full(p.unsuspendScheduledFor)} unless cancelled above.` : ''}</p>
@@ -421,11 +494,13 @@ export function SecurityScreen() {
 
             <div className="sy-sub">
               <h4>Saved recovery codes</h4>
-              <p className="sy-d">{s.recoveryCodesLeft} of 10 unused. Each is half of a recovery and works once; a code alone gets no one in. New codes replace every earlier one and are shown only once.</p>
-              {!codes && s.recoveryCodesLeft <= 2 ? <Note tone="wait" title={s.recoveryCodesLeft === 0 ? 'No saved codes left' : 'Few saved codes left'}>Saved codes decide between your own passkeys: suspending one, removing a new one at once and making new codes each need one, and someone holding only one of your devices does not have them.{s.recoveryCodesLeft === 0 && usable.length > 1 ? ' With none left and more than one passkey, new codes cannot be made at once: remove the passkeys you no longer hold first (each waits the protection delay).' : ' Make new codes while you still have one.'}</Note> : null}
+              {s.codesMade || codes
+                ? <p className="sy-d">{s.recoveryCodesLeft} of 10 unused. Each is half of a recovery and works once; a code alone gets no one in. New codes replace every earlier one and are shown only once.</p>
+                : <p className="sy-d">None yet: QED makes them with your first device, and this account has no device. Each is half of a recovery and works once; a code alone gets no one in.{s.email.canVerify ? '' : ' On this installation, which cannot send email, they are the way back in if you lose your device.'}</p>}
+              {!codes && s.codesMade && s.recoveryCodesLeft <= 2 ? <Note tone="wait" title={s.recoveryCodesLeft === 0 ? 'No saved codes left' : 'Few saved codes left'}>Saved codes decide between your own passkeys: suspending one, removing a new one at once and making new codes each need one, and someone holding only one of your devices does not have them.{s.recoveryCodesLeft === 0 && usable.length > 1 ? ' With none left and more than one passkey, new codes cannot be made at once: remove the passkeys you no longer hold first (each waits the protection delay).' : ' Make new codes while you still have one.'}</Note> : null}
               {codeSpent && !codes ? <Note tone="wait" title="One of your saved codes was used">The recovery you cancelled had used one of your saved codes, so it no longer works. Make new codes now: that needs one of the codes you still have.</Note> : null}
               {!codes && s.recoveryCodesLeft > 0 ? <Field label="A saved recovery code, for new codes" hint="New codes need one of the codes you have now, so that someone holding one of your devices cannot replace yours.">{(p) => <input {...p} className="input" autoComplete="off" spellCheck={false} value={savedCode} onChange={(e) => setSavedCode(e.target.value)} />}</Field> : null}
-              {codes ? <><ol className="codes" aria-label="New recovery codes">{codes.map((c) => <li key={c} className="code">{c}</li>)}</ol><p className="small wait">New codes, shown once: store them somewhere other than this device. The earlier codes no longer work.</p></> : <div><Btn small busy={regen.busy} onClick={() => void regen.run()}>Make new codes</Btn></div>}
+              {codes ? <><ol className="codes" aria-label="New recovery codes">{codes.map((c) => <li key={c} className="code">{c}</li>)}</ol><p className="small wait">{codesFirst ? 'Your codes, shown once: store them somewhere other than this device.' : 'New codes, shown once: store them somewhere other than this device. The earlier codes no longer work.'}</p></> : <div><Btn small busy={regen.busy} onClick={() => void regen.run()}>{s.codesMade ? 'Make new codes' : 'Save recovery codes'}</Btn></div>}
               <Problem error={regen.error} />
             </div>
 
@@ -633,7 +708,7 @@ function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () 
         <ul className="sy-needs-for" aria-label="What removing the password needs">
           <li><Mark tone={keys.length ? 'ok' : 'void'} /><div><p className="sy-t">A passkey that can sign in</p><p className="sy-d">{keys.length ? `You have ${listed(keys.map((k) => `"${k.name}"`))}.` : 'None yet: add one under Passkeys.'}</p></div></li>
           <li><Mark tone={issuer ? 'ok' : view.contacts.length ? 'wait' : 'void'} /><div><p className="sy-t">A recovery contact who can issue you a code</p><p className="sy-d">{issuer ? `@${issuer.handle} is active and can issue you a recovery code.` : active ? `Not yet: @${active.handle} has no passkey, and a contact issues a code only after confirming with one.` : view.contacts.length ? `Not yet: @${view.contacts[0]!.handle} has not accepted, or the wait has not ended.` : 'None yet: name one under "If you lose every passkey".'}</p></div></li>
-          <li><Mark tone={view.recoveryCodesLeft > 0 ? 'ok' : 'void'} /><div><p className="sy-t">Saved recovery codes</p><p className="sy-d">{view.recoveryCodesLeft > 0 ? `${view.recoveryCodesLeft} of 10 unused.` : 'None left: make new ones under "If you lose every passkey".'}</p></div></li>
+          <li><Mark tone={view.recoveryCodesLeft > 0 ? 'ok' : 'void'} /><div><p className="sy-t">Saved recovery codes</p><p className="sy-d">{view.recoveryCodesLeft > 0 ? `${view.recoveryCodesLeft} of 10 unused.` : view.codesMade ? 'None left: make new ones under "If you lose every passkey".' : 'None yet: save them under "If you lose every passkey".'}</p></div></li>
         </ul>
         <p className="small">{ready
           ? 'From then on a recovery needs one of your saved codes and a code from your recovery contact. Every other session of this account ends; on your other devices, sign in again with a passkey. Your passkey is asked for first, unless you confirmed with it here in the last five minutes.'
@@ -648,13 +723,13 @@ function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () 
  * The account's state in four tiles, each a link to its part: where it is signed in, how many passkeys can approve, whether
  * a lost device could be recovered, and what waits to take effect. A tile that needs the owner says why in its line.
  */
-function SecuritySummary({ sessions, password, usable, hasPasskey, recoveryReady, codesLeft, contact, email, waiting }: {
-  sessions: number; password: boolean; usable: number; hasPasskey: boolean; recoveryReady: boolean; codesLeft: number; contact: string | null; email: boolean; waiting: number
+function SecuritySummary({ sessions, password, usable, hasPasskey, recoveryReady, codesLeft, codesMade, contact, email, waiting }: {
+  sessions: number; password: boolean; usable: number; hasPasskey: boolean; recoveryReady: boolean; codesLeft: number; codesMade: boolean; contact: string | null; email: boolean; waiting: number
 }) {
   const tiles: { to: string; icon: typeof LogIn; k: string; v: string; s: string; tone: 'ok' | 'wait' | 'void' }[] = [
     { to: '#sign-in', icon: LogIn, k: 'Signing in', v: `${sessions} session${sessions === 1 ? '' : 's'}`, s: password ? 'With a passkey or the password; a password approves nothing' : 'With a passkey only', tone: 'ok' },
     { to: '#passkeys', icon: KeyRound, k: 'Passkeys that approve', v: String(usable), s: !hasPasskey || usable === 0 ? 'None: nothing can be approved until you add one' : usable === 1 ? 'Add one on a second device, so losing this one does not lock you out' : 'On more than one device', tone: !hasPasskey || usable === 0 ? 'void' : usable === 1 ? 'wait' : 'ok' },
-    { to: '#recovery', icon: LifeBuoy, k: 'If you lose every device', v: recoveryReady ? 'Recoverable' : 'Not recoverable yet', s: recoveryReady ? `${email ? 'Your email and' : 'A saved code and'} ${email ? (codesLeft ? `a saved code (${codesLeft} left)` : contact ?? 'your second proof') : contact ?? 'your second proof'}, then a wait` : !email && codesLeft > 0 ? 'Add an email address, or name a recovery contact who has a passkey' : codesLeft === 0 && !contact ? 'No saved codes left: make new ones' : 'Name a recovery contact who has a passkey', tone: recoveryReady ? 'ok' : 'wait' },
+    { to: '#recovery', icon: LifeBuoy, k: 'If you lose every device', v: recoveryReady ? 'Recoverable' : 'Not recoverable yet', s: recoveryReady ? `${email ? 'Your email and' : 'A saved code and'} ${email ? (codesLeft ? `a saved code (${codesLeft} left)` : contact ?? 'your second proof') : contact ?? 'your second proof'}, then a wait` : !email && codesLeft > 0 ? 'Add an email address, or name a recovery contact who has a passkey' : codesLeft === 0 && !contact ? (codesMade ? 'No saved codes left: make new ones' : 'Save recovery codes, and name a recovery contact') : 'Name a recovery contact who has a passkey', tone: recoveryReady ? 'ok' : 'wait' },
     { to: waiting ? '#sy-needs-h' : '#recovery-and-signers', icon: TimerReset, k: 'Changes waiting', v: String(waiting), s: waiting ? 'A change that weakens a protection waits; any passkey can cancel it' : 'Nothing is waiting to take effect', tone: waiting ? 'wait' : 'ok' },
   ]
   return (
