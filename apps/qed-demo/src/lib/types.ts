@@ -118,6 +118,14 @@ export interface StatementView {
 
 export interface Quote { price: string; size: string | null; sourceTs: number | null; precision: string; recvTs: number; provider: string; ageMs: number; stale: boolean; usableForExecution: boolean; label: string }
 export interface MarketInstrument { id: string; kind: string; name: string; base: string; quote: string; provider: string; venue: string; tradable: boolean; baseScale: number; meta: Record<string, unknown> & { category?: string; note?: string; minNotional?: string; qtyStep?: string; cutoff?: string; payoutDays?: number }; quotes: Record<string, Quote> }
+/** One row of the household's watchlist (server/watchlist.ts): a price with its source, time and basis, and the change since it was added. */
+export interface WatchItem {
+  instrumentId: string; name: string; kind: string; quote: string; tradable: boolean; priceType: string; price: string | null
+  provider: string; basis: 'observed' | 'synthetic'; precision: string | null; at: number | null; recvTs: number | null; ageMs: number | null; stale: boolean; status: string
+  addedAt: number; addedPrice: string | null; addedProvider: string | null; addedPriceAt: number | null
+  change: string | null; changePct: number | null; changeNote: string | null
+}
+export interface Watchlist { items: WatchItem[]; count: number; max: number }
 export interface Term { id: string; kind: string; name: string; value: Record<string, unknown>; source: string; source_url: string | null; as_of: string; status: string }
 export interface Market { asOf: number; instruments: MarketInstrument[]; providers: { provider: string; state: string; since: number; last_ok: number | null; last_error: string | null; last_error_at: number | null; messages: number; reconnects: number }[]; clock: { ts: number; reference: string; offset_ms: number; uncertainty_ms: number } | null; terms: Term[]; notOffered?: { id: string; name: string; reason: string }[] }
 export interface Receipt { id: string; seq: number; ts: number; kind: string; subject: string; body: Record<string, unknown>; prev_hash: string; hash: string }

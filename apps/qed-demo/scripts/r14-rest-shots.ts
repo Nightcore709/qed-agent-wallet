@@ -4,7 +4,7 @@
  *
  *   QED_FIXTURE_FILE=data/rest-fixture.json QED_UI=http://localhost:13800 node scripts/r14-rest-shots.ts <label> [widths] [themes] [rich|fresh|both] [routes]
  *
- * Writes evidence/design/r14-rest/<label>/<household>-<route>-<width>-<theme>.png (the whole scrollable page), and
+ * Writes evidence/design/<QED_SHOT_DIR, default r14-rest>/<label>/<household>-<route>-<width>-<theme>.png (the whole scrollable page), and
  * prints each page's horizontal overflow (scrollWidth over the window) so a sideways scroll at 390 px is a finding.
  */
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -20,7 +20,7 @@ const widths = (process.argv[3] ?? '1440,1024,768,390').split(',')
 const themes = (process.argv[4] ?? 'dark').split(',') as ('dark' | 'light')[]
 const who = (!process.argv[5] || process.argv[5] === 'both' ? 'rich,fresh' : process.argv[5]).split(',')
 const routes = (process.argv[6] ?? '/holdings,/earn,/protect,/ask,/activity,/vault,/workspace,/notifications,/judge').split(',')
-const out = join(app, 'evidence', 'design', 'r14-rest', label)
+const out = join(app, 'evidence', 'design', process.env.QED_SHOT_DIR ?? 'r14-rest', label)
 mkdirSync(out, { recursive: true })
 const browser = await chromium.launch({ channel: 'chrome', headless: true })
 const sizeOf = (w: string) => { const [px, x] = w.split('x'); const width = Number(px), scale = x ? Number(x) : 1; return { width, height: scale > 1 ? 450 : width < 600 ? 844 : 900, scale } }

@@ -95,6 +95,7 @@ import { agreeCycle, answerClaim, cancelCycle, nettingView, preparePayment, prop
 import { listQuotes, requestQuotes } from './rfq.ts'
 import { answerOffer, clientReport, createModel, modelsView, offerModel, reportsAcross, SCOPE_NOTE } from './institutional.ts'
 import { ALLOC_POLICIES, type AllocPolicy, checkCertificate, hedgeWhatIf, labCertificates, labResearch, labView, proposeRebalance } from './lab.ts'
+import { addWatch, removeWatch, watchlistView } from './watchlist.ts'
 import { createIdea, decide as decideIdea, ideaRecord, listIdeas, readWithAnswers } from './ideas.ts'
 
 const MAX_BODY = 64 * 1024
@@ -473,6 +474,24 @@ route('GET', '/api/records/purge', (r) => { purgeApprover(r); return { candidate
 route('POST', '/api/records/purge', (r) => { purgeApprover(r); requireStepUp(r); return runPurge(r.db, r.personId, str(r.body.personId), r.body.previewDigest, r.now) }, true, 'person')
 route('POST', '/api/data/deletion/cancel', (r) => { cancelDeletion(r.db, r.personId, r.now); return { ok: true } }, true, 'person')
 route('GET', '/api/market', (r) => marketView(r.db, r.ctx.market, r.now))
+// Grow's watchlist (server/watchlist.ts): the household's own list of names, each row built from the market data QED holds, with its
+// source, time and observed or synthetic. Any member reads it; changing it needs the operator role (the default for a change). It
+// is readable and keepable in any home currency: it holds no money and places no order (buying stays the ticket's, with its approval).
+route('GET', '/api/watchlist', (r) => { requireSetup(r); return watchlistView(r.db, r.ctx.market, r.userId, r.now) })
+route('POST', '/api/watchlist', (r) => {
+  requireSetup(r)
+  if (!rateLimit(r.db, `watchlist:${r.personId}`, 120, 3600_000, r.now)) throw new AppError(429, 'too_many', 'That is 120 changes to the watchlist in an hour. Wait a while.')
+  const out = addWatch(r.db, r.ctx.market, r.userId, r.role, str(r.body.instrumentId), r.now, r.ip)
+  if (out.added) emit(r.db, r.now, r.userId, 'watchlist', {})
+  return out
+})
+route('POST', '/api/watchlist/remove', (r) => {
+  requireSetup(r)
+  if (!rateLimit(r.db, `watchlist:${r.personId}`, 120, 3600_000, r.now)) throw new AppError(429, 'too_many', 'That is 120 changes to the watchlist in an hour. Wait a while.')
+  const out = removeWatch(r.db, r.userId, r.role, str(r.body.instrumentId), r.now, r.ip)
+  if (out.removed) emit(r.db, r.now, r.userId, 'watchlist', {})
+  return out
+})
 // Grow: holdings against a benchmark the owner chooses (none is chosen for them), and the risk estimates (benchmark.ts)
 route('GET', '/api/grow/compare', (r) => { requireSetup(r); const hs = holdings(r.db, r.ctx.market, r.userId, r.now); return { comparison: compare(r.db, r.userId, hs, r.query.get('benchmark') || null, r.now), risk: riskEstimate(r.db, hs) } })
 route('GET', '/api/market/history', (r) => history(r.db, str(r.query.get('id')), { days: Number(r.query.get('days')) || undefined, hours: Number(r.query.get('hours')) || undefined }))

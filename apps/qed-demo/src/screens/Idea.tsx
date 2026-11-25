@@ -38,8 +38,10 @@ export function IdeaScreen() {
   const prior = useData<IdeaRecord>(revise ? `/api/ideas/${encodeURIComponent(revise)}` : null)
   // an idea Ask handed over arrives in the address (?text=): read at once, as if the person had pressed Read
   const handed = revise ? '' : (query.get('text') ?? '').slice(0, 300)
+  // the watchlist hands over the name too (?instrument=): it is the answer to "which one?", which the person can still change
+  const handedId = revise ? '' : (query.get('instrument') ?? '').slice(0, 80)
   const [text, setText] = useState(handed)
-  const [answers, setAnswers] = useState<{ instrumentId?: string; amount?: number; cadence?: 'once' | 'monthly' }>({})
+  const [answers, setAnswers] = useState<{ instrumentId?: string; amount?: number; cadence?: 'once' | 'monthly' }>(handedId ? { instrumentId: handedId } : {})
   const [view, setView] = useState<IdeaReadView | null>(null)
   const recent = useData<{ ideas: IdeaSummary[] }>('/api/ideas', ['action', 'program'])
   const reading = useAction(async (t: string, a: typeof answers) => { setView(await api<IdeaReadView>('POST', '/api/ideas/read', { text: t, answers: a })) })
@@ -55,7 +57,7 @@ export function IdeaScreen() {
     const a = { instrumentId: p.investigation.plan.instrumentId, amount: p.investigation.plan.amount, cadence: p.investigation.plan.cadence }
     setText(p.text); setAnswers(a); void readNow(p.text, a)
   }, [prior.data, readNow])
-  useEffect(() => { if (handed) void readNow(handed, {}) }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (handed) void readNow(handed, handedId ? { instrumentId: handedId } : {}) }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const submitRead = (e: FormEvent) => { e.preventDefault(); void reading.run(text, answers) }
   const pick = (p: string) => { setText(p); setAnswers({}); setView(null); void reading.run(p, {}) }
   const answer = (patch: typeof answers) => { const next = { ...answers, ...patch }; setAnswers(next); void reading.run(text, next) }

@@ -650,14 +650,14 @@ export function AskScreen() {
       <h2 id="ak-guide-h">{current ? 'Carry on in your own words' : 'What you can ask'}</h2>
       {current ? (
         <ul>
-          <li><b>“Make it ₹3,000 instead”</b> replaces a proposal with a corrected one; both cards say so.</li>
+          <li><b>“Make it {fmt.money(300_000)} instead”</b> replaces a proposal with a corrected one; both cards say so.</li>
           <li><b>“Why that much?”</b> asks for the reasoning behind a reply.</li>
           <li><b>“Cancel that”</b> withdraws what is still open. QED's own code does it; no model is asked.</li>
         </ul>
       ) : (
         <ul>
-          <li><b>Several things at once</b> “Invest ₹2,000 every month and park my idle cash.”</li>
-          <li><b>Two limits together</b> “₹2,000 a week, but never more than ₹5,000 a month.” The card says what they do together.</li>
+          <li><b>Several things at once</b> “Invest {fmt.money(200_000)} every month and park my idle cash.”</li>
+          <li><b>Two limits together</b> “{fmt.money(200_000)} a week, but never more than {fmt.money(500_000)} a month.” The card says what they do together.</li>
           <li><b>Your on-chain wallet</b> “Keep 10 test dollars in my dollar reserve.”</li>
           <li><b>Then carry on</b> Correct a proposal, ask why, change a limit, or say “cancel that”.</li>
         </ul>
@@ -691,7 +691,8 @@ export function AskScreen() {
             {!wide ? <div className="ak-tools"><ConvMenu list={convs} current={null} rules={rulesLink} /></div> : null}
             <Orb size="lg" busy={ask.busy} />
             <h1 id="ak-h1">Ask QED.<span className="dim"> What should it work out for you?</span></h1>
-            <p className="ak-lede">Ask in your own words, then carry on: correct a proposal, ask why, or say “cancel”. QED reads your recorded position, answers with figures it can find in your records, and may propose instructions. A reply cannot act: every proposal is checked by the same code as what you write by hand, and nothing runs until you sign it.</p>
+            <p className="ak-lede">Ask in your own words. QED answers from the figures in your records and may draft a proposal. Asking moves no money and a reply cannot act: nothing runs until you read the proposal and approve it with your passkey, and you can say “cancel” at any point before that.</p>
+            <details className="disclose ak-more"><summary>How a proposal is checked</summary><p>Every proposal is checked by the same code as an instruction you write by hand, then shown to you with its limits. You can correct it, ask why, or cancel it in the same conversation. This page is a convenience: the passkey approval and the limits you signed are what authorise anything.</p></details>
             <div className="ak-meta"><EngineChip ai={ai} models={models} /></div>
           </header>
         )}

@@ -201,6 +201,8 @@ p.pr-empty .stamp { margin-right: var(--s2); }
   .pr-tiles > *, .pr-rules > * { grid-column: auto !important; }
   .pr-tiles[data-n="3"] > :last-child:nth-child(odd), .pr-tiles[data-n="5"] > :last-child:nth-child(odd), .pr-rules[data-n="5"] > :last-child:nth-child(odd) { grid-column: 1 / -1 !important; }
   .pr-tiles > .wide { grid-column: 1 / -1 !important; }
+  /* R14 rest 2: a wide first card and three more leave the last alone in the second column; it takes the row */
+  .pr-tiles[data-n="3"] > .wide ~ :last-child:nth-child(even) { grid-column: 1 / -1 !important; }
 }
 @media (max-width: 1099px) {
   .pr-top { grid-template-columns: minmax(0, 1fr); }

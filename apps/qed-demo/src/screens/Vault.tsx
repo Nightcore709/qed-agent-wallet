@@ -626,7 +626,7 @@ function Head({ sub, state, stage, nav }: { sub: string; state?: RailState | nul
       <header className="page-head vt-head">
         <div className="vt-head-text">
           <h1>On-chain wallet.<span className="dim"> Test money, owned by passkey.</span></h1><p><Src kind="chain" /></p>
-          <p>{cap(unitWords(main.symbol))} and {unitWords(reserve.symbol)} on a chain that runs on this computer; they have no value. QED may pay from it only inside the limits of a mandate you sign, and the wallet's own contract enforces them.</p>
+          <p>{cap(unitWords(main.symbol))} and {unitWords(reserve.symbol)} on a chain that runs on this computer; they have no value. QED may pay from it only inside the limits of a mandate you sign, and the wallet's own contract enforces them.{stage === 'owned' ? ' You can pause the wallet or revoke the mandate at any time under Stop or change it; each takes effect on the chain as soon as it is recorded.' : ''}</p>
         </div>
         <div className="vt-head-state">
           {stage === 'owned' && state ? <Stamp tone={paused ? 'wait' : 'ok'}>{paused ? 'Paused' : 'Running'} on a local test chain</Stamp>
@@ -700,7 +700,7 @@ function SetupSummary({ stage, o }: { stage: 0 | 1 | 2; o: Overview }) {
   const threshold = o.workspace?.threshold ?? o.plan?.threshold ?? 1
   const signing = o.passkeys.filter((p) => p.signer)
   const who: ReactNode = shared
-    ? (o.plan ? <>One passkey of each member who may sign: {o.plan.members.map((m) => `${m.name} (${m.passkey ?? 'no passkey yet'})`).join(', ')}. {o.plan.threshold} different members must sign, checked by the chain itself.</>
+    ? (o.plan ? <>One passkey of each member who may sign: {o.plan.members.map((m) => `${m.name} (${m.passkey ?? 'no passkey yet'})`).join(', ')}. {o.plan.threshold === 1 ? 'Any one of them can sign' : `${o.plan.threshold} different members must sign`}, checked by the chain itself.</>
       : o.signers?.length ? <>{andList(o.signers.map((m) => `${m.you ? 'you' : m.name} (${m.passkey})`))}; {threshold === 1 ? 'any one of them can sign' : `${threshold} different members must sign`}, checked by the chain itself.</> : 'Your members\' passkeys, as the chain names them.')
     : stage === 0 ? (o.owner?.state === 'ready' ? <>{andList(o.owner.passkeys.map((n) => `“${n}”`))}: {o.owner.passkeys.length === 1 ? 'your passkey' : 'your passkeys'}. One signature is enough.{o.owner.waiting?.length ? ` ${andList(o.owner.waiting.map((w) => `“${w.passkey}”`))} ${o.owner.waiting.length === 1 ? 'was' : 'were'} added less than 24 hours ago and can be made a signer later, under Security.` : ''}</>
       : o.owner ? 'No passkey yet that can own it: see the first step.'
@@ -800,7 +800,7 @@ function SetUp({ o, reload }: { o: Overview; reload: () => void }) {
   return (
     <Units.Provider value={{ main: unit(tokens.treasury), reserve: unit(tokens.reserve) }}>
     <SetupFlow stage={0} shared={shared} threshold={o.plan?.threshold ?? 1} title={shared ? 'Set up this workspace\'s wallet' : 'Set up your wallet'}
-      intro={`Three steps. ${shared ? 'Your members\' passkeys' : 'Your passkey'} signs each one over the exact terms, and the vault service holds no key that could stand in for ${shared ? 'them' : 'it'}.`}
+      intro={`Three steps. ${shared ? 'Your members\' passkeys sign' : 'Your passkey signs'} each one over the exact terms, and the vault service holds no key that could stand in for ${shared ? 'them' : 'it'}.`}
       summary={<SetupSummary stage={0} o={o} />}>
       {o.lost ? <Note tone="wait" title="Your earlier wallet is no longer on the vault service">The service on this computer was started with a new data folder, so the chain that held your wallet is gone. Its tokens were valueless test tokens. Setting up makes a new wallet.</Note> : null}
       {ws?.status === 'failed' ? <Note tone="void" title="Setting up stopped before it finished">Nothing of yours was at stake: the wallet holds nothing until you accept it. Try again; each step that already happened is skipped.</Note> : null}
@@ -2128,8 +2128,7 @@ export function VaultJobScreen({ id }: { id: string }) {
   return (
     <div className="vt vt-job">
       <header className="page-head vt-job-head">
-        <div><Crumb to="/vault">On-chain wallet</Crumb><h1>{title}</h1><p><Src kind="chain" /></p>{more ? <p className="wrap-any">{more}</p> : null}<p className="vt-job-when">Asked {iso(j.createdAt)}{j.finishedAt ? `, finished ${iso(j.finishedAt)}` : ''}. {chainLine(j.network)}</p></div>
-        {j.status === 'confirming' ? <Stamp big>Confirming</Stamp> : j.status === 'reorged' ? <Stamp big tone="void">Not done</Stamp> : out ? <Stamp big tone={out[1]}>{out[0]}</Stamp> : <Stamp big tone={j.status === 'failed' || j.status === 'interrupted' ? 'void' : live ? undefined : 'plain'}>{live ? 'Running' : cap(j.status)}</Stamp>}
+        <div><Crumb to="/vault">On-chain wallet</Crumb><div className="vt-job-state">{j.status === 'confirming' ? <Stamp big>Confirming</Stamp> : j.status === 'reorged' ? <Stamp big tone="void">Not done</Stamp> : out ? <Stamp big tone={out[1]}>{out[0]}</Stamp> : <Stamp big tone={j.status === 'failed' || j.status === 'interrupted' ? 'void' : live ? undefined : 'plain'}>{live ? 'Running' : cap(j.status)}</Stamp>}</div><h1>{title}</h1><p><Src kind="chain" /></p>{more ? <p className="wrap-any">{more}</p> : null}{!live && !j.error && out?.[1] === 'ok' ? <p className="wrap-any">A finished action on the test wallet. Its checks, its result and its evidence are below; nothing on this page can change or repeat it.</p> : live ? <p className="wrap-any">Still running. This page updates by itself, and nothing here needs you.</p> : null}<p className="vt-job-when">Asked {iso(j.createdAt)}{j.finishedAt ? `, finished ${iso(j.finishedAt)}` : ''}. {chainLine(j.network)}</p></div>
       </header>
       {j.status === 'confirming' ? <Note tone="wait" title="Mined, waiting for its confirmations">Its transaction is in block {j.confirmations?.block ?? 'not read yet'}, with {j.confirmations?.have ?? 0} of the {j.confirmations?.need ?? 2} confirmations an operation needs before QED reports it done (the block itself counts as one). If a reorganisation of the chain replaces that block first, it is reported as not done, never as done.</Note> : null}
       {j.error ? <Note tone="void" title={j.status === 'interrupted' ? 'The service stopped while this was running' : j.status === 'reorged' ? 'A reorganisation of the chain undid it' : 'It stopped with an error'}>{plain(j.error)}{j.guidance ? <span className="vt-block">{plain(j.guidance)}</span> : null}</Note> : null}
