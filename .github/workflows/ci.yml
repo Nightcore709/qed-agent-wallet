@@ -15,7 +15,7 @@ jobs:
     name: Solidity — build, 145 tests, fuzz + invariants
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       - uses: foundry-rs/foundry-toolchain@v1
       - run: forge build --sizes
@@ -26,7 +26,7 @@ jobs:
     name: Agent — type-check, 60 tests, all four economies on a local chain
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
@@ -64,7 +64,7 @@ jobs:
     name: Independently re-verify every on-chain claim (Ethereum Sepolia, no keys)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
