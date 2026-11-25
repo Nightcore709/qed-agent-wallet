@@ -1,7 +1,7 @@
 /**
  * A design fixture: an isolated stack with one fresh passkey household that has realistic activity on both sides.
  * Paper household: bills, payments, purchases at live prices, standing instructions, earning work. On-chain vault (a
- * local chain on this computer, valueless test tokens): accepted, a mandate, a payment, a promise, money set aside, a
+ * local chain on this QED installation, valueless test tokens): accepted, a mandate, a payment, a promise, money set aside, a
  * conversion and a standing policy. Everything is done through the public API with passkey approvals over exact
  * terms (a software authenticator answering as Touch ID would); nothing is written to the database directly, except, with
  * QED_FIXTURE_EARN_STATES=1, one paper job as the wallet recorded jobs before terms were recorded (see the paper escrow's states).

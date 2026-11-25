@@ -89,7 +89,7 @@ test('a fund purchase: the NAV day in words, each state with its day on the reco
   const sheet = page.getByRole('dialog', { name: 'Approve this order' })
   await expect(sheet.getByText(new RegExp(`^the NAV for ${DAY.source}, or the next one published$`))).toBeVisible()
   await expect(sheet.getByText(/^On paper the money reaches the fund house about 2 seconds after you approve, (?:before|after) the 15:00 India time cut-off\./)).toBeVisible()
-  await expect(sheet.getByText(/synthetic NAV generated on this computer \(presentation mode\)/)).toBeVisible()
+  await expect(sheet.getByText(/synthetic NAV generated on this QED installation \(presentation mode\)/)).toBeVisible()
   expect(await sheet.innerText()).not.toMatch(ISO)
   await sheet.getByRole('button', { name: 'Approve and send with your passkey' }).click()
 

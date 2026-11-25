@@ -39,7 +39,7 @@ test('presentation mode: every screen says its values are synthetic, and nothing
     expect(text, path).not.toMatch(/(?:from|by|on|through) (?:CoinDCX|AMFI|Binance|Coinbase|the ECB|the New York Fed|mfapi\.in)/)
     expect(text, path).not.toMatch(/\((?:Binance|Coinbase|ECB reference)\)/)
   }
-  // two providers, both generated on this computer: 'synthetic' (crypto, funds, rates) and 'synthetic-markets' (the paper
+  // two providers, both generated on this QED installation: 'synthetic' (crypto, funds, rates) and 'synthetic-markets' (the paper
   // exchange's shares, ETFs, bills and bonds, whose label on screen reads "Synthetic prices ... not market data")
   expect(s.query('SELECT DISTINCT provider FROM quotes ORDER BY provider')).toEqual([{ provider: 'synthetic' }, { provider: 'synthetic-markets' }])
   expect(s.query('SELECT DISTINCT source FROM daily_values ORDER BY source')).toEqual([{ source: 'synthetic' }, { source: 'synthetic-markets' }])
@@ -63,7 +63,7 @@ test('an order estimate says when and where it was priced, counts down, and cann
   await page.getByLabel('With how much').fill('2000')
   await page.getByRole('button', { name: 'See what this would do' }).click()
   const sheet = page.getByRole('dialog', { name: 'Approve this order' })
-  await expect(sheet.getByText(/Priced on synthetic values generated on this computer \(presentation mode\)'s order book at \d\d:\d\d:\d\d\. This estimate holds for \d+ more seconds/)).toBeVisible()
+  await expect(sheet.getByText(/Priced on synthetic values generated on this QED installation \(presentation mode\)'s order book at \d\d:\d\d:\d\d\. This estimate holds for \d+ more seconds/)).toBeVisible()
   await expect(sheet.getByRole('button', { name: 'Approve and send with your passkey' })).toBeEnabled()
   // the test stack's quotes hold for 6 seconds (60 normally)
   await expect(sheet.getByText(/This estimate has lapsed: close this and see what it would do again/)).toBeVisible({ timeout: 10_000 })
@@ -97,7 +97,7 @@ test('an order’s receipt states its reference price, spread, average, fee and 
   const costs = (JSON.parse(r!.body_json) as { costs: { cashBooked: string; ledgerAgrees: boolean } }).costs
   expect(costs.ledgerAgrees).toBe(true)
   await page.goto(`${s.base}/receipts/${a!.receipt_id}`)
-  await expect(page.getByText(/^The best ask, ₹[\d,]+\.\d\d, on synthetic values generated on this computer \(presentation mode\)'s order book it filled against/)).toBeVisible()
+  await expect(page.getByText(/^The best ask, ₹[\d,]+\.\d\d, on synthetic values generated on this QED installation \(presentation mode\)'s order book it filled against/)).toBeVisible()
   await expect(page.getByText(/between the best bid and ask/)).toBeVisible()
   const ledgerText = await page.getByText(/^Agrees: it moved exactly ₹/).innerText()
   expect(Math.round(Number(ledgerText.match(/₹([\d,]+\.\d\d)/)![1]!.replace(/,/g, '')) * 100)).toBe(-Number(costs.cashBooked))

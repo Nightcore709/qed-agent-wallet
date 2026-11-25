@@ -56,11 +56,11 @@ describe('the configuration', () => {
     expect(g).toMatchObject({ issuer: 'https://accounts.google.com', issuers: ['https://accounts.google.com', 'accounts.google.com'], authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
       tokenEndpoint: 'https://oauth2.googleapis.com/token', jwksUri: 'https://www.googleapis.com/oauth2/v3/certs', redirectUri: 'https://qed.example/auth/google/callback', standIn: false })
   })
-  it('accepts a stand-in issuer only on an isolated test stack, on this computer, with no public origin', () => {
+  it('accepts a stand-in issuer only on an isolated test stack, on this QED installation, with no public origin', () => {
     const base = { QED_GOOGLE_CLIENT_ID: 'id', QED_GOOGLE_CLIENT_SECRET: 'secret', QED_GOOGLE_ISSUER: 'http://127.0.0.1:9999' }
     expect(() => googleConfig(base, 'http://localhost:5174', null)).toThrow(/isolated test stack/)
     expect(() => googleConfig({ ...base, QED_TEST_STACK: '1' }, 'https://qed.example', 'https://qed.example')).toThrow(/isolated test stack/)
-    expect(() => googleConfig({ ...base, QED_TEST_STACK: '1', QED_GOOGLE_ISSUER: 'https://evil.example' }, 'http://localhost:5174', null)).toThrow(/on this computer/)
+    expect(() => googleConfig({ ...base, QED_TEST_STACK: '1', QED_GOOGLE_ISSUER: 'https://evil.example' }, 'http://localhost:5174', null)).toThrow(/on this QED installation/)
     expect(googleConfig({ ...base, QED_TEST_STACK: '1' }, 'http://localhost:5174', null)).toMatchObject({ standIn: true, issuer: 'http://127.0.0.1:9999', issuers: ['http://127.0.0.1:9999'] })
   })
 })

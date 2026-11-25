@@ -179,6 +179,6 @@ test('a subscription is found and reviewed; a repeat is held and confirmed; a di
   await page.emulateMedia({ media: 'screen' })
 
   // 5. Activity shows the dispute's state
-  await page.goto(`${s.base}/activity`)
+  await page.goto(`${s.base}/activity?view=list`)
   await expect(page.getByText('Dispute open').first()).toBeVisible()
 })

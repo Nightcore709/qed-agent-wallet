@@ -103,6 +103,14 @@ export function useMasonry() {
     if (!el) return undefined
     const UNIT = 4
     const apply = () => {
+      // R14: laying the board out starts by taking every card back to its own height, and measuring forces the browser to
+      // lay the page out in that state. The page is shorter for that moment, so the browser pulls a scrolled page up to
+      // the new end (Home jumped to its top, with a twitch, on every refresh). The position is put back once the
+      // board has its heights again.
+      const keep = window.scrollY
+      try { settle() } finally { if (window.scrollY !== keep) window.scrollTo({ top: keep, behavior: 'instant' }) }
+    }
+    const settle = () => {
       const on = getComputedStyle(el).display === 'grid'
       const cards = Array.from(el.children) as HTMLElement[]
       // back to each card's own height first: a card lengthened on the last pass must not be measured at that length.

@@ -122,7 +122,7 @@ export function sweepOne(dir: string, log: (line: string) => void, out: Sweep = 
 }
 
 /**
- * Remove the folders named `prefix…` in parent whose owner is gone (a dead process on this computer, or no owner record
+ * Remove the folders named `prefix…` in parent whose owner is gone (a dead process on this QED installation, or no owner record
  * and older than a minute), overwriting their files first; leave and report the others (sweepOne). `beforeOne` is a test
  * seam, called with each name before it is swept.
  */

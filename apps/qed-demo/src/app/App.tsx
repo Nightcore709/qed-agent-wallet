@@ -305,7 +305,7 @@ function Welcome() {
             <p>QED pays, saves, invests and earns for you within limits you sign. Code the assistant cannot change enforces every limit, and every action keeps who did it, why, and the checks it passed.</p>
           </div>
           <Vignette />
-          <p className="welcome-fine">Examples. This build uses practice money: paper balances, valueless test tokens on a chain on this computer, and live market prices.</p>
+          <p className="welcome-fine">Examples. This build uses practice money: paper balances, valueless test tokens on a chain on this QED installation, and live market prices.</p>
         </section>
 
         <main className="welcome-access" id="content">
@@ -601,7 +601,7 @@ function PresentationBanner() {
   const { session } = useSession()
   if (!session.presentation) return null
   // Claims review F2: what is synthetic is the market data; the wallet's transactions are real on a local test chain
-  return <div className="banner wait" role="note">Presentation mode: market prices, NAVs, rates and their history are synthetic, generated on this computer; no data from CoinDCX, AMFI, Binance, Coinbase or any other market data provider is used. On-chain wallet transactions are real, on a test chain running on this computer, with valueless test tokens. The 19-20 October record is historical.</div>
+  return <div className="banner wait" role="note">Presentation mode: market prices, NAVs, rates and their history are synthetic, generated on this QED installation; no data from CoinDCX, AMFI, Binance, Coinbase or any other market data provider is used. On-chain wallet transactions are real, on a test chain running on this QED installation, with valueless test tokens. The 19-20 October record is historical.</div>
 }
 
 /** Shown on every page while a recovery somebody started is open. */
@@ -930,7 +930,7 @@ function Shell() {
       <header className="topbar">
         <span className="topbar-start">
           <Brand to="/" />
-          <span className="practice-chip" title={session.presentation ? 'Every price and value is synthetic, generated on this computer.' : 'The bank account is paper money and the on-chain wallet holds valueless test tokens. Prices are live market observations.'}><span className="long">{session.presentation ? 'Synthetic prices' : 'Practice money'}</span><span className="short">Practice</span></span>
+          <span className="practice-chip" title={session.presentation ? 'Every price and value is synthetic, generated on this QED installation.' : 'The bank account is paper money and the on-chain wallet holds valueless test tokens. Prices are live market observations.'}><span className="long">{session.presentation ? 'Synthetic prices' : 'Practice money'}</span><span className="short">Practice</span></span>
         </span>
         {onAsk ? <span className="ask-gap" aria-hidden="true" /> : <AskField path={path} />}
         <span className="topbar-tools">

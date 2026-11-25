@@ -705,3 +705,39 @@ a.ac-trace-link:hover { color: var(--ink); text-decoration: underline; }
 .ac-glossary dt { font-weight: 650; color: var(--ink); }
 .ac-glossary dd { line-height: 1.45; }
 @media (max-width: 759px) { .ac-glossary { padding: var(--s2) var(--s4); } }
+
+/* ------------------------------------------------------------------------------------------------ R14: folders first, a compact bar
+   Activity opens on its folders. One bar under the heading: Folders/List, the search and one button for the filters; the
+   filters (five selects on one baseline, the amount and the dates behind "More filters") open under it in the list. Labels
+   sit above every field and every field has one height, so a row's fields share one baseline. The top bar's height is
+   respected by every heading and day row Activity scrolls to (the shell's own rules cover controls and sections). */
+.ac h1, .ac h2, .ac-day th, .ac-book, .ac-find, .fold-shelf, .ac [id] { scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+.ac-find { display: flex; flex-direction: column; align-items: stretch; gap: var(--s3); padding: var(--s3) var(--s4); }
+.ac-bar { display: flex; flex-wrap: wrap; align-items: end; gap: var(--s3); }
+.ac-bar .ac-search { flex: 1 1 260px; }
+.ac-view { display: inline-flex; padding: 3px; gap: 2px; border-radius: var(--r-pill); border: 1px solid var(--rule-2); background: var(--pane); }
+.ac-view-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; min-width: 44px; padding: 0 var(--s3); border: 0; border-radius: var(--r-pill); background: none; font: inherit; font-size: var(--t-small); font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.ac-view-btn svg { width: 16px; height: 16px; }
+.ac-view-btn[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
+.ac-bar .ac-filters-toggle, .ac-filters .ac-more-toggle { min-height: 44px; align-self: end; }
+.ac-panel { display: grid; gap: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.ac-panel[hidden] { display: none; }
+.ac-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items: end; gap: var(--s3); }
+.ac-filters > .ac-filter, .ac-filters > .btn { min-width: 0; }
+.ac-filters .ac-more-toggle { justify-self: start; }
+.ac-filter .input, .ac-search-box .input { min-height: 44px; }
+.ac-more-toggle[aria-expanded="true"] svg, .ac-filters-toggle[aria-expanded="true"] svg:last-child { rotate: 180deg; }
+.ac-ranges { grid-column: auto; align-items: end; }
+.ac-range > legend { float: none; display: block; }
+.ac-range-pair { align-items: end; }
+.ac-kept { margin: 0; }
+.ac-find-foot { border-top: 1px solid var(--rule); }
+/* a row's primary line is what happened, the amount and the state; every time and chain fact is behind its own button */
+.ac-more { display: block; margin-top: 2px; }
+ul.ac-detail { list-style: none; margin: 6px 0 0; padding: var(--s2) var(--s3); display: grid; gap: 4px; border-left: 2px solid var(--rule-2); }
+ul.ac-detail[hidden] { display: none; }
+ul.ac-detail > li { margin: 0; }
+@media (max-width: 759px) {
+  .ac-bar .ac-search { flex-basis: 100%; order: 3; }
+  .ac-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}

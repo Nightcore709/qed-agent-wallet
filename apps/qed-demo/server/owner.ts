@@ -68,14 +68,14 @@ interface Built { kind: 'order' | 'payment'; venue: string; params: OrderParams 
  */
 function framed(inst: Instrument, side: Side, type: 'nav' | 'market' | 'limit' | 'stop', b: Built, synthetic = false): Built {
   const fund = inst.kind === 'mutual_fund'
-  // in presentation mode the NAVs and the book are generated on this computer: the sheet says so, never AMFI or a live book
+  // in presentation mode the NAVs and the book are generated on this QED installation: the sheet says so, never AMFI or a live book
   const priced = fund
-    ? synthetic ? 'it is priced at a synthetic NAV generated on this computer (presentation mode).' : 'it is priced at the NAV the fund house publishes through AMFI.'
-    : synthetic ? 'it is priced against a synthetic order book generated on this computer (presentation mode).' : 'it is priced against the live prices on its book.'
+    ? synthetic ? 'it is priced at a synthetic NAV generated on this QED installation (presentation mode).' : 'it is priced at the NAV the fund house publishes through AMFI.'
+    : synthetic ? 'it is priced against a synthetic order book generated on this QED installation (presentation mode).' : 'it is priced against the live prices on its book.'
   const head: Built['lines'] = [
     { label: 'Placed with', value: fund ? 'the fund house, on paper' : "CoinDCX's order book, on paper", basis: 'rule', note: `Practice money: no order reaches ${fund ? 'the fund house' : 'CoinDCX'}; ${priced}` },
     { label: 'Asset', value: fund ? `Units of ${inst.name}` : `${inst.base_asset}, for Indian rupees`, basis: 'exact' },
-    { label: 'Route', value: 'A paper venue on this computer', basis: 'rule', note: 'No exchange, fund house, bank or blockchain is contacted.' },
+    { label: 'Route', value: 'A paper venue on this QED installation', basis: 'rule', note: 'No exchange, fund house, bank or blockchain is contacted.' },
   ]
   const tail: Built['lines'][number] = fund
     ? side === 'buy'
@@ -123,7 +123,7 @@ async function buildOrder(ctx: Ctx, userId: string, raw: Raw, now: number): Prom
     // the NAV day by when the money reaches the fund house (a purchase) or the request reaches the registrar, in words
     const ent = fundEntitlement(inst, side, now)
     const today = istDay(now)
-    const navSource = nav.provider === 'synthetic' ? 'generated on this computer (presentation mode)' : 'published by AMFI'
+    const navSource = nav.provider === 'synthetic' ? 'generated on this QED installation (presentation mode)' : 'published by AMFI'
     basis.push(`Latest NAV ${nav.price} is for ${dayText(istDay(nav.sourceTs ?? 0), today)}, ${navSource} and received ${whenIst(nav.recvTs)}. It is not the price this order will get.`)
     const arrives = side === 'buy' ? `On paper the money reaches the fund house about ${Math.round(FUND_PAY_IN_MS / 1000)} seconds after you approve, ${ent.beforeCutoff ? 'before' : 'after'} the ${ent.cutoff} India time cut-off.` : `The request reaches the registrar when you approve, ${ent.beforeCutoff ? 'before' : 'after'} the ${ent.cutoff} India time cut-off.`
     lines.push({ label: 'Executes at', value: `the NAV for ${dayText(ent.minNavDate, today)}, or the next one published`, basis: 'rule', note: `${arrives} ${ent.rule}` })

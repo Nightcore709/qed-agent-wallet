@@ -181,7 +181,10 @@ async function activityJourney(page: Page, width: number): Promise<void> {
   await pay(page, 'City Power', 'citypower@okbank', '1200', true)
   await expect.poll(settled, { timeout: 30_000 }).toBe(2)
 
+  // R14: Activity opens on its folders; the list is a press away (or the address's view=list)
   await page.goto('/activity')
+  await expect(page.getByRole('region', { name: 'Your records, filed' }).or(page.getByRole('heading', { name: 'Your records, filed' })).first()).toBeVisible()
+  await page.getByRole('button', { name: 'Day book', exact: true }).click()
   const status = page.getByRole('search', { name: 'Find in the day book' }).getByRole('status')
   await expect(status).toHaveText('2 entries')
   // a misspelt name finds the payee, and the page says which spelling it read
@@ -192,12 +195,13 @@ async function activityJourney(page: Page, width: number): Promise<void> {
   await page.getByRole('button', { name: 'Clear the search' }).click()
   await expect(status).toHaveText('2 entries')
 
-  // on a phone the filters fold under one button
-  if (width < 760) await page.getByRole('button', { name: /^Filters/ }).click()
+  // the filters fold under one button, on every width; the amount and the dates under "More filters"
+  await page.getByRole('button', { name: /^Filters/ }).click()
   const filters = page.getByRole('group', { name: 'Filter the day book' })
   await filters.getByLabel('Direction').selectOption({ label: 'Money out' })
   await expect(status).toHaveText('Showing 2 of 2 entries.')
   // the amount and the dates are a group of their own beside the filters, folded with them on a phone
+  await page.getByRole('button', { name: 'More filters' }).click()
   const ranges = page.getByRole('group', { name: 'Narrow by amount and dates' })
   const amount = ranges.getByRole('group', { name: 'Amount, in rupees' })
   await amount.getByLabel('At least').fill('1,000')

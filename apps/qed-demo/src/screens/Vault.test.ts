@@ -294,7 +294,7 @@ describe('setting the wallet up is three steps, each saying what it does for the
   it('a shared wallet names its members and how many must sign', () => {
     const steps = setupSteps(0, true, 2)
     expect(steps[0]!.title).toBe('Create it, owned by your members')
-    expect(steps[0]!.does).toBe('QED puts a wallet on a test chain on this computer and makes your members\' passkeys its owners: 2 different members must sign for anything it does as owner.')
+    expect(steps[0]!.does).toBe('QED puts a wallet on a test chain on this QED installation and makes your members\' passkeys its owners: 2 different members must sign for anything it does as owner.')
     expect(steps[1]!.does).toBe('The passkeys of 2 different members take ownership. Then the opening grant of test rupees arrives; until then it can only be read.')
   })
 })
@@ -325,12 +325,12 @@ describe('who enforces each rule, told apart (Meridian; the owner\'s R11 criteri
 
 describe('the chain, in words (R12 task comparison, T10)', () => {
   it('names the chain with its id when the terms carry it, and says a payment out cannot be undone', () => {
-    expect(whereWords({ chainId: 31337 })).toBe('On a local test chain on this computer (chain id 31337): the tokens have no value.')
-    expect(whereWords({})).toBe('On a local test chain on this computer: the tokens have no value.')
+    expect(whereWords({ chainId: 31337 })).toBe('On a local test chain on this QED installation (chain id 31337): the tokens have no value.')
+    expect(whereWords({})).toBe('On a local test chain on this QED installation: the tokens have no value.')
     expect(FINAL_WORDS).toMatch(/On a real chain, once it is mined a payment cannot be reversed, by QED or by you/)
-    expect(FINAL_WORDS).toMatch(/whose key is held on this computer/)
-    expect(chainLine('Local Anvil chain 31337, valueless test tokens')).toBe('On a local test chain on this computer (chain id 31337); the tokens have no value.')
-    expect(chainLine(undefined)).toBe('On a local test chain on this computer; the tokens have no value.')
+    expect(FINAL_WORDS).toMatch(/whose key is held on this QED installation/)
+    expect(chainLine('Local Anvil chain 31337, valueless test tokens')).toBe('On a local test chain on this QED installation (chain id 31337); the tokens have no value.')
+    expect(chainLine(undefined)).toBe('On a local test chain on this QED installation; the tokens have no value.')
   })
   it('writes test tokens in words in a record headline, so it never reads as real money', () => {
     expect(tokensInWords('Paid ₹3.00 to CloudCo')).toBe('Paid 3.00 test rupees to CloudCo')

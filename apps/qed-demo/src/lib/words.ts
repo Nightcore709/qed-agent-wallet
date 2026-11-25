@@ -20,8 +20,8 @@ export const SOURCE: Record<string, [string, string]> = {
   amfi: ['AMFI daily NAV file', 'The NAV that every fund order executes at'],
   frankfurter: ['ECB rates, through Frankfurter', 'Dollar and euro reference rates, once each working day'],
   nyfed: ['Federal Reserve Bank of New York', 'SOFR and EFFR reference rates, once each working day'],
-  'synthetic-markets': ['Synthetic prices for shares, ETFs, bills and bonds', 'Generated on this computer from a stated starting value: a recorded fund NAV for an ETF, a round number for the rest. Not market data, and never live'],
-  synthetic: ['Synthetic values (presentation mode)', 'Every price, order book, NAV, rate and history, generated on this computer; no market data provider is used'],
+  'synthetic-markets': ['Synthetic prices for shares, ETFs, bills and bonds', 'Generated on this QED installation from a stated starting value: a recorded fund NAV for an ETF, a round number for the rest. Not market data, and never live'],
+  synthetic: ['Synthetic values (presentation mode)', 'Every price, order book, NAV, rate and history, generated on this QED installation; no market data provider is used'],
 }
 
 type Stop = { protectiveContinues?: boolean } | null | undefined

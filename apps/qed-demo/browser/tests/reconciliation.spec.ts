@@ -43,7 +43,7 @@ test('a finished payment whose rail record differs is shown as needing attention
   const row = page.getByRole('link', { name: /Pay ₹500 to Corner Shop/ }).locator('xpath=ancestor::li[1]')
   await expect(row).toContainText('Needs attention: the venue\'s record differs')
   await expect(row.getByText('Completed', { exact: true })).toHaveCount(0)
-  await page.goto('/activity')
+  await page.goto('/activity?view=list') // R14: Activity opens on its folders; the day book is the list
   await expect(page.getByText('Needs attention: the venue\'s record differs').first()).toBeVisible()
   await page.goto(`/record/${a!.id}`)
   await expect(page.getByText('Needs attention: the venue\'s record differs').first()).toBeVisible()

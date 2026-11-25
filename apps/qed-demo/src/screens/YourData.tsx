@@ -78,11 +78,23 @@ export function YourData() {
               </>
             ) : (
               <>
-                <p className="yd-note">Deleting needs a confirmation with your passkey, then waits {days(d.delayMs)}, and you can cancel in that time. It signs you out everywhere, removes your sign-in methods, contact details and notices, and overwrites names and notes in the records that stay. Your financial records stay under a pseudonymous id for {d.retention.financialYears} years, as the schedule below says. Paper balances are not paid out.</p>
-                {d.inFlight.length ? <Note tone="void" title="Not while money is in flight"><ul className="yd-list">{d.inFlight.map((x) => <li key={x}>{x}</li>)}</ul></Note> : null}
-                <Field label="Type delete my account to confirm">{(p) => <input {...p} type="text" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} />}</Field>
-                <Btn tone="void" small busy={ask.busy} disabled={text !== 'delete my account' || d.inFlight.length > 0} onClick={() => void ask.run()}>Delete my account</Btn>
-                <Problem error={ask.error} />
+                <div className="yd-del">
+                  <div className="yd-del-info">
+                    <section aria-labelledby="yd-what"><h4 id="yd-what">What happens</h4>
+                      <ul className="yd-list"><li>You are signed out everywhere.</li><li>Your sign-in methods, contact details and notices are removed.</li><li>Names and notes in the records that stay are overwritten.</li><li>Paper balances are not paid out.</li></ul></section>
+                    <section aria-labelledby="yd-stays"><h4 id="yd-stays">What stays</h4>
+                      <p className="yd-note">Your financial records stay under a pseudonymous id for {d.retention.financialYears} years, as the retention schedule below says.</p></section>
+                    <section aria-labelledby="yd-cancel"><h4 id="yd-cancel">How to cancel</h4>
+                      <p className="yd-note">Deleting needs a confirmation with your passkey, then waits {days(d.delayMs)}, and you can cancel in that time.</p></section>
+                  </div>
+                  <div className="yd-del-act">
+                    <h4>What blocks it</h4>
+                    {d.inFlight.length ? <Note tone="void" title="Not while money is in flight"><ul className="yd-list">{d.inFlight.map((x) => <li key={x}>{x}</li>)}</ul></Note> : <p className="yd-note">Nothing blocks it now: no money is in flight. It is checked again when the wait ends.</p>}
+                    <Field label="Type delete my account to confirm">{(p) => <input {...p} type="text" autoComplete="off" value={text} onChange={(e) => setText(e.target.value)} />}</Field>
+                    <Btn tone="void" small busy={ask.busy} disabled={text !== 'delete my account' || d.inFlight.length > 0} onClick={() => void ask.run()}>Delete my account</Btn>
+                    <Problem error={ask.error} />
+                  </div>
+                </div>
               </>
             )}
           </div>

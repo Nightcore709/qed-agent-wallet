@@ -53,7 +53,7 @@ test('the whole flow: the objective and the signed authority, the decision, the 
   // who decides, said before anything is asked: the double, never called a model
   const whoPanel = page.getByRole('region', { name: 'Who decides on this page' })
   await expect(whoPanel.getByText('A scripted test double, not a model')).toBeVisible()
-  await expect(whoPanel.getByText(/made up on this computer \(presentation mode\)/)).toBeVisible()
+  await expect(whoPanel.getByText(/made up on this QED installation \(presentation mode\)/)).toBeVisible()
   await expect(page.getByText('A real model', { exact: false }).filter({ hasText: /^A real model/ })).toHaveCount(0)
   const kinds = page.getByRole('region', { name: 'Where each step comes from' })
   for (const w of ['Genuine model call', 'Mock or scripted', 'Historical evidence', 'Newly reproduced']) await expect(kinds.getByText(w, { exact: true }).first()).toBeVisible()

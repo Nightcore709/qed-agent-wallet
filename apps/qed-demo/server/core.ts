@@ -717,7 +717,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const uiPorts = [apiPort, Number(env.QED_WEB_PORT ?? 5174)]
   const prod = productionSettings(env)
   // Secure by default when reachable (NIST SSDF PW.9): the local build's settings (plain HTTP, localhost names) are only
-  // safe on this computer, because its Host check stops browsers, not a client that sends "Host: localhost" itself.
+  // safe on this QED installation, because its Host check stops browsers, not a client that sends "Host: localhost" itself.
   if (!['127.0.0.1', '::1', 'localhost'].includes(host) && !prod.publicOrigin) {
     throw new Error(`Configuration: QED_HOST=${host} makes the API reachable from other computers, which needs the production settings: set QED_PUBLIC_ORIGIN to its https:// origin (docs/PRODUCTION.md), or listen on 127.0.0.1.`)
   }

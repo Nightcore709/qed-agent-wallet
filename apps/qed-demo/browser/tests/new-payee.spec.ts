@@ -76,7 +76,7 @@ test('a close match takes the registered name; a payment above the amount waits,
   expect(s.query('SELECT name, name_check, registered_name FROM payees WHERE user_id = ?', person!.id)).toEqual([{ name: 'Ravi Kumar', name_check: 'match', registered_name: 'Ravi Kumar' }])
   // the answer is shown with the payee before any payment
   // with where the answer comes from and what it cannot tell (R13 section 4)
-  await expect(page.getByText(/^Name check: Matches the name the paper bank holds for this address: Ravi Kumar\. Made when the payee was added, against the paper bank's own directory on this computer; no real bank or NPCI was asked\. It can say only whether a name matches the one held for the address, not who controls the account or whether someone is pressing you to pay\.$/)).toBeVisible()
+  await expect(page.getByText(/^Name check: Matches the name the paper bank holds for this address: Ravi Kumar\. Made when the payee was added, against the paper bank's own directory on this QED installation; no real bank or NPCI was asked\. It can say only whether a name matches the one held for the address, not who controls the account or whether someone is pressing you to pay\.$/)).toBeVisible()
 
   /** Pay the chosen payee; the wait is said before the terms are asked for, and the sheet gives its time and reason. */
   async function payAndApprove(amount: string): Promise<void> {
@@ -88,7 +88,7 @@ test('a close match takes the registered name; a payment above the amount waits,
     await expect(sheet.getByText(new RegExp(`^It is sent at \\d+ \\w{3} \\d{4}, \\d\\d:\\d\\d IST, not before: Ravi Kumar was added today at \\d\\d:\\d\\d, and in a payee's first 24 hours what you send it above ₹5,000 waits ${HOLD_SEC} seconds \\(shortened on this test installation; set to 24 hours\\) before it is sent, as set in Safeguards\\. Until then you can cancel it on its record\\.$`))).toBeVisible()
     await expect(sheet.getByText(/^Not before \d+ \w{3} \d{4}, \d\d:\d\d IST$/)).toBeVisible()
     await expect(sheet.getByText('Matches the name the paper bank holds for this address: Ravi Kumar', { exact: true })).toBeVisible()
-    await expect(sheet.getByText(/against the paper bank's own directory on this computer; no real bank or NPCI was asked\./)).toBeVisible()
+    await expect(sheet.getByText(/against the paper bank's own directory on this QED installation; no real bank or NPCI was asked\./)).toBeVisible()
     await sheet.getByRole('button', { name: 'Approve and send with your passkey' }).click()
     await expect(sheet).toBeHidden()
   }

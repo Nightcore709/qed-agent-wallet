@@ -37,7 +37,7 @@ export interface EmailState {
   pending: boolean
   /** Whether this installation can send a confirmation at all. False: confirming is unavailable here, and the screens say so. */
   canVerify: boolean
-  /** True with the local test outbox: the "message" is kept on this computer and nothing is sent. */
+  /** True with the local test outbox: the "message" is kept on this QED installation and nothing is sent. */
   simulated: boolean
 }
 

@@ -123,7 +123,7 @@ export function executedWords(c: { outcome: string; venue: string }, s5: J, s6: 
   if (txs.length) {
     const ok = txs.filter((t) => t.status === 'success').length
     const blocks = [...new Set(txs.map((t) => String(t.block ?? '')).filter(Boolean))]
-    const where = c.venue === 'ephemeral-chain' || txs.every((t) => t.chain === 'ephemeral') ? 'a throwaway test chain that no longer exists' : 'the local test chain on this computer'
+    const where = c.venue === 'ephemeral-chain' || txs.every((t) => t.chain === 'ephemeral') ? 'a throwaway test chain that no longer exists' : 'the local test chain on this QED installation'
     return `${txs.length === 1 ? 'One transaction' : `${txs.length} transactions`} on ${where}; ${ok} of ${txs.length} succeeded${blocks.length ? `, in block${blocks.length === 1 ? '' : 's'} ${blocks.join(', ')}` : ''}.`
   }
   if (s5.executed && (c.venue === 'paper' || s6.venue?.kind === 'paper')) return 'Filled by a paper venue this installation runs, with its own books; no order or payment reached an exchange or a bank.'
@@ -152,7 +152,7 @@ export function reconciledWords(s3: J, s5: J, v: J): string {
 /** The kinds of evidence, in the owner's terms, so that none is read as another; each counts its cases and narrows to them. */
 type KindKey = 'local-chain' | 'ephemeral-chain' | 'paper' | 'scripted'
 const KINDS: { key: KindKey; word: string; says: string; of: (c: CaseSummary) => boolean }[] = [
-  { key: 'local-chain', word: 'Local test chain', says: 'Executed by this build on a chain on this computer, with test tokens of no value. Re-readable while it runs; not a public network.', of: (c) => c.venue === 'local-chain' },
+  { key: 'local-chain', word: 'Local test chain', says: 'Executed by this build on a chain on this QED installation, with test tokens of no value. Re-readable while it runs; not a public network.', of: (c) => c.venue === 'local-chain' },
   { key: 'ephemeral-chain', word: 'Throwaway test chain', says: 'Executed on a chain made for one test and gone since; only its record remains.', of: (c) => c.venue === 'ephemeral-chain' },
   { key: 'paper', word: 'Paper venue', says: 'Simulated: this installation\'s own books. No exchange or bank was reached and no money moved.', of: (c) => c.venue === 'paper' },
   { key: 'scripted', word: 'Scripted test double', says: 'Replies replayed from a fixed file, not a model. It shows what QED\'s controls do with a proposal, not what a model would do.', of: (c) => c.model?.label === 'scripted-test-double' },
@@ -540,7 +540,7 @@ export function EvidenceCaseScreen({ id }: { id: string }) {
           <Step n="6" s={s6} hash={c.hashes.sections['6'] ?? ''}>
             <dl className="kv small">
               {s6.revision ? <><dt>QED's code</dt><dd>Revision {String(s6.revision.commit ?? '').slice(0, 7)}{s6.revision.uncommittedChanges ? <span className="wait">, with changes not yet committed</span> : null}</dd></> : null}
-              {s6.chain ? <><dt>Chain</dt><dd>{s6.chain.chainId === 31337 ? 'A local test chain on this computer; not publicly verifiable' : `Chain ${String(s6.chain.chainId)}`}</dd></> : null}
+              {s6.chain ? <><dt>Chain</dt><dd>{s6.chain.chainId === 31337 ? 'A local test chain on this QED installation; not publicly verifiable' : `Chain ${String(s6.chain.chainId)}`}</dd></> : null}
               {txs.length ? <><dt>Transactions</dt><dd>{txs.filter((t) => t.status === 'success').length} of {txs.length} succeeded{txs.some((t) => t.block) ? `, in block ${[...new Set(txs.map((t) => String(t.block ?? '')).filter(Boolean))].join(', ')}` : ''}; each hash is in the technical detail below</dd></> : null}
             </dl>
           </Step>

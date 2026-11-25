@@ -3,7 +3,7 @@
  * a priced quote (HTTP 402, in the style of the x402 pattern); QED compares the quotes and, only inside a mandate you sign
  * with your passkey (a limit for one purchase, a limit for a month, the services allowed), pays one on the paper rail. Every
  * purchase is kept with the quotes compared, the checks made and its receipt; one outside the mandate is refused with the
- * reason. Both services are test doubles on this computer and no real money moves.
+ * reason. Both services are test doubles on this QED installation and no real money moves.
  */
 import { Check, ShoppingBag, X } from 'lucide-react'
 import { useRef, useState } from 'react'
@@ -45,7 +45,7 @@ export function Commerce() {
   const picked = chosen ?? data?.services.map((s) => s.id) ?? []
   return (
     <section className="panel pay-commerce" aria-labelledby="cm-h">
-      <div className="pay-sec-head cm-head"><div><h2 id="cm-h">Services QED can buy for you</h2><p>Simulated: two test services on this computer, paid on the paper rail. No real money moves and no real merchant is involved.</p>
+      <div className="pay-sec-head cm-head"><div><h2 id="cm-h">Services QED can buy for you</h2><p>Simulated: two test services on this QED installation, paid on the paper rail. No real money moves and no real merchant is involved.</p>
         {data?.note ? <details className="disclose cm-note"><summary>What is simulated, and what is not claimed</summary><p>{data.note}</p></details> : null}</div></div>
       {error ? <Problem error={error} /> : !data ? <Loading what="Reading the mandate" /> : <div className="cm-grid">
         <div className="cm-mandate">

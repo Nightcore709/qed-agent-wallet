@@ -33,7 +33,7 @@ export function googleConfig(env: NodeJS.ProcessEnv, linkOrigin: string, publicO
     if (env.QED_TEST_STACK !== '1' || publicOrigin) throw new Error('Configuration: QED_GOOGLE_ISSUER names a stand-in issuer for tests. It is honoured only on an isolated test stack (QED_TEST_STACK=1) with no public origin; Google\'s own endpoints are built in.')
     let u: URL
     try { u = new URL(standIn) } catch { throw new Error(`Configuration: QED_GOOGLE_ISSUER (${standIn}) is not a URL.`) }
-    if (u.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(u.hostname) || u.pathname !== '/' || u.search || u.hash) throw new Error('Configuration: QED_GOOGLE_ISSUER must be an http:// origin on this computer (127.0.0.1 or localhost).')
+    if (u.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(u.hostname) || u.pathname !== '/' || u.search || u.hash) throw new Error('Configuration: QED_GOOGLE_ISSUER must be an http:// origin on this QED installation (127.0.0.1 or localhost).')
     return { clientId, clientSecret, issuers: [u.origin], issuer: u.origin, authorizationEndpoint: `${u.origin}/authorize`, tokenEndpoint: `${u.origin}/token`, jwksUri: `${u.origin}/jwks`, redirectUri, standIn: true }
   }
   return {

@@ -36,12 +36,12 @@ const sim = (id: string, name: string, channel: string, revocation: string, text
 const real = (r: Omit<InstitutionTerms, 'simulated' | 'channel' | 'registration' | 'readOn'> & { channel?: string | null }): InstitutionTerms => ({ ...r, simulated: false, channel: r.channel ?? null, registration: 'not-registered', readOn: '2026-11-23' })
 
 export const INSTITUTION_TERMS: readonly InstitutionTerms[] = [
-  sim('paper-rail', 'The paper bank', 'e-mandate and payment API on this computer', 'The paper bank\'s revoke call, which answers with its own reference', 'QED\'s local stand-in for a bank, with standing debit mandates and UPI, IMPS, NEFT and RTGS style rails. No real money moves.'),
-  sim('paper-crypto', 'The paper exchange', 'order API on this computer', 'Cancelling an order, which the paper exchange acknowledges', 'QED\'s local stand-in for a crypto exchange, filling against recorded order books.'),
-  sim('paper-mf', 'The paper fund registrar', 'order API on this computer', 'Cancelling an order before its NAV day', 'QED\'s local stand-in for a fund registrar, allotting units at a recorded NAV.'),
-  sim('paper-exchange', 'The paper securities exchange desk', 'order API on this computer', 'Cancelling an order, which the desk acknowledges', 'QED\'s local stand-in for a securities exchange desk.'),
-  sim('paper-gsec', 'The paper government-securities desk', 'order API on this computer', 'Cancelling an order, which the desk acknowledges', 'QED\'s local stand-in for a government-securities desk.'),
-  sim('paper-fx-desk', 'The paper foreign-exchange desk', 'conversion API on this computer', 'None: a conversion settles at once on paper', 'QED\'s local stand-in for a foreign-exchange desk.'),
+  sim('paper-rail', 'The paper bank', 'e-mandate and payment API on this QED installation', 'The paper bank\'s revoke call, which answers with its own reference', 'QED\'s local stand-in for a bank, with standing debit mandates and UPI, IMPS, NEFT and RTGS style rails. No real money moves.'),
+  sim('paper-crypto', 'The paper exchange', 'order API on this QED installation', 'Cancelling an order, which the paper exchange acknowledges', 'QED\'s local stand-in for a crypto exchange, filling against recorded order books.'),
+  sim('paper-mf', 'The paper fund registrar', 'order API on this QED installation', 'Cancelling an order before its NAV day', 'QED\'s local stand-in for a fund registrar, allotting units at a recorded NAV.'),
+  sim('paper-exchange', 'The paper securities exchange desk', 'order API on this QED installation', 'Cancelling an order, which the desk acknowledges', 'QED\'s local stand-in for a securities exchange desk.'),
+  sim('paper-gsec', 'The paper government-securities desk', 'order API on this QED installation', 'Cancelling an order, which the desk acknowledges', 'QED\'s local stand-in for a government-securities desk.'),
+  sim('paper-fx-desk', 'The paper foreign-exchange desk', 'conversion API on this QED installation', 'None: a conversion settles at once on paper', 'QED\'s local stand-in for a foreign-exchange desk.'),
   real({ id: 'wells-fargo', name: 'Wells Fargo (reference only)', termsUrl: 'https://www.wellsfargo.com/online-banking/online-access-agreement/upcoming/', termsVersion: 'Online Access Agreement, Version Effective November 24, 2026', effectiveDate: '2026-11-24',
     agentPolicy: 'credentials-only', agentPolicyText: 'Section 15: an AI agent given the customer\'s login credentials acts as the customer, its instructions deemed authorised by the customer, at the customer\'s own risk. No agent channel is described.', revocationChannel: 'The customer must be able to evidence a revocation (section 15(f)).' }),
   real({ id: 'citi', name: 'Citi (reference only)', termsUrl: 'https://www.citi.com/tandc/view-printable-version', termsVersion: 'Online User Agreement, last updated November 2026, section H', effectiveDate: '2026-11',
@@ -67,7 +67,7 @@ export function staleRecords(asOf: string, records: readonly InstitutionTerms[] 
 export function connectable(t: InstitutionTerms): { ok: boolean; reason: string } {
   if (t.agentPolicy === 'credentials-only') return { ok: false, reason: `${t.name}: its terms give an agent no channel but the customer\'s own login credentials, and QED never asks for, holds or uses a bank password. No connection is made.` }
   if (!t.simulated) return { ok: false, reason: `${t.name}: QED holds no registration and no connector for a real institution yet (EXT-14). The terms are recorded for reference only.` }
-  return { ok: true, reason: 'A simulated institution on this computer.' }
+  return { ok: true, reason: 'A simulated institution on this QED installation.' }
 }
 export function assertConnectable(id: string): InstitutionTerms {
   const t = termsOf(id)
@@ -83,7 +83,7 @@ export function connectionSummary(t: InstitutionTerms): { id: string; name: stri
   return {
     id: t.id, name: t.name, simulated: t.simulated, termsVersion: t.termsVersion, connectable: c.ok, reason: c.reason,
     lines: [
-      { label: t.simulated ? 'Kind' : 'Status', value: t.simulated ? 'Simulated: QED\'s own stand-in on this computer. Nothing here is a real institution, and no real money moves.' : 'A real institution: terms read for reference, no connection.' },
+      { label: t.simulated ? 'Kind' : 'Status', value: t.simulated ? 'Simulated: QED\'s own stand-in on this QED installation. Nothing here is a real institution, and no real money moves.' : 'A real institution: terms read for reference, no connection.' },
       { label: 'Terms', value: `${t.termsVersion}, effective ${t.effectiveDate}, read ${t.readOn}` },
       { label: 'Agent policy', value: t.agentPolicyText },
       { label: 'Channel', value: t.channel ?? 'None offered to an agent' },

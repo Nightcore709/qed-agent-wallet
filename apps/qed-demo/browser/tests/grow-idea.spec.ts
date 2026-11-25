@@ -92,7 +92,7 @@ test('on a computer: a lump sum tested against doing nothing, ordered once with 
   await expect(alts.getByText('Synthetic prices')).toBeVisible()
   await expect(alts.getByText('Do nothing', { exact: true })).toBeVisible()
   await expect(alts.getByText(/too short for a claim; QED makes none until 36/).first()).toBeVisible()
-  await expect(alts.getByText(/Every price here is synthetic, generated on this computer: this shows the method, not markets\./)).toBeVisible()
+  await expect(alts.getByText(/Every price here is synthetic, generated on this QED installation: this shows the method, not markets\./)).toBeVisible()
   expect(inv.evidence.outcomes.map((o) => o.id)).toEqual(expect.arrayContaining(['idea', 'cash', 'liquid', 'spread']))
   // what it does to the money: free money before and after, as the server worked them out
   const effects = page.getByRole('region', { name: 'What it does to your money' })
