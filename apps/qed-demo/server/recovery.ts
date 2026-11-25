@@ -155,6 +155,8 @@ function wrongTry(db: Db, tokenId: string, tries: number, now: number): void {
  */
 export function addAddress(db: Db, s: Session, kind: Kind, raw: unknown, now: number, replaces?: unknown): { id: string; expiresAt: number } {
   noDelivery('address')
+  // email goes through Postmark; no text-message provider exists, so no code could reach a phone (nothing is pretended)
+  if (kind === 'phone' && deliveryMode() === 'postmark') throw new AppError(503, 'delivery_unavailable', 'QED sends email, not text messages, so a phone number cannot be confirmed here. Add an email address instead.')
   if (!strongConfirm(db, s, now)) throw confirmNeeded(db, s, kind === 'email' ? 'add an email address' : 'add a phone number', now)
   // an address can start a reset or a recovery after the delay: a passkey in its cool-off adds none (RISK-068, Q-062)
   refuseCoolingOff(db, s, kind === 'email' ? 'add an email address' : 'add a phone number', now)

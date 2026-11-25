@@ -7,7 +7,11 @@
  *              computer, and nothing presents a stored message as one that was sent. Refused with a public origin
  *              (core.ts loadConfig): the page shows reset links to whoever can open it.
  *   None       no adapter (the default with a public origin): a feature that needs a message says that it cannot send one.
- *   Provider   prepared, not configured. A real email or SMS provider needs, before any code may send through it: a
+ *   Postmark   QED_DELIVERY=postmark (server/postmark.ts): each email is queued here and sent by the engine's mail loop
+ *              (mailTick), once each, with retries for a short while after a failure that may pass. Text messages are not
+ *              sent through it: a phone number cannot be confirmed (recovery.ts addAddress). Refused at start unless its
+ *              token, sender address and stream are set (postmark-config.ts).
+ *   Provider   prepared, not configured (an SMS provider; email has Postmark above). A real email or SMS provider needs, before any code may send through it: a
  *              provider account, its credentials kept out of source control, a verified sending domain (SPF, DKIM,
  *              DMARC) for email, sender registration for text messages in India (TRAI's DLT registration of the sender
  *              ID and each message template), and the owner's approval for the spending and for handing addresses and
@@ -31,6 +35,12 @@ export type Channel = 'email' | 'sms'
  * code exactly as they appear in the body, taken out of the kept text when the token stops working.
  */
 export interface Message { channel: Channel; to: string; personId: string | null; purpose: string; subject: string; body: string; tokenId?: string; secrets?: string[] }
+
+/** What an adapter throws. `retry`: the failure may pass (a timeout, a rate limit, Postmark's own error), so the message is tried again. */
+export class DeliveryError extends Error {
+  readonly retry: boolean
+  constructor(message: string, retry: boolean) { super(message); this.name = 'DeliveryError'; this.retry = retry }
+}
 
 export interface DeliveryAdapter {
   readonly name: string
@@ -74,12 +84,14 @@ export const linkTo = (path: string, token: string): string => `${settings.linkO
  */
 export function deliver(db: Db, m: Message, now: number): string | null {
   if (settings.delivery === 'none') return null
+  // with a provider the message waits in the queue for the mail loop; with the outbox that is the whole delivery
+  const queued = settings.delivery === 'postmark'
   const id = newId('msg', now)
   const body = m.body.slice(0, 4000)
   // The same text with its link and code taken out, kept beside it for when they stop working (redactSpent).
   const redacted = m.tokenId ? (m.secrets ?? []).filter(Boolean).reduce((b, secret) => b.split(secret).join(REMOVED), body) : null
   db.run('INSERT INTO outbound_messages (id, person_id, channel, to_address, purpose, subject, body, created_at, status, adapter, token_id, body_redacted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    id, m.personId, m.channel, m.to, m.purpose, m.subject.slice(0, 200), body, now, 'simulated', OUTBOX.name, m.tokenId ?? null, redacted)
+    id, m.personId, m.channel, m.to, m.purpose, m.subject.slice(0, 200), body, now, queued ? 'queued' : 'simulated', queued ? 'postmark' : OUTBOX.name, m.tokenId ?? null, redacted)
   return id
 }
 
@@ -95,26 +107,56 @@ export function redactSpent(db: Db, now: number): number {
     (SELECT id FROM one_time_tokens WHERE used_at IS NOT NULL OR replaced_at IS NOT NULL OR expires_at <= ?)`, now, now).changes
 }
 
+/** How long a message that failed in a way that may pass is tried again, and how long between tries. */
+export const RETRY_WINDOW_MS = 10 * 60_000
+export const RETRY_EVERY_MS = 15_000
 /**
- * Prepared for a provider: send every queued message with the given adapter, once each, recording the outcome. Nothing
- * in this build queues a message (the outbox stores them as simulated), so this runs only in its own test, with a fake.
- * A sent message's body is replaced by a note, so a link it carried is not kept beside the database's other records.
+ * A message still 'sending' this long after the retry window closed was claimed by a process that has gone: it is said to
+ * have failed and is not sent again (a duplicate security message is worse than a lost one). Measured from its creation
+ * because no claim time is kept, so a live attempt, which the window bounds, is never taken for a dead one.
  */
-export async function dispatchQueued(db: Db, adapter: DeliveryAdapter, now: number, limit = 20): Promise<{ sent: number; failed: number }> {
-  let sent = 0, failed = 0
-  for (const m of db.all<{ id: string; person_id: string | null; channel: Channel; to_address: string; purpose: string; subject: string; body: string }>(`SELECT * FROM outbound_messages WHERE status = 'queued' ORDER BY created_at LIMIT ?`, limit)) {
+export const SENDING_STALE_MS = 2 * 60_000
+const nextTry = new Map<string, number>()
+
+/**
+ * Send every queued message with the given adapter, once each, recording the outcome. A message is claimed first, so a
+ * second dispatcher cannot send it. A sent message's body is replaced by a note, so a link it carried is not kept beside
+ * the database's other records. A failure that may pass (DeliveryError.retry: a timeout, a rate limit, a provider error)
+ * puts the message back in the queue for another try in RETRY_EVERY_MS, until RETRY_WINDOW_MS after it was made; any other
+ * failure, or the end of the window, is final ('failed', with the reason). A message whose link or code stopped working
+ * while it waited (used, replaced, expired: redactSpent) is not sent at all. Nothing here logs: the caller gets counts.
+ * The reasons stored hold no address, body or token (postmark.ts).
+ */
+export async function dispatchQueued(db: Db, adapter: DeliveryAdapter, now: number, limit = 20): Promise<{ sent: number; failed: number; retrying: number }> {
+  let sent = 0, failed = 0, retrying = 0
+  // a message claimed by a process that stopped before it recorded the outcome: said to have failed, never sent again
+  db.run(`UPDATE outbound_messages SET status = 'failed', error = 'Interrupted while being sent; not sent again. Ask again.' WHERE status = 'sending' AND created_at < ?`, now - RETRY_WINDOW_MS - SENDING_STALE_MS)
+  for (const m of db.all<{ id: string; person_id: string | null; channel: Channel; to_address: string; purpose: string; subject: string; body: string; created_at: number; redacted_at: number | null }>(`SELECT * FROM outbound_messages WHERE status = 'queued' ORDER BY created_at LIMIT ?`, limit)) {
+    if ((nextTry.get(m.id) ?? 0) > now) continue
     // claimed first, so a second dispatcher cannot send it again
     if (db.run(`UPDATE outbound_messages SET status = 'sending' WHERE id = ? AND status = 'queued'`, m.id).changes !== 1) continue
+    nextTry.delete(m.id)
+    if (m.redacted_at !== null) {
+      db.run(`UPDATE outbound_messages SET status = 'failed', error = 'Not sent: its link or code stopped working before it could be sent.' WHERE id = ?`, m.id)
+      failed++; continue
+    }
     try {
       const r = await adapter.send({ id: m.id, channel: m.channel, to: m.to_address, personId: m.person_id, purpose: m.purpose, subject: m.subject, body: m.body })
-      db.run(`UPDATE outbound_messages SET status = 'sent', sent_at = ?, provider_ref = ?, adapter = ?, body = '(sent; the text is not kept)', body_redacted = NULL WHERE id = ?`, now, r.providerRef, adapter.name, m.id)
+      db.run(`UPDATE outbound_messages SET status = 'sent', sent_at = ?, provider_ref = ?, adapter = ?, body = '(sent; the text is not kept)', body_redacted = NULL, error = NULL WHERE id = ?`, now, r.providerRef, adapter.name, m.id)
       sent++
     } catch (e) {
-      db.run(`UPDATE outbound_messages SET status = 'failed', error = ?, adapter = ? WHERE id = ?`, (e instanceof Error ? e.message : String(e)).slice(0, 300), adapter.name, m.id)
-      failed++
+      const reason = (e instanceof Error ? e.message : String(e)).slice(0, 300)
+      if (e instanceof DeliveryError && e.retry && now - m.created_at < RETRY_WINDOW_MS) {
+        db.run(`UPDATE outbound_messages SET status = 'queued', error = ? WHERE id = ?`, `Trying again: ${reason}`, m.id)
+        nextTry.set(m.id, now + RETRY_EVERY_MS)
+        retrying++
+      } else {
+        db.run(`UPDATE outbound_messages SET status = 'failed', error = ?, adapter = ? WHERE id = ?`, reason, adapter.name, m.id)
+        failed++
+      }
     }
   }
-  return { sent, failed }
+  return { sent, failed, retrying }
 }
 
 /** The developer page's list: newest first. Every row is a simulated message; the page says so above them all. */

@@ -31,6 +31,7 @@ import { reviewedLine } from './adviser.ts'
 import { analyseGoal, goalAuthority, goalDoc, type GoalParams, goalTitle, parseGoal, planGoal } from './goals.ts'
 import { classOf, CLASS_NAME, treatment } from './tax.ts'
 import { isSecurity, securityCosts } from './securities.ts'
+import { swpEstimate, type Leg, neededByInstant, payoutAt, planWithdrawal, RULE_VERSION, RULE_WORDS, receivingDay, scopeOf, sourcesOf, type Withdrawal } from './withdrawal.ts'
 import { checkerB, exactCheck, type Plan, PLAN_KEYS, ZERO_PLAN } from '../shared/kernel/index.ts'
 import { fromAmountText } from '../shared/amount-text.ts'
 import { floorToStep, fraction, mulDiv, notional, parseDec, parsePrice, priceToNumber, quantityFor, toNum } from '../shared/fixed.ts'
@@ -222,7 +223,7 @@ export function trailingReturn(db: Db, instrumentId: string, days: number): { an
 
 export { describeSchedule, firstDue, nextDue }
 
-export interface PlanResult { actions: PlannedAction[]; skip?: string; memo?: Record<string, unknown> }
+export interface PlanResult { actions: PlannedAction[]; skip?: string; memo?: Record<string, unknown>; /** What a run still owes, in words, when it could not do all of what was asked (shown with the run and ending it as partial). */ owed?: string; /** The latest instant the money of a withdrawal may reach the bank; the policy check re-tests it when each sale is sent. */ neededBy?: number }
 export interface ProgramRow { id: string; user_id: string; kind: ProgramKind; pillar: Pillar; title: string; state: string; live_version: number | null; next_due_at: number | null; memo: Record<string, unknown>; created_at: number }
 export interface TriggerHit { occurrence: string; trigger: Record<string, unknown>; memo?: Record<string, unknown> }
 
@@ -482,44 +483,16 @@ const sweep: KindSpec<SweepP> = {
   },
 }
 
-// ---- swp (a systematic withdrawal plan: a fixed rupee amount from one fund to the bank on a schedule; R13, audit G3)
-interface SwpP { instrumentId: string; amount: number; schedule: Schedule }
-/**
- * What one withdrawal of `units` would cost, worked out on the units it would redeem first-in, first-out: the exit load on
- * each slice by how long it has been held (the scheme's graded or flat load), and the tax on each slice's gain by the rule in
- * force (tax.ts, a model: a slab-rate class has no figure). All are estimates on today's NAV; the real NAV is a later one.
- */
-export function swpEstimate(ctx: Ctx, userId: string, inst: Instrument, units: bigint, nav: string, now: number): { gross: number; exitLoad: number; gain: number; tax: number | null; taxNote: string; slices: number; loadNote: string } {
-  const price = parsePrice(nav)
-  const gross = Number(notional(units, inst.baseScale, price, inst.quoteScale, 'down'))
-  const lots = ctx.db.all<{ opened_at: number; qty: string; remaining: string; cost: string }>(
-    'SELECT opened_at, CAST(qty AS TEXT) qty, CAST(remaining AS TEXT) remaining, CAST(cost AS TEXT) cost FROM lots WHERE user_id = ? AND instrument_id = ? AND remaining > 0 ORDER BY opened_at, id', userId, inst.id)
-  const lt = term(ctx.db, inst.meta.exitLoad ?? 'mf.exitload.none')
-  const byDay = Array.isArray(lt?.value.byDay) ? (lt!.value.byDay as string[]) : null
-  const flat = !byDay && typeof lt?.value.rate === 'string' ? Number(lt.value.rate) : 0
-  let left = Number(units), exitLoad = 0, gain = 0, tax = 0, slab = false, slices = 0
-  const cls = (at: number) => classOf(ctx.db, inst.id, at)
-  for (const l of lots) {
-    if (left <= 0) break
-    const rem = Number(l.remaining), take = Math.min(rem, left)
-    left -= take; slices++
-    const value = gross * (take / Number(units)), cost = Number(l.cost) * (take / Number(l.qty))
-    const days = Math.floor((now - l.opened_at) / 86_400_000)
-    const rate = byDay ? (days >= 0 && days < byDay.length ? Number(byDay[days]) : 0) : flat
-    exitLoad += value * rate
-    const g = value - cost
-    gain += g
-    const tr = treatment(cls(l.opened_at), l.opened_at, now)
-    if (tr.rateBp === null) slab = true
-    else if (g > 0) tax += g * (tr.rateBp / 10_000)
-  }
-  const c = cls(lots[0]?.opened_at ?? now)
-  const taxNote = lots.length === 0 ? 'No units are held yet, so there is no gain to tax.' : slab
-    ? `Taxed at your slab rate (${CLASS_NAME[c]}); this app does not know your slab, so no figure is given. The gain on this withdrawal is about ${amountText(Math.max(0, Math.round(gain)))}.`
-    : `${CLASS_NAME[c]}: modelled rate on the gain, before any yearly exemption. A model of the rules, not tax advice.`
-  return { gross, exitLoad: Math.round(exitLoad), gain: Math.round(gain), tax: slab ? null : Math.round(tax), taxNote, slices, loadNote: lt ? `${lt.name} (${lt.status})` : 'none modelled' }
-}
-const swp: KindSpec<SwpP> = {
+// ---- swp (a systematic withdrawal plan: a fixed rupee amount from the funds the owner approves to the bank on a schedule; R13 audit G3, R14 liquidity-aware)
+// `alsoFrom`, `reserve` and `needByDays` are written only when the owner set them, so a plan written before they existed keeps its exact document.
+interface SwpP { instrumentId: string; amount: number; schedule: Schedule; alsoFrom?: string[]; reserve?: number; needByDays?: number; withdrawalRule?: number }
+const swpExtras = (p: SwpP): boolean => (p.alsoFrom?.length ?? 0) > 0 || (p.reserve ?? 0) > 0 || p.needByDays !== undefined
+const swpNames = (ctx: Ctx, p: SwpP): string => sourcesOf(p).map((id) => instrument(ctx.db, id)?.name.replace(/ \(.*\)$/, '') ?? id).join(', ')
+const legSummary = (l: Leg, target: number): string => `Withdraw ${amountText(Math.min(target, l.gross))} from ${l.name}${l.last ? ' (the last units)' : ''}; the money reaches your bank about ${whenIst(l.settlesAt)}`
+/** The sentence that says what is still owed after a run or a preview, or null when nothing is. */
+const owedText = (w: Withdrawal): string | null => (w.owed ? `${amountText(w.shortfall)} of the ${amountText(w.target)} was not withdrawn this run, and later runs do not make it up: ${w.shortfallWhy.join(' ')}`.trim() : null)
+/** A plan with no added funds, reserve or deadline: exactly as it was before the liquidity-aware plan (R13), document and behaviour. */
+const swpLegacy: KindSpec<SwpP> = {
   kind: 'swp', pillar: 'grow', label: 'Withdraw regularly', blurb: 'Redeem a fixed rupee amount of one fund into your bank account each week or month, while the units last.',
   parse(ctx, _u, raw, now) {
     const f = new Fields()
@@ -597,6 +570,136 @@ const swp: KindSpec<SwpP> = {
     const act = sellOrder(inst, units, a, 'swp', false)
     const est = swpEstimate(ctx, prog.user_id, inst, units, nav.price, now)
     return { actions: [{ ...act, summary: `Withdraw ${amountText(Math.min(target, est.gross))} from ${inst.name}${last ? ' (the last units)' : ''}`, params: { ...(act.params as OrderParams), swpPaise: String(target) } }], memo: { lastWithdrawal: { units: units.toString(), exitLoadEstimate: est.exitLoad, taxEstimate: est.tax, at: now } } }
+  },
+}
+const swp: KindSpec<SwpP> = {
+  kind: 'swp', pillar: 'grow', label: 'Withdraw regularly', blurb: 'Redeem a fixed rupee amount from one fund, or from several in an order QED explains, into your bank account each week or month, while the units last.',
+  parse(ctx, _u, raw, now) {
+    const f = new Fields()
+    const inst = f.instrument(ctx.db, raw, 'instrumentId', ['mutual_fund'])
+    const amount = f.paise(raw, 'amount', { min: 50_000, max: 100_000_000, label: 'The amount each time' })
+    const schedule = f.schedule(raw, 'schedule', now)
+    if (schedule.type !== 'weekly' && schedule.type !== 'monthly') f.err('schedule', 'A withdrawal plan runs weekly or monthly.')
+    const extra: Pick<SwpP, 'alsoFrom' | 'reserve' | 'needByDays' | 'withdrawalRule'> = {}
+    if (raw.alsoFrom !== undefined) {
+      const ids = raw.alsoFrom
+      if (!Array.isArray(ids) || ids.length > 4 || ids.some((x) => typeof x !== 'string')) f.err('alsoFrom', 'Choose up to four more funds to withdraw from.')
+      else {
+        const more: string[] = []
+        for (const id of ids as string[]) {
+          const i = instrument(ctx.db, id)
+          if (!i || !i.tradable || i.kind !== 'mutual_fund') f.err('alsoFrom', 'Choose funds QED can trade.')
+          else if (id === inst?.id || more.includes(id)) f.err('alsoFrom', 'Each fund can be chosen once.')
+          else more.push(id)
+        }
+        if (more.length) extra.alsoFrom = more
+      }
+    }
+    if (raw.reserve !== undefined && raw.reserve !== 0) {
+      const r = f.paise(raw, 'reserve', { min: 0, max: 100_000_000_000, label: 'The reserve' })
+      if (r > 0) extra.reserve = r
+    }
+    if (raw.needByDays !== undefined && raw.needByDays !== null) extra.needByDays = f.int(raw, 'needByDays', 1, 10, 'The days to have the money by')
+    if (raw.withdrawalRule !== undefined && raw.withdrawalRule !== RULE_VERSION) f.err('withdrawalRule', `This version of QED implements withdrawal rule ${RULE_VERSION} only.`)
+    f.done()
+    // a plan with added funds, a reserve or a deadline is signed under the rule's version; one without keeps the document it always had
+    return { instrumentId: inst!.id, amount, schedule, ...extra, ...(Object.keys(extra).length ? { withdrawalRule: RULE_VERSION } : {}) }
+  },
+  title: (ctx, p) => `Withdraw ${amountText(p.amount)} from ${(p.alsoFrom?.length ?? 0) > 0 ? `${sourcesOf(p).length} funds` : instrument(ctx.db, p.instrumentId)!.name.replace(/ \(.*\)$/, '')} to your bank, ${describeSchedule(p.schedule)}`,
+  schedule: (p) => p.schedule,
+  // Each run redeems no more than the amount, so the limit for a run is the amount; the month's is what the schedule asks for.
+  suggestAuthority: (_c, _u, p, now) => ({ maxPerRun: p.amount, maxPerMonth: Math.max(p.amount, Math.ceil(monthlyRuns(p.schedule)) * p.amount), maxPerDay: null, expiresAt: now + 365 * DAY, runMode: 'approve', maxSlippageBps: 100, maxRuns: null }),
+  analyse(ctx, userId, p, a, now) {
+    if (!swpExtras(p)) return swpLegacy.analyse(ctx, userId, p, a, now)
+    const inst = instrument(ctx.db, p.instrumentId)!
+    const ids = sourcesOf(p)
+    const insts = ids.map((id) => instrument(ctx.db, id)!)
+    const inputs = insts.map((i) => inputFor(ctx, i, now, 'nav')).filter((x): x is DataInput => !!x)
+    const target = Math.min(p.amount, a.maxPerRun)
+    const w = planWithdrawal(ctx, userId, scopeOf(p), target, now)
+    const perMonth = Math.round(monthlyRuns(p.schedule) * p.amount)
+    // what the units can cover: only funds that could pay in time, and never the reserve
+    const coverable = Math.max(0, Math.min(w.usableValue, w.valueNow - w.reserve))
+    const runs = Math.floor(coverable / p.amount)
+    const warnings: string[] = [], refusals: string[] = []
+    for (const i of insts) if (!inputs.some((x) => x.instrumentId === i.id)) warnings.push(`No NAV has been received for ${i.name} yet.`)
+    const anyHeld = insts.some((i) => available(ctx.db, userId, `pos:${i.id}`) > 0n)
+    if (!anyHeld) refusals.push(ids.length > 1 ? 'You hold no units of any of the funds you chose to withdraw from.' : `You hold no units of ${inst.name} to withdraw from.`)
+    else if (coverable < p.amount) warnings.push(`The units that could be sold are worth ${amountText(coverable)}${(p.reserve ?? 0) > 0 ? ' above your reserve' : ''}, less than one withdrawal of ${amountText(p.amount)}: a run would sell what it can and report the rest as not withdrawn.`)
+    if (p.needByDays !== undefined) {
+      // checked against the schedule's own days and times: a run on a weekend or after the 15:00 cut-off is received on the next business day
+      let at = firstDue(p.schedule, now), none: number | null = null
+      for (let n = 0; n < 12 && at !== null && none === null; n++, at = nextDue(p.schedule, at)) if (!insts.some((i) => payoutAt(i, at!) <= neededByInstant(at!, p.needByDays!))) none = at
+      if (none !== null) refusals.push(`The run due ${whenIn(none, scheduleZone(p.schedule))} would find no chosen fund able to pay within ${p.needByDays} business day${p.needByDays === 1 ? '' : 's'}, so it could never have the money by the day you need it.`)
+    }
+    if (p.amount > a.maxPerRun) refusals.push(`Each withdrawal is ${amountText(p.amount)} but the limit for one run is ${amountText(a.maxPerRun)}.`)
+    if (perMonth > a.maxPerMonth) warnings.push(`The schedule asks for about ${amountText(whole(perMonth))} a month but the monthly limit is ${amountText(a.maxPerMonth)}: later runs in a month will be refused.`)
+    warnings.push('A withdrawal sells units at the NAV published for its day. If a fund falls, the same rupees take more units and the units run out sooner. A fall in value is not a limit this plan can stop.')
+    const owed = owedText(w)
+    if (owed) warnings.push(`If it ran now: ${owed}`)
+    if (a.runMode === 'approve') warnings.push('It asks you before every run. A request you do not answer within 24 hours lapses, and that withdrawal does not happen. The reserve and the day you need the money by are checked again at the moment each sale is sent.')
+    const exitSum = w.legs.reduce((s, l) => s + l.exitLoad, 0)
+    const known = w.legs.filter((l) => l.tax !== null), slab = w.legs.filter((l) => l.tax === null)
+    const taxValue = !w.legs.length ? 'worked out once you hold units' : slab.length === 0 ? `about ${amountText(known.reduce((t, l) => t + l.tax!, 0), 2)}` : `${known.length ? `about ${amountText(known.reduce((t, l) => t + l.tax!, 0), 2)} on ${known.map((l) => l.name).join(', ')}; ` : ''}slab rate, no figure, on ${slab.map((l) => l.name).join(', ')}`
+    const exitText = w.legs.length ? (exitSum > 0 ? `about ${amountText(exitSum, 2)} on the next withdrawal` : 'none on the next withdrawal') : 'worked out once you hold units'
+    const first = w.legs[0]
+    return {
+      tier: 'bounded', tierReason: 'It only sells units of the funds you chose and pays the money into your own bank account. It is bounded by your limits and your reserve; it does not protect the funds\' value and it is not a certified move.',
+      headline: ids.length > 1 ? `${amountText(p.amount)} from ${ids.length} funds to your bank, ${describeSchedule(p.schedule)}` : `${amountText(p.amount)} from ${inst.name} to your bank, ${describeSchedule(p.schedule)}`,
+      figures: [
+        { label: 'Your units now', value: amountText(w.valueNow), basis: 'recorded', note: `Across ${ids.length} fund${ids.length === 1 ? '' : 's'}, each at its latest NAV` },
+        { label: 'Each withdrawal', value: amountText(p.amount), basis: 'recorded', note: 'Units are rounded down so the amount is never exceeded; the NAV that applies is a later one' },
+        { label: 'Withdrawals the units cover', value: `${runs}`, basis: 'estimate', note: 'Counts only funds that could pay in time and leaves out your reserve. At today\'s NAV, with the funds neither rising nor falling' },
+        ...((p.reserve ?? 0) > 0 ? [{ label: 'Kept back, never sold', value: amountText(p.reserve!), basis: 'recorded' as const, note: 'Your reserve: the value that stays in these funds after any run' }] : []),
+        { label: 'Exit load', value: exitText, basis: 'modelled', note: first ? `${first.name}: ${first.loadNote}; first-in, first-out on the units it would sell. Money out is the amount less this` : 'The scheme\'s own load applies to units held less than its period' },
+        { label: 'Tax on the gain in a withdrawal', value: taxValue, basis: 'modelled', note: first ? first.taxNote : 'The rule that applies depends on the fund and how long each unit has been held' },
+        { label: 'Money reaches your bank', value: 'on each fund\'s own payout day, listed below', basis: 'modelled', note: 'The paper registrar pays as the scheme\'s rule says; a real fund house pays on its own schedule. No tax is deducted at source on a fund redemption in this app.' },
+        ...(p.schedule.type === 'monthly' || p.schedule.type === 'weekly' ? [{ label: 'First run', value: firstDue(p.schedule, now) ? whenIn(firstDue(p.schedule, now)!, scheduleZone(p.schedule)) : 'none', basis: 'recorded' as const }] : []),
+      ],
+      consequences: [
+        `${describeSchedule(p.schedule).replace(/^./, (c) => c.toUpperCase())}, QED redeems the units of your chosen funds, in the order the rule below gives, that come to ${amountText(p.amount)} at the latest NAV.`,
+        `The fund house prices the redemption at the NAV for its own day, so the money that arrives can differ a little from ${amountText(p.amount)}. The exit load is taken from it; tax on the gain is not, and is yours to pay later.`,
+        'If no unit can be sold in a run, it does nothing that time and says why. It never buys.',
+        'Each run works the order out again from your records at that moment, and sells only from the funds listed here.',
+      ],
+      warnings, refusals, inputs, computedAt: now, preview: { value: w.valueNow, withdrawal: w },
+    }
+  },
+  doc(ctx, u, p, a, an) {
+    if (!swpExtras(p)) return swpLegacy.doc(ctx, u, p, a, an)
+    const each = Math.min(p.amount, a.maxPerRun)
+    return {
+      may: [`Redeem units of ${swpNames(ctx, p)}, in the order the rule below gives, worth ${amountText(p.amount)} in all at the latest NAV, ${describeSchedule(p.schedule)}, and pay the money into your own bank account.`],
+      limits: [`Each run redeems units worth at most ${amountText(each)} at the NAV it sees, across all the funds together; the NAV that applies is a later one.`,
+        ...((p.reserve ?? 0) > 0 ? [`Never sells so much that less than ${amountText(p.reserve!)} is left across these funds, at the latest NAV. Checked again at the moment each sale is sent.`] : [])],
+      conditions: [
+        'Only units you hold now, in the funds named above. When no unit can be sold in a run, it does nothing that time and says why.',
+        'The exit load the scheme charges is taken from each withdrawal, and tax on the gain is yours to pay: neither is a limit of this authority.',
+        'Orders execute at the NAV the fund house publishes for the applicable day.',
+        ...RULE_WORDS.map((r) => `Order of sale (rule ${p.withdrawalRule ?? RULE_VERSION}): ${r}`),
+        ...(p.needByDays !== undefined ? [`The money must reach your bank within ${p.needByDays} business day${p.needByDays === 1 ? '' : 's'} of the business day a run is received. A fund that cannot do that is not sold, and the sale is checked against it again at the moment it is sent. What is not withdrawn is reported; later runs do not make it up.`] : []),
+      ],
+      never: ['Buy anything.', 'Sell any holding not named above.', 'Send money anywhere except into your own bank account.', ...COMMON_NEVER.slice(0, 2)],
+    }
+  },
+  plan(ctx, prog, p, a, t, now) {
+    if (!swpExtras(p)) return swpLegacy.plan(ctx, prog, p, a, t, now)
+    const target = Math.min(p.amount, a.maxPerRun)
+    const w = planWithdrawal(ctx, prog.user_id, scopeOf(p), target, now)
+    if (w.legs.length === 0) {
+      const names = sourcesOf(p).map((id) => instrument(ctx.db, id)?.name ?? id)
+      const why = w.left.filter((l) => l.kind !== 'covered')
+      if (why.length > 0 && why.every((l) => l.kind === 'none-held')) return { actions: [], skip: names.length > 1 ? 'You hold no units of any of the funds in this plan, so there is nothing to withdraw.' : `You hold no units of ${names[0]}, so there is nothing to withdraw.` }
+      const text = `Nothing was withdrawn this run; ${amountText(target)} is not withdrawn, and later runs do not make it up. ${why.map((l) => `${l.name}: ${l.reason}`).join(' ')}`.trim()
+      return { actions: [], skip: text, owed: text }
+    }
+    const actions = w.legs.map((l): PlannedAction => {
+      const inst = instrument(ctx.db, l.instrumentId)!
+      const act = sellOrder(inst, BigInt(l.units), a, 'swp', false)
+      return { ...act, summary: legSummary(l, target), params: { ...(act.params as OrderParams), swpPaise: String(Math.min(target, l.gross)) } }
+    })
+    const owed = owedText(w)
+    return { actions, ...(owed ? { owed } : {}), ...(w.neededBy !== null ? { neededBy: w.neededBy } : {}), memo: { lastWithdrawal: { units: w.legs[0]!.units, exitLoadEstimate: w.legs.reduce((s, l) => s + l.exitLoad, 0), taxEstimate: w.legs.every((l) => l.tax !== null) ? w.legs.reduce((s, l) => s + (l.tax ?? 0), 0) : null, at: now, legs: w.legs.map((l) => ({ instrumentId: l.instrumentId, units: l.units, gross: l.gross, settlesAt: l.settlesAt })) } } }
   },
 }
 

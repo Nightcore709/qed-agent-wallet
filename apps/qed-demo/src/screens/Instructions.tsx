@@ -216,6 +216,33 @@ function ComingWeeks({ cal, paused }: { cal: RunCalendar; paused: boolean }) {
   )
 }
 
+interface WithdrawalLeg { instrumentId: string; name: string; unitsText: string; gross: number; exitLoad: number; tax: number | null; settlesAt: number; navPrice: string; navProvider: string; navDate: string; why: string; last: boolean }
+interface WithdrawalView { target: number; planned: number; shortfall: number; owed: boolean; shortfallWhy: string[]; legs: WithdrawalLeg[]; left: { instrumentId: string; name: string; reason: string }[]; rule: string[]; basis: string; reserve: number; neededBy: number | null }
+/** A withdrawal plan's breakdown before it is signed: what would be sold, from which holding, what it costs, when it settles and why. */
+function WithdrawalBreakdown({ w }: { w: WithdrawalView }) {
+  return (
+    <div className="pr-cq-plain" data-testid="withdrawal-breakdown"><h3>What a run would sell today, and why</h3>
+      <p>{w.legs.length ? `${fmt.money(w.planned)} of the ${fmt.money(w.target)} each run asks for would come from ${w.legs.length === 1 ? 'one holding' : `${w.legs.length} holdings`}, in this order. Worked out from your records now; each run works it out again.` : 'Nothing could be sold today. Each run works it out again from your records.'}</p>
+      {w.legs.map((l, i) => (
+        <section key={l.instrumentId} aria-label={`${i + 1}. ${l.name}`}>
+          <p><strong>{i + 1}. {l.name}</strong></p>
+          <dl className="pr-cq-kv">
+            <div><dt>Sells</dt><dd>{l.unitsText} units{l.last ? ' (all you hold)' : ''}, about {fmt.money(l.gross, true)} at NAV {l.navPrice}</dd></div>
+            <div><dt>Money reaches your bank</dt><dd>about {fmt.dayTime(l.settlesAt)} India time</dd></div>
+            <div><dt>Exit load</dt><dd>{l.exitLoad > 0 ? `about ${fmt.money(l.exitLoad, true)}, taken from the money` : 'none'}</dd></div>
+            <div><dt>Tax on the gain</dt><dd>{l.tax === null ? 'slab rate: no figure' : `about ${fmt.money(l.tax, true)}, yours to pay later; none is deducted at source`}</dd></div>
+            <div><dt>Why here</dt><dd>{l.why}</dd></div>
+            <div><dt>Price</dt><dd>NAV {l.navPrice} for {l.navDate}, from {l.navProvider}. Paper; the registrar prices it at a later NAV.</dd></div>
+          </dl>
+        </section>
+      ))}
+      {w.left.filter((l) => l.reason).length ? <><p><strong>Not sold from</strong></p><ul>{w.left.map((l) => <li key={l.instrumentId}>{l.name}: {l.reason}</li>)}</ul></> : null}
+      {w.owed ? <p className="void" role="status">If it ran now, {fmt.money(w.shortfall)} would not be withdrawn, and later runs do not make it up. {w.shortfallWhy.join(' ')}</p> : null}
+      <details><summary>The rule, in words</summary><ul>{w.rule.map((r, i) => <li key={i}>{r}</li>)}</ul></details>
+    </div>
+  )
+}
+
 /** What follows from an instruction: the server's analysis, figure by figure, each with the kind of figure it is. */
 export function Consequences({ analysis, headingId, heading = true }: { analysis: Analysis; headingId?: string; heading?: boolean }) {
   const cert = analysis.certificate as { scenarios?: number; counted?: { label: string; monthly: number }[]; notCounted?: string[]; scope?: string; checkerA?: { tierD: boolean }; checkerB?: { tierD: boolean }; agree?: boolean } | undefined
@@ -225,6 +252,7 @@ export function Consequences({ analysis, headingId, heading = true }: { analysis
       {analysis.refusals.map((r, i) => <Note key={`r${i}`} tone="void" title="Cannot be signed as it stands">{r}</Note>)}
       {analysis.warnings.map((w, i) => <Note key={`w${i}`} tone="wait">{w}</Note>)}
       {analysis.figures.length ? <dl className="pr-cq-figs">{analysis.figures.map((f, i) => <div key={i}><dt>{f.label}</dt><dd className="v">{f.value}</dd><dd className="n"><Basis kind={f.basis} />{f.note ? ` ${f.note}` : ''}</dd></div>)}</dl> : null}
+      {(analysis.preview as { withdrawal?: WithdrawalView } | undefined)?.withdrawal ? <WithdrawalBreakdown w={(analysis.preview as { withdrawal: WithdrawalView }).withdrawal} /> : null}
       {analysis.consequences.length ? <div className="pr-cq-plain"><h3>In plain words</h3><ul>{analysis.consequences.map((c, i) => <li key={i}>{c}</li>)}</ul></div> : null}
       {cert?.counted ? (
         <div className="pr-cq-plain"><h3>What the no-regret check assumed about you</h3>

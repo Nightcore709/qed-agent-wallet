@@ -16,7 +16,7 @@ export interface SessionInfo {
   /** The authority of the passkey this session was opened with ('signin' after a recovery), or null for a password session. */
   passkeyAuthority?: 'full' | 'signin' | null
   /** How email and text messages leave QED: 'outbox' is the local test outbox (nothing is sent), 'none' no adapter. */
-  delivery?: 'outbox' | 'none'
+  delivery?: 'outbox' | 'none' | 'postmark'
   /** How long a recovery and a protection-lowering change wait on this installation; a test stack's shortened wait on payments to new payees, or null. */
   delays?: { recoveryMs: number; protectionMs: number; newPayeeHoldTestMs?: number | null }
   workspace?: { id: string; name: string; kind: string; role: string; policy: { signers: number; makerChecker: boolean } }

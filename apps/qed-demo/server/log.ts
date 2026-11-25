@@ -17,7 +17,7 @@ const RULES: [RegExp, string | ((m: string) => string)][] = [
   // the key-encryption key's record (server/keys.ts: qedkek1:<id>:<key>:<check>)
   [/qedkek1:[^\s"',;]+/g, 'qedkek1:[redacted]'],
   // credentials named in headers or settings, whatever follows them on the line up to a separator
-  [/\b(authorization|proxy-authorization|cookie|set-cookie|x-qed-csrf|x-qed-adviser)(["']?\s*[:=]\s*)("[^"]*"|[^\s,;]+)/gi, '$1$2[redacted]'],
+  [/\b(authorization|proxy-authorization|cookie|set-cookie|x-qed-csrf|x-qed-adviser|x-postmark-server-token|x-postmark-account-token)(["']?\s*[:=]\s*)("[^"]*"|[^\s,;]+)/gi, '$1$2[redacted]'],
   [/\bBearer\s+[A-Za-z0-9._~+/=-]+/g, 'Bearer [redacted]'],
   // a session cookie however it is named (qed_session, __Host-qed_session)
   [/\b((?:__Host-)?qed_session)=[^\s;,"']+/g, '$1=[redacted]'],

@@ -145,6 +145,14 @@ export function beginGoogle(db: Db, g: GoogleConfig, purpose: unknown, s: Sessio
   return { url: `${g.authorizationEndpoint}?${q.toString()}`, binding, expiresAt: now + STATE_TTL_MS }
 }
 
+/** Google's own issuer: the one `iss` an absent callback parameter is excused for. */
+export const GOOGLE_ISSUER = 'https://accounts.google.com'
+/** RFC 9207: present, it must be this issuer; absent (or empty), it is excused only when the one configured issuer is Google's. */
+export function issuerAcceptable(iss: unknown, g: Pick<GoogleConfig, 'issuer'>): boolean {
+  if (iss === undefined || iss === null || iss === '') return g.issuer === GOOGLE_ISSUER
+  return iss === g.issuer
+}
+
 /** Exchange the code for the ID token at the issuer's token endpoint (client secret in the body; PKCE verifier beside it). */
 async function exchange(g: GoogleConfig, code: string, verifier: string): Promise<unknown> {
   const failed = (): AppError => new AppError(502, 'google_failed', 'Google did not complete the sign-in, so nothing was changed. Try again.')
@@ -179,8 +187,11 @@ export async function finishGoogle(db: Db, g: GoogleConfig, input: { code: unkno
   if (input.only && (input.only === 'signin') !== (row.purpose === 'signin')) throw stateGone()
   // 'link' and 'confirm' are finished only by the session that began them
   if (row.purpose !== 'signin' && (!s || s.userId !== row.person_id || s.sessionHash !== row.session_hash)) throw stateGone()
-  // RFC 9207: the callback names the issuer that answered; another one is a mix-up, and so is none (Google always sends it)
-  if (input.iss !== g.issuer) throw stateGone()
+  // RFC 9207: a callback that names the issuer that answered must name this one; another one is a mix-up. Where it names
+  // none, it is accepted only for Google's own issuer: the RFC lets a client of one authorization server rely on that
+  // alone (the state, the browser binding and PKCE still bind the flow, and the ID token's iss is checked below). The
+  // stand-in issuer of a test stack is never excused, so the tests keep proving the refusal.
+  if (!issuerAcceptable(input.iss, g)) throw stateGone()
   const idToken = await exchange(g, input.code, row.verifier)
   let c: IdClaims
   try { c = await verifyIdToken(idToken, { clientId: g.clientId, issuers: g.issuers, nonce: row.nonce, now, keyFor: keysOf(g) }) }

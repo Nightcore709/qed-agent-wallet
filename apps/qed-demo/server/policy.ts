@@ -20,6 +20,7 @@ import { mulDiv, notional, parsePrice, priceToNumber } from '../shared/fixed.ts'
 import { homeMoneyMinor } from '../shared/home-money.ts'
 import { dayText, istDay } from '../shared/day-text.ts'
 import { closedText, DATA_LABEL, isSecurity, sessionOf } from './securities.ts'
+import { payoutAt } from './withdrawal.ts'
 
 const big = (s: string | undefined): bigint => BigInt(s ?? '0')
 /** A sum in the text of a check, always to the paisa, through the one formatter (shared/money.ts). */
@@ -129,10 +130,28 @@ export function decide(ctx: Ctx, a: ActionRow, now: number): Decision {
           const others = db.get<{ n: number }>(`SELECT COUNT(*) n FROM runs WHERE program_id = ? AND version = ? AND id <> ? AND state IN ('done', 'partial', 'executing')`, a.program_id!, run.version, a.run_id!)!.n
           add('within-run-count', others < authority.maxRuns, `${others} other run${others === 1 ? '' : 's'} of this instruction ${others === 1 ? 'is' : 'are'} done or in progress, against ${authority.maxRuns} in all.`)
         }
-        const scope = parse<{ instrumentId?: string; legs?: { instrumentId: string }[]; payeeHandles?: string[]; plan?: unknown; rules?: { instrumentId?: string }[] }>(ver!.params_json, {})
+        const scope = parse<{ instrumentId?: string; alsoFrom?: string[]; legs?: { instrumentId: string }[]; payeeHandles?: string[]; plan?: unknown; rules?: { instrumentId?: string }[] }>(ver!.params_json, {})
         if (order) {
-          const allowed = new Set<string>([scope.instrumentId, ...(scope.legs ?? []).map((l) => l.instrumentId), ...(scope.rules ?? []).map((r) => r.instrumentId)].filter((x): x is string => !!x))
+          const allowed = new Set<string>([scope.instrumentId, ...(scope.alsoFrom ?? []), ...(scope.legs ?? []).map((l) => l.instrumentId), ...(scope.rules ?? []).map((r) => r.instrumentId)].filter((x): x is string => !!x))
           if (prog?.kind !== 'floor' && prog?.kind !== 'paydown') add('instrument-in-scope', allowed.has(order.instrumentId), `${inst?.name ?? order.instrumentId} ${allowed.has(order.instrumentId) ? 'is' : 'is not'} named in the signed instruction.`)
+          // a withdrawal's reserve and its needed-by day are tested again when each sale is sent, not only when the run was planned: a
+          // run can wait a day for its approval, and a sale by hand or a lower NAV in between must not take it below what was signed
+          if (prog?.kind === 'swp' && order.side === 'sell' && inst && order.qty) {
+            const sp = parse<{ instrumentId?: string; alsoFrom?: string[]; reserve?: number; needByDays?: number }>(ver!.params_json, {})
+            if ((sp.reserve ?? 0) > 0) {
+              let free = 0n
+              for (const id of [sp.instrumentId, ...(sp.alsoFrom ?? [])]) {
+                const si = id ? instrument(db, id) : undefined, nav = si ? ctx.market.get(si.id, 'nav') : undefined
+                if (si && nav) free += notional(available(db, a.user_id, `pos:${si.id}`), si.baseScale, parsePrice(nav.price), si.quoteScale, 'down')
+              }
+              const navNow = ctx.market.get(inst.id, 'nav')
+              const leg = navNow ? notional(big(order.qty), inst.baseScale, parsePrice(navNow.price), inst.quoteScale, 'down') : 0n
+              const left = free - leg
+              add('swp-reserve', !!navNow && left >= BigInt(sp.reserve!), `${homeMoneyMinor(free)} of free units in the signed funds at the latest NAV, less this sale of ${homeMoneyMinor(leg)}, leaves ${homeMoneyMinor(left)} against the signed reserve of ${homeMoneyMinor(sp.reserve!)}.`)
+            }
+            const nb = parse<{ neededBy?: number }>(db.get<{ decision_json: string }>('SELECT decision_json FROM runs WHERE id = ?', a.run_id)?.decision_json, {}).neededBy
+            if (typeof nb === 'number') { const pays = payoutAt(inst, now); add('swp-needed-by', pays <= nb, `Sent now, this sale pays ${whenIst(pays)}; the money was to reach your bank by ${whenIst(nb)}.`) }
+          }
         }
         if (pay && scope.payeeHandles) add('payee-in-scope', scope.payeeHandles.includes(pay.payeeHandle), `${pay.payeeHandle} ${scope.payeeHandles.includes(pay.payeeHandle) ? 'is' : 'is not'} named in the signed instruction.`)
       }

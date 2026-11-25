@@ -30,7 +30,9 @@ import { type Clock, type Config, type Db, emit, ist, j, openDb, parse, systemCl
 import { applyDueChanges } from './passkeys.ts'
 import { applyDueDeletions } from './records.ts'
 import { recoveryTick } from './recovery.ts'
-import { configureDelivery } from './delivery.ts'
+import { configureDelivery, dispatchQueued } from './delivery.ts'
+import { postmarkAdapter } from './postmark.ts'
+import { log } from './log.ts'
 import { notice, stepAllActions } from './execute.ts'
 import { disputeTick } from './owner.ts'
 import { retryRevocations } from './revocation.ts'
@@ -106,6 +108,7 @@ export class Engine {
   private readonly clock: Clock
   private providers: Provider[] = []
   private timer: NodeJS.Timeout | null = null
+  private mailTimer: NodeJS.Timeout | null = null
   private busy = false
   private stopped = false
   /** A graceful stop was asked for: no new tick starts, and a tick under way stops at its next step boundary. */
@@ -179,6 +182,21 @@ export class Engine {
       for (const p of this.providers) p.start()
     }
     this.timer = setInterval(() => void this.tick(), 1000)
+    // Email through Postmark (QED_DELIVERY=postmark): its own loop, apart from the tick, because a send may wait 10 seconds
+    // for an answer and the tick must not. Several engines or APIs cannot send one message twice: dispatchQueued claims it.
+    const pm = (this.cfg as Partial<Pick<Config, 'delivery' | 'postmark'>>)
+    if (pm.delivery === 'postmark' && pm.postmark) {
+      const adapter = postmarkAdapter(pm.postmark)
+      let mailing = false
+      this.mailTimer = setInterval(() => {
+        if (mailing || this.stopped || this.stopping) return
+        mailing = true
+        dispatchQueued(this.db, adapter, this.clock.now()).then((r) => {
+          // counts only: never an address, a body or a link
+          if (r.sent || r.failed || r.retrying) log('engine', r.failed ? 'warn' : 'info', 'email dispatch', { sent: r.sent, failed: r.failed, retrying: r.retrying })
+        }).catch((e: unknown) => log('engine', 'error', 'email dispatch stopped by an error', { error: e instanceof Error ? e.name : 'error' })).finally(() => { mailing = false })
+      }, 1000)
+    }
     void this.tick()
   }
 
@@ -248,6 +266,7 @@ export class Engine {
     this.lease = 'lost'
     this.stopped = true
     if (this.timer) clearInterval(this.timer)
+    if (this.mailTimer) clearInterval(this.mailTimer)
     for (const p of this.providers) p.stop()
     try { emit(this.db, this.clock.now(), null, 'engine', { state: 'fenced', pid: process.pid, instance: this.instance, why }) } catch { /* recorded in the caller's log instead */ }
     this.releaseLock()
@@ -432,6 +451,7 @@ export class Engine {
   async stopGracefully(graceMs: number): Promise<{ abandoned: boolean; waitedMs: number }> {
     this.stopping = true
     if (this.timer) { clearInterval(this.timer); this.timer = null }
+    if (this.mailTimer) { clearInterval(this.mailTimer); this.mailTimer = null }
     const t0 = performance.now()
     while (this.busy && performance.now() - t0 < graceMs) await new Promise((r) => setTimeout(r, 20))
     const abandoned = this.busy
@@ -443,6 +463,7 @@ export class Engine {
     if (this.closed) return
     this.stopped = true
     if (this.timer) clearInterval(this.timer)
+    if (this.mailTimer) clearInterval(this.mailTimer)
     for (const p of this.providers) p.stop()
     // Only the one engine writes its last beat and its stop. One that was fenced, refused or never started writes
     // nothing: the heartbeat row belongs to whichever engine holds the database.
