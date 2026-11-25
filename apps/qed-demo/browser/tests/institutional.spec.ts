@@ -85,7 +85,8 @@ test('two businesses net what they owe each other; the payer\'s amount band asks
   await pa.reload()
   await expect(pa.getByText(`You owe ${nameB} ₹1,20,000`)).toBeVisible()
   await pa.getByRole('button', { name: /^Agree/ }).click()
-  expect(query<{ state: string }>(`SELECT state FROM netting_claims WHERE creditor_ws = ? OR debtor_ws = ?`, wsA!.id, wsA!.id).map((r) => r.state)).toEqual(['agreed', 'agreed'])
+  // the click's request may still be in flight: wait for the stored state rather than reading it once
+  await expect.poll(() => query<{ state: string }>(`SELECT state FROM netting_claims WHERE creditor_ws = ? OR debtor_ws = ?`, wsA!.id, wsA!.id).map((r) => r.state)).toEqual(['agreed', 'agreed'])
 
   // A proposes the cycle: Rs 4,20,000 of claims become one payment of Rs 1,80,000 from B to A
   await pa.getByLabel('Net with (codes)').fill(codeB)
