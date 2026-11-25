@@ -21,22 +21,30 @@ import { Check, Fingerprint, FlaskConical, KeyRound, ShieldAlert } from 'lucide-
 import type { AttackInfo, DecisionRecord, HistoricalEvidence, HistoryEntry, Job, LiabilityView, LimitCheck, LimitsResult, MandateView, PaymentLimits, PolicyView, Proposal, ProposalKind, QuotaView, QuoteResult, RailState, ScenarioInfo, TickRecord, ToSign, VaultView } from '../../chain/types.ts'
 import { api, fmt, navigate, useData, useNow } from '../lib/core.ts'
 import { CHAIN_CURRENCIES, CHAIN_TOKENS, DEFAULT_ASSET_SET, TEST_TOKEN_SYMBOLS, tokenBySymbol, type AssetSet } from '../../shared/chain-assets.ts'
-import { confirmWithPasskey, deviceWords, setUpVaultWithTokens, signForVault } from '../lib/passkey.ts'
+import { addFirstPasskey, confirmWithPasskey, deviceWords, passkeysAvailable, platformPasskeyAvailable, setUpVaultWithTokens, signForVault } from '../lib/passkey.ts'
 import { EnforcedBy, EnforcementKey, type Enforcer } from '../ui/enforced.tsx'
 import { ApprovalSheet, type PendingApproval } from '../ui/instrument.tsx'
-import { Btn, Crumb, Field, Link, Loading, Mark, MoneyBar, Note, Problem, Src, Stamp, Swatch, useAction, useMasonry } from '../ui/kit.tsx'
+import { Btn, Crumb, Field, Link, Loading, Mark, MoneyBar, Note, Problem, Src, Stamp, Swatch, useAction, useMasonry, useSession } from '../ui/kit.tsx'
 
 
 interface Asset { symbol: string; decimals: number }
 /** The rail's view of this household's workspace (chain/types.ts WorkspaceView, the parts shown here). */
 interface Workspace { id: string; status: 'deploying' | 'awaiting-acceptance' | 'ready' | 'failed'; ownerAccount: string | null; ownerAccountBuild: { label: string; declaredReady: boolean } | null; signers: { signerId: string; role: 'member' | 'recovery' }[]; threshold: number | null; asset: Asset; reserveAsset: Asset; grant: { vault: string; ownerAccount: string; token: string } | null; createdAt: string }
 interface ScheduledChange { changeId: string; kind: string; summary: string; status: 'pending' | 'applied' | 'cancelled'; readyAt: number; readyTime: string; ready: boolean }
+/** As server/rail.ts OwnerReadiness: `ready` names the passkeys that become the wallet's signers; the others say what stands in the way. */
+type OwnerReadiness =
+  | { state: 'ready'; passkeys: string[]; waiting?: { passkey: string; until: number }[] }
+  | { state: 'no-passkey' }
+  | { state: 'signin-only' }
+  | { state: 'cooling-off'; passkey: string; until: number }
 interface Overview {
   available: boolean; reason?: string; custody: string
   /** Whether this household has a vault; `lost` when the vault service no longer knows the one it had (a new data folder). */
   setUp: boolean; lost?: boolean; canSetUp: boolean; whyNot?: string
   /** This person's passkeys that can sign today, and whether each is a signer of the vault. */
   passkeys: { id: string; name: string; signer: boolean | null }[]
+  /** R14: for a household's own wallet, whether its passkeys can own one now and, if not, why (server/rail.ts ownerReadiness). */
+  owner?: OwnerReadiness
   /** The one web origin the vault's owner account takes signatures from (fixed when it was set up). */
   origin: string | null; origins: string[]
   workspace: Workspace | null; state: RailState | null; scheduled: ScheduledChange[]
@@ -694,7 +702,9 @@ function SetupSummary({ stage, o }: { stage: 0 | 1 | 2; o: Overview }) {
   const who: ReactNode = shared
     ? (o.plan ? <>One passkey of each member who may sign: {o.plan.members.map((m) => `${m.name} (${m.passkey ?? 'no passkey yet'})`).join(', ')}. {o.plan.threshold} different members must sign, checked by the chain itself.</>
       : o.signers?.length ? <>{andList(o.signers.map((m) => `${m.you ? 'you' : m.name} (${m.passkey})`))}; {threshold === 1 ? 'any one of them can sign' : `${threshold} different members must sign`}, checked by the chain itself.</> : 'Your members\' passkeys, as the chain names them.')
-    : stage === 0 ? <>{o.passkeys.length ? o.passkeys.map((p) => p.name).join(', ') : 'None yet'}: the passkeys this account can use today. One signature is enough.</>
+    : stage === 0 ? (o.owner?.state === 'ready' ? <>{andList(o.owner.passkeys.map((n) => `“${n}”`))}: {o.owner.passkeys.length === 1 ? 'your passkey' : 'your passkeys'}. One signature is enough.{o.owner.waiting?.length ? ` ${andList(o.owner.waiting.map((w) => `“${w.passkey}”`))} ${o.owner.waiting.length === 1 ? 'was' : 'were'} added less than 24 hours ago and can be made a signer later, under Security.` : ''}</>
+      : o.owner ? 'No passkey yet that can own it: see the first step.'
+      : <>{o.passkeys.length ? o.passkeys.map((p) => p.name).join(', ') : 'None yet'}: the passkeys this account can use today. One signature is enough.</>)
     : <>{signing.length ? andList(signing.map((p) => `“${p.name}”`)) : 'Your passkey'}. One signature is enough, checked by the chain itself.</>
   const rows: { k: string; v: ReactNode; done: boolean }[] = [
     { k: 'Who can sign', v: who, done: stage > 0 },
@@ -711,6 +721,52 @@ function SetupSummary({ stage, o }: { stage: 0 | 1 | 2; o: Overview }) {
       </dl>
       <p className="vt-sum-foot">A chain that runs on this computer: not a public chain, and nothing on it has any value.</p>
     </>
+  )
+}
+
+/**
+ * R14: what stands between this account and a wallet it can own, said where the person is, with the way through on the
+ * same page. A wallet is owned by a passkey, so:
+ *   - an account opened with a password makes its first passkey here (the password again, then the device's own check);
+ *     that passkey has no 24-hour wait, because the account has no older passkey whose authority it could be taking;
+ *   - a browser that cannot make passkeys, or a device with no screen lock for one, is told exactly that and what to use;
+ *   - a passkey that signs in only, or one in its first 24 hours beside an older one, is told why and from when.
+ * Nothing here decides anything: the server's rule does (server/rail.ts ownerReadiness), and refuses the same way.
+ */
+function OwnerGate({ owner, reload }: { owner: OwnerReadiness | undefined; reload: () => void }) {
+  const session = useSession()
+  const [pw, setPw] = useState('')
+  // whether this device can hold a passkey itself; null until the browser has answered (and where it cannot say)
+  const [builtIn, setBuiltIn] = useState<boolean | null>(null)
+  useEffect(() => { let on = true; void platformPasskeyAvailable().then((v) => { if (on) setBuiltIn(v) }); return () => { on = false } }, [])
+  const add = useAction(async () => { await addFirstPasskey(pw); setPw(''); await session.reload(); reload() })
+  if (!owner || owner.state === 'ready') return null
+  if (owner.state === 'signin-only') return (
+    <Note tone="wait" title="Your passkey signs you in, but cannot own a wallet yet">
+      It was added by a recovery or after a password reset, so for now it signs you in only. Ask for its approval authority under <Link to="/security">Security and recovery</Link>: it takes effect after a wait in which every device and address of yours is told and can stop it. Then come back here and set the wallet up.
+    </Note>
+  )
+  if (owner.state === 'cooling-off') return (
+    <Note tone="wait" title={`You can set the wallet up from ${fmt.dayTime(owner.until)}`}>
+      “{owner.passkey}” was added to this account less than 24 hours ago, and a passkey can own a wallet only after its first 24 hours: someone who got into your session must not be able to put their own passkey on your wallet. Nothing else needs doing; come back then.
+    </Note>
+  )
+  if (!passkeysAvailable()) return (
+    <Note tone="void" title="This browser cannot make a passkey">
+      A wallet is owned by a passkey, and this browser has no support for them (or this page is not open over a secure connection). Open QED in a current Chrome, Safari, Edge or Firefox, on a phone or computer with a screen lock, and sign in there with your handle and password: your account is the same everywhere. Until then you can use everything that needs no approval.
+    </Note>
+  )
+  return (
+    <div className="vt-gate" role="group" aria-labelledby="vt-gate-h">
+      <h4 id="vt-gate-h">First, a passkey on this device</h4>
+      <p>This account signs in with a password, and a wallet is owned by a passkey: a key your device keeps and unlocks with {deviceWords()}. Enter your password and your device makes one. It then signs in for you and approves what you pay.</p>
+      {builtIn === false ? <Note tone="wait" title="This device has no screen lock a passkey can use">It has no fingerprint, face check or PIN set up for passkeys. You can still make one: when you continue, your browser offers a phone nearby (scan its code with the phone&apos;s camera) or a security key with a PIN. Or turn on this device&apos;s screen lock (Touch ID, Windows Hello or a PIN) and come back.</Note> : null}
+      <form className="vt-gate-form" onSubmit={(e) => { e.preventDefault(); if (pw) void add.run() }}>
+        <Field label="Your password" hint="Asked again because a passkey is added only right after it is typed.">{(p) => <input {...p} className="input" type="password" autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} />}</Field>
+        <div><Btn tone="fill" type="submit" busy={add.busy} disabled={!pw}><Fingerprint aria-hidden="true" />Create a passkey on this device</Btn></div>
+      </form>
+      <Problem error={add.error} />
+    </div>
   )
 }
 
@@ -738,6 +794,8 @@ function SetUp({ o, reload }: { o: Overview; reload: () => void }) {
   const allowed = o.origins.includes(here)
   const missing = o.plan?.members.filter((m) => !m.passkey) ?? []
   const shared = !!o.plan
+  // a household's wallet needs a passkey of its owner that can own one now (server/rail.ts ownerReadiness); a shared one, its members'
+  const ownerReady = shared ? o.passkeys.length > 0 : o.owner ? o.owner.state === 'ready' : o.passkeys.length > 0
   const unit = (c: AssetSet['treasury']): Asset => ({ symbol: CHAIN_TOKENS[c].symbol, decimals: CHAIN_TOKENS[c].decimals })
   return (
     <Units.Provider value={{ main: unit(tokens.treasury), reserve: unit(tokens.reserve) }}>
@@ -749,9 +807,9 @@ function SetUp({ o, reload }: { o: Overview; reload: () => void }) {
       {ws?.status === 'deploying' ? <Note tone="wait" title="Your wallet is being created">This takes a few seconds. If it does not finish, try again: each step that already happened is skipped.</Note> : null}
       {!allowed ? <Note tone="void">This page is at {here}, which QED does not accept for passkeys. Open QED at {o.origins.join(' or ')}.</Note> : null}
       {missing.length ? <Note tone="wait">{missing.map((m) => m.name).join(', ')} {missing.length === 1 ? 'has' : 'have'} no passkey that can sign yet. Every member who may sign needs one before the wallet is set up.</Note> : null}
-      {/* a greyed button must say why: an account opened with a password has no passkey to own the vault with yet */}
-      {!o.passkeys.length && !o.plan ? <Note tone="wait" title="Setting it up needs a passkey">This account has none yet: the wallet is owned by your passkeys, so there is nothing to own it with. <Link to="/security">Add a passkey under Security and recovery</Link>, then come back here.</Note> : null}
-      <Device />
+      {/* a greyed button must say why, and the way through is on this page (R14): no trip to another screen, no dead end */}
+      {!shared ? <OwnerGate owner={o.owner} reload={reload} /> : null}
+      {ownerReady ? <Device /> : null}
       {!shared ? (
         <details className="vt-fold">
           <summary>Test tokens: {CHAIN_TOKENS[tokens.treasury].many}, {CHAIN_TOKENS[tokens.reserve].many} and {CHAIN_TOKENS[tokens.route].many}{chosen ? ', your choice' : ', the usual ones'}</summary>
@@ -765,7 +823,7 @@ function SetUp({ o, reload }: { o: Overview; reload: () => void }) {
         </details>
       ) : null}
       <label className="row small vt-timelock"><input type="checkbox" checked={timeLock} onChange={(e) => setTimeLock(e.target.checked)} /> Time-lock withdrawals and resuming: withdrawing, setting money aside for a creditor, resuming after a pause and replacing the vault's guardian then wait the wallet's delay, and any signer can cancel them. You can change this later under Security; turning it off waits the delay.</label>
-      <div><Btn tone="fill" className="lg" busy={go.busy} disabled={!o.passkeys.length || !allowed || missing.length > 0 || !distinct} onClick={() => void go.run()}><Fingerprint aria-hidden="true" />{chosen ? 'Confirm with your passkey, sign the test tokens and set it up' : 'Confirm with your passkey and set it up'}</Btn></div>
+      <div><Btn tone="fill" className="lg" busy={go.busy} disabled={!ownerReady || !allowed || missing.length > 0 || !distinct} onClick={() => void go.run()}><Fingerprint aria-hidden="true" />{chosen ? 'Confirm with your passkey, sign the test tokens and set it up' : 'Confirm with your passkey and set it up'}</Btn></div>
       <Problem error={go.error} />
       <details className="vt-fold"><summary>More about signers, and the address</summary><p className="vt-fold-p">{shared ? 'Each member\'s signer is the first passkey they registered that can sign today. A member or a passkey added later is not a signer until it is made one under Security, "Who can sign for your on-chain wallet". A larger number of signatures this workspace asks for above a size is checked by QED, not by the chain.' : 'A passkey you add later is not a signer until you make it one under Security, "Who can sign for your on-chain wallet".'} Signatures are accepted from <span className="code">{here}</span> only.</p></details>
     </SetupFlow>
@@ -1996,9 +2054,10 @@ export function VaultScreen({ sub }: { sub: string }) {
   if (!d) body = o.error ? <Problem error={o.error} /> : <div className="page-wait"><Loading what="Reaching the vault service" /></div>
   else if (!d.available) {
     body = <>
-      <Note tone="wait" title="The vault service is not available">{d.reason}</Note>
-      <p className="vt-say">It is a separate service from QED's engine, because it runs a local chain. Everything else in QED works without it. In a terminal: <code>cd apps/qed-demo/chain && npm start</code></p>
+      <Note tone="wait" title="The on-chain wallet's service is not answering">{d.reason}</Note>
+      <p className="vt-say">Nothing in your wallet has changed: its test tokens stay on its chain, and nothing can move them without your passkey. Everything else in QED works without this service.</p>
       <div><Btn onClick={o.reload}>Try again</Btn></div>
+      <details className="vt-fold"><summary>If you run this QED yourself</summary><p className="vt-fold-p">The wallet is a separate service from QED&apos;s engine, because it runs a local chain. On a development machine, start it in a terminal: <code>cd apps/qed-demo/chain && npm start</code>. On a deployment, its log says why it stopped.</p></details>
     </>
   } else if (stage === 'none' || !st) body = <SetUp o={d} reload={o.reload} />
   else if (sub !== '' && sub !== 'records' && !st.provisioned) body = <Note tone="wait">Your wallet is not accepted yet. <Link to="/vault">Accept it first.</Link></Note>

@@ -88,7 +88,7 @@ describe('a request the vault service does not answer', () => {
     const e = await refusal(rail(CFG, 'POST', '/workspaces/ws_a/liabilities/3/settle', {}, { 'Idempotency-Key': 'ui-press-2' }, 300))
     expect(e).toMatchObject({ status: 504, code: 'rail_outcome_unknown' })
     expect(e.message).toMatch(/may have received this request/)
-    expect(e.message).not.toMatch(/not running/)
+    expect(e.message).not.toMatch(/not running|not answering/) // R14: "not answering" is what a service that is off is now told as
     expect(posts).toHaveLength(1) // nothing re-sent
   })
 

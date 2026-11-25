@@ -10,6 +10,17 @@ import { api, ApiError, setCsrf } from './core.ts'
 type Options = { challengeId: string; options: Record<string, unknown> }
 
 export const passkeysAvailable = (): boolean => browserSupportsWebAuthn()
+/**
+ * Whether this device can hold a passkey itself and check that it is the person (a platform authenticator with user
+ * verification: Touch ID, Windows Hello, a phone's screen lock). False means a passkey is still possible, on a phone
+ * nearby or a security key; null where the browser cannot say. Used only to tell the person what to expect (R14).
+ */
+export async function platformPasskeyAvailable(): Promise<boolean | null> {
+  try {
+    const pk = (globalThis as { PublicKeyCredential?: { isUserVerifyingPlatformAuthenticatorAvailable?: () => Promise<boolean> } }).PublicKeyCredential
+    return pk?.isUserVerifyingPlatformAuthenticatorAvailable ? await pk.isUserVerifyingPlatformAuthenticatorAvailable() : null
+  } catch { return null }
+}
 
 /**
  * What this device will ask for, so the button says what will happen. A passkey is unlocked by the device in whatever
@@ -153,6 +164,15 @@ export async function setUpVaultWithTokens(origin: string, currencies: { treasur
   const response = await use(b)
   // R13: the time-lock, chosen at set-up, travels with the request (it only adds protection, so it needs no signature of its own)
   return api('POST', '/api/vault/setup', { origin, currencies, challengeId: b.challengeId, response, ...(timeLock ? { timeLock: true } : {}) })
+}
+
+/**
+ * A password account's first passkey (D-094): the password typed again, which unlocks exactly this, then the device
+ * makes the passkey. The server refuses it if the account has a passkey by then.
+ */
+export async function addFirstPasskey(password: string, passkeyName?: string): Promise<{ id: string; name: string }> {
+  await api('POST', '/api/auth/stepup', { password })
+  return addPasskey(passkeyName)
 }
 
 export async function addPasskey(passkeyName?: string): Promise<{ id: string; name: string }> {

@@ -119,3 +119,42 @@ test("killed in the middle of creating a workspace: the restart completes it at 
     } finally { await s.stop(); }
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+/**
+ * R14 (the production failure of 25 Nov 2026). A creation that stops after the registry has recorded the workspace's
+ * contracts and before the chain was saved leaves a registry that names contracts the saved chain does not hold. On the
+ * deployed image that happened to every set-up (the co-signer could not be configured), and the next start then failed
+ * for everyone ("the contract function cosigner returned no data"): one unfinished workspace stopped the wallet service.
+ * Such a workspace is completed at start, like one stopped earlier; and another household's finished wallet is untouched.
+ */
+test("killed after a workspace's contracts were recorded and before the chain was saved: the restart completes it, the service is ready, and a finished workspace still works", { timeout: 300_000 }, async () => {
+  const P = Number(process.env.QED_CHAIN_TEST_PORT ?? 15195);
+  const more = { ...env, QED_RAIL_ECONOMY_ANVIL_PORT: String(P + 2) };
+  const alice = new SoftwarePasskey(), bob = new SoftwarePasskey();
+  const body = { workspaceId: "late-crash-home", owner: alice.publicKey, rpIdHash: RP_ID_HASH };
+  const first = await startService("svc-crash-recorded", P, P + 1, { env: more, workspace: null });
+  const dir = first.dir;
+  try {
+    // a finished wallet first, with money in it
+    assert.equal((await first.call("POST", "/workspaces", { workspaceId: "bob-home", owner: bob.publicKey, rpIdHash: RP_ID_HASH })).status, 201);
+    assert.equal((await act(first, "bob-home", "provision", {}, [bob])).result?.outcome, "executed");
+    const bobBefore = (await first.call<RailState>("GET", "/workspaces/bob-home/state")).data.treasury.balance;
+    assert.equal(await first.stop(), 0);
+    const second = await startService("svc-crash-recorded", P, P + 1, { env: { ...more, QED_RAIL_ALLOW_FAULTS: "1", QED_RAIL_FAULT: "provision-recorded" }, workspace: null, dir });
+    await second.call("POST", "/workspaces", body).catch(() => null); // the process dies with the contracts recorded and the chain not saved
+    await second.until(async () => second.child.exitCode !== null || second.child.signalCode !== null, 20_000, "the kill");
+    second.reapAnvil();
+    const s = await startService("svc-crash-recorded", P, P + 1, { env: more, workspace: null, dir });
+    try {
+      assert.equal((await s.call<{ ready: boolean }>("GET", "/health")).data.ready, true, s.log().slice(-600));
+      const v = (await s.call<WorkspaceView>("GET", "/workspaces/late-crash-home")).data;
+      assert.deepEqual([v.status, v.grant], ["awaiting-acceptance", null], JSON.stringify(v).slice(0, 300));
+      const again = await s.call<WorkspaceView>("POST", "/workspaces", body);
+      assert.deepEqual([again.status, again.data.duplicate, again.data.contracts.vault], [200, true, v.contracts.vault]);
+      assert.equal((await act(s, "late-crash-home", "provision", {}, [alice])).result?.outcome, "executed", "the completed workspace is accepted and works");
+      // the other household's wallet: the same money, and it still acts
+      assert.equal((await s.call<RailState>("GET", "/workspaces/bob-home/state")).data.treasury.balance, bobBefore);
+      assert.equal((await act(s, "bob-home", "mandate", { maxPerPayment: "100" }, [bob])).result?.outcome, "executed");
+    } finally { await s.stop(); }
+  } finally { await first.stop().catch(() => undefined); rmSync(dir, { recursive: true, force: true }); }
+});

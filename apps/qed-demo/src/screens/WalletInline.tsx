@@ -20,7 +20,7 @@ import { Btn, Field, Link, Mark, Note, Problem, Src, useAction } from '../ui/kit
 import { headline, payeesInWords, plain, useVaultApproval } from './Vault.tsx'
 
 const PAYEE = 'CloudCo'
-interface WalletOverview { available: boolean; setUp: boolean; state: RailState | null; workspace: { asset: { symbol: string; decimals: number }; reserveAsset: { symbol: string; decimals: number } } | null }
+interface WalletOverview { available: boolean; setUp: boolean; state: RailState | null; workspace: { status?: string; asset: { symbol: string; decimals: number }; reserveAsset: { symbol: string; decimals: number } } | null }
 type Approval = ReturnType<typeof useVaultApproval>
 
 // Token atoms as paise: one definition, in lib/words.ts, so Protect need not download this file to read its figures.
@@ -35,12 +35,17 @@ function useWallet() {
   return { o, st: d?.state ?? null, main: d?.workspace?.asset.decimals ?? 2, res: d?.workspace?.reserveAsset.decimals ?? 6 }
 }
 
-/** What stops a wallet part from showing its form: no service, no wallet, no mandate. Null when the form can show. */
+/**
+ * What stops a wallet part from showing its form: no service, no wallet, a wallet not accepted yet, no mandate. Null when
+ * the form can show. Each is one sentence that says what is missing and links to the next step. It is a paragraph, not
+ * one of the parts' grids (`vt-inline`): on a grid, the sentence, its link and its ending became three rows (R14).
+ */
 function Missing({ w, needsMandate }: { w: ReturnType<typeof useWallet>; needsMandate: boolean }) {
   if (!w.o.data) return null
-  if (!w.o.data.available) return <p className="vt-inline vt-wmissing">The on-chain wallet's service is not running, so nothing on the chain can be done from here now.</p>
-  if (!w.o.data.setUp || !w.st) return <p className="vt-inline vt-wmissing">Your on-chain wallet is not set up. <Link to="/vault">Set it up</Link>, then use it from here.</p>
-  if (needsMandate && !w.st.mandate) return <p className="vt-inline vt-wmissing">Before QED can act on your on-chain wallet, sign a mandate saying how much and to whom. <Link to="/vault">Write the mandate</Link>.</p>
+  if (!w.o.data.available) return <p className="vt-wmissing">The on-chain wallet&apos;s service is not answering just now, so nothing on the chain can be done from here. Nothing in your wallet has changed; try again in a minute.</p>
+  if (!w.o.data.setUp || !w.st) return <p className="vt-wmissing">Your on-chain wallet is not set up yet. <Link to="/vault">Set it up</Link>, then use it from here.</p>
+  if (w.o.data.workspace?.status === 'awaiting-acceptance') return <p className="vt-wmissing">Your on-chain wallet is created and waiting for you to accept it. <Link to="/vault">Accept it</Link>, then use it from here.</p>
+  if (needsMandate && !w.st.mandate) return <p className="vt-wmissing">QED cannot act on your on-chain wallet until you sign a mandate saying how much and to whom. <Link to="/vault">Write the mandate</Link>, then use it from here.</p>
   return null
 }
 

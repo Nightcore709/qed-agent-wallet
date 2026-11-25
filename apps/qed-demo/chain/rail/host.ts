@@ -30,6 +30,8 @@ import { quickReceipts } from "./chain-socket.ts";
 import { ClockSkewError, GapDetector, alignNextBlock, anchor, reading, type Gap } from "./clock.ts";
 import { BASELINE_WORKSPACE, CHAIN_ID, RELEASE_ID, defaultConfig, type RailConfig } from "./config.ts";
 import { COSIGNER_SELF_TEST, InProcessCosigner, SCOPE_RE, scopedPort, type CosignerConfig, type CosignerHost } from "./cosigner.ts";
+import { cosignerRecordsDir } from "./cosigner-env.ts";
+import { startReadOnlyDoor, type ReadOnlyDoor } from "./chain-socket.ts";
 import type { D7Config, Reference } from "./authority-ledger.ts";
 import { INR_DECIMALS, INR_VENUES, deployMarket, deployReleaseSandbox, emptyCurrencyMarket, ensureCurrencyMarket, tokenOf, type Addresses, type CurrencyMarket, type MarketAddresses } from "./deploy.ts";
 import { AssetSetError, CHAIN_TOKENS, DEFAULT_ASSET_SET, assetSetDigest, assetSetDocument, checkAssetSet, fromInr, isDefaultSet, poolKey, referenceBandOf, venuePlan, type AssetSet } from "../../shared/chain-assets.ts";
@@ -206,6 +208,7 @@ export class RailHost {
         this.#hostKeys = { deployer: derivedAccount(this.#master, "host:deployer"), cloudco: derivedAccount(this.#master, "host:payee:cloudco"), denied: derivedAccount(this.#master, "host:denylisted"), keeper: derivedAccount(this.#master, "host:market-keeper") };
         this.denyList = loadDenyList(this.cfg.railDir, [this.#hostKeys.denied.address]);
       }
+      await this.openChainDoor();
       this.cosigner = await this.makeCosigner();
       const genesis = this.store.meta<{ id: string; at: string; addresses?: Addresses; market?: MarketAddresses }>("genesis");
       if (!genesis) await this.deployFresh();
@@ -214,8 +217,11 @@ export class RailHost {
       await this.ensureBounties();
       await this.ensureDisputes();
       if (this.cfg.mode === "baseline-parity") await this.attachBaseline();
-      // a workspace whose creation stopped before its contracts existed has nothing to attach: it is resumed below
-      else for (const row of this.store.workspaceRows()) if (parse<any>(row.spec)?.contracts) await this.attachWorkspace(row.id as string);
+      // A workspace whose creation stopped is not attached here: it is completed below. That holds whether it stopped
+      // before its contracts existed or after the registry recorded them (R14): the chain is saved only when a creation
+      // ends, so the saved chain may not hold the contracts the registry names, and attaching would read contracts that
+      // are not there. One unfinished workspace must never keep every other household's wallet from starting.
+      else for (const row of this.store.workspaceRows()) if (row.status !== "deploying" && parse<any>(row.spec)?.contracts) await this.attachWorkspace(row.id as string);
       this.#gaps = new GapDetector(this.cfg.wallClock, this.cfg.monoClock, this.cfg.gapSeconds * 1000);
       // a workspace whose creation was interrupted is completed now, from where it stopped, before the host is ready
       if (this.cfg.mode === "multi-tenant") for (const row of this.store.workspaceRows()) if (row.status === "deploying") await this.writer(() => this.provision(row.id as string)).catch((e) => this.cfg.log(`workspace ${row.id} could not be completed: ${publicError(e)}`));
@@ -242,12 +248,44 @@ export class RailHost {
     try { await this.#writer; } catch { /* a failed job is already recorded */ }
     try { if (was === "ready") await this.checkpoint(); } catch { /* the last per-job checkpoint stands */ }
     await this.cosigner?.stop().catch(() => {});
+    await this.chainDoor?.close().catch(() => {});
+    this.chainDoor = null;
     await this.anvil?.stop().catch(() => {});
     for (const ws of this.all()) if (ws.store !== this.store) ws.store?.close();
     this.store?.close();
     this.#unlockSecrets?.(); // after the co-signer, which reads its key file, has stopped
     this.#unlockSecrets = null;
     await (globalThis as { curve_bn128?: { terminate?: () => Promise<void> } }).curve_bn128?.terminate?.().catch(() => {});
+  }
+
+  /**
+   * R14: the chain's read-only door, open only when the co-signer is its own process and has been given a folder for it
+   * (QED_COSIGNER_CHAIN_DIR: in the container, a folder of this service's user and the co-signer's group). Null on a
+   * development machine, where the co-signer is this user and uses the chain's own socket, as before.
+   */
+  chainDoor: ReadOnlyDoor | null = null;
+  /** The socket the co-signer reaches the chain by: the read-only door when there is one, else the chain's own. */
+  private get cosignerChainSocket(): string { return this.chainDoor?.path ?? this.anvil.socketPath; }
+  /**
+   * Opens the door before the co-signer is configured for anything. A co-signer that runs as another user and has no
+   * door could not read the chain: that is refused here, at start, in words, instead of failing at the first payment.
+   */
+  private async openChainDoor(): Promise<void> {
+    const dir = this.cfg.cosigner === "process" ? process.env.QED_COSIGNER_CHAIN_DIR : undefined;
+    if (!dir) {
+      if (this.cfg.cosigner === "process" && process.env.QED_COSIGNER_UID) throw new Error("The co-signer runs as its own user and has no way to read the chain: QED_COSIGNER_CHAIN_DIR names no folder for the chain's read-only door (scripts/deploy/entrypoint.sh makes it). Nothing was started.");
+      return;
+    }
+    this.chainDoor = await startReadOnlyDoor(join(dir, "chain.sock"), this.anvil.socketPath);
+  }
+
+  /**
+   * Where the co-signer keeps one workspace's decision records (R14; cosigner-env.ts cosignerRecordsDir): in its own
+   * folder when it runs as its own process with one (the container: another user, who cannot enter this service's data
+   * folder), else in the workspace's own records folder, as before.
+   */
+  private cosignerRecords(id: string, workspaceRecords: string): string {
+    return cosignerRecordsDir(this.cfg.cosigner === "process" ? process.env.QED_COSIGNER_STATE_DIR : null, id, workspaceRecords);
   }
 
   protected async makeCosigner(): Promise<CosignerHost> {
@@ -337,7 +375,7 @@ export class RailHost {
     ws.owner = new ReleaseDevelopmentOwner(new OwnerSigner(devAccount("OWNER")));
     ws.cosigner = scopedPort(this.cosigner, BASELINE_WORKSPACE);
     ws.summary = { id: BASELINE_WORKSPACE, status: "ready", guards: [], ownerKind: "release-development-owner", ownerCustody: ws.owner.custody, ownerAccount: null, ownerAccountBuild: null, signers: [], threshold: null, asset: { symbol: "tUSD", decimals: 6, address: a.usd }, reserveAsset: { symbol: "tEUR", decimals: 6, address: a.eur }, grant: null, createdAt: this.store.meta<{ at: string }>("genesis")!.at };
-    await ws.cosigner.configure({ rpcUrl: this.anvil.url, chainSocket: this.anvil.socketPath, chainId: CHAIN_ID, vault: a.vault, lens: a.lens, escrow: a.vault, owner: ws.owner.address, denylist: [ws.K.MALLORY.address], deployBlock: a.deployBlock, recordsDir: ws.recordsDir, engine: "release" });
+    await ws.cosigner.configure({ rpcUrl: this.anvil.url, chainSocket: this.cosignerChainSocket, chainId: CHAIN_ID, vault: a.vault, lens: a.lens, escrow: a.vault, owner: ws.owner.address, denylist: [ws.K.MALLORY.address], deployBlock: a.deployBlock, recordsDir: this.cosignerRecords(BASELINE_WORKSPACE, ws.recordsDir), engine: "release" });
     this.workspaces.set(BASELINE_WORKSPACE, ws);
   }
 
@@ -536,6 +574,8 @@ export class RailHost {
     await this.align();
     for (const who of [dep, k.relayer, k.sentinel, k.agent(1), k.guardian(1)]) if ((await this.pub.getBalance({ address: who.address })) < parseEther("1")) await this.rpc("anvil_setBalance", [who.address, toHex(parseEther("10"))]);
     const cosigner = await this.cosigner.address(id);
+    // whether this run put a contract on the chain: then the block recorded by an earlier, unfinished run is not this chain's
+    let deployedNow = false;
     const deployAt = async (nonce: number, abi: unknown, bytecode: Hex, args: unknown[]): Promise<Address> => {
       const at = getContractAddress({ from: dep.address, nonce: BigInt(nonce) });
       const code = await this.pub.getCode({ address: at });
@@ -543,6 +583,7 @@ export class RailHost {
       const next = await this.pub.getTransactionCount({ address: dep.address });
       if (next !== nonce) throw new Error(`workspace ${id}: its deployer is at nonce ${next}, but contract ${nonce} is missing. Nothing more was deployed.`);
       const d = await this.c.deploy(dep, abi, bytecode, args);
+      deployedNow = true;
       if (getAddress(d.address) !== at) throw new Error(`workspace ${id}: contract ${nonce} landed at ${d.address}, not ${at}.`);
       return at;
     };
@@ -577,9 +618,10 @@ export class RailHost {
     }
     // 4 · ownership offered to the owner account; its passkey accepts it with the workspace's first approval
     for (const v of [vault, reserve]) if ((await ownerOf(v)) === dep.address && getAddress(await read(v, A.QEDVaultAbi, "pendingOwner")) !== ownerAccount) await this.c.send(dep, v, fn(A.QEDVaultAbi, "transferOwnership", [ownerAccount]));
-    const deployBlock = spec.deployBlock ?? (await this.pub.getBlockNumber()).toString();
+    const deployBlock = !deployedNow && spec.deployBlock ? spec.deployBlock : (await this.pub.getBlockNumber()).toString();
     const done = { ...spec, guards: guards.map((g) => ({ target: g.target, selector: g.selector, reason: g.reason })), ...(contained ? { protective: protective.map((g) => ({ target: g.target, selector: g.selector, reason: g.reason })), sentinel: k.sentinel.address } : {}), ...(options ? { lockable: lockable.map((g) => ({ target: g.target, selector: g.selector, reason: g.reason })), timeLockAtSetup: spec.request.timeLock === true } : {}), contracts: { ownerAccount, vault, reserve, exec, treasuryPolicy }, deployBlock, grant: spec.grant ?? null };
     this.store.updateWorkspace(id, "deploying", done, this.iso());
+    this.fault("provision-recorded");
     const ws = await this.attachWorkspace(id);
     // R7 D7: a workspace that shares a member with this one now has this one's addresses in its principal set
     if (this.cfg.authority === "d7") for (const other of this.linkedWorkspaces(id)) { const w = this.workspaces.get(other.id); if (w) await w.cosigner.configure(this.cosignerConfig(other.id, w.recordsDir)); }
@@ -669,7 +711,7 @@ export class RailHost {
     // S5: an order into a 0-decimal token (tJPY) cannot come within the release's 1 to 100 ppm of its bound, one unit being
     // hundreds of ppm of a small conversion: a set other than the default lets τ cover two base units (fork change 6)
     const granular = isDefaultSet(this.setOf(spec)) ? {} : { minToleranceUnits: 2 };
-    const base: CosignerConfig = { rpcUrl: this.anvil.url, chainSocket: this.anvil.socketPath, chainId: CHAIN_ID, vault: c.vault, lens: m.lens, escrow: m.escrow, owner: c.ownerAccount, denylist: this.denyList ? this.denyList.entries.map((e) => e.address) : [this.#hostKeys!.denied.address], deployBlock: spec.deployBlock, recordsDir, engine: "fork", ...granular };
+    const base: CosignerConfig = { rpcUrl: this.anvil.url, chainSocket: this.cosignerChainSocket, chainId: CHAIN_ID, vault: c.vault, lens: m.lens, escrow: m.escrow, owner: c.ownerAccount, denylist: this.denyList ? this.denyList.entries.map((e) => e.address) : [this.#hostKeys!.denied.address], deployBlock: spec.deployBlock, recordsDir: this.cosignerRecords(id, recordsDir), engine: "fork", ...granular };
     return this.cfg.authority === "d7" ? { ...base, authority: "d7", d7: this.authorityConfig(id) } : { ...base, authority: "release" };
   }
 
@@ -1043,7 +1085,7 @@ export class RailHost {
     };
   }
 
-  /** Test seam (off unless QED_RAIL_ALLOW_FAULTS=1): QED_RAIL_FAULT="mid-provision" kills the process there. */
+  /** Test seam (off unless QED_RAIL_ALLOW_FAULTS=1): QED_RAIL_FAULT="mid-provision" or "provision-recorded" kills the process there. */
   fault(name: string) {
     if (this.cfg.allowFaults && process.env.QED_RAIL_FAULT === name) process.kill(process.pid, "SIGKILL");
   }

@@ -163,7 +163,8 @@ describe('the bounty routes, against a stand-in vault service', () => {
     expect([e?.status, e?.code, e?.message]).toEqual([422, 'claim_rejected', 'The judge rejects this claim, so it cannot be paid: The theorem holds for this claim.'])
     fake.up = false
     const v = await bountiesView(CFG, db, asha) as Record<string, any>
-    expect([v.originals.length, v.local.available, v.local.code, v.local.reason]).toEqual([2, false, 'rail_off', expect.stringMatching(/not running/)])
+    // R14: said for the person in front of it (what is wrong, that nothing changed, what to do), not for whoever runs the service
+    expect([v.originals.length, v.local.available, v.local.code, v.local.reason]).toEqual([2, false, 'rail_off', expect.stringMatching(/^The on-chain wallet's service is not answering.*Nothing was sent.*Try again in a minute\.$/)])
   })
 
   it('the originals do not depend on the vault service: a board that is off, or a vault the service no longer knows, is said with its code', async () => {

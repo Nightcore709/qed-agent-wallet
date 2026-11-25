@@ -346,3 +346,17 @@ describe('the chain, in words (R12 task comparison, T10)', () => {
     expect(sameAddress(owner.replace(/c$/i, 'd'), 31337, owner)).toBe(false)
   })
 })
+
+describe('the sentences that send a person to the wallet (R14)', () => {
+  it('none is drawn on a grid: a sentence with its link inside it is a paragraph, or its link and its ending become rows of their own', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { join } = await import('node:path')
+    const here = join(import.meta.dirname, '..')
+    const inline = readFileSync(join(here, 'screens', 'WalletInline.tsx'), 'utf8')
+    // `vt-inline` is a grid for the parts' forms; on a <p> it made "Set it up" and ", then use it from here." two more rows
+    expect(inline).not.toMatch(/<p className="[^"]*\bvt-inline\b/)
+    expect(inline.match(/<p className="vt-wmissing">/g)?.length).toBe(4)
+    const css = readFileSync(join(here, 'styles', 'screens', 'vault.css'), 'utf8')
+    expect(css).toMatch(/\.vt-wmissing \{ display: block;/)
+  })
+})
