@@ -125,17 +125,32 @@ test('a password account changes its password, then removes it once it has a pas
   await expect(contact.getByRole('button', { name: 'Accept' })).toHaveCount(0)
   await owner.waitForTimeout(6500)
 
-  // everything a recovery needs is in place: the passkey confirms the removal
+  // everything a recovery needs is in place: the passkey confirms the removal, which waits the protection delay
+  // (SECURITY.md 8j (c)): the sheet says so before, and the panel says until when and how to cancel it after
   await owner.goto('/security')
   await panel.getByRole('button', { name: 'Remove password' }).click()
   await expect(needs.getByText(`@${contactHandle} is active and can issue you a recovery code.`)).toBeVisible()
   await expect(needs.getByText('10 of 10 unused.')).toBeVisible()
+  await expect(rm.getByText(/Removing it waits .*: the password keeps working until then, every address of yours is told now, and any of your passkeys, or one of your saved recovery codes, can cancel it/)).toBeVisible()
   await rm.getByRole('button', { name: 'Remove password' }).click()
   await expect(owner.getByRole('dialog')).toHaveCount(0)
-  await expect(panel.getByText('Password removed', { exact: true })).toBeVisible()
-  await expect(panel.getByText('This account has no password: it signs in only with its passkeys.')).toBeVisible()
+  const waiting = panel.locator('.note').filter({ hasText: /^Your password is to be removed / })
+  await expect(waiting).toBeVisible()
+  await expect(waiting).toContainText(/It keeps working until then\..*cancel the removal under Needs you/)
   await expect(panel.getByRole('heading', { name: 'Password' })).toBeFocused()
-  expect(query('SELECT pw_hash FROM users WHERE handle = ?', handle)).toEqual([{ pw_hash: '!' }])
+  await expect(panel.getByRole('button', { name: 'Remove password' })).toHaveCount(0)
+  await expect(owner.getByRole('region', { name: 'Needs you' }).getByRole('heading', { name: 'Remove your password' })).toBeVisible()
+  expect(query<{ pw_hash: string }>('SELECT pw_hash FROM users WHERE handle = ?', handle)[0]!.pw_hash.startsWith('scrypt$')).toBe(true)
+  // it takes effect when the delay ends (6 s on the test stack): this session was opened with the password, so it ends
+  // with it, and the owner signs in again with the passkey
+  await expect.poll(() => query<{ pw_hash: string }>('SELECT pw_hash FROM users WHERE handle = ?', handle)[0]!.pw_hash, { timeout: 30_000 }).toBe('!')
+  await owner.reload()
+  await owner.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }).click()
+  await expect(owner.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' })).toHaveCount(0)
+  await owner.goto('/security')
+  // signed in (the page's parts are there), and the password panel is gone with the password
+  await expect(owner.getByRole('region', { name: 'Signing in' })).toBeVisible()
+  await expect(owner.getByRole('region', { name: 'Password', exact: true })).toHaveCount(0)
   // the recovery path no longer offers the password as its second proof (R12: "One more proof" lists what remains)
   const path = owner.getByRole('list', { name: 'What a recovery takes' })
   await expect(path.getByText(`a code from @${contactHandle}.`, { exact: false })).toBeVisible()
@@ -143,6 +158,7 @@ test('a password account changes its password, then removes it once it has a pas
   // the history says what happened, in order
   const history = owner.getByRole('region', { name: 'What happened' })
   await expect(history.getByText('Password removed; the account signs in only with passkeys')).toBeVisible()
+  await expect(history.getByText('Removing your password was asked for; it waits before it takes effect')).toBeVisible()
   await expect(history.getByText('Password changed; every other session was signed out')).toBeVisible()
   await expect(history.getByText('Account created with a password')).toBeVisible()
 

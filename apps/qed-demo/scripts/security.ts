@@ -152,7 +152,7 @@ interface Signed { cookie: string; csrf: string; userId: string }
 interface Person extends Signed { handle: string; auth: SoftAuthenticator; codes: string[]; signupFinish: unknown }
 const as = (p: { cookie: string; csrf: string }, extra: Opts = {}): Opts => ({ cookie: p.cookie, csrf: p.csrf, ...extra })
 let signupBegins = 0 // every sign-up begin that reached the handler counts against the per-address limit
-const signupCodesAtSignup: number[] = [] // how many saved codes each sign-up's own answer carried (R14: none)
+const signupCodesAtSignup: number[] = [] // how many saved codes each sign-up's own answer carried (R14, F1: ten, made with the first device)
 
 async function signUp(handle: string, household = true): Promise<Person> {
   const auth = authenticator()
@@ -162,10 +162,11 @@ async function signUp(handle: string, household = true): Promise<Person> {
   const f = await http('POST', '/api/auth/passkey/signup/finish', { body: signupFinish })
   const j = must(f, `sign-up finish for ${handle}`)
   const p: Person = { handle, auth, cookie: cookieOf(f), csrf: String(j.csrf), userId: String(j.userId), codes: [], signupFinish }
-  // R14: sign-up makes no saved recovery codes (the forced codes step is gone). These checks are about what the codes do,
-  // so each person makes their set right after, as under Security: one passkey, none yet, a fresh confirmation.
+  // R14 (review F1, SECURITY.md 8k): a sign-up with a passkey makes the account's saved codes with its first device, in
+  // the same change, and its answer carries them once; these checks are about what the codes do, so they keep that set.
+  // (Asking for new ones now would need one of them: H2.)
   signupCodesAtSignup.push(Array.isArray(j.recoveryCodes) ? (j.recoveryCodes as unknown[]).length : 0)
-  p.codes = must(await http('POST', '/api/security/recovery-codes', as(p, { body: {} })), `saved codes for ${handle}`).codes as string[]
+  p.codes = Array.isArray(j.recoveryCodes) && j.recoveryCodes.length ? (j.recoveryCodes as string[]) : must(await http('POST', '/api/security/recovery-codes', as(p, { body: {} })), `saved codes for ${handle}`).codes as string[]
   if (household) must(await http('POST', '/api/household', as(p, { body: {} })), `household for ${handle}`)
   return p
 }
@@ -394,7 +395,7 @@ try {
     const storedAs = stored.length && stored.every((r) => algo(r) === 'scrypt') ? 'scrypt (V6.5.2 met)' : stored.every((r) => algo(r) === 'sha256') ? 'salted SHA-256 (V6.5.2 not met: a code of under 112 bits needs a password-hashing algorithm)' : `mixed or unrecognised (${[...new Set(stored.map(algo))].join(', ')})`
     const saltBits = Math.min(...stored.map((r) => Buffer.from(String(r.salt ?? ''), 'hex').length * 8))
     const salts = new Set(stored.map((r) => String(r.salt ?? '')))
-    check('N02', 'account', 'recovery codes: none is made by the sign-up itself (R14); made on request they are ten, each 16 symbols of a 32-symbol alphabet (80 bits), all different, salted, and none stored in clear', 'V6.5.4 entropy; V6.5.3 random generation; V6.5.2 (see observed)', 'no code in any sign-up\'s answer; ten distinct codes of the form; ten stored rows, each with a salt of at least 32 bits; no code in any stored row', `sign-up answers carried ${signupCodesAtSignup.reduce((a, b) => a + b, 0)} codes; `+`${victim.codes.length} codes, ${victim.codes.filter((c) => form.test(c)).length} of the form, ${new Set(victim.codes).size} distinct; ${stored.length} rows, salts of at least ${saltBits} bits (${salts.size} distinct: ${salts.size === 1 ? 'one per batch' : 'one per code'}); ${inClear} found in clear; stored as ${storedAs}`, victim.codes.length === 10 && victim.codes.every((c) => form.test(c)) && new Set(victim.codes).size === 10 && stored.length === 10 && saltBits >= 32 && inClear === 0 && signupCodesAtSignup.every((n) => n === 0))
+    check('N02', 'account', 'recovery codes: the sign-up with a passkey makes them with its first device and returns them once (R14, F1); they are ten, each 16 symbols of a 32-symbol alphabet (80 bits), all different, salted, and none stored in clear', 'V6.5.4 entropy; V6.5.3 random generation; V6.5.2 (see observed)', 'ten codes in each passkey sign-up\'s answer; ten distinct codes of the form; ten stored rows, each with a salt of at least 32 bits; no code in any stored row', `sign-up answers carried ${signupCodesAtSignup.reduce((a, b) => a + b, 0)} codes; `+`${victim.codes.length} codes, ${victim.codes.filter((c) => form.test(c)).length} of the form, ${new Set(victim.codes).size} distinct; ${stored.length} rows, salts of at least ${saltBits} bits (${salts.size} distinct: ${salts.size === 1 ? 'one per batch' : 'one per code'}); ${inClear} found in clear; stored as ${storedAs}`, victim.codes.length === 10 && victim.codes.every((c) => form.test(c)) && new Set(victim.codes).size === 10 && stored.length === 10 && saltBits >= 32 && inClear === 0 && signupCodesAtSignup.every((n) => n === 10))
 
     let accepted = signupBegins, limited: Res | null = null
     for (let i = 0; i < 25 && !limited; i++) { const x = await http('POST', '/api/auth/passkey/signup/begin', { body: { handle: `limit-${i}`, displayName: 'x' } }); if (x.status === 200) accepted++; else limited = x }
@@ -1050,11 +1051,16 @@ try {
     const token = /#token=([A-Za-z0-9_-]+)/.exec(rows<{ body: string }>(`SELECT body FROM outbound_messages WHERE to_address = ? AND purpose = 'password-reset' ORDER BY created_at DESC LIMIT 1`, mailbox)[0]?.body ?? '')?.[1] ?? ''
     const before = await http('POST', '/api/auth/password/reset/state', { body: { token } })
     const removed = await http('POST', `/api/security/addresses/${String(added.id)}/remove`, as(lr))
+    // R14 (SECURITY.md 8j (c)): removing a confirmed address is a removal of a way back in, so it waits the protection
+    // delay (DELAY_SEC here) and the engine applies it; the address, and the link sent to it, stay until then
+    const during = await http('POST', '/api/auth/password/reset/state', { body: { token } })
+    await sleep((DELAY_SEC + 2) * 1000)
+    must(await http('GET', '/api/security', as(lr)), 'read Security once the removal is due')
     const after = await http('POST', '/api/auth/password/reset/state', { body: { token } })
     const reset = await http('POST', '/api/auth/password/reset', { body: { token, password: 'Lantern-Harbour-6620', confirm: 'Lantern-Harbour-6620' } })
-    check('R05', 'r13', 'removing an address stops the reset link already sent to it', 'V6.4.1 recovery secrets; V6.4.3 reset not usable by a former channel',
-      'the link works before; removal 200; then the link 410 and the reset refused', `before ${code(before)}; removal ${code(removed)}; after ${code(after)}; reset ${code(reset)}`,
-      before.status === 200 && removed.status === 200 && after.status === 410 && reset.status === 410)
+    check('R05', 'r13', 'removing an address stops the reset link already sent to it, when the removal takes effect', 'V6.4.1 recovery secrets; V6.4.3 reset not usable by a former channel',
+      'the link works before; removal 200, scheduled; the link works while it waits; once it applies, the link 410 and the reset refused', `before ${code(before)}; removal ${code(removed)}${removed.json?.scheduled === true ? ' scheduled' : ''}; during ${code(during)}; after ${code(after)}; reset ${code(reset)}`,
+      before.status === 200 && removed.status === 200 && removed.json?.scheduled === true && during.status === 200 && after.status === 410 && reset.status === 410)
   })
 
   await group('r13-business', async () => {

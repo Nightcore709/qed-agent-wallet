@@ -26,10 +26,15 @@ import { SavedCodes } from '../ui/SavedCodes.tsx'
 // Safeguards and the words test read these from here; they live with the other Protect pages' helpers.
 export { delayWords, sessionDevice }
 
-/** hasPasskey: given for this account's own contacts; a contact issues a recovery code only after confirming with one. */
-interface Contact { id: string; handle: string; name: string; requestedAt: number; effectiveAt: number; acceptedAt: number | null; active: boolean; hasPasskey?: boolean }
-/** An address outside QED (R12): email (notices now; a way back in after the protection delay) or a phone (notices only). */
-interface Address { id: string; kind: 'email' | 'phone'; address: string; addedAt: number; confirmedAt: number | null; usableFrom: number | null; replaces: string | null }
+/**
+ * hasPasskey: given for this account's own contacts; a contact issues a recovery code only after confirming with one.
+ * removalScheduledFor: ending a contact who has accepted waits the protection delay (SECURITY.md 8j (c)); when it ends.
+ */
+interface Contact { id: string; handle: string; name: string; requestedAt: number; effectiveAt: number; acceptedAt: number | null; active: boolean; hasPasskey?: boolean; removalScheduledFor?: number | null; removalChangeId?: string | null }
+/** An address outside QED (R12): email (notices now; a way back in after the protection delay) or a phone (notices only). A confirmed email's removal waits (8j (c)). */
+interface Address { id: string; kind: 'email' | 'phone'; address: string; addedAt: number; confirmedAt: number | null; usableFrom: number | null; replaces: string | null; removalScheduledFor?: number | null; removalChangeId?: string | null }
+/** The changes that remove a way back in (8j (c)): any passkey of the person, or one of their saved codes, cancels one. */
+const FALLBACK_REMOVALS = new Set(['remove-contact', 'remove-address', 'remove-password'])
 interface SecurityView {
   passkeys: { id: string; name: string; createdAt: number; lastUsedAt: number | null; synced: boolean; removedAt: number | null; suspendedAt: number | null; current: boolean; removalScheduledFor: number | null; unsuspendScheduledFor: number | null
     /** 'signin': added by a recovery or after a password reset; it approves nothing until its authority is restored (R12). */
@@ -43,12 +48,15 @@ interface SecurityView {
   /** R3: until when this session may ask for a fresh set of the codes it was shown, or null. */
   codesAgainUntil?: number | null
   recoveries: { id: string; started_at: number; available_at: number; cancelled_at: number | null; completed_at: number | null; via?: string; method?: string }[]
-  scheduled: { id: string; kind: string; subject: string; requested_at: number; effective_at: number; workspace_id?: string | null; workspace_name?: string | null; requested_by_handle?: string | null; detail?: { policy?: Record<string, unknown>; before?: Record<string, number>; after?: Record<string, number>; reserve?: { before: number; after: number } } }[]
+  scheduled: { id: string; kind: string; subject: string; requested_at: number; effective_at: number; workspace_id?: string | null; workspace_name?: string | null; requested_by_handle?: string | null; detail?: { policy?: Record<string, unknown>; before?: Record<string, number>; after?: Record<string, number>; reserve?: { before: number; after: number }; contact?: string; address?: string; replacedBy?: string } }[]
   contacts: Contact[]
-  trustedBy: (Contact & { openRecovery: boolean; pendingAuthority: boolean; pendingLoosening: boolean })[]
+  /** endingAt: they asked to end you as their contact; you stay it until then (8j (c)). */
+  trustedBy: (Contact & { openRecovery: boolean; pendingAuthority: boolean; pendingLoosening: boolean; endingAt?: number | null })[]
   secondMethod: { contacts: number; password: boolean }
-  /** heldUntil: after a password reset, until when the password confirms no change to how the account gets back in. */
-  password: { set: boolean; changedAt: number | null; heldUntil?: number | null }
+  /** heldUntil: after a password reset, until when the password confirms no change to how the account gets back in; removalScheduledFor: its removal waits (8j (c)). */
+  password: { set: boolean; changedAt: number | null; heldUntil?: number | null; removalScheduledFor?: number | null; removalChangeId?: string | null }
+  /** R2: from when the codes made with a waiting request for approval authority work (they replace the earlier ones then). */
+  codesFrom?: number | null
   issuedForMe: { contact: string; issuedAt: number; expiresAt: number }[]
   events: { ts: number; kind: string; detail: Record<string, unknown> }[]
   delays: { recoveryMs: number; protectionMs: number; testMode: boolean }
@@ -96,6 +104,13 @@ const EVENT: Record<string, string> = {
   'contact-authority-requested': 'Someone who trusts you asked for approval authority after a recovery', 'you-stopped-recovery': 'You stopped a recovery for someone who trusts you', 'loosening-cancelled': 'A recovery contact stopped a change that would have loosened your protections', 'you-stopped-loosening': 'You stopped a loosening of protections for someone who trusts you',
   'profile-loosening-scheduled': 'A change that loosens your protections was asked for; it waits before it takes effect', 'profile-loosened': 'A change that loosens your protections took effect after its wait',
   'contact-loosening-scheduled': 'Someone who trusts you asked to loosen a protection',
+  // removing a way back in waits (SECURITY.md 8j (c), R14)
+  'recovery-contact-removal-scheduled': 'Ending a recovery contact was asked for; it waits before it takes effect',
+  'contact-role-ending-scheduled': 'Someone who trusts you asked to end you as their recovery contact; you stay it until the wait ends',
+  'contact-role-continues': 'Someone who trusts you cancelled ending you as their recovery contact',
+  'email-removal-scheduled': 'Removing an email address was asked for; it waits before it takes effect',
+  'password-removal-scheduled': 'Removing your password was asked for; it waits before it takes effect',
+  'password-removal-lapsed': 'Removing your password did not take effect: without it, a recovery would have had no second proof',
 }
 /** How a recovery was started, in words. */
 const METHOD_WORDS: Record<string, string> = { 'email+saved': 'an email link and a saved code', 'email+contact': 'an email link and a recovery contact\'s code', 'email+password': 'an email link and the password', 'saved+contact': 'a saved code and a recovery contact\'s code', 'saved+password': 'a saved code and the password' }
@@ -110,6 +125,11 @@ export function eventWords(e: { kind: string; detail: Record<string, unknown> })
   if (e.kind === 'signed-in' && e.detail.method === 'google') return 'Signed in with Google'
   if (e.kind === 'recovery-codes-made' && (e.detail.reason === 'first-device' || e.detail.reason === 'second-device')) return 'Saved recovery codes made, with your first device'
   if (e.kind === 'recovery-codes-made' && e.detail.reason === 'recovery') return 'Saved recovery codes made, with the recovery'
+  // R2: the codes made with a request for approval authority come into force when it is given
+  if (e.kind === 'recovery-codes-made' && e.detail.reason === 'authority-restored') return 'The saved recovery codes made with the request for approval authority now work'
+  if (e.kind === 'recovery-codes-replaced' && e.detail.reason === 'authority-restored') return 'The saved recovery codes made with the request for approval authority now work; earlier codes no longer do'
+  if (e.kind === 'change-cancelled' && e.detail.with === 'saved-code') return 'A scheduled change was cancelled with a saved recovery code'
+  if (e.kind === 'password-changed' && e.detail.removalCancelled === true) return 'Password changed; every other session was signed out, and the waiting removal of the password was cancelled'
   // a confirmation the local test outbox kept was not sent, and is not said to be (R13; recorded since then)
   if (e.detail.simulated === true && (e.kind === 'email-confirmation-sent' || e.kind === 'phone-confirmation-sent')) return `A confirmation for ${e.kind === 'email-confirmation-sent' ? 'an email address' : 'a phone number'} was kept in the simulated outbox, not sent`
   if ((e.kind === 'paused-with-saved-code' || e.kind === 'paused-by-contact') && e.detail.already === true) {
@@ -209,7 +229,15 @@ export function SecurityScreen() {
   const remove = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/passkeys/${id}/remove`, { code: savedCode.trim() || undefined })); setSavedCode(''); v.reload() })
   const suspend = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/passkeys/${id}/suspend`, { code: savedCode.trim() || undefined })); setSavedCode(''); v.reload() })
   const unsuspend = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/passkeys/${id}/unsuspend`)); v.reload() })
-  const cancel = useAction(async (id: string) => { await withPasskey(fresh(), () => api('POST', `/api/security/changes/${id}/cancel`)); v.reload() })
+  // A removal of a way back in (8j (c)) is cancelled with the account's strongest confirmation (a passkey; with none, the
+  // password), or with one of the saved codes, typed below it; every other change with a passkey, as before.
+  const cancel = useAction(async (c: { id: string; kind: string }) => {
+    if (FALLBACK_REMOVALS.has(c.kind)) { await strongly(); await api('POST', `/api/security/changes/${c.id}/cancel`) }
+    else await withPasskey(fresh(), () => api('POST', `/api/security/changes/${c.id}/cancel`))
+    v.reload()
+  })
+  const [codeFor, setCodeFor] = useState<string | null>(null), [cancelCode, setCancelCode] = useState('')
+  const cancelWithCode = useAction(async (id: string) => { await api('POST', `/api/security/changes/${id}/cancel`, { code: cancelCode.trim() }); setCancelCode(''); setCodeFor(null); v.reload() })
   // whether the codes shown are the account's first (R14: none is made at sign-up), so the page does not speak of "earlier codes"
   const [codesFirst, setCodesFirst] = useState(false)
   const regen = useAction(async () => { await strongly(); const first = v.data?.codesMade === false; const r = await api<{ codes: string[] }>('POST', '/api/security/recovery-codes', { code: savedCode.trim() || undefined }); setSavedCode(''); setCodesFirst(first); setCodes(r.codes); await reload(); v.reload() })
@@ -227,7 +255,9 @@ export function SecurityScreen() {
   const accept = useAction(async (id: string) => { await api('POST', `/api/security/contacts/${id}/accept`); v.reload() })
   const issue = useAction(async (id: string) => { const r = await withPasskey(fresh(), () => api<{ code: string; expiresAt: number }>('POST', `/api/security/contacts/${id}/code`)); setConfirmIssue(null); setIssued({ linkId: id, ...r }); v.reload() })
   // R12: a passkey that signs in only asks for approval authority with itself; the request waits and anyone of yours can stop it.
-  const askAuthority = useAction(async () => { await requestAuthority(); await reload(); v.reload() })
+  // R2: a passkey added after a password reset gets its saved codes with the request, shown once here
+  const [authorityCodes, setAuthorityCodes] = useState<{ codes: string[]; from: number } | null>(null)
+  const askAuthority = useAction(async () => { const r = await requestAuthority(); if (r.recoveryCodes) setAuthorityCodes({ codes: r.recoveryCodes, from: r.effectiveAt }); await reload(); v.reload() })
   // Stopping it: from the session of the passkey that asked, or after a confirmation with a passkey that has authority.
   const stopAuthority = useAction(async (id: string) => {
     try { await api('POST', `/api/security/authority/${id}/cancel`) }
@@ -268,7 +298,7 @@ export function SecurityScreen() {
 
       {needs ? (
         <section className="sy-needs" aria-labelledby="sy-needs-h">
-          <PartHead id="sy-needs-h" title="Needs you" aside={<><span className="count" aria-hidden="true">{needs}</span><span className="sr">{needs} item{needs === 1 ? '' : 's'}</span></>}>{s.scheduled.length ? 'Each change below weakens a protection, so it waits. Until the time shown, any of your passkeys can cancel it; after that it applies by itself.' : null}</PartHead>
+          <PartHead id="sy-needs-h" title="Needs you" aside={<><span className="count" aria-hidden="true">{needs}</span><span className="sr">{needs} item{needs === 1 ? '' : 's'}</span></>}>{s.scheduled.length ? `Each change below weakens a protection, so it waits. Until the time shown, any of your passkeys can cancel it; after that it applies by itself.${s.scheduled.some((c) => FALLBACK_REMOVALS.has(c.kind)) ? ' Removing a way back in (a recovery contact, an email address, your password) can also be cancelled with one of your saved recovery codes.' : ''}` : null}</PartHead>
           <ul className="sy-need-list">
             {open.map((r) => (
               <li key={r.id} className="sy-need urgent">
@@ -295,18 +325,31 @@ export function SecurityScreen() {
                   </div>
                 </li>
               )
+              // removing a way back in (8j (c)): what stays until then, and that a saved code cancels it too
+              const fallback = FALLBACK_REMOVALS.has(c.kind)
+              const address = s.addresses.find((a) => a.id === c.subject)?.address ?? c.detail?.address ?? 'an email address'
+              const until = c.kind === 'remove-contact' ? 'Until then they stay your recovery contact and can still issue you a code.' : c.kind === 'remove-address' ? `Until then it stays on your account and keeps receiving your security notices.${c.detail?.replacedBy ? ' It is being replaced by a new address you added.' : ''}` : 'Until then your password keeps working.'
               return (
                 <li key={c.id} className="sy-need">
                   <div>
-                    <h3>{c.kind === 'remove-passkey' ? `Remove the passkey "${name}"` : c.kind === 'unsuspend-passkey' ? `Allow the suspended passkey "${name}" again` : c.kind === 'lower-policy' ? `In "${c.workspace_name ?? 'a workspace'}": ${policyLowering(c.detail)}` : c.kind === 'remove-bill' ? `Remove a bill that your bank reserve counts. It frees ${fmt.money(Number(c.detail?.reserve?.before ?? 0) - Number(c.detail?.reserve?.after ?? 0), true)} of what must stay in your bank account. The bill stays until then.` : c.kind === 'loosen-profile' ? `Loosen your protections. ${profileChangeLines({ after: c.detail?.after ?? {}, before: c.detail?.before ?? {} }).join('. ')}.` : 'A change to your account'}{c.requested_by_handle && c.kind === 'lower-policy' ? <span className="sy-by"> (asked by @{c.requested_by_handle})</span> : null}</h3>
-                    <p>Asked {fmt.dayTime(c.requested_at)}; takes effect {fmt.full(c.effective_at)} ({fmt.rel(c.effective_at, now)}).</p>
+                    <h3>{c.kind === 'remove-passkey' ? `Remove the passkey "${name}"` : c.kind === 'unsuspend-passkey' ? `Allow the suspended passkey "${name}" again` : c.kind === 'remove-contact' ? `End @${c.detail?.contact ?? 'a contact'} as your recovery contact` : c.kind === 'remove-address' ? `Remove the email address ${address}` : c.kind === 'remove-password' ? 'Remove your password' : c.kind === 'lower-policy' ? `In "${c.workspace_name ?? 'a workspace'}": ${policyLowering(c.detail)}` : c.kind === 'remove-bill' ? `Remove a bill that your bank reserve counts. It frees ${fmt.money(Number(c.detail?.reserve?.before ?? 0) - Number(c.detail?.reserve?.after ?? 0), true)} of what must stay in your bank account. The bill stays until then.` : c.kind === 'loosen-profile' ? `Loosen your protections. ${profileChangeLines({ after: c.detail?.after ?? {}, before: c.detail?.before ?? {} }).join('. ')}.` : 'A change to your account'}{c.requested_by_handle && c.kind === 'lower-policy' ? <span className="sy-by"> (asked by @{c.requested_by_handle})</span> : null}</h3>
+                    <p>Asked {fmt.dayTime(c.requested_at)}; takes effect {fmt.full(c.effective_at)} ({fmt.rel(c.effective_at, now)}).{fallback ? ` ${until} To keep it, cancel this with any of your passkeys, or with one of your saved recovery codes.` : ''}</p>
+                    {fallback && codeFor === c.id ? (
+                      <form className="sy-contact" style={{ marginTop: 8 }} onSubmit={(e) => { e.preventDefault(); void cancelWithCode.run(c.id) }}>
+                        <Field label="One of your saved recovery codes" hint="It is checked, not used up: cancelling only keeps a way back in." error={cancelWithCode.error?.code === 'code_wrong' ? cancelWithCode.error.message : undefined}>{(p) => <input {...p} className="input" autoComplete="off" spellCheck={false} value={cancelCode} onChange={(e) => setCancelCode(e.target.value)} />}</Field>
+                        <Btn type="submit" small busy={cancelWithCode.busy} disabled={!cancelCode.trim()}>Cancel with this code</Btn>
+                      </form>
+                    ) : null}
                   </div>
-                  <div className="sy-need-acts"><Btn small busy={cancel.busy} onClick={() => void cancel.run(c.id)}>Cancel it</Btn></div>
+                  <div className="sy-need-acts">
+                    <Btn small busy={cancel.busy} onClick={() => void cancel.run(c)}>Cancel it</Btn>
+                    {fallback && codeFor !== c.id ? <Btn small tone="quiet" onClick={() => { setCodeFor(c.id); setCancelCode(''); cancelWithCode.clear() }}>Use a saved code instead</Btn> : null}
+                  </div>
                 </li>
               )
             })}
           </ul>
-          <Problem error={cancelRecovery.error ?? cancel.error ?? stopAuthority.error ?? grantAuthority.error} />
+          <Problem error={cancelRecovery.error ?? cancel.error ?? (cancelWithCode.error?.code === 'code_wrong' ? null : cancelWithCode.error) ?? stopAuthority.error ?? grantAuthority.error} />
         </section>
       ) : null}
 
@@ -422,9 +465,16 @@ export function SecurityScreen() {
               <div><dt>Removing a passkey</dt><dd>Removing one, or allowing a suspended one again, waits {wait}, so someone who gets in cannot take your other passkeys away before you can stop them.</dd></div>
             </dl>
           ) : null}
+          {/* R2: outside the section below, which goes once the passkey can approve, so codes not yet saved stay on screen */}
+          {authorityCodes ? (
+            <div className="sy-part" role="status"><Note tone="wait" title="Save these recovery codes now">
+              <p className="small" style={{ marginBottom: 8 }}>They were made with your request for approval authority. They work from {fmt.full(authorityCodes.from)}, when the passkey can approve, and then replace any codes made before; until then nothing accepts them. If you lose them before then, stop the request and ask again: that makes a new set, and the wait starts again.</p>
+              <SavedCodes codes={authorityCodes.codes} onContinue={() => setAuthorityCodes(null)} />
+            </Note></div>
+          ) : null}
           {signinOnly.length ? (
             <section id="authority" className="sy-part" aria-labelledby="au-h">
-              <PartHead id="au-h" level={3} title="Approving payments again" aside={signinOnly.some((p) => p.restoreScheduledFor) ? 'Asked' : 'Not asked yet'}>A passkey added by a recovery, or after a password reset, signs you in but approves nothing: not a payment, an instruction, a change to your protections, or your on-chain wallet. Asking gives it approval authority after {wait}; every device, email address and recovery contact of yours is told, and any other passkey of yours or a recovery contact can stop it.</PartHead>
+              <PartHead id="au-h" level={3} title="Approving payments again" aside={signinOnly.some((p) => p.restoreScheduledFor) ? 'Asked' : 'Not asked yet'}>A passkey added by a recovery, or after a password reset, signs you in but approves nothing: not a payment, an instruction, a change to your protections, or your on-chain wallet. Asking gives it approval authority after {wait}; every device, email address and recovery contact of yours is told, and any other passkey of yours or a recovery contact can stop it. A passkey added after a password reset also gets your saved recovery codes with its request, shown once: they work from the end of the wait.</PartHead>
               <ul className="sy-rows">{signinOnly.map((p) => (
                 <li key={p.id}>
                   <DeviceGlyph name={p.name} />
@@ -497,6 +547,7 @@ export function SecurityScreen() {
               {s.codesMade || codes
                 ? <p className="sy-d">{s.recoveryCodesLeft} of 10 unused. Each is half of a recovery and works once; a code alone gets no one in. New codes replace every earlier one and are shown only once.</p>
                 : <p className="sy-d">None yet: QED makes them with your first device, and this account has no device. Each is half of a recovery and works once; a code alone gets no one in.{s.email.canVerify ? '' : ' On this installation, which cannot send email, they are the way back in if you lose your device.'}</p>}
+              {s.codesFrom ? <p className="sy-s wait">A new set was made with your request for approval authority and shown once then. It works from {fmt.full(s.codesFrom)}, and then replaces any codes made before.</p> : null}
               {!codes && s.codesMade && s.recoveryCodesLeft <= 2 ? <Note tone="wait" title={s.recoveryCodesLeft === 0 ? 'No saved codes left' : 'Few saved codes left'}>Saved codes decide between your own passkeys: suspending one, removing a new one at once and making new codes each need one, and someone holding only one of your devices does not have them.{s.recoveryCodesLeft === 0 && usable.length > 1 ? ' With none left and more than one passkey, new codes cannot be made at once: remove the passkeys you no longer hold first (each waits the protection delay).' : ' Make new codes while you still have one.'}</Note> : null}
               {codeSpent && !codes ? <Note tone="wait" title="One of your saved codes was used">The recovery you cancelled had used one of your saved codes, so it no longer works. Make new codes now: that needs one of the codes you still have.</Note> : null}
               {!codes && s.recoveryCodesLeft > 0 ? <Field label="A saved recovery code, for new codes" hint="New codes need one of the codes you have now, so that someone holding one of your devices cannot replace yours.">{(p) => <input {...p} className="input" autoComplete="off" spellCheck={false} value={savedCode} onChange={(e) => setSavedCode(e.target.value)} />}</Field> : null}
@@ -510,15 +561,16 @@ export function SecurityScreen() {
                 <li key={c.id}>
                   <div className="sy-main"><p className="sy-t">{c.name} <span className="sy-d">@{c.handle}</span></p>
                     <p className="sy-d">{c.active ? `Active since ${fmt.dayTime(Math.max(c.effectiveAt, c.acceptedAt ?? 0))}` : !c.acceptedAt ? `Asked ${fmt.dayTime(c.requestedAt)}; waiting for them to accept${c.effectiveAt > now ? `, and active no earlier than ${fmt.full(c.effectiveAt)}` : ''}` : `Accepted; active from ${fmt.full(c.effectiveAt)}`}</p>
-                    <p className="sy-d">{c.active && c.hasPasskey ? 'Can issue you a recovery code from their own account. Cannot sign in to yours or approve anything.' : c.active ? 'Cannot issue a code until they add a passkey of their own.' : 'Cannot issue a code until they have accepted and the wait has ended.'}</p></div>
-                  <span className="sy-acts"><Btn small busy={endContact.busy} onClick={() => void endContact.run({ id: c.id, mine: true })}>{c.active ? 'End' : 'Withdraw'}</Btn></span>
+                    <p className="sy-d">{c.active && c.hasPasskey ? 'Can issue you a recovery code from their own account. Cannot sign in to yours or approve anything.' : c.active ? 'Cannot issue a code until they add a passkey of their own.' : 'Cannot issue a code until they have accepted and the wait has ended.'}</p>
+                    {c.removalScheduledFor ? <p className="sy-s wait">Ends {fmt.full(c.removalScheduledFor)} ({fmt.rel(c.removalScheduledFor, now)}). Until then they stay your recovery contact. To keep them, cancel it under Needs you, with any of your passkeys or a saved recovery code.</p> : null}</div>
+                  {c.removalScheduledFor ? null : <span className="sy-acts"><Btn small busy={endContact.busy} onClick={() => void endContact.run({ id: c.id, mine: true })}>{c.acceptedAt ? 'End' : 'Withdraw'}<span className="sr"> @{c.handle}</span></Btn></span>}
                 </li>
               ))}</ul> : <p className="sy-d">None yet.</p>}
               <form className="sy-contact" onSubmit={(e) => { e.preventDefault(); void nominate.run() }}>
                 <Field label="Their handle" error={nominate.error?.fields.handle}>{(p) => <input {...p} className="input" autoCapitalize="none" value={contactHandle} onChange={(e) => setContactHandle(e.target.value)} />}</Field>
                 <Btn type="submit" busy={nominate.busy} disabled={!contactHandle.trim()}>Name as recovery contact</Btn>
               </form>
-              <p className="sy-hint">A contact makes recovering this account easier, so a new one becomes active only after {wait} and once they accept; any passkey can withdraw it meanwhile.</p>
+              <p className="sy-hint">A contact makes recovering this account easier, so a new one becomes active only after {wait} and once they accept; any passkey can withdraw it meanwhile. Ending a contact who has accepted waits {wait} too: they are told at once and stay your contact until then, and any of your passkeys, or one of your saved codes, can cancel it. That way someone who gets into one of your devices cannot quietly take your way back in.</p>
               {nominate.error && !nominate.error.fields.handle ? <Problem error={nominate.error} /> : <Problem error={endContact.error} />}
             </div>
           </section>
@@ -530,7 +582,7 @@ export function SecurityScreen() {
                 <li key={c.id} className="sy-trust">
                   <div className="sy-main">
                     <p className="sy-t">{c.name} <span className="sy-d">@{c.handle}</span></p>
-                    <p className="sy-d">{!c.acceptedAt ? 'Asked you to be their recovery contact' : c.active ? 'You are their recovery contact' : `Active from ${fmt.full(c.effectiveAt)}`}{c.openRecovery ? '; a recovery of their account is open now' : ''}{c.pendingAuthority ? '; a recovered passkey of theirs has asked for approval authority' : ''}{c.pendingLoosening ? '; they have asked to loosen a protection, which waits its delay' : ''}</p>
+                    <p className="sy-d">{!c.acceptedAt ? 'Asked you to be their recovery contact' : c.active ? 'You are their recovery contact' : `Active from ${fmt.full(c.effectiveAt)}`}{c.openRecovery ? '; a recovery of their account is open now' : ''}{c.pendingAuthority ? '; a recovered passkey of theirs has asked for approval authority' : ''}{c.pendingLoosening ? '; they have asked to loosen a protection, which waits its delay' : ''}{c.endingAt ? `; they asked to end you as their recovery contact, which takes effect ${fmt.full(c.endingAt)}: if they did not tell you, call them` : ''}</p>
                     {confirmIssue === c.id ? <Note tone="void" title={`Only if ${c.name} asked you directly`}>Issue a code only if they asked you in person, or on a call you made to a number you already had for them. Anyone who has this code and one of their saved codes can start a recovery of their account. Your passkey confirms it.<div className="row" style={{ marginTop: 8 }}><Btn tone="fill" busy={issue.busy} onClick={() => void issue.run(c.id)}>Issue the code</Btn><Btn onClick={() => setConfirmIssue(null)}>Do not issue</Btn></div></Note> : null}
                     {confirmStop === c.id ? <Note tone="wait" title={`Stop what is under way for ${c.name}`}>{c.openRecovery ? 'Their recovery will not complete. ' : ''}{c.pendingAuthority ? 'Their request for approval authority will not take effect. ' : ''}Do this if they did not tell you about it themselves. Your passkey confirms it, and they are told.<div className="row" style={{ marginTop: 8 }}><Btn tone="void" busy={stopForThem.busy} onClick={() => void stopForThem.run(c.id)}>Stop it</Btn><Btn onClick={() => setConfirmStop(null)}>Leave it</Btn></div></Note> : null}
                     {confirmLoosening === c.id ? <Note tone="wait" title={`Stop the loosening ${c.name} asked for`}>Nothing is loosened: the change is cancelled before its delay ends. Do this if they did not tell you about it themselves, or if someone may be pressing them to make it. It changes nothing else, they can ask again, and it waits its delay again. Your passkey confirms it, and they are told.<div className="row" style={{ marginTop: 8 }}><Btn tone="void" busy={stopLoosening.busy} onClick={() => void stopLoosening.run(c.id)}>Stop it</Btn><Btn onClick={() => setConfirmLoosening(null)}>Leave it</Btn></div></Note> : null}
@@ -595,6 +647,7 @@ function AddressesPanel({ addresses, legacyPw, onChanged }: { addresses: Address
   const emails = addresses.filter((a) => a.kind === 'email'), phones = addresses.filter((a) => a.kind === 'phone')
   const confirmedEmails = emails.filter((a) => a.confirmedAt !== null).length, confirmedPhone = phones.some((a) => a.confirmedAt !== null)
   const state = (a: Address): string => a.confirmedAt === null ? 'Waiting for confirmation: open the link in its message, or type the code from it here.'
+    : a.removalScheduledFor ? `Confirmed ${fmt.dayTime(a.confirmedAt)}. To be removed ${fmt.full(a.removalScheduledFor)} (${fmt.rel(a.removalScheduledFor, now)}); until then it stays and receives your security notices. To keep it, cancel the removal under Needs you, with any of your passkeys or a saved recovery code.`
     : a.kind === 'phone' ? `Confirmed ${fmt.dayTime(a.confirmedAt)}. Receives short security notices by text message; never a way back in.`
       : a.usableFrom !== null && a.usableFrom > now ? `Confirmed ${fmt.dayTime(a.confirmedAt)}. Receives your security notices now; can start a password reset or a recovery from ${fmt.full(a.usableFrom)}.`
         : `Confirmed ${fmt.dayTime(a.confirmedAt)}. Receives your security notices, and can start a password reset or a recovery.`
@@ -602,7 +655,7 @@ function AddressesPanel({ addresses, legacyPw, onChanged }: { addresses: Address
   return (
     <section id="addresses" className="sy-sub" aria-labelledby="ad-h">
       <h4 id="ad-h">Email and text messages</h4>
-      <p className="sy-d">Where QED tells you, outside QED, about every change to who can act for you. A new email address waits {delayWords(session.delays?.protectionMs ?? NORMAL_DELAY_MS)} before it can start a reset or a recovery, so that someone who adds theirs cannot use it at once.{session.delivery === 'outbox' ? <> In this build nothing is sent: messages go to the <a href="/dev/outbox" target="_blank" rel="noopener">simulated outbox</a>.</> : null}</p>
+      <p className="sy-d">Where QED tells you, outside QED, about every change to who can act for you. A new email address waits {delayWords(session.delays?.protectionMs ?? NORMAL_DELAY_MS)} before it can start a reset or a recovery, so that someone who adds theirs cannot use it at once. Removing a confirmed one, or changing it, waits as long before the old address goes: it is told at once, and any of your passkeys, or one of your saved codes, can cancel it.{session.delivery === 'outbox' ? <> In this build nothing is sent: messages go to the <a href="/dev/outbox" target="_blank" rel="noopener">simulated outbox</a>.</> : null}</p>
       {session.delivery === 'none' ? <Note tone="wait" title="Email is not available here">{noDeliveryWords('address')}</Note> : null}
       {addresses.length ? <ul className="sy-rows">{addresses.map((a) => (
         <li key={a.id}>
@@ -615,13 +668,13 @@ function AddressesPanel({ addresses, legacyPw, onChanged }: { addresses: Address
               <Btn type="submit" small busy={confirm.busy} disabled={!(code[a.id] ?? '').trim()}>Confirm</Btn>
             </form> : null}
           </div>
-          <span className="sy-acts">
+          {a.removalScheduledFor ? null : <span className="sy-acts">
             {a.confirmedAt !== null ? <Btn small tone="quiet" onClick={() => { setReplacing({ id: a.id, kind: a.kind }); add.clear() }}>Change<span className="sr"> {a.address}</span></Btn> : null}
             <Btn small tone="quiet" busy={remove.busy} onClick={() => void remove.run(a.id)}>{a.confirmedAt === null ? 'Withdraw' : 'Remove'}<span className="sr"> {a.address}</span></Btn>
-          </span>
+          </span>}
         </li>
       ))}</ul> : <p className="sy-d">None yet.</p>}
-      {replacing ? <Note tone="wait" title={`Changing ${addresses.find((a) => a.id === replacing.id)?.address ?? 'an address'}`}>Enter the new one below. The old one keeps working until the new one is confirmed, and is then told of the change and removed.<div style={{ marginTop: 8 }}><Btn small tone="quiet" onClick={() => setReplacing(null)}>Keep it as it is</Btn></div></Note> : null}
+      {replacing ? <Note tone="wait" title={`Changing ${addresses.find((a) => a.id === replacing.id)?.address ?? 'an address'}`}>Enter the new one below.{replacing.kind === 'email' ? ` The old one keeps working until the new one is confirmed and for ${delayWords(session.delays?.protectionMs ?? NORMAL_DELAY_MS)} after that; it is told at once, and any of your passkeys, or one of your saved codes, can cancel its removal.` : ' The old one keeps working until the new one is confirmed, and is then told of the change and removed.'}<div style={{ marginTop: 8 }}><Btn small tone="quiet" onClick={() => setReplacing(null)}>Keep it as it is</Btn></div></Note> : null}
       {session.delivery !== 'none' && (confirmedEmails < 3 || replacing?.kind === 'email') ? <form className="sy-contact" onSubmit={(e) => { e.preventDefault(); void add.run('email') }}>
         <Field label={replacing?.kind === 'email' ? 'New email address' : 'Add an email address'} hint="Any ordinary address, Gmail included. A link and a code are sent to confirm it." error={add.error?.fields.address && (email || !phone) ? add.error.fields.address : undefined}>{(p) => <input {...p} className="input" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} />}</Field>
         <Btn type="submit" busy={add.busy} disabled={!email.trim()}>Send a confirmation</Btn>
@@ -641,10 +694,11 @@ const endedWords = (n: number): string => (n === 0 ? 'No other session was signe
 
 /**
  * The password of an account that has one (D-094, RISK-076). Changing it takes the account's strongest confirmation:
- * its passkey, or, with no passkey yet, the current password typed again in the same request. Removing it takes a
- * passkey and a way back in without it (a recovery then needs a saved code and a code from an active recovery
- * contact), so its sheet lists those first and offers the removal only when all are there. Either ends every other
- * session. The panel shows while the account has a password, and once more right after its removal, to say it is gone.
+ * its passkey, or, with no passkey yet, the current password typed again in the same request, takes effect at once and
+ * ends every other session. Removing it takes a passkey and a way back in without it (a recovery then needs a saved code
+ * and a code from an active recovery contact), so its sheet lists those first and offers the removal only when all are
+ * there. The removal waits the protection delay (SECURITY.md 8j (c)): the panel then says until when, and that any
+ * passkey or a saved code cancels it under Needs you; when it applies, the sessions the password opened end.
  */
 function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () => void }) {
   const { session } = useSession()
@@ -653,12 +707,14 @@ function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () 
   const [next, setNext] = useState('')
   const [showCurrent, setShowCurrent] = useState(false)
   const [showNext, setShowNext] = useState(false)
-  const [done, setDone] = useState<{ removed: boolean; ended: number } | null>(null)
+  const [done, setDone] = useState<{ kind: 'changed'; ended: number } | { kind: 'scheduled' } | null>(null)
   const head = useRef<HTMLHeadingElement>(null)
   const passkey = !!session.hasPasskey
   const set = view.password.set
-  // After a removal its button is gone with the password: focus goes to this panel's heading, not to the top of the page.
-  useEffect(() => { if (done?.removed && !set) head.current?.focus() }, [done, set])
+  const pending = view.password.removalScheduledFor ?? null
+  const wait = delayWords(view.delays.protectionMs)
+  // After asking for the removal its button is gone: focus goes to this panel's heading, not to the top of the page.
+  useEffect(() => { if (done?.kind === 'scheduled') head.current?.focus() }, [done])
   /** With a passkey: confirm first when this session's confirmation is not fresh, and once more if the server says it lapsed. */
   const confirmed = async <T,>(fn: () => Promise<T>): Promise<T> => {
     if (passkey && !session.stepUpFresh) await confirmWithPasskey()
@@ -668,13 +724,13 @@ function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () 
   const open = (which: 'change' | 'remove') => { setDone(null); setSheet(which) }
   const change = useAction(async () => {
     const r = await confirmed(() => api<{ ended: number }>('POST', '/api/security/password', passkey ? { password: next } : { current, password: next }))
-    close(); setDone({ removed: false, ended: r.ended }); onChanged()
+    close(); setDone({ kind: 'changed', ended: r.ended }); onChanged()
   })
   const remove = useAction(async () => {
-    const r = await confirmed(() => api<{ ended: number }>('POST', '/api/security/password/remove'))
-    close(); setDone({ removed: true, ended: r.ended }); onChanged()
+    await confirmed(() => api<{ effectiveAt: number }>('POST', '/api/security/password/remove'))
+    close(); setDone({ kind: 'scheduled' }); onChanged()
   })
-  if (!set && !done?.removed) return null
+  if (!set) return null
   const keys = view.passkeys.filter((p) => !p.removedAt && !p.suspendedAt)
   // the contact a recovery would ask: active, and with a passkey to issue a code with (the server counts only such a one)
   const issuer = view.contacts.find((c) => c.active && c.hasPasskey)
@@ -683,13 +739,16 @@ function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () 
   const fieldError = change.error?.fields.current ?? change.error?.fields.password
   return (
     <section className="sy-part" aria-labelledby="pw-h">
-      <div className="sy-part-head"><div className="pg-sec-t"><h3 id="pw-h" ref={head} tabIndex={-1}>Password</h3><span className="pg-aside">{!set ? 'Removed' : view.password.changedAt ? `Changed ${fmt.dayTime(view.password.changedAt)}` : 'As set when the account was made'}</span></div>
-        <p className="pg-note">{!set ? 'This account has no password: it signs in only with its passkeys.' : passkey
-          ? 'This account can also sign in with its password. A page that imitates this one can steal a password but never a passkey, so here a password signs in and sets things up, and approving anything needs a passkey. Changing or removing it signs out every other session.'
+      <div className="sy-part-head"><div className="pg-sec-t"><h3 id="pw-h" ref={head} tabIndex={-1}>Password</h3><span className="pg-aside">{pending ? 'Removal waiting' : view.password.changedAt ? `Changed ${fmt.dayTime(view.password.changedAt)}` : 'As set when the account was made'}</span></div>
+        <p className="pg-note">{passkey
+          ? `This account can also sign in with its password. A page that imitates this one can steal a password but never a passkey, so here a password signs in and sets things up, and approving anything needs a passkey. Changing it signs out every other session at once; removing it waits ${wait}.`
           : 'This account signs in with its password, and until it has a passkey that password is its only key. Changing it signs out every other session.'}</p></div>
-      {set && !passkey && view.password.heldUntil ? <Note tone="wait" title={`Reset recently: limited until ${fmt.full(view.password.heldUntil)}`}>Until then the password cannot make new recovery codes, add or remove an email address or phone number, or cancel a recovery: every address of the account was told of the reset, and this wait lets its owner act if someone else reset it.</Note> : null}
-      <div role="status">{done ? <Note tone="ok" title={done.removed ? 'Password removed' : 'Password changed'}>{endedWords(done.ended)}{done.removed ? ' On your other devices, sign in with a passkey.' : ''}</Note> : null}</div>
-      {set ? <div className="row"><Btn small onClick={() => open('change')}>Change password</Btn>{passkey ? <Btn small tone="quiet" onClick={() => open('remove')}>Remove password</Btn> : null}</div> : null}
+      {!passkey && view.password.heldUntil ? <Note tone="wait" title={`Reset recently: limited until ${fmt.full(view.password.heldUntil)}`}>Until then the password cannot make new recovery codes, add or remove an email address or phone number, or cancel a recovery: every address of the account was told of the reset, and this wait lets its owner act if someone else reset it.</Note> : null}
+      <div role="status">
+        {done?.kind === 'changed' ? <Note tone="ok" title="Password changed">{endedWords(done.ended)}</Note> : null}
+        {pending ? <Note tone="wait" title={`Your password is to be removed ${fmt.full(pending)}`}>It keeps working until then. From then this account signs in only with its passkeys, and every session opened with the password ends. To keep the password, cancel the removal under Needs you, at the top of this page, with any of your passkeys or one of your saved recovery codes. If you think someone knows it, change it now instead: a change takes effect at once.</Note> : null}
+      </div>
+      <div className="row"><Btn small onClick={() => open('change')}>Change password</Btn>{passkey && !pending ? <Btn small tone="quiet" onClick={() => open('remove')}>Remove password</Btn> : null}</div>
       {set && !passkey ? <p className="sy-hint">Once the account has a passkey, the password can be removed.</p> : null}
 
       <Sheet open={sheet === 'change'} title="Change your password" onClose={close}
@@ -704,14 +763,14 @@ function PasswordPanel({ view, onChanged }: { view: SecurityView; onChanged: () 
 
       <Sheet open={sheet === 'remove'} title="Remove your password" onClose={close}
         foot={<><Btn onClick={close}>Keep the password</Btn>{ready ? <Btn tone="void" busy={remove.busy} onClick={() => void remove.run()}>Remove password</Btn> : null}</>}>
-        <p>Without a password this account signs in only with its passkeys, and a password someone has learned stops working at once. A password cannot be added back later.</p>
+        <p>Without a password this account signs in only with its passkeys. Removing it waits {wait}: the password keeps working until then, every address of yours is told now, and any of your passkeys, or one of your saved recovery codes, can cancel it, so someone who gets into one of your devices cannot quietly take this way back in. If you think someone knows the password, change it instead: a change takes effect at once. A password cannot be added back later.</p>
         <ul className="sy-needs-for" aria-label="What removing the password needs">
           <li><Mark tone={keys.length ? 'ok' : 'void'} /><div><p className="sy-t">A passkey that can sign in</p><p className="sy-d">{keys.length ? `You have ${listed(keys.map((k) => `"${k.name}"`))}.` : 'None yet: add one under Passkeys.'}</p></div></li>
           <li><Mark tone={issuer ? 'ok' : view.contacts.length ? 'wait' : 'void'} /><div><p className="sy-t">A recovery contact who can issue you a code</p><p className="sy-d">{issuer ? `@${issuer.handle} is active and can issue you a recovery code.` : active ? `Not yet: @${active.handle} has no passkey, and a contact issues a code only after confirming with one.` : view.contacts.length ? `Not yet: @${view.contacts[0]!.handle} has not accepted, or the wait has not ended.` : 'None yet: name one under "If you lose every passkey".'}</p></div></li>
           <li><Mark tone={view.recoveryCodesLeft > 0 ? 'ok' : 'void'} /><div><p className="sy-t">Saved recovery codes</p><p className="sy-d">{view.recoveryCodesLeft > 0 ? `${view.recoveryCodesLeft} of 10 unused.` : view.codesMade ? 'None left: make new ones under "If you lose every passkey".' : 'None yet: save them under "If you lose every passkey".'}</p></div></li>
         </ul>
         <p className="small">{ready
-          ? 'From then on a recovery needs one of your saved codes and a code from your recovery contact. Every other session of this account ends; on your other devices, sign in again with a passkey. Your passkey is asked for first, unless you confirmed with it here in the last five minutes.'
+          ? 'When it takes effect, a recovery needs one of your saved codes and a code from your recovery contact, and every session opened with the password ends; sign in again there with a passkey. Your passkey is asked for first, unless you confirmed with it here in the last five minutes.'
           : 'Without the password, a recovery needs one of your saved codes and a code from an active recovery contact, so both must be in place first: otherwise losing every passkey would lose this account.'}</p>
         <Problem error={remove.error} />
       </Sheet>

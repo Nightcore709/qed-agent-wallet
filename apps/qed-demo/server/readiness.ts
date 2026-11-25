@@ -185,6 +185,8 @@ const OPERATIONS = new Set([
   'RISK-119', 'RISK-120',
   // account-access work that is not in this build yet (as RISK-077), and the vendored verifier's licence notice (the team's documents)
   'RISK-121', 'RISK-122',
+  // the recovery review's follow-ups (latent while email and SMS are off; tracked by the team)
+  'RISK-125',
 ])
 
 /** A risk's standing in words, without the register's references. */

@@ -8,7 +8,9 @@
  *
  * Removing it needs a passkey that can sign in, a fresh confirmation with one, and a way back in without it: a recovery
  * then needs one of the saved codes and a code from a recovery contact, so an unused saved code and an active contact
- * must both exist. Every other session ends, and the password then opens nothing. Both routes are limited like sign-in.
+ * must both exist. Since R14 (SECURITY.md 8j (c)) the removal is scheduled: it waits the protection delay (written past
+ * here, as activeContact writes a contact's), and any passkey, or a saved code from any session, cancels it. When it
+ * applies, the sessions the password opened end and the password then opens nothing. Both routes are limited like sign-in.
  */
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -16,8 +18,8 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { startApi } from './api.ts'
 import { loadConfig } from './core.ts'
-import { authenticatorFor, signUp, stepUp } from '../scripts/lib/passkey-client.ts'
-import { makeRecoveryCodes } from './passkeys.ts'
+import { authenticatorFor, signIn, signUp, stepUp } from '../scripts/lib/passkey-client.ts'
+import { applyDueChanges, makeRecoveryCodes, PROTECTION_DELAY_MS } from './passkeys.ts'
 
 type J = Record<string, any>
 // A port of its own for each run: suites in other worktrees run the same files at the same time (a fixed port let one run's
@@ -65,8 +67,14 @@ describe('changing and removing a password', () => {
     // R14: sign-up makes no saved codes; this account makes its set first (the password just typed confirms it), as these tests rely on them
     await owner.ok('POST', '/api/security/recovery-codes', {})
     const b = await owner.ok('POST', '/api/security/passkeys/begin')
-    await owner.ok('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response: key.create(b.options) })
-    return { owner, key, made }
+    // the first device brings the account's saved codes (R1: a fresh set, replacing those made before it)
+    const codes = (await owner.ok('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response: key.create(b.options) })).recoveryCodes as string[]
+    return { owner, key, made, codes }
+  }
+  /** The scheduled removal of this account's password, written due (as activeContact writes a contact's delay past) and applied, as the engine's tick would. */
+  function removalApplies(handle: string): void {
+    expect(api.ctx.db.run(`UPDATE scheduled_changes SET effective_at = ? WHERE kind = 'remove-password' AND cancelled_at IS NULL AND applied_at IS NULL AND person_id = (SELECT id FROM users WHERE handle = ?)`, Date.now() - 1000, handle).changes).toBe(1)
+    applyDueChanges(api.ctx.db, Date.now())
   }
   /**
    * A recovery contact who has accepted, made active at once (the protection delay is written past here, as M3 of
@@ -183,10 +191,20 @@ describe('changing and removing a password', () => {
     const made10 = (await owner.ok('POST', '/api/security/recovery-codes')).codes as string[] // none unused, one passkey: at once
     expect(made10).toHaveLength(10)
 
-    // the way back exists and the confirmation is fresh: removed, and the thief's session ends
-    expect(await owner.ok('POST', '/api/security/password/remove')).toEqual({ ok: true, ended: 1 })
+    // the way back exists and the confirmation is fresh: the removal is scheduled (8j (c)); the password works until then
+    const asked = await owner.ok('POST', '/api/security/password/remove')
+    expect(asked).toEqual({ ok: true, scheduled: true, changeId: expect.stringMatching(/^chg_/), effectiveAt: expect.any(Number) })
+    expect(asked.effectiveAt - Date.now()).toBeGreaterThan(PROTECTION_DELAY_MS - 60_000)
+    expect(hashOf('pw-remove')).not.toBe('!')
+    expect((await thief.ok('GET', '/api/security')).password).toMatchObject({ set: true, removalScheduledFor: asked.effectiveAt, removalChangeId: asked.changeId })
+    // asked again meanwhile: the same request
+    expect(answer(await owner.call('POST', '/api/security/password/remove'))).toEqual([409, 'already_scheduled', null])
+    // when it applies, the password is gone and every session it opened ends: the thief's, and this one (opened with it at sign-up)
+    removalApplies('pw-remove')
     expect(hashOf('pw-remove')).toBe('!')
     expect(answer(await thief.call('GET', '/api/security'))).toEqual([401, 'signed_out', null])
+    expect(answer(await owner.call('GET', '/api/security'))).toEqual([401, 'signed_out', null])
+    await signIn(owner.ok, key) // back in with the passkey
     // the password now opens nothing: sign-in answers as for an unknown handle, a step-up is refused, and a recovery
     // started with a saved code and the password records nothing
     const login = await client().call('POST', '/api/auth/login', { handle: 'pw-remove', password: PW })
@@ -255,7 +273,29 @@ describe('changing and removing a password', () => {
     const b = await helper.ok('POST', '/api/security/passkeys/begin')
     await helper.ok('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response: authenticatorFor(PORT).create(b.options) })
     expect((await owner.ok('GET', '/api/security')).contacts[0]).toMatchObject({ active: true, hasPasskey: true })
-    expect(await owner.ok('POST', '/api/security/password/remove')).toEqual({ ok: true, ended: 0 })
+    expect(await owner.ok('POST', '/api/security/password/remove')).toMatchObject({ ok: true, scheduled: true })
+  }, 60_000)
+
+  it('8j (c): the scheduled removal is cancelled from a session opened with the password only with a saved code, which is not used up', async () => {
+    const PW = 'a cancellable long phrase'
+    const { owner, key, codes } = await passwordAccountWithPasskey('pw-cancel', PW)
+    await activeContact(owner, key, 'pw-cancel-helper', { passkey: true })
+    await stepUp(owner.ok, key)
+    const asked = await owner.ok('POST', '/api/security/password/remove')
+    // the owner, without the device, signs in with the password elsewhere
+    const laptop = client()
+    await laptop.ok('POST', '/api/auth/login', { handle: 'pw-cancel', password: PW })
+    await laptop.ok('POST', '/api/auth/stepup', { password: PW })
+    const bare = await laptop.call('POST', `/api/security/changes/${asked.changeId}/cancel`)
+    expect([...answer(bare), bare.json.error?.message]).toEqual([401, 'stepup_required', null, 'Confirm with one of your passkeys, or enter one of your saved recovery codes, to cancel it.'])
+    expect(answer(await laptop.call('POST', `/api/security/changes/${asked.changeId}/cancel`, { code: 'AAAA-BBBB-CCCC-DDDD' })).slice(0, 2)).toEqual([403, 'code_wrong'])
+    expect(await laptop.ok('POST', `/api/security/changes/${asked.changeId}/cancel`, { code: codes[0] })).toEqual({ ok: true, cancelled: true, with: 'saved-code' })
+    const view = await owner.ok('GET', '/api/security')
+    expect(view.recoveryCodesLeft).toBe(10)
+    expect(view.password).toMatchObject({ set: true, removalScheduledFor: null, removalChangeId: null })
+    expect(view.events.find((e: J) => e.kind === 'change-cancelled')?.detail).toMatchObject({ kind: 'remove-password', with: 'saved-code' })
+    applyDueChanges(api.ctx.db, asked.effectiveAt + 1)
+    expect(hashOf('pw-cancel')).not.toBe('!')
   }, 60_000)
 
   it('M2: suspending a passkey also withdraws the confirmation it gave a session it did not open', async () => {
@@ -318,6 +358,7 @@ describe('changing and removing a password', () => {
     expect(answer(await client().call('POST', '/api/auth/login', { handle: 'pw-locked', password: PW })).slice(0, 2)).toEqual([429, 'locked'])
     await stepUp(owner.ok, key)
     await owner.ok('POST', '/api/security/password/remove')
+    removalApplies('pw-locked') // scheduled since R14 (8j (c)); the lock is cleared when it applies
     const login = await client().call('POST', '/api/auth/login', { handle: 'pw-locked', password: PW })
     const unknown = await client().call('POST', '/api/auth/login', { handle: 'nobody-at-all', password: PW })
     expect([login.status, login.json]).toEqual([unknown.status, unknown.json])

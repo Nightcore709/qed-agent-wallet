@@ -920,16 +920,73 @@ wallet. H1 and H2 were then fixed and re-verified (below):
 - **Medium, accepted with reasons (the independent reviewer agreed, third round).** (a) A compromised API process can
   drop the owner's challenges, as it could before the H1 fix: in this deployment every owner action, an unfrozen
   passkey's cancel included, reaches the private chain only through QED's wallet service, which the API instructs.
-  (b) A thief holding an unsuspended passkey can stop co-signed recoveries through QED until the owner suspends it.
-  (c) Removing a recovery contact, the password or an email address takes effect at once on a passkey confirmation, so
-  one stolen passkey can strip those account-recovery fallbacks; what protects the owner is a second passkey and a saved
-  code (the fallbacks matter only once every passkey is lost). (d) R-4: an owner with no saved code left cannot evict a
+  (b) A thief holding an unsuspended passkey can stop co-signed recoveries through QED until the owner suspends it
+  (examined again under R14: no small mitigation is sound; why, below). (c) *Mitigated under R14 (below):* removing a
+  recovery contact, the password or an email address took effect at once on a passkey confirmation, so one stolen passkey
+  could strip those account-recovery fallbacks before the owner noticed. (d) R-4: an owner with no saved code left cannot evict a
   stolen passkey (suspension and at-once removal need a code, new codes need one while more than one passkey is usable,
   and a scheduled removal can be cancelled by the passkey it removes): saved codes now decide every dispute between two
   passkey holders. Sign-up already requires confirming the codes were stored elsewhere; the Security screen warns when
   two or fewer are left and says what to do when none are. Low: a thief's scheduled removals still apply after the
   protection delay unless cancelled (by design; the owner is notified); a thief that is already the only usable passkey
   can spend the codes by cancelling recoveries and then make new ones.
+- **8j (c), mitigated (R14 Priority 4B, 26 Nov 2026).** Removing a way back in is a scheduled change now, on the mechanism
+  every other weakening uses: a row in `scheduled_changes`, applied by `applyDueChanges` on the engine's tick and before
+  every Security read (`server/passkeys.ts` `scheduleFallbackRemoval`, `FALLBACK_REMOVALS`). No schema change.
+  - *What waits* `PROTECTION_DELAY_MS` (72 hours): ending a recovery contact who has accepted (`removeContact`); removing
+    the password (`removePassword`); removing a confirmed email address (`server/recovery.ts` `removeAddress`); and
+    changing one: the new address is added at once, as adding always was, and the old one goes only when the delay ends
+    (`confirmed`), so "change" is no way around the wait.
+  - *Who is told, at once:* the person, in the history and by an urgent notice on every confirmed address (the one being
+    removed included), with the time it takes effect; the contact being removed, who keeps the role, and can still issue
+    a code, until then. Told again when it applies ('recovery-contact-ended', 'email-removed', 'password-removed'); a
+    removed address hears once more itself.
+  - *Who cancels:* any passkey of the person that can confirm (`cancelScheduledChange`, as for every scheduled change); or
+    one of their saved codes, from any of their sessions, one opened with the password included
+    (`cancelScheduledChangeWithCode`). The code is checked, not used up, as for the signed-out pause, because cancelling
+    grants nothing; ten tries an hour; failures are audited. On an account with no passkey (only an address can be removed
+    there) the password typed again cancels. A password session alone schedules none of these and cancels none.
+    Suspending the passkey that confirmed a request cancels it (`requested_by` is that passkey); the old address's removal
+    that a change of address schedules records no passkey (it is scheduled when the new address is confirmed, by its link
+    or code), so that one is cancelled under Needs you.
+  - *When it applies,* exactly once (the row is read again under the write lock; `server/fallback-removal.test.ts` reopens
+    the database file between steps). A contact who stepped down meanwhile, an address already gone, or a change whose new
+    address was removed: it lapses. The password's removal lapses if the password was changed or reset after it was asked
+    (a change also cancels it at once), or if a recovery would then have no second proof (`wayBackWithoutPassword` read
+    again; said in the history). Otherwise the sessions the password opened end (no session that asked is still alive:
+    sessions last 24 hours), and reset or recovery links already sent to a removed address stop working (R05, from then).
+  - *What stays at once, and why:* adding a contact, an address or a password (adding was never the risk); a contact
+    stepping down (their decision, confirmed as strongly as they can); withdrawing a request nobody accepted, and an
+    address nobody confirmed (neither is a way back in); a phone number (notices only, never a way back in); and changing
+    the password, so that a password someone has learned can still be shut out at once.
+  - Tests: `server/fallback-removal.test.ts`; `server/password-change-routes.test.ts` "8j (c)"; the Chrome journey
+    "ending a recovery contact waits" in `browser/tests/recovery.spec.ts`.
+  - *Residual.* (1) A stolen passkey can still *change* the password at once: a change confirmed with a passkey does not
+    ask for the current one (RISK-076's design, so that an owner who forgot it can replace it), and the owner then no
+    longer knows it. The owner is told on every channel, and a password is only ever a second proof beside a saved code,
+    which a device thief does not have. (2) The thief can cancel the owner's own removals with the stolen passkey: evict it
+    first (suspend it, which takes a saved code, H2). (3) While an address waits to go, a mailbox the owner no longer trusts
+    still receives notices and can start a recovery, which needs a second proof and which any passkey cancels; it cannot
+    reset the password of an account that has a passkey that can approve. On an account with no passkey, adding one stops
+    resets at once. (4) An owner with neither a passkey at hand nor a saved code cannot cancel (the signed-out page offers
+    only the pause); what protects them is the notice on every channel and 72 hours to reach a device or a code.
+- **8j (b), examined under R14 (26 Nov 2026): no small mitigation is sound, so it stays accepted.** The rule considered,
+  "a stop confirmed by a passkey added after the recovery began is refused, or needs the guardian's confirmation", was not
+  adopted, for three reasons.
+  1. It does not cover the case. The thief's passkey is a stolen or synced one, so it existed before any recovery the owner
+     starts; the rule refuses only passkeys added during a recovery, which a thief does not need.
+  2. It can refuse the owner's own challenge, the one H1 exists for. An owner whose older passkeys are with the thief gets a
+     passkey that can confirm only through a recovery and a restored authority, so it is newer than a co-signed recovery the
+     thief started; under the rule that owner could not stop it, against the owner's rule of 25 Nov ("an independent way to
+     challenge it throughout the full waiting period"). Asking the guardian instead hands the challenge to the person who
+     co-signed the recovery being challenged.
+  3. The sound tie-breaker between two holders of one person's passkeys is a saved code (H2), but requiring one to stop makes
+     the H1 challenge depend on codes the owner may not have (8j (d)), which weakens H1. And the stop names the chain's
+     recovery id, whose start QED knows only for the recoveries it relayed, so any rule on timing also changes the wallet
+     service path and its chain tests: not small.
+  What limits (b) now: suspending the passkey ends it at once and freezes it on the chain (it then neither stops nor
+  cancels); without a saved code a thief can neither suspend the owner's passkeys nor make codes (H2); and since R14 a
+  thief cannot strip the owner's ways back in while the owner reacts (8j (c), above).
 - **Low.** `_thaw` restarts a co-signed recovery at now + the current recovery delay, which can be earlier than its first
   time if the delay was lowered meanwhile; the wallet service does not record `RecoveryRestarted`, so a screen can show a
   stale time until an apply is refused with the new one; a bounty board or an account recorded under an earlier build
@@ -1037,12 +1094,27 @@ confirmation box is gone; what protects is that the codes exist and are shown).
   session's id, and moves to the new set. Tests: `server/access-codes.test.ts` "R3: …" (works in the window; refused from
   another session, with no fresh confirmation, after 30 minutes, after a code is used, after a second passkey exists).
   Residual: past the window, a lost first set is the F6 situation below.
-- *R2 (Medium) OPEN, do not enable email delivery before it is fixed.* The password-reset path recreates F1: a first
-  passkey added after a reset signs in only and brings no codes, and once its authority is restored by the wait, the
-  account's only usable passkey may make codes at once (H2's own exception), so whoever held the mailbox and then the new
-  passkey holds the tie-breaker. It is unreachable while `QED_DELIVERY=none`, because no reset can be sent. Before any
-  email provider is enabled: make the codes at the sign-in-only passkey's authority request, unusable until that authority
-  is restored, and revoked on cancellation.
+- *R2 (Medium) closed (26 Nov 2026, R14 Priority 4B).* The password-reset path recreated F1: a first passkey added after
+  a reset signs in only and brings no codes, and once its authority was restored by the wait, the account's only usable
+  passkey could make codes at once (H2's own exception), so whoever held the mailbox and then the new passkey held the
+  tie-breaker (unreachable while `QED_DELIVERY=none`, because no reset can be sent). The reviewer's fix, as built:
+  - the codes are made when that passkey asks for its approval authority (`server/recovery.ts` `finishAuthorityRequest`,
+    for a passkey whose reason is `after-password-reset`), and shown once to the session that asked, on Security (and on
+    the after-recovery page), with the same Copy, Download and Continue;
+  - until the authority is restored they are no codes of the account's: they are kept apart, under the request
+    (`meta`, `pending-codes:<request>`; `server/passkeys.ts` `keepPendingCodes`), so no act that takes a code can match them;
+  - when the authority is restored, by the wait or by another passkey, they become the account's codes and every earlier
+    one stops working, as at a first device under R1 (`activatePendingCodes`; told as 'recovery-codes-replaced' or
+    'recovery-codes-made');
+  - a request stopped in any way (by the passkey itself or another passkey, a recovery contact, a second reset, a
+    suspension, a lapse) never restores, so its set never works, and the next sweep removes what was kept of it;
+  - after the restoration the H2 rules apply as for any account: new codes need one of these, and no route mints a set
+    while codes exist.
+  Tests: `server/reset-authority-codes.test.ts` (shown at the request; refused before the restoration and accepted after;
+  lost with each kind of cancellation; "REGRESSION R2": after a reset, the restoration and a fresh session, nobody can mint
+  a set of their own). A passkey that a recovery registered asks as before (its recovery made codes if it spent one).
+  Residual: a set lost before the restoration is not shown again; the person stops the request and asks again, which makes
+  a new set and waits again. This was a gate on enabling email (RISK-123); the other gate, F4, is the delayed address above.
 - *Google-opened address.* The address a Google sign-in opens an account with is usable at once (`server/google.ts`). That
   is harmless: such an account has no password to reset, and an address cannot start a recovery without a saved code beside
   it. The F4 wait applies to every address of an account opened with an email address and a password.
