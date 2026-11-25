@@ -34,6 +34,7 @@ import { ActionDoc, ApprovalSheet, type PendingApproval } from '../ui/instrument
 import { Paise } from '../ui/charts.tsx'
 import { Basis, Btn, EmptyState, Field, Link, MoneyInput, Note, Problem, Stamp, StateStamp, useAction, useSession, useStickySide } from '../ui/kit.tsx'
 import { Skel, useHashTarget } from '../ui/page.tsx'
+import { Watching } from './Watching.tsx'
 import { expiredLine, standsUntilLine } from '../lib/order-expiry.ts'
 import { atomsText, dailyWord, deskStatus, fromOf, isoDayOf, isUnits, MINUS, pctText, placesOf, quantityText, show, tickerOf, unitsWord } from '../ui/prices.ts'
 import { useMedia } from '../ui/viewport.ts'
@@ -689,6 +690,8 @@ export function HoldingsScreen() {
       </div>
 
       <Holdings home={home.data} market={m} now={now} onChart={pick} />
+
+      <Watching market={m} />
 
       <GrowIdeas />
 

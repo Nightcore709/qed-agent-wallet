@@ -31,6 +31,7 @@ import { getProfile, householdModel } from './household.ts'
 import { balance } from './ledger.ts'
 import { dateText, hardshipText } from './liquidity.ts'
 import { freshness } from './market.ts'
+import { watchlistView } from './watchlist.ts'
 import {
   type Cite, createConversation, earlierQuestions, type Grounding, groundingOf, historyFor, isCancellation, LINK_IDS, linksOf, loadConversation, numbersIn,
   openProposals, resolveCites, type Tokens, tokensFor, wordRe, writtenRupees,
@@ -331,6 +332,9 @@ Conversation:
 
 The owner's limits and a floor on their worst case are enforced by separate code after you answer. A proposal that breaks them is refused there, so do not try to work around them: mention the limit instead.
 
+Watchlist (DATA.watching):
+- The names the owner watches, each with its price, the source that gave it ("source"), the time of that price ("priceTime"), whether it is observed (read from a public source) or synthetic (generated on this computer; paper exchange prices), whether it is stale, and its change since it was added. When asked how what they are watching is doing, answer from it, and for every name you mention say its source, whether it is observed or synthetic, and how old its price is. Say plainly when a price is stale or when no price has arrived. Quote only its own figures, in its own currency (quoteCurrency), and never forecast.
+
 On-chain wallet (DATA.wallet):
 - When DATA.wallet.available is true the owner also has an on-chain vault, on a local test chain with valueless test tokens: a treasury in test rupees (tINR) and a dollar reserve in test dollars (tUSD). You may then propose the kinds in DATA.wallet.kinds: "wallet-policy" (keep a reserve topped up), "wallet-pay" (pay a payee in the vault's book, now or as a promise) and "wallet-ring-fence" (set money aside for such a payee). When it is not available, never propose them.
 - For a wallet kind, write paramsJson exactly as its paramsShape says, with amounts as decimal text in the token (for example "250.00"). Set runMode to "approve" and every limit to null: the owner's signed mandate on the vault sets the limits.
@@ -397,6 +401,10 @@ export function buildContext(ctx: Ctx, userId: string, now: number, tokens?: Tok
       return { instrumentId: i.id, name: i.name, type: i.kind === 'mutual_fund' ? `mutual fund (${i.meta.category})` : 'digital asset traded in rupees', price: t?.price ?? null, priceType: t?.type ?? null, priceAgeSeconds: Number.isFinite(f.ageMs) ? Math.round(f.ageMs / 1000) : null, stale: f.stale,
         pastYearChange: tr ? `${(tr.annualised * 100).toFixed(1)}% from ${tr.from} to ${tr.to} (past change, not a forecast)` : null, limitUsedForWorstCase: term(db, i.meta.limitTerm ?? '')?.value.fall ?? null }
     }),
+    // The household's watchlist (R14, watchlist.ts): read only, as the rows the owner sees, each with its source, the time of its price, whether it is observed or synthetic, and its change since it was added. Prices are in the instrument's own quote currency, as text.
+    watching: watchlistView(db, ctx.market, userId, now).items.map((w) => ({ instrumentId: w.instrumentId, name: w.name, quoteCurrency: w.quote, price: w.price, priceType: w.priceType, source: w.provider, observedOrSynthetic: w.basis,
+      priceTime: w.at === null ? null : new Date(w.at).toISOString(), priceTimeIs: w.precision === 'day' ? 'the day a published value is for' : 'when the source stamped it, or when QED received it', stale: w.stale, status: w.status,
+      addedOn: new Date(w.addedAt).toISOString(), priceWhenAdded: w.addedPrice, changeSinceAdded: w.change, changeSinceAddedPercent: w.changePct, changeNote: w.changeNote })),
     kinds: [...kindCatalogue().map((k) => ({ kind: k.kind, pillar: k.pillar, what: k.blurb, paramsShape: KIND_SHAPES[k.kind] })), ...ONE_OFF_KINDS.map((k) => ({ kind: k, pillar: k === 'pay' || k === 'add-payee' ? 'spend' : 'grow', what: ONE_OFF_SHAPES[k].split(' - ')[1] ?? '', paramsShape: ONE_OFF_SHAPES[k] }))],
   }
   return Object.keys(omitted).length ? { ...snapshot, omitted } : snapshot

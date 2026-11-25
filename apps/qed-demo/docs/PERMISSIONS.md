@@ -19,7 +19,7 @@ How to read it (ASVS 5.0 V8.1.1, V8.2.1):
   own; `reads`, a GET.
 - Business-workspace roles and what each may do: `server/workspaces.ts`; field-level rules: `SECURITY.md`, "Authorization".
 
-294 routes.
+297 routes.
 
 | Method | Path | Session | Least role | Further checks | Writes |
 |---|---|---|---|---|---|
@@ -90,6 +90,9 @@ How to read it (ASVS 5.0 V8.1.1, V8.2.1):
 | POST | `/api/records/purge` | yes | the person (any workspace) | fresh passkey; named purge approver | one |
 | POST | `/api/data/deletion/cancel` | yes | the person (any workspace) | none | one |
 | GET | `/api/market` | yes | viewer | none | reads |
+| GET | `/api/watchlist` | yes | viewer | household set up | reads |
+| POST | `/api/watchlist` | yes | operator | household set up; rate limit | one |
+| POST | `/api/watchlist/remove` | yes | operator | household set up; rate limit | one |
 | GET | `/api/grow/compare` | yes | viewer | household set up | reads |
 | GET | `/api/market/history` | yes | viewer | none | reads |
 | GET | `/api/engine` | yes | viewer | none | reads |

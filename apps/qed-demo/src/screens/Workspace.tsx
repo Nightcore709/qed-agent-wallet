@@ -63,7 +63,7 @@ export function WorkspaceScreen() {
   const changeRole = useAction(async (personId: string, to: Role) => { await fresh(session.stepUpFresh); await api('POST', `/api/workspace/members/${personId}/role`, { role: to }); w.reload(); void reload() })
   const removeMember = useAction(async (personId: string) => { await fresh(session.stepUpFresh); await api('POST', `/api/workspace/members/${personId}/remove`); w.reload(); void reload() })
   const switchTo = useAction(async (id: string) => { await api('POST', `/api/workspaces/${id}/switch`); await reload(); w.reload(); open.reload() })
-  const title = session.workspace?.name ?? 'Workspace'
+  const title = session.workspace?.kind === 'business' ? session.workspace.name : 'Your workspace'
   if (!w.data) return <div className="workspace"><WorkspaceHead title={title} />{w.error ? <Problem error={w.error} /> : <Loading what="Reading the workspace" />}</div>
   const ws = w.data
   const business = session.workspace?.kind === 'business'
@@ -73,7 +73,7 @@ export function WorkspaceScreen() {
   const list = session.workspaces ?? []
   return (
     <div className="workspace">
-      <WorkspaceHead title={title} lead={business ? `A business workspace. You are ${ws.role === 'owner' ? 'its owner' : `an ${ws.role}`} here.` : 'Your personal workspace: you are its only member and every request needs only your signature.'} />
+      <WorkspaceHead title={title} lead={business ? `A business workspace. You are ${ws.role === 'owner' ? 'its owner' : `an ${ws.role}`} here. QED can prepare a request, but only members who may sign can approve it, each with a passkey, and nothing moves until enough of them have.` : 'Your personal workspace: you are its only member. QED can prepare a request, but nothing moves until you approve it with your passkey, and you can pause QED at any time from the top of the page.'} />
 
       {business ? (
         <section className="pg-sec" aria-labelledby="queue-h">
@@ -134,7 +134,7 @@ export function WorkspaceScreen() {
           </div> : null}
           {business && can(ws.role, 'admin') ? <form className="wk-part wk-form" onSubmit={(e) => { e.preventDefault(); void add.run() }}>
             <h3>Add a member</h3>
-            <div className="form-grid">
+            <div className="form-grid cols-2 fields">
               <Field label="Their handle" error={add.error?.fields.handle}>{(p) => <input {...p} className="input" autoCapitalize="none" value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
               <Field label="Role">{(p) => <select {...p} className="input" value={role} onChange={(e) => setRole(e.target.value as Role)}>{ROLES.filter((r) => can(ws.role, r)).map((r) => <option key={r} value={r}>{ROLE_TEXT[r]}</option>)}</select>}</Field>
             </div>
@@ -173,7 +173,7 @@ export function WorkspaceScreen() {
         <div className="pg-sec-head"><div className="pg-sec-t"><h2 id="new-h">Start a business workspace</h2></div><p className="pg-note">Its own vault, its own records and its own members. You become its owner; add members and how many must sign afterwards.</p></div>
         <form className="pg-sheet wk-new" onSubmit={(e) => { e.preventDefault(); void create.run() }}>
           <input className="input" aria-label="Business name" placeholder="Business name" value={name} onChange={(e) => setName(e.target.value)} />
-          <Btn type="submit" busy={create.busy} disabled={name.trim().length < 2}>Create</Btn>
+          <Btn type="submit" tone="fill" busy={create.busy} disabled={name.trim().length < 2}>Create</Btn>
         </form>
         <Problem error={create.error} />
       </section>
@@ -237,7 +237,7 @@ function PolicyForm({ ws, onSaved }: { ws: WorkspaceView; onSaved: () => void })
       <Problem error={cancel.error} />
       {editable ? <form className="wk-form" onSubmit={(e) => { e.preventDefault(); void save.run() }}>
         <h3>Change who must sign</h3>
-        <div className="form-grid">
+        <div className="form-grid cols-3 fields">
           <Field label="Signatures for every request">{(p) => <input {...p} className="input" inputMode="numeric" value={signers} onChange={(e) => setSigners(e.target.value)} />}</Field>
           <Field label="From this amount" hint="Leave empty for no larger requirement.">{(p) => <MoneyInput {...p} value={large} onChange={setLarge} />}</Field>
           <Field label="Signatures from that amount">{(p) => <input {...p} className="input" inputMode="numeric" value={largeSigners} onChange={(e) => setLargeSigners(e.target.value)} />}</Field>
@@ -246,7 +246,7 @@ function PolicyForm({ ws, onSaved }: { ws: WorkspaceView; onSaved: () => void })
           <legend>Amount bands</legend>
           <p className="wk-hint">From each amount, that many different members must sign. Under the first band the count above applies. Each band must ask for at least as many as the one below it.</p>
           {bands.map((b, i) => (
-            <div key={i} className="form-grid wk-band-row">
+            <div key={i} className="form-grid cols-3 wk-band-row">
               <Field label={`Band ${i + 1}: from this amount`}>{(p) => <MoneyInput {...p} value={b.from} onChange={(v) => setBands(bands.map((x, k) => (k === i ? { ...x, from: v } : x)))} />}</Field>
               <Field label={`Band ${i + 1}: signatures`}>{(p) => <input {...p} className="input" inputMode="numeric" value={b.signers} onChange={(e) => setBands(bands.map((x, k) => (k === i ? { ...x, signers: e.target.value } : x)))} />}</Field>
               <div className="wk-band-x"><Btn small tone="void" onClick={() => setBands(bands.filter((_, k) => k !== i))}>Remove band {i + 1}</Btn></div>
@@ -258,7 +258,7 @@ function PolicyForm({ ws, onSaved }: { ws: WorkspaceView; onSaved: () => void })
           <legend>Each member's limit</legend>
           <p className="wk-hint">The most a member may prepare or sign in one request. Leave empty for no limit. A limit set or lowered takes effect at once; raising or removing one waits 72 hours.</p>
           {ws.members.map((m) => (
-            <div key={m.personId} className="form-grid wk-band-row">
+            <div key={m.personId} className="form-grid cols-2 wk-band-row">
               <Field label={`${m.name} (@${m.handle}), ${m.role}`}>{(p) => <MoneyInput {...p} value={limits[m.personId] ?? null} onChange={(v) => setLimits({ ...limits, [m.personId]: v })} />}</Field>
             </div>
           ))}

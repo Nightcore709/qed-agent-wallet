@@ -18,7 +18,7 @@ import { openKeyring } from './key-config.ts'
 import { testKeys } from './key-fixture.ts'
 import { MigrationRefused, sealMigrationCopy } from './migration-copy.ts'
 import { archivePlaintext } from './plaintext-archive.ts'
-import { toSchemaV7 } from './schema-fixture.ts'
+import { toSchemaV8 } from './schema-fixture.ts'
 import { createBackup, listManifests, verifySealed } from './sealed.ts'
 import { sweepOne, sweepScratch } from './scratch.ts'
 
@@ -61,7 +61,7 @@ function leftover(parent: string, name: string, owner: { pid: number; what: stri
 /**
  * A fixture database in a private data folder, padded with random bytes so that copying and sealing it takes long enough
  * to be interrupted, and keys. `older`: recorded at the schema version before this build's, shaped as that version was
- * (v7: without what v8 added for a fund purchase's money received, the paper escrow's deadlines and payee name checks, server/schema-fixture.ts), so that opening it migrates. The fixture test
+ * (v8: without what v9 added, Grow's watchlist table, server/schema-fixture.ts), so that opening it migrates. The fixture test
  * below checks it is a real database of that version, so a new SCHEMA_VERSION makes this fixture follow it.
  */
 function world(o: { padMb?: number; older?: boolean; keys?: boolean } = {}) {
@@ -79,7 +79,7 @@ function world(o: { padMb?: number; older?: boolean; keys?: boolean } = {}) {
     raw.exec('COMMIT')
   }
   raw.close()
-  if (o.older) toSchemaV7(db)
+  if (o.older) toSchemaV8(db)
   const keys = o.keys === false ? undefined : testKeys(root)
   const env = { PATH: process.env.PATH ?? '', HOME: root, QED_DB: db, QED_KEY_DIR: join(root, 'keys'), QED_BACKUP_DIR: join(root, 'backups'), TMPDIR: join(root, 'tmp') }
   mkdirSync(env.TMPDIR, { mode: 0o700 })

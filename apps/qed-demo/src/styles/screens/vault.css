@@ -14,7 +14,7 @@
 .vt .btn[disabled], .vt-inline .btn[disabled] { opacity: 1; filter: none; color: var(--ink-3); background: transparent; border: 1px dashed var(--rule-2); box-shadow: none; }
 
 /* the head: drawn before any data (M11); its state stamp waits for the vault service in a slot of its own height */
-.vt-head { margin-bottom: 0; align-items: flex-end; }
+.vt-head { margin-bottom: 0; flex-direction: column; align-items: flex-start; gap: var(--s4); } /* R14 rest 2: the state stands under the words, not alone at the far edge of an empty row */
 .vt-head h1 { max-width: 24ch; }
 .vt-head h1 .dim { display: block; color: var(--ink-3); font-weight: 560; }
 .vt-head-text > p { font-size: var(--t-body); color: var(--ink-2); max-width: 66ch; }
@@ -182,7 +182,7 @@
 .vt-now-v { font-size: var(--t-fig-l); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.04; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
 .vt-now-s { font-size: var(--t-small); color: var(--ink-2); }
 .vt-now-s a { font-weight: 600; }
-.vt-lims { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: var(--s3); }
+.vt-lims { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 212px), 1fr)); gap: var(--s3); }
 .vt-lim { display: grid; align-content: start; gap: 4px; }
 .vt-lim-k { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--s2); font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
 .vt-lim-v { font-size: var(--t-fig-s); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
@@ -369,6 +369,7 @@
 
 /* ------------------------------------------------------------------------------------------------ a job, as a record */
 .vt-job-head { margin-bottom: 0; }
+.vt-job-state { margin: var(--s3) 0 var(--s2); } /* R14 rest 2: the outcome is read first, above the sentence it belongs to, not alone at the far edge */
 .vt-job-head h1 { max-width: 30ch; font-size: var(--t-h1); line-height: 1.15; letter-spacing: var(--track-h); }
 .vt-job-head .wrap-any { max-width: 80ch; font-size: var(--t-body); }
 .vt-job-head .vt-job-when { font-size: var(--t-small); color: var(--ink-3); }

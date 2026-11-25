@@ -55,7 +55,7 @@ export function NotificationsScreen() {
   // A change to your security asks for a passkey when this session was opened with a password (server/api.ts).
   const ack = useAction(async (id: string) => { await withPasskeyIfAsked(() => api('POST', `/api/notices/${id}/ack`), session.hasPasskey); v.reload() })
   const save = useAction(async () => { if (prefs) { const r = await api<{ prefs: Prefs }>('POST', '/api/notify/prefs', prefs); setPrefs(r.prefs); v.reload() } })
-  const head = <header className="page-head"><div><h1>Notifications</h1><p>What QED tells you, when, and what happens if nobody answers. A notice stops or undoes nothing: the pause control and the limits you sign do.</p></div></header>
+  const head = <header className="page-head"><div><h1>Notifications</h1><p>What QED tells you, and when. A notice is only a message: it moves no money and stops nothing. To stop QED, use Pause; to change what it may do, change a limit you signed. QED's checks run whether or not you read a notice.</p></div></header>
   if (!v.data || !prefs) return <div className="pr pr-nt">{head}{v.error ? <Problem error={v.error} /> : <div className="page-wait"><Loading what="Opening notifications" /></div>}</div>
   const d = v.data
   const f = save.error?.fields ?? {}
@@ -108,10 +108,12 @@ export function NotificationsScreen() {
         <section data-col="1" className="panel pr-nt-set" aria-labelledby="nt-set-h">
           <div className="pr-nt-head"><h2 id="nt-set-h">Settings</h2><KindTag kind="set" /><p>Indian time</p></div>
           <form className="pr-nt-form" onSubmit={(e) => { e.preventDefault(); void save.run() }}>
+            <div className="form-grid cols-2 fields">
             <Field label="Quiet hours from" error={f.quietFrom}>{(p) => <input {...p} type="time" className="input" value={prefs.quietFrom ?? ''} onChange={(e) => setPrefs({ ...prefs, quietFrom: e.target.value || null })} />}</Field>
             <Field label="Quiet hours until" error={f.quietTo}>{(p) => <input {...p} type="time" className="input" value={prefs.quietTo ?? ''} onChange={(e) => setPrefs({ ...prefs, quietTo: e.target.value || null })} />}</Field>
             <Field label="Daily digest at" error={f.digestAt}>{(p) => <input {...p} type="time" className="input" value={prefs.digestAt} onChange={(e) => setPrefs({ ...prefs, digestAt: e.target.value })} />}</Field>
             <Field label="Raise again if not acknowledged within" error={f.escalateMin}>{(p) => <select {...p} className="input" value={prefs.escalateMin} onChange={(e) => setPrefs({ ...prefs, escalateMin: Number(e.target.value) })}>{[15, 30, 60, 120, 240].map((m) => <option key={m} value={m}>{minutes(m)}</option>)}</select>}</Field>
+            </div>
             <p className="small muted pr-nt-hint">Leave the quiet hours empty for none. In them only warnings wait; urgent notices and those that need an answer are never held.</p>
             <div className="pr-nt-save"><Btn tone="fill" type="submit" busy={save.busy}>Save settings</Btn></div>
           </form>

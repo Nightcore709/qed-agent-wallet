@@ -284,7 +284,7 @@ export function ProtectScreen() {
     <header className="page-head pr-head">
       <div>
         <h1>Protect</h1>
-        <p>What QED watches, what you have set, and who enforces each rule, down to what still holds if QED itself fails.</p>
+        <p>What QED may do on its own, what only you can approve, and what still holds if QED itself fails. You can pause any instruction here; changing one needs your passkey.</p>
       </div>
       <Link className="btn fill" to="/instructions/new"><Plus aria-hidden="true" />New instruction</Link>
     </header>
@@ -609,16 +609,16 @@ function Yours({ progs, envelope, liq, home, payees, now, acting, pause }: {
         <p className="pr-ins-note">{drafts.length ? <><b>Not in force:</b> QED can do nothing under {drafts.length === 1 ? 'this draft' : `these ${drafts.length} drafts`} until you sign {drafts.length === 1 ? 'it' : 'them'}: {drafts.map((p, i) => <span key={p.id}>{i ? '; ' : ''}<Link to={`/instructions/${p.id}`}>{p.title}</Link></span>)}. </> : null}Changing an instruction makes a new version, which you sign with your passkey before it is in force.</p>
       </div>
 
-      <ul className="pr-tiles" data-n="4">
-        <Tile title="What must stay in your bank" tag={<KindTag kind="enforced" by="server" />}
-          now={liq ? <><span className="pr-v" data-reserve="need">{fmt.money(liq.need, true)}</span><span>{liq.binding ? `For what falls due to ${fmt.isoDay(liq.binding.date)}, at worst, as you told QED to allow for.` : 'Nothing due needs money that is not certain to arrive first.'}</span><ReserveBasis l={liq} /></> : <span className="skel pr-skel-line" />}
-          meta={[['What enforces it', 'QED\'s server: whatever your instructions\' limits say, none of it can come out of what must stay; a run that would is refused'], ['If that fails', 'It is as good as its list: a bill that is not registered, or spending above your figure, is outside it.']]}
-          act={<Go to="/safeguards#reserve">What it allows for</Go>} />
-        <Tile title="Payees" tag={<KindTag kind="enforced" by="server" />}
+      <ul className="pr-tiles" data-n="3">
+        <Tile wide title="Payees" tag={<KindTag kind="enforced" by="server" />}
           now={payees === null ? <span className="skel pr-skel-line" /> : names.length ? <><span className="pr-v">{plural(names.length, 'payee')}</span><span>{listed(names.slice(0, 3))}{names.length > 3 ? ` and ${names.length - 3} more` : ''}.</span></> : <><span className="pr-v">None yet</span><span>You add one when you first pay them.</span></>}
           what="Who your payments and instructions may pay. Before a payee is saved, the paper bank checks the name behind its address; in its first day, a large payment to it waits before it is sent."
           meta={[['What enforces it', 'QED\'s server: an instruction pays only the payees it names'], ['Name check', 'The paper bank\'s, on paper: anything but a match is added only once you say you checked the address yourself, and every payment says what it answered'], ['Look-alikes', 'One that looks like a payee you already have is flagged, and added only once you say you checked it; a payment to it says what it looks like before your passkey signs'], ['New payees', 'In a payee\'s first day, a payment above the amount you set waits before it is sent, and you can cancel it meanwhile'], ['If that fails', 'A payment could go to an address you did not mean.']]}
           act={<Go to="/pay">Your payees, in Spend</Go>} />
+        <Tile title="What must stay in your bank" tag={<KindTag kind="enforced" by="server" />}
+          now={liq ? <><span className="pr-v" data-reserve="need">{fmt.money(liq.need, true)}</span><span>{liq.binding ? `For what falls due to ${fmt.isoDay(liq.binding.date)}, at worst, as you told QED to allow for.` : 'Nothing due needs money that is not certain to arrive first.'}</span><ReserveBasis l={liq} /></> : <span className="skel pr-skel-line" />}
+          meta={[['What enforces it', 'QED\'s server: whatever your instructions\' limits say, none of it can come out of what must stay; a run that would is refused'], ['If that fails', 'It is as good as its list: a bill that is not registered, or spending above your figure, is outside it.']]}
+          act={<Go to="/safeguards#reserve">What it allows for</Go>} />
         <Tile id="pr-floor" title="Your floor" tag={<KindTag kind="enforced" by="server" />} tone={worst?.valid && worst.cushion < 0 ? 'void' : undefined}
           now={!worst ? <span className="skel pr-skel-line" /> : <><span className="pr-v">{fmt.money(worst.line)}</span><span>{worst.valid ? <>If every holding fell to its limit you would have {fmt.money(worst.gHat, true)}, {fmt.money(Math.abs(worst.cushion), true)} {worst.cushion >= 0 ? 'above' : 'below'} it.</> : `Your worst case cannot be worked out now: ${worst.invalidReasons.join('; ') || 'a price is missing'}.`}</span></>}
           what="The least you want to keep if markets fall."

@@ -612,3 +612,24 @@
   .ticket > *, .tk-now, .ticket-quote > * { min-width: 0; }
   .tk-stage, .ticket-quote { overflow-wrap: anywhere; }
 }
+
+/* ------------------------------------------------------------------------------------------------ watching (R14) */
+.gr-watch-list { display: grid; gap: var(--s3); margin: var(--s3) 0; }
+.gr-watch-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3) var(--s5); align-items: start; padding: var(--s4); border-radius: var(--r-md); border: 1px solid var(--rim); background: color-mix(in oklab, var(--pane-2) 60%, transparent); }
+.gr-watch-main { display: grid; gap: var(--s1); min-width: 0; }
+.gr-watch-name { font-size: var(--t-body); font-weight: 650; overflow-wrap: anywhere; }
+.gr-watch-sub { margin-left: var(--s2); font-size: var(--t-small); font-weight: 500; color: var(--ink-3); }
+.gr-watch-px b { font-size: var(--t-lead); font-weight: 650; font-variant-numeric: tabular-nums lining-nums; }
+.gr-watch-src { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); color: var(--ink-2); overflow-wrap: anywhere; }
+.gr-watch-chg { overflow-wrap: anywhere; }
+.gr-watch-acts { display: flex; flex-wrap: wrap; gap: var(--s2); justify-content: flex-end; }
+.gr-watch .gr-watch-act { min-height: 44px; }
+.gr-watch-add { display: flex; flex-wrap: wrap; align-items: end; gap: var(--s3); margin-top: var(--s3); }
+.gr-watch-add .field { flex: 1 1 16rem; min-width: 0; margin: 0; }
+.gr-watch-add select { width: 100%; min-height: 44px; }
+.gr-watch-note:empty { display: none; }
+@media (max-width: 719px) {
+  .gr-watch-row { grid-template-columns: minmax(0, 1fr); }
+  .gr-watch-acts { justify-content: flex-start; }
+}
+.gr-watch-name .gr-watch-sub { display: block; margin: 2px 0 0; }

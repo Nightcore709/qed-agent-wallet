@@ -181,6 +181,8 @@ const OPERATIONS = new Set([
   // R14: the release checks' labelled test accounts left on the hosted service (deployment) and the browser suite's
   // timing under heavy load on the team's computer (its own test tooling)
   'RISK-119', 'RISK-120',
+  // account-access work that is not in this build yet (as RISK-077), and the vendored verifier's licence notice (the team's documents)
+  'RISK-121', 'RISK-122',
 ])
 
 /** A risk's standing in words, without the register's references. */
