@@ -936,3 +936,137 @@ wallet. H1 and H2 were then fixed and re-verified (below):
   keeps its earlier code; a guardian can spend recovery codes by co-signing and then withdrawing.
 
 None of these can move money in this build: every balance is a valueless test token on a private chain.
+
+### 8k. Account access under R14: ordinary sign-in, the device, and saved codes at the right moment (25 Nov 2026)
+
+The owner's instruction (R14, Priority 1): keep the passkey cryptography and every financial safeguard, and make the
+experience around it that of a familiar financial application. The forced saved-codes step at sign-up was the main
+complaint. What changed, and why each change is safe, is below; the code names the same rule where it enforces it.
+
+**Five operations, never interchangeable** (`shared/access-operations.ts`, read by the server's comments and by the
+screens; `shared/access-operations.test.ts` holds the owner's cells): (1) entering the account; (2) enrolling a device;
+(3) approving a protected financial action; (4) recovering account access; (5) recovering authority over the wallet. A
+password, Google, an emailed link or code, or a signed-in session never approves money and never becomes wallet
+authority: the approval routes still have only the passkey path (a passkey assertion over the hash of the exact terms),
+and every rule written for a password session now holds for anything that is not a passkey session
+(`server/api.ts` `weakSession`, `server/passkeys.ts` `mayEndStrong`: "not a passkey", so a later way in is weak by default).
+
+**Email and password** (`server/access.ts`, `server/auth.ts`). An account is opened with an email address and a password;
+the handle (the public name others pay) is made from the person's name, never from the address, unless they choose one.
+- *An address nobody has confirmed reserves nothing.* `users.email_key` is not unique. Opening an account never says
+  whether an address is in use (ASVS 5.0 V6.3.8), and nobody can take an address from its owner by typing it first
+  (pre-hijacking): a second account opened with the same address is a separate account.
+- *Signing in by address* costs one scrypt derivation whether no account, one or several use the address (a "sign-in
+  tag": scrypt of the password under a salt made from the address and the installation's random salt, compared with the
+  tag of each account opened with that address). Five tries per address in fifteen minutes, counted before any password is
+  checked and whether or not any account exists; every account the try did not open counts it as a wrong password, at the
+  same five as its handle. A tag is bound to the password hash it was made for, so a path that changed the password and
+  forgot the tag stops the address signing in; it never leaves an old password working.
+  Residual: two accounts opened with one address lock each other's password sign-in by their own sign-ins (each try
+  tests every account's password, so each is counted); passkeys are not affected.
+- *Confirmation* goes through `server/delivery.ts`. With the local test outbox it is kept there and said to be simulated.
+  With no adapter (`QED_DELIVERY=none`, production today) nothing is written, nothing is said to be sent, the account
+  works, and the address is shown as not verified with verifying marked unavailable. No SMTP or HTTP provider adapter
+  was added: one needs a provider account, credentials and a verified sending domain (`PROVIDER_DEPENDENCY`), which is
+  the owner's decision. Reviewed decision (F4, 25 Nov 2026): the address an
+  account was opened with waits the protection delay after its confirmation before it can start a password reset or a
+  recovery, as an address added later does, and the owner's devices are told. The first draft made it usable at once; the
+  confirmation link needs no session, so someone who controls the mailbox but not the account (an address typed in by
+  another person at sign-up, a mailbox given up and taken again) could confirm and reset at once. Test:
+  `server/access.test.ts` "F4". What a mailbox alone can do is unchanged (below).
+
+**Google** (`server/google.ts`, `server/google-config.ts`; stand-in issuer for tests `server/oidc-standin.ts`).
+OpenID Connect authorization-code flow with `fetch` and `node:crypto` only: state (kept as its SHA-256, used once, ten
+minutes), nonce, PKCE S256, a binding value in an HttpOnly SameSite=Strict cookie of the browser that began (login CSRF),
+the issuer named in the callback (RFC 9207), and the ID token verified against Google's keys: RS256 only, key of 2048
+bits or more, issuer, audience and authorized party, expiry, issued-at, nonce, subject, `email_verified` true. Enabled only
+when `QED_GOOGLE_CLIENT_ID` and `QED_GOOGLE_CLIENT_SECRET` are both set; otherwise its routes answer 404 and no button is
+rendered. The identity is Google's issuer and subject: an existing account is never signed in to, linked or merged because
+its address matches. A Google account QED has not seen opens a new account; adding Google to an account that exists is its
+owner's act under Security, with that account's strongest confirmation at the start and again when Google answers. A
+session Google opens is an ordinary one, exactly as a password's. Google states no time of last sign-in (no `auth_time`
+in its discovery document, read 25 Nov 2026), so "confirmed with Google again" means a new, complete round trip in this
+browser, and is never called a re-entry of the Google password. Phone sign-in: no provider exists, nothing is shown; it
+would need an SMS provider with sender registration (TRAI DLT for Indian numbers), and a text message would still be an
+entry factor only, never a recovery or approval factor (section 8e, "Text messages").
+
+**Enrolling a device.** After sign-up one optional step offers it in the owner's words ("Use your fingerprint, Face ID
+or device PIN for faster, more secure access"). The first device: after the account's ordinary sign-in given again in the
+last five minutes: the password, D-094, where the account has one; Google confirmed again only on an account with no
+password (F5: on an account that has a password, Google is an ordinary sign-in and never stands in for it;
+`strongConfirm`, `googleConfirms`; `server/google.test.ts` "F5"). Every further one: only after a confirmation by a
+passkey that can approve, and it starts in its cool-off, as before. The page asks the browser whether the device has a
+user-verifying check (`isUserVerifyingPlatformAuthenticatorAvailable`) and says plainly when it has none.
+
+**Saved recovery codes, and H2 (8j).** No forced step at sign-up: nothing to tick, nothing to type. They are made in the
+same transaction as the account's FIRST device, whichever way it comes: sign-up with a passkey (`finishSignup`), the
+first passkey of an account opened with an address, a password or Google (`finishAddPasskey`), and the first passkey made
+inside the wallet's set-up (`addFirstPasskey`, the same route). They are shown once on the screen that follows (the device
+step, the wallet's first-passkey step or Security: Copy, Download and Continue, with one line on why they matter). A second
+device and a completed recovery make none (a recovery spends and replaces one only when it used one, as before R14). A first
+passkey added after a password reset signs in only and brings none: a reset proves the mailbox, not the owner.
+*The first draft was wrong and the independent review (F1, High) found it.* It made codes optional, and so by H2's own
+rule (the only usable passkey may make codes at once) the first holder of a device could mint the tie-breaker. A thief with
+a synced passkey, or a session within five minutes of a passkey sign-in, could make codes, add a passkey of his own and
+suspend the owner's (suspension checks the code, not the cool-off): the owner could then never suspend, regenerate, remove
+at once or start a backup recovery. Now the codes exist before anyone can be a second holder, so every H2 rule applies from
+the first device: suspending another passkey, removing a cooling-off one at once and replacing unused codes each spend one,
+and with more than one usable passkey and none unused no path makes codes at once. Test:
+`server/access-codes.test.ts` "REGRESSION F1" (one passkey, two sessions: the second holder gets no codes and cannot suspend
+while the account's codes exist), with the first-device and recovery cases beside it. An account that holds codes and already has a
+device keeps the base behaviour exactly; at its FIRST device the set is always replaced (R1, below).
+*Correction to the first draft's claim.* It said that one usable passkey means "no second holder, so nobody to decide
+between". That is wrong: a synced passkey is one credential with two holders (the owner's devices and whoever got into the
+sync account), and so is a session of one credential on two machines. With the codes made at the first device, the accepted
+Mediums in 8j (b) and (d) are no worse than before R14: the same codes exist from the same moment, and the sentence in 8j
+(d) "Sign-up already requires confirming the codes were stored elsewhere" is replaced by the first-device rule above (the
+confirmation box is gone; what protects is that the codes exist and are shown).
+
+**Second review of the F1 fix (what holds now, 26 Nov 2026).**
+- *R1 (Medium) closed.* Codes could still be made while an account had no device, with only the password (or Google on a
+  Google-only account): whoever made them held the tie-breaker for good, because the first device then made none. Now the
+  account's first usable device ALWAYS makes a fresh set in its own transaction and revokes every unused code made before
+  it (`finishAddPasskey`), and says on the screen that the earlier codes no longer work. Test: `server/access-codes.test.ts`
+  "R1: a password holder makes codes before any device…" (the earlier codes are refused for suspending and for new codes;
+  only the new set works). A first passkey that signs in only (after a password reset) still makes none: see R2.
+- *R3 (Medium) mitigated.* A first-device set lives only in page memory and is shown once; if it was lost before it was
+  saved, no route could make new ones without a code. Now the session that received a set may ask for a fresh set without a
+  code (Security: "Show me new codes (the ones made a moment ago were not saved)"), only while the account has exactly one
+  usable passkey, no code of that set has been used, and within 30 minutes of its making, and only with that session's fresh
+  passkey confirmation. The window is kept on the server (`meta`, key `codes-window:<person>`), bound to the receiving
+  session's id, and moves to the new set. Tests: `server/access-codes.test.ts` "R3: …" (works in the window; refused from
+  another session, with no fresh confirmation, after 30 minutes, after a code is used, after a second passkey exists).
+  Residual: past the window, a lost first set is the F6 situation below.
+- *R2 (Medium) OPEN, do not enable email delivery before it is fixed.* The password-reset path recreates F1: a first
+  passkey added after a reset signs in only and brings no codes, and once its authority is restored by the wait, the
+  account's only usable passkey may make codes at once (H2's own exception), so whoever held the mailbox and then the new
+  passkey holds the tie-breaker. It is unreachable while `QED_DELIVERY=none`, because no reset can be sent. Before any
+  email provider is enabled: make the codes at the sign-in-only passkey's authority request, unusable until that authority
+  is restored, and revoked on cancellation.
+- *Google-opened address.* The address a Google sign-in opens an account with is usable at once (`server/google.ts`). That
+  is harmless: such an account has no password to reset, and an address cannot start a recovery without a saved code beside
+  it. The F4 wait applies to every address of an account opened with an email address and a password.
+
+Residual, F6 (OPEN, for the owner): on an installation with no email provider (production today), an account that never saved
+the codes it was shown, or one opened with Google alone, cannot be recovered if its only device is lost: the recovery needs
+a verified email, or a saved code and a second proof. A Google-only account can still sign in with Google and approves
+nothing until a device is set up. The remedy is a provider decision (an email adapter, `PROVIDER_DEPENDENCY`) or a recovery
+contact; neither was added here.
+
+**A full-disk gap found on the way.** With ten fewer rows per sign-up, the write that failed first on a full disk became
+the one that ended the browser's earlier session after the account's transaction had committed: an account was made
+behind an answer that said nothing had changed. The earlier session now ends inside the account's own transaction
+(`auth.ts` `endPresented`; `server/storage-faults.test.ts`).
+
+**Review items fixed with F1** (independent review of 780dbeca): F4 above; F5 above; F7 wording that said more than is true
+(at-once removal needs a saved code; a first device after a password reset signs in only; the opening address waits; the
+reset mail of a Google-only account names Google); F11 a password change and a reset apply the sign-up's rules
+(`auth.ts` `checkNewPassword`); F12 a Google sign-in ends the browser's earlier session inside the account's transaction;
+F9 removing a linked Google account ends the sessions Google opened. Left as they are: F8 and F10 (low, accepted).
+
+**Schema v10, part (a).** Account access is its own step, v9 to v10 (the watchlist's v8 to v9 step is another branch's and
+is released first; a v8 database steps through both after one sealed copy). Two nullable columns on `users` and three
+tables; nothing is filled. Existing accounts keep their handle, password, passkeys, codes, addresses and sessions, and gain
+no sign-in address, identity or permission (`server/access-migration.test.ts`, on a schema-9 fixture with a watchlist row,
+and one test that steps a v8 database through both).
+

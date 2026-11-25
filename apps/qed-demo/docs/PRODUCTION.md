@@ -196,6 +196,7 @@ reset without the keys); it is referenced, not repeated, here.
 | TLS private keys | rehearsal: made at run time in a private temporary folder and deleted | public certificate at the edge (managed); internal certificate from a private CA | automatic | ASVS 12.2.2, 12.3.4 |
 | Model API key (`ANTHROPIC_API_KEY`) | environment, when set | secret manager; `QED_AI_PROVIDER=none` until the owner approves a model and its data terms (Q-051) | 90 days | ASVS 13.3.1 |
 | Adviser reviewer token (`QED_ADVISER_TOKEN`, D-088) | environment, when set | secret manager | 90 days | ASVS 13.3.1 |
+| Google client secret (`QED_GOOGLE_CLIENT_SECRET`, with `QED_GOOGLE_CLIENT_ID`; R14) | unset: sign-in with Google is off and no button is rendered | secret manager, injected at start. Needs an OAuth 2.0 "Web application" client in a Google Cloud project with the authorized redirect URI `<QED_PUBLIC_ORIGIN>/auth/google/callback`, its consent screen configured, and Google's branded button in place of the plain one (its sign-in branding guidelines). Both variables are set together or not at all | on compromise, and when staff with access change | ASVS 13.3.1 |
 | Session tokens, CSRF tokens, passkey challenges | database (token as SHA-256; CSRF token plain) | database | per session | ASVS 7.2.3 |
 | Review account password `data/review-account.json` | local only (D-062, D-098) | never in production | — | — |
 

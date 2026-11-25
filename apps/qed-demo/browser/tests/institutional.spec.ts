@@ -13,10 +13,10 @@ const unique = (p: string) => `${p}${Date.now().toString(36)}${Math.floor(Math.r
 async function createAccount(page: Page, handle: string): Promise<void> {
   await page.goto('/')
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill(`Member ${handle}`)
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
   await page.getByRole('button', { name: 'Continue' }).click()
 }
 async function openHousehold(page: Page): Promise<void> {

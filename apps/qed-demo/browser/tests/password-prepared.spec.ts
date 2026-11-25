@@ -34,13 +34,13 @@ test('a payee added in a password session is named as such on the approval sheet
   // An account opened with a password, its household opened, then a passkey made after typing the password again.
   await owner.goto('/')
   await owner.getByRole('button', { name: 'Create an account' }).click()
+  await owner.getByText('Choose your handle (optional)').click()
   await owner.getByLabel('Handle').fill(handle)
   await owner.getByLabel('Name to sign with').fill('Prepared Owner')
-  await owner.getByRole('radio', { name: /With a password/ }).check()
+  // R14: the ordinary sign-up is an email address and a password
+  await owner.getByLabel('Email', { exact: true }).fill(`${handle}@example.in`)
   await owner.getByLabel('Password', { exact: true }).fill(password)
-  await owner.getByRole('button', { name: 'Create account with a password' }).click()
-  await owner.getByLabel('I have stored these codes somewhere other than this device').check()
-  await owner.getByRole('button', { name: 'Continue' }).click()
+  await owner.getByRole('button', { name: 'Create account', exact: true }).click()
   await owner.getByRole('button', { name: 'Not now' }).click()
   await owner.getByRole('button', { name: 'Open the household' }).click()
   await expect(owner.getByRole('heading', { name: /Finish setting up/ })).toBeVisible()
@@ -52,7 +52,7 @@ test('a payee added in a password session is named as such on the approval sheet
   // The owner signs out and back in with the passkey.
   await owner.getByRole('button', { name: /account menu$/ }).click()
   await owner.getByRole('button', { name: 'Sign out' }).click()
-  await owner.getByRole('button', { name: 'Sign in with a passkey' }).click()
+  await owner.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }).click()
   await expect.poll(async () => (await owner.evaluate(async () => (await fetch('/api/session')).json()) as { authMethod?: string }).authMethod).toBe('passkey')
   const [person] = query<{ id: string }>('SELECT id FROM users WHERE handle = ?', handle)
 

@@ -19,7 +19,7 @@ How to read it (ASVS 5.0 V8.1.1, V8.2.1):
   own; `reads`, a GET.
 - Business-workspace roles and what each may do: `server/workspaces.ts`; field-level rules: `SECURITY.md`, "Authorization".
 
-297 routes.
+304 routes.
 
 | Method | Path | Session | Least role | Further checks | Writes |
 |---|---|---|---|---|---|
@@ -43,10 +43,17 @@ How to read it (ASVS 5.0 V8.1.1, V8.2.1):
 | POST | `/api/auth/recovery/link/passkey/begin` | no | the person (any workspace) | none | own |
 | POST | `/api/auth/recovery/link/passkey/finish` | no | the person (any workspace) | none | own |
 | POST | `/api/auth/email/confirm` | no | the person (any workspace) | none | one |
+| POST | `/api/auth/google/begin` | no | the person (any workspace) | none | one |
+| POST | `/api/auth/google/finish` | no | the person (any workspace) | none | own |
+| POST | `/api/security/google/begin` | yes | the person (any workspace) | none | one |
+| POST | `/api/security/google/finish` | yes | the person (any workspace) | none | own |
+| POST | `/api/security/google/:id/remove` | yes | the person (any workspace) | none | one |
+| POST | `/api/security/email/resend` | yes | the person (any workspace) | none | one |
 | GET | `/api/dev/outbox` | no | viewer | none | reads |
 | GET | `/api/security` | yes | the person (any workspace) | none | reads |
 | POST | `/api/security/passkeys/begin` | yes | the person (any workspace) | none | own |
 | POST | `/api/security/passkeys/finish` | yes | the person (any workspace) | none | own |
+| POST | `/api/security/recovery-codes/again` | yes | the person (any workspace) | none | one |
 | POST | `/api/security/passkeys/:id/remove` | yes | the person (any workspace) | none | own |
 | POST | `/api/security/passkeys/:id/suspend` | yes | the person (any workspace) | none | own |
 | POST | `/api/security/passkeys/:id/unsuspend` | yes | the person (any workspace) | none | one |

@@ -37,10 +37,10 @@ async function signUp(page: Page, prefix: string): Promise<string> {
   await page.goto(`${s.base}/`)
   const handle = `${prefix}${Date.now().toString(36)}`
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Idea Owner')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)

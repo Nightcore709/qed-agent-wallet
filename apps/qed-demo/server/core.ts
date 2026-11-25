@@ -10,9 +10,10 @@ import { fileURLToPath } from 'node:url'
 import { registerAmountSql } from './amount-sql.ts'
 import { migrateToV6 } from './migrate-v6.ts'
 import { closeAsFound, MigrationRefused, sealMigrationCopy } from './migration-copy.ts'
+import { type GoogleConfig, googleConfig } from './google-config.ts'
 import { MICROS, PRICES } from './model-prices.ts'
 
-export const SCHEMA_VERSION = '9'
+export const SCHEMA_VERSION = '10'
 const HERE = dirname(fileURLToPath(import.meta.url))
 export const APP_ROOT = join(HERE, '..')
 
@@ -401,6 +402,26 @@ const MIGRATIONS: Record<string, { to: string; alter: (db: Db) => void; fill: (d
     alter: () => { /* (d) nothing to alter: the table is made by schema.sql */ },
     fill: () => { /* (d) nothing to fill: the list starts empty for every household */ },
   },
+  // 25 Nov 2026, R14 account access: its own step, v9 to v10 (the v8 to v9 step is the watchlist's, part (d), released first).
+  // (a) Account access (Priority 1; server/access.ts, server/google.ts). Two nullable columns on users: the address an
+  // account is created with, and its lower-cased form for lookup (not unique: an address nobody has confirmed proves
+  // nothing, so it reserves nothing). Three tables made by schema.sql: email_logins (what lets that address and the
+  // password sign in, at one fixed cost whoever else uses the address), federated_identities (a Google account that signs
+  // in to a QED account) and oauth_states (the ten-minute state of one OpenID Connect sign-in). Nothing is filled: every
+  // account that exists keeps its handle, its password, its passkeys with the authority they had, its saved codes and
+  // its addresses, and gains no sign-in address, no Google identity and no permission it did not have. Saved codes are no
+  // longer made at sign-up from this version on; the ones that exist keep working and keep their meaning (H2).
+  '9': {
+    to: '10',
+    alter: (db) => {
+      // (a)
+      addColumn(db, 'users', 'email', 'TEXT')
+      addColumn(db, 'users', 'email_key', 'TEXT')
+    },
+    fill: () => {
+      // (a) nothing to fill
+    },
+  },
 }
 
 /**
@@ -581,6 +602,11 @@ export interface Config {
    * else, so the name cannot reach a page or an account (docs/DEPLOY.md).
    */
   probeHosts: string[]
+  /**
+   * Sign-in with Google (R14, server/google.ts): set only when QED_GOOGLE_CLIENT_ID and QED_GOOGLE_CLIENT_SECRET are both
+   * set; null otherwise, and then its routes answer "not found" and the interface renders no button.
+   */
+  google: GoogleConfig | null
   /** Whether /api/ready also needs the wallet service to answer (QED_READY_REQUIRES_WALLET=1); off: it is reported only. */
   readyRequiresWallet: boolean
 }
@@ -725,6 +751,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     linkOrigin: linkOriginOf(env, prod.publicOrigin, uiPorts[1]!, prod.publicOrigin ? [prod.publicOrigin] : allowedHosts.map((h) => `http://${h}`)),
     probeHosts: prod.host ? extraHosts.filter((h) => h !== prod.host) : [],
     readyRequiresWallet: env.QED_READY_REQUIRES_WALLET === '1',
+    google: googleConfig(env, linkOriginOf(env, prod.publicOrigin, uiPorts[1]!, prod.publicOrigin ? [prod.publicOrigin] : allowedHosts.map((h) => `http://${h}`)), prod.publicOrigin),
   }
 }
 

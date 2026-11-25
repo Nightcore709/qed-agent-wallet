@@ -65,9 +65,10 @@ it as `qed.db.pre-v4-<time>.bak` (sealed instead, when encrypted backups are con
 on-chain wallet service (127.0.0.1:5176, with its own local chain on 8546); without it everything except the
 on-chain wallet works, and the wallet's pages say it is not reachable.
 
-- **Create an account** on the first screen, in one of two ways. With a passkey: your device makes one (fingerprint,
-  face or device PIN). With a password: a handle and a password of ten characters or more. Either way QED shows ten
-  recovery codes once (copy or download them). A password account is then offered the passkey that approves
+- **Create an account** on the first screen (R14): your name, an email address and a password of ten characters or
+  more; or, where it is configured, Google; or, for no password at all, a passkey. No recovery codes stand in the way.
+  An account opened with a password or Google is then offered the device ("Use your fingerprint, Face ID or device PIN
+  for faster, more secure access"), which is the passkey that approves
   payments; "Not now" is allowed, and until a passkey is added the account can look at everything and set up but
   approve nothing (every approval is a passkey signature over the exact terms; D-094). Then open a paper household
   with the example figures or your own, beside a live preview of where they leave you. Home lists what is left to

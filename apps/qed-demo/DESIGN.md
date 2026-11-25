@@ -1049,8 +1049,10 @@ Sign-in is a split: the peacock field (wordmark, the headline "Money that moves 
 example objects drawn from the real components, the practice-money note) beside the way in. Both ordinary ways in:
 a passkey (one press) or a handle and password; creating an account offers the same two (D-094). A password session
 can look at everything and set up; every approval is still a passkey signature over the exact terms, so the next
-step offers to add one ("Not now" is allowed and says what it leaves out). Recovery codes are shown once, with copy
-and download. Opening the household is a form beside a live peacock preview of where the figures leave the owner.
+step offers to add one ("Not now" is allowed and says what it leaves out). Since R14 the way in is one screen with the
+ordinary ways first (email or handle and password; the device, "Sign in with your fingerprint, Face ID or device PIN";
+Google only where configured), the step after sign-up carries the owner's sentence, and saved recovery codes are offered
+after the device is set up (and arrive with a second device), shown once with copy and download, never as a wall. Opening the household is a form beside a live peacock preview of where the figures leave the owner.
 Home then shows "Finish setting up" until the passkey, the on-chain wallet and a first instruction exist.
 
 ### P7. Checks before a screen is done

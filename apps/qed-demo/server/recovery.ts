@@ -32,7 +32,7 @@
  */
 import { randomBytes, timingSafeEqual } from 'node:crypto'
 import { generateAuthenticationOptions, generateRegistrationOptions, type RegistrationResponseJSON, verifyRegistrationResponse } from '@simplewebauthn/server'
-import { hashPassword, IDLE_MS, rateLimit, type Session, validateCredentials, verifyPassword } from './auth.ts'
+import { checkNewPassword, emailTagFor, hashPassword, IDLE_MS, rateLimit, storeEmailLogin, type Session, verifyPassword } from './auth.ts'
 import { AppError, audit, bad, type Db, j, newId, parse, whenIst } from './core.ts'
 import { deliver, deliveryMode, linkOrigin, linkTo, maskAddress, notifyChannels, redactSpent } from './delivery.ts'
 import {
@@ -187,14 +187,40 @@ export function addAddress(db: Db, s: Session, kind: Kind, raw: unknown, now: nu
   })
 }
 
+/**
+ * The confirmation of the address an account was opened with (R14, server/access.ts): an unconfirmed address and a link and
+ * a code sent to it, as addAddress sends them, asked for by the sign-up itself or by a later "send it again". With no
+ * adapter nothing is written and false is returned: no message is pretended. Called inside the caller's transaction.
+ */
+export function sendEmailConfirmation(db: Db, personId: string, n: { address: string; key: string }, handle: string, now: number): boolean {
+  if (deliveryMode() === 'none') return false
+  // an earlier unconfirmed request for the same address is replaced by this one, and its link and code stop working
+  for (const old of db.all<{ id: string }>(`SELECT id FROM contact_points WHERE person_id = ? AND kind = 'email' AND address_key = ? AND verified_at IS NULL AND removed_at IS NULL`, personId, n.key)) {
+    db.run(`UPDATE contact_points SET removed_at = ?, removed_reason = 'asked again' WHERE id = ?`, now, old.id)
+    if (db.run(`UPDATE one_time_tokens SET replaced_at = ? WHERE person_id = ? AND purpose = 'verify-email' AND subject = ? AND used_at IS NULL AND replaced_at IS NULL`, now, personId, old.id).changes) redactSpent(db, now)
+  }
+  const id = newId('cpt', now)
+  db.run(`INSERT INTO contact_points (id, person_id, kind, address, address_key, created_at) VALUES (?, ?, 'email', ?, ?, ?)`, id, personId, n.address, n.key, now)
+  const t = newToken(db, personId, 'verify-email', id, CONFIRM_EMAIL_TTL_MS, now, { link: true, code: true })
+  deliver(db, { channel: 'email', to: n.address, personId, purpose: 'verify-email', tokenId: t.id, secrets: [linkTo('/verify-email', t.token!), t.code!], subject: 'Confirm your email address for QED',
+    body: `A QED account, @${handle}, was opened with this address.\n\nConfirm that the address is yours with this link (it works once, for 30 minutes):\n${linkTo('/verify-email', t.token!)}\n\nOr type this code under Security in QED: ${t.code}\n\nOnce confirmed, the address receives the account's security notices and can reset its password. If you did not open this account, ignore this message: the address is not used until it is confirmed, and confirming it would tie your address to someone else's account.` }, now)
+  securityEvent(db, personId, 'email-confirmation-sent', { address: maskAddress('email', n.address), simulated: deliveryMode() === 'outbox' }, now)
+  return true
+}
+
 /** Confirm an address: called with the link's token (no session needed: the link proves the mailbox) or a typed code. */
 function confirmed(db: Db, p: Point, now: number): { kind: Kind; address: string; usableFrom: number | null } {
+  // Every email address, the one the account was opened with included, waits the protection delay after its confirmation
+  // before it can start a reset or a recovery, with the owner's devices told (review F4). The link needs no session, so
+  // someone who controls the mailbox but not the account (an address typed in by someone else at sign-up, a mailbox
+  // given up and taken again) must not be able to confirm it and reset the password at once.
+  const own = p.kind === 'email' && !p.replaces_id && !!db.get('SELECT 1 FROM users WHERE id = ? AND email_key = ?', p.person_id, p.address_key)
   const usableFrom = p.kind === 'email' ? now + PROTECTION_DELAY_MS : null
   db.run('UPDATE contact_points SET verified_at = ?, usable_from = ? WHERE id = ?', now, usableFrom, p.id)
   const old = p.replaces_id ? db.get<Point>('SELECT * FROM contact_points WHERE id = ? AND person_id = ? AND removed_at IS NULL', p.replaces_id, p.person_id) : undefined
   if (old) db.run(`UPDATE contact_points SET removed_at = ?, removed_reason = 'replaced' WHERE id = ?`, now, old.id)
   if (old?.kind === 'email') endLinks(db, p.person_id, now) // as when it is removed (R13 review, R05)
-  securityEvent(db, p.person_id, p.kind === 'email' ? 'email-added' : 'phone-added', { address: maskAddress(p.kind, p.address), ...(old ? { replaced: maskAddress(old.kind, old.address) } : {}) }, now)
+  securityEvent(db, p.person_id, p.kind === 'email' ? (own ? 'email-confirmed' : 'email-added') : 'phone-added', { address: maskAddress(p.kind, p.address), ...(old ? { replaced: maskAddress(old.kind, old.address) } : {}) }, now)
   // The address that was replaced hears of it once more, although it receives nothing else from now on.
   if (old) notifyChannels(db, p.person_id, { kind: `${p.kind}-changed`, title: p.kind === 'email' ? 'The email address of your QED account was changed' : 'The phone number of your QED account was changed', body: `It is now ${maskAddress(p.kind, p.address)}. This address will receive nothing more from QED.` }, now, [{ kind: old.kind, address: old.address }], true)
   audit(db, now, p.person_id, 'owner', `${p.kind}.confirm`, p.id, { replaced: old?.id ?? null })
@@ -309,8 +335,12 @@ export function requestPasswordReset(db: Db, identifier: unknown, ip: string, no
         return
       }
       if (!u.pw_hash.startsWith('scrypt$')) {
+        // an account Google signs in to (review F7) is not locked out: it has no password, and Google is its way in
+        const viaGoogle = !!db.get(`SELECT 1 FROM federated_identities WHERE person_id = ? AND removed_at IS NULL`, u.id)
         for (const p of to) deliver(db, { channel: 'email', to: p.address, personId: u.id, purpose: 'reset-no-password', subject: 'QED: this account has no password',
-          body: `Someone asked to reset the password of the QED account @${u.handle}. It has no password and no passkey that can sign in. Recover the account instead: ${linkToPage('/?help=recover')}\n\nIf you did not ask, ignore this message.` }, now)
+          body: viaGoogle
+            ? `Someone asked to reset the password of the QED account @${u.handle}. It has no password: it signs in with Google. Sign in with Google; there is no password to reset.\n\nIf you can no longer sign in with that Google account, recover the account instead: ${linkToPage('/?help=recover')}\n\nIf you did not ask, ignore this message.`
+            : `Someone asked to reset the password of the QED account @${u.handle}. It has no password and no passkey that can sign in. Recover the account instead: ${linkToPage('/?help=recover')}\n\nIf you did not ask, ignore this message.` }, now)
         return
       }
       const t = newToken(db, u.id, 'password-reset', null, RESET_TTL_MS, now, { link: true, code: false })
@@ -342,13 +372,15 @@ export async function resetPassword(db: Db, input: { token: unknown; password: u
   if (!u.pw_hash.startsWith('scrypt$')) throw new AppError(409, 'no_password', 'This account has no password now. Recover it instead.')
   if (hasApprovingPasskey(db, t.person_id)) throw new AppError(409, 'has_passkey', 'This account has a passkey that can approve now: sign in with it, and change the password under Security and recovery.')
   if (typeof input.password !== 'string' || input.password !== input.confirm) throw bad('Check the highlighted fields.', { confirm: 'The two passwords are not the same.' })
-  let password: string
-  try { password = validateCredentials(u.handle, input.password).password } catch (e) { if (e instanceof AppError && e.fields?.password) throw bad('Check the highlighted field.', { password: e.fields.password }); throw e }
+  const password = checkNewPassword(db, t.person_id, input.password)
   const hash = await hashPassword(password)
+  // an account opened with an address signs in with that address and the new password from now (auth.ts storeEmailLogin)
+  const tag = await emailTagFor(db, t.person_id, password)
   return db.tx(() => {
     if (!spend(db, t.id, now)) throw gone('used')
     db.run(`UPDATE one_time_tokens SET replaced_at = ? WHERE person_id = ? AND purpose = 'password-reset' AND used_at IS NULL AND replaced_at IS NULL`, now, t.person_id)
     if (db.run('UPDATE users SET pw_hash = ?, failed_logins = 0, locked_until = NULL, authority_hold_at = ?, password_reset_at = ? WHERE id = ? AND pw_hash = ?', hash, now, now, t.person_id, u.pw_hash).changes !== 1) throw new AppError(409, 'retry', 'The password was changed meanwhile. Ask for a new link.')
+    storeEmailLogin(db, t.person_id, tag, hash, now)
     // every session ends; the answer counts those that were still in use (lapsed ones are closed too, not counted)
     const ended = db.get<{ n: number }>('SELECT COUNT(*) n FROM sessions WHERE user_id = ? AND revoked_at IS NULL AND expires_at >= ? AND last_seen_at >= ?', t.person_id, now, now - IDLE_MS)?.n ?? 0
     db.run('UPDATE sessions SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL', now, t.person_id)

@@ -32,6 +32,13 @@ export interface SessionInfo {
   /** R13 S7: the household's home currency (the rupee for a household that chose none) and the ones it may choose at set-up. */
   homeCurrency?: string; homeCurrencies?: { code: string; name: string }[]
   sessions?: { created_at: number; last_seen_at: number; ua: string | null; current: number }[]
+  /** R14: which ordinary sign-ins this installation offers beside email and a password. google: false, true, or 'stand-in' (a test stack's local issuer). */
+  signIn?: { google: boolean | 'stand-in' }
+  /** R14: the address the account was opened with and whether it is confirmed; canVerify false where no email can be sent. */
+  email?: { address: string | null; verified: boolean; pending: boolean; canVerify: boolean; simulated: boolean }
+  hasPassword?: boolean
+  /** R14: unused saved recovery codes. None are made at sign-up; the screens lead to them at the right moment. */
+  recoveryCodesLeft?: number
 }
 export interface ProfileChange { id: string; requestedAt: number; effectiveAt: number; after: Record<string, number>; before: Record<string, number> }
 export const SessionCtx = createContext<{ session: SessionInfo; reload: () => Promise<void> }>({ session: { authenticated: false }, reload: async () => {} })

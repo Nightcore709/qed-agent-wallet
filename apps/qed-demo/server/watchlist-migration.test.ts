@@ -14,7 +14,7 @@ import { DEFAULT_OPENING, openHousehold } from './household.ts'
 import { openKeyring } from './key-config.ts'
 import { testKeys } from './key-fixture.ts'
 import { seedRegistry } from './registry.ts'
-import { toSchemaV8, V9_TABLES } from './schema-fixture.ts'
+import { toSchemaV8, V9_TABLES, V10_COLUMNS, V10_TABLES } from './schema-fixture.ts'
 
 const folders: string[] = []
 const tempFolder = (prefix: string): string => { const d = mkdtempSync(join(tmpdir(), prefix)); folders.push(d); return d }
@@ -31,7 +31,12 @@ function everything(path: string): Record<string, unknown[]> {
   const d = new DatabaseSync(path, { readOnly: true })
   try {
     const out: Record<string, unknown[]> = {}
-    for (const t of tablesOf(d)) if (!V9_TABLES.includes(t) && t !== 'meta') out[t] = d.prepare(`SELECT * FROM ${t} ORDER BY rowid`).all()
+    // the build migrates on past v9 (v10, R14 account access): what it adds, columns and tables, is not what v9 must leave alone
+    for (const t of tablesOf(d)) {
+      if (V9_TABLES.includes(t) || V10_TABLES.includes(t) || t === 'meta') continue
+      const cols = (d.prepare(`PRAGMA table_info(${t})`).all() as { name: string }[]).map((c) => c.name).filter((c) => !V10_COLUMNS.some(([vt, vc]) => vt === t && vc === c))
+      out[t] = d.prepare(`SELECT ${cols.join(', ')} FROM ${t} ORDER BY rowid`).all()
+    }
     return out
   } finally { d.close() }
 }
@@ -53,8 +58,8 @@ function v8Database(): string {
 }
 
 describe('schema v9 part (d): the watchlist table on a v8 database', () => {
-  it('this build is at v9, and a v8 file lacks the table', () => {
-    expect(SCHEMA_VERSION).toBe('9')
+  it('this build is at or past v9, and a v8 file lacks the table', () => {
+    expect(Number(SCHEMA_VERSION)).toBeGreaterThanOrEqual(9)
     const path = v8Database()
     expect(versionOf(path)).toBe('8')
     const d = new DatabaseSync(path, { readOnly: true })
@@ -67,7 +72,7 @@ describe('schema v9 part (d): the watchlist table on a v8 database', () => {
     expect(Object.keys(before).length).toBeGreaterThan(20)
     const db = openDb(path)
     try {
-      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: '9' })
+      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: SCHEMA_VERSION })
       expect(db.get('SELECT COUNT(*) n FROM watchlist_items')).toEqual({ n: 0 })
     } finally { db.close() }
     expect(everything(path)).toEqual(before)
@@ -80,7 +85,7 @@ describe('schema v9 part (d): the watchlist table on a v8 database', () => {
     const once = everything(path)
     openDb(path).close()
     expect(everything(path)).toEqual(once)
-    expect(versionOf(path)).toBe('9')
+    expect(versionOf(path)).toBe(SCHEMA_VERSION)
     expect(listManifests(join(dirname(path), 'migration-copies'))).toHaveLength(1)
   })
 
@@ -90,7 +95,7 @@ describe('schema v9 part (d): the watchlist table on a v8 database', () => {
     openDb(path).close()
     const [m] = listManifests(join(dirname(path), 'migration-copies'))
     const target = join(tempFolder('qed-v9-restored-'), 'qed.db')
-    expect(restoreBackup({ manifest: m!, keyring: openKeyring('migration-copy'), target }).manifest.migration).toEqual({ from: '8', to: '9' })
+    expect(restoreBackup({ manifest: m!, keyring: openKeyring('migration-copy'), target }).manifest.migration).toEqual({ from: '8', to: SCHEMA_VERSION })
     expect(versionOf(target)).toBe('8')
     expect(everything(target)).toEqual(before)
   })

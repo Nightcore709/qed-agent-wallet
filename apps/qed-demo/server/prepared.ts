@@ -51,10 +51,11 @@ function byWhom(db: Db, workspaceId: string, personId: string): string {
   return u ? ` by ${u.display_name} (@${u.handle})` : ''
 }
 /** The methods whose work is said in what a passkey signs: a password session, and a sign-in-only passkey session. */
-const LABELLED = new Set(['password', 'signin-passkey'])
+const LABELLED = new Set(['password', 'signin-passkey', 'google'])
 const how = (db: Db, workspaceId: string, r: { person_id: string; at: number; method: string }): string => r.method === 'signin-passkey'
   ? `${byWhom(db, workspaceId, r.person_id)} in a sign-in-only passkey session at ${atIst(r.at)}, not with a passkey that can approve`
-  : `${byWhom(db, workspaceId, r.person_id)} in a password session at ${atIst(r.at)}, not with a passkey`
+  : r.method === 'google' ? `${byWhom(db, workspaceId, r.person_id)} in a session opened with Google at ${atIst(r.at)}, not with a passkey`
+    : `${byWhom(db, workspaceId, r.person_id)} in a password session at ${atIst(r.at)}, not with a passkey`
 
 /**
  * The sentences a document must carry about what it relies on that a password session prepared: the request itself
@@ -102,5 +103,5 @@ export function tellPayeeAdded(db: Db, workspaceId: string, payee: { name: strin
   const ws = db.get<{ kind: string; display_name: string }>('SELECT kind, display_name FROM users WHERE id = ?', workspaceId)
   const by = db.get<{ handle: string }>('SELECT handle FROM users WHERE id = ?', a.personId)?.handle ?? ''
   const detail = { payee: `${payee.name} (${payee.handle})`, at: now, by, ...(ws?.kind === 'business' ? { workspace: ws.display_name, workspaceId } : {}) }
-  for (const m of members(db, workspaceId)) securityEvent(db, m.personId, a.authMethod === 'signin-passkey' ? 'payee-added-in-signin-session' : 'payee-added-in-password-session', detail, now)
+  for (const m of members(db, workspaceId)) securityEvent(db, m.personId, a.authMethod === 'signin-passkey' ? 'payee-added-in-signin-session' : a.authMethod === 'google' ? 'payee-added-in-google-session' : 'payee-added-in-password-session', detail, now)
 }

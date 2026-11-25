@@ -27,10 +27,11 @@ test.afterAll(async () => { await s?.stop(); if (dir) rmSync(dir, { recursive: t
 async function newOwner(page: Page, handle: string): Promise<void> {
   await page.goto(`${s.base}/`)
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Watching Owner')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
+  await expect(page.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10) // R14: made with the first device, shown once, no box to tick
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)
@@ -47,7 +48,7 @@ test('two names watched with their source and time, one removed, the ticket open
 
   await page.goto(`${s.base}/holdings`)
   const panel = page.locator('#watching')
-  await expect(panel.getByRole('heading', { name: 'Watching' })).toBeVisible()
+  await expect(panel.getByRole('heading', { name: 'Watching', exact: true })).toBeVisible()
   // the empty state says what this is and how to add
   await expect(panel.getByText('You are not watching anything yet')).toBeVisible()
   await expect(panel.getByText(/Choose a name below and press Add/)).toBeVisible()

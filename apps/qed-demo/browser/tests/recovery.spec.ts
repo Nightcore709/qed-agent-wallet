@@ -64,28 +64,44 @@ async function fromOutbox(back: Page, to: string, subject: string | RegExp, name
 const has = async (back: Page, to: string, subject: string): Promise<boolean> =>
   ((await (await back.request.get('/api/dev/outbox?limit=200')).json()) as { messages: { to: string; subject: string }[] }).messages.some((m) => m.to === to && m.subject === subject)
 
-/** A new account (with a passkey unless a password is given) whose email address is confirmed by its link. */
+/**
+ * A new account whose email address is confirmed by its link. With a password: the ordinary sign-up (R14), with the
+ * address itself, whose confirmation is kept in the simulated outbox at once. Without: an account made with a passkey,
+ * which saves its recovery codes when offered them and adds the address under Security.
+ */
 async function accountWithEmail(page: Page, handle: string, email: string, opts: { password?: string; household?: boolean } = {}): Promise<string[]> {
   await page.goto('/')
   await page.getByRole('button', { name: 'Create an account' }).click()
-  await page.getByLabel('Handle').fill(handle)
-  await page.getByLabel('Name to sign with').fill(`Test ${handle}`)
+  let codes: string[] = []
   if (opts.password) {
-    await page.getByRole('radio', { name: /With a password/ }).check()
+    await page.getByLabel('Name to sign with').fill(`Test ${handle}`)
+    await page.getByLabel('Email', { exact: true }).fill(email)
     await page.getByLabel('Password', { exact: true }).fill(opts.password)
-    await page.getByRole('button', { name: 'Create account with a password' }).click()
-  } else await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await expect(page.getByRole('heading', { name: 'Keep a way back in' })).toBeVisible()
-  // the email first: sending its confirmation is enough to continue
-  await page.getByLabel('Email address', { exact: true }).fill(email)
-  await page.getByRole('button', { name: 'Send a confirmation' }).click()
-  // the confirmation is kept in the simulated outbox and is not said to be sent (R13)
-  await expect(page.getByText(`Kept in the simulated outbox, not sent to ${email}`)).toBeVisible()
-  await expect(page.getByText(`Confirmation sent to ${email}`)).toHaveCount(0)
-  const codes = await page.getByRole('list', { name: 'Recovery codes' }).locator('li').allInnerTexts()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
-  await page.getByRole('button', { name: 'Continue' }).click()
-  if (opts.password) await page.getByRole('button', { name: 'Not now' }).click()
+    await page.getByText('Choose your handle (optional)').click()
+    await page.getByLabel('Handle').fill(handle)
+    await page.getByRole('button', { name: 'Create account', exact: true }).click()
+    // the confirmation is kept in the simulated outbox and is not said to be sent (R13)
+    await expect(page.getByText(`Kept in the simulated outbox, not sent to ${email}`)).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByText(`Confirmation sent to ${email}`)).toHaveCount(0)
+    await page.getByRole('button', { name: 'Not now' }).click()
+  } else {
+    await page.getByRole('button', { name: 'Use a passkey instead' }).click()
+    await page.getByLabel('Handle').fill(handle)
+    await page.getByLabel('Name to sign with').fill(`Test ${handle}`)
+    await page.getByRole('button', { name: 'Create account with a passkey' }).click()
+    await expect(page.getByRole('heading', { name: 'Keep a way back in' })).toBeVisible()
+    await expect(page.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10)
+    codes = await page.getByRole('list', { name: 'Recovery codes' }).locator('li').allInnerTexts()
+    await page.getByRole('button', { name: 'Continue' }).click()
+    // the address, added under Security: sending its confirmation is enough to go on
+    await page.goto('/security')
+    await page.getByLabel('Add an email address').fill(email)
+    await page.getByRole('button', { name: 'Send a confirmation' }).click()
+    // kept in the simulated outbox, never said to be sent (R13): the address waits to be confirmed, and the history says where the message is
+    await expect(page.getByRole('button', { name: `Withdraw ${email}` })).toBeVisible()
+    await expect(page.getByText(/A confirmation for an email address was kept in the simulated outbox, not sent/).first()).toBeVisible()
+    await page.goto('/')
+  }
   if (opts.household) { await page.getByRole('button', { name: 'Open the household' }).click(); await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible() }
   // the confirmation link, from the outbox, opened in this browser
   const link = await fromOutbox(page, email, 'Confirm your email address for QED')
@@ -158,8 +174,9 @@ test('forgot password: a link from the outbox sets a new password, ends every se
   await other.getByLabel('Password', { exact: true }).fill(password)
   await other.getByRole('button', { name: 'Sign in with your password' }).click()
   await expect(other.getByText(`Signed in as Test ${handle}`)).toBeVisible()
-  // a new address starts nothing until its protection delay has passed
-  await page.waitForTimeout(WAIT)
+  // the address the account was opened with waits the protection delay after its confirmation, like any other (review F4,
+  // server/access.test.ts; 6 seconds on this stack): the reset is asked for once it has passed
+  await expect.poll(() => (query<{ u: number | null }>(`SELECT usable_from u FROM contact_points WHERE person_id = ? AND kind = 'email' AND verified_at IS NOT NULL AND removed_at IS NULL`, u!.id)[0]?.u ?? Infinity) <= Date.now(), { timeout: 30_000 }).toBe(true)
   await page.getByRole('button', { name: 'Sign out' }).click()
   await page.getByRole('button', { name: 'Reset your password' }).click()
   await shots(page, 'forgot-ask')
@@ -191,7 +208,7 @@ test('forgot password: a link from the outbox sets a new password, ends every se
   // every session ended, the other device's too; nobody was signed in by the link; every address was told
   expect(query('SELECT COUNT(*) n FROM sessions WHERE user_id = ? AND revoked_at IS NULL', u!.id)).toEqual([{ n: 0 }])
   await other.reload()
-  await expect(other.getByRole('button', { name: 'Sign in with a passkey' })).toBeVisible()
+  await expect(other.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' })).toBeVisible()
   expect(await has(page, email, 'QED: Your password was reset')).toBe(true)
   // the old password no longer opens it; the new one does
   await page.getByRole('button', { name: 'Go to sign in' }).click()
@@ -261,7 +278,7 @@ test('a lost passkey: an email link and a saved code start a recovery that waits
   await expect(page.getByText(`Signed in as Test ${handle}`)).toBeVisible()
   // signed out and in again with the new passkey
   await page.getByRole('button', { name: 'Sign out' }).click()
-  await page.getByRole('button', { name: 'Sign in with a passkey' }).click()
+  await page.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }).click()
   await expect(page.getByText(`Signed in as Test ${handle}`)).toBeVisible()
   const session = await page.evaluate(async () => (await fetch('/api/session')).json()) as Record<string, unknown>
   expect(session).toMatchObject({ authenticated: true, authMethod: 'passkey', passkeyAuthority: 'signin', stepUpFresh: false })
@@ -353,10 +370,10 @@ test('a recovery is cancelled from a signed-in device, and again by a recovery c
   const helperHandle = unique('hc')
   await helper.goto('/')
   await helper.getByRole('button', { name: 'Create an account' }).click()
+  await helper.getByRole('button', { name: 'Use a passkey instead' }).click()
   await helper.getByLabel('Handle').fill(helperHandle)
   await helper.getByLabel('Name to sign with').fill(`Test ${helperHandle}`)
   await helper.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await helper.getByLabel('I have stored these codes somewhere other than this device').check()
   await helper.getByRole('button', { name: 'Continue' }).click()
   await owner.goto('/security')
   await owner.getByLabel('Their handle').fill(helperHandle)
@@ -425,12 +442,13 @@ test('suspected compromise: every session ends from "If something is wrong", and
   const handle = unique('sc')
   await owner.goto('/')
   await owner.getByRole('button', { name: 'Create an account' }).click()
+  await owner.getByRole('button', { name: 'Use a passkey instead' }).click()
   await owner.getByLabel('Handle').fill(handle)
   await owner.getByLabel('Name to sign with').fill(`Test ${handle}`)
   await owner.getByRole('button', { name: 'Create account with a passkey' }).click()
+  // R14 (F1): the codes come with the first device and are shown once
   await expect(owner.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10)
   const codes = await owner.getByRole('list', { name: 'Recovery codes' }).locator('li').allInnerTexts()
-  await owner.getByLabel('I have stored these codes somewhere other than this device').check()
   await owner.getByRole('button', { name: 'Continue' }).click()
   // a second passkey on another authenticator; the first one's key is copied to a thief
   const stolen = await laptop.credentials()
@@ -443,7 +461,7 @@ test('suspected compromise: every session ends from "If something is wrong", and
   const t = await addAuthenticator(thief)
   await t.load(stolen)
   await thief.goto('/')
-  await thief.getByRole('button', { name: 'Sign in with a passkey' }).click()
+  await thief.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }).click()
   await expect(thief.getByText(`Signed in as Test ${handle}`)).toBeVisible()
   // the owner, on the device with the other passkey: "If something is wrong", then end every session
   await owner.goto('/security')
@@ -452,19 +470,19 @@ test('suspected compromise: every session ends from "If something is wrong", and
   await shots(owner, 'if-wrong')
   await wrong.getByRole('button', { name: 'End every session' }).click()
   await owner.getByRole('button', { name: 'End every session, this one too' }).click()
-  await expect(owner.getByRole('button', { name: 'Sign in with a passkey' })).toBeVisible()
+  await expect(owner.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' })).toBeVisible()
   const [u] = query<{ id: string }>('SELECT id FROM users WHERE handle = ?', handle)
   expect(query('SELECT COUNT(*) n FROM sessions WHERE user_id = ? AND revoked_at IS NULL', u!.id)).toEqual([{ n: 0 }])
   await thief.reload()
-  await expect(thief.getByRole('button', { name: 'Sign in with a passkey' })).toBeVisible()
+  await expect(thief.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' })).toBeVisible()
   // back in with the passkey still held; the stolen one suspended at once
-  await owner.getByRole('button', { name: 'Sign in with a passkey' }).click()
+  await owner.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }).click()
   await expect(owner.getByText(`Signed in as Test ${handle}`)).toBeVisible()
   await owner.goto('/security')
   // it leaves a single usable passkey, so it needs one of the saved codes, which the thief does not have (H2)
   await owner.getByRole('textbox', { name: 'A saved recovery code, to suspend' }).fill(codes[0]!)
   await owner.getByRole('button', { name: 'Suspend now' }).click()
   await expect(owner.getByText(/Suspended .*: it cannot sign in, confirm or approve/)).toBeVisible()
-  await thief.getByRole('button', { name: 'Sign in with a passkey' }).click()
+  await thief.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }).click()
   await expect(thief.getByText(/could not be verified|could not be used/)).toBeVisible()
 })

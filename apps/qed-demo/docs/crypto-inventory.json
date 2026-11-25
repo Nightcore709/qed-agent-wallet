@@ -9,23 +9,23 @@
   "@noble/hashes/sha3": "Keccak-256: Ethereum addresses and instrument ids (shared/instrument.ts, scripts/never-appear.ts).",
   "@simplewebauthn/browser": "The browser side of the WebAuthn ceremonies (src/lib/passkey.ts): the platform authenticator holds the private key; QED never sees it.",
   "@simplewebauthn/server": "WebAuthn ceremonies: passkey registration and assertion verification, ES256 (P-256) only, user verification required (server/passkeys.ts, recovery.ts); the software authenticator of the tests and scripts (server/softauthn.ts, scripts/security.ts).",
-  "node:crypto.KeyObject": "Typed key handles for AES-GCM data keys and HMAC keys (server/keys.ts) and the software authenticator's P-256 key (server/softauthn.ts).",
+  "node:crypto.KeyObject": "Typed key handles for AES-GCM data keys and HMAC keys (server/keys.ts) and the software authenticator's P-256 key (server/softauthn.ts). R14: the RSA keys of an OpenID Connect issuer (server/google.ts, server/oidc-standin.ts).",
   "node:crypto.X509Certificate": "Reads a self-signed certificate a rehearsal makes for its own loopback TLS (scripts/prod-rehearsal.ts). No certificate is trusted from elsewhere.",
   "node:crypto.createCipheriv": "AES-256-GCM sealing (random 96-bit nonce, 128-bit tag): data-encryption keys and backups (server/keys.ts), a person's export key (server/records.ts). docs/ENCRYPTION.md section 3.",
   "node:crypto.createDecipheriv": "AES-256-GCM opening, the tag checked first (server/keys.ts, server/records.ts).",
-  "node:crypto.createHash": "SHA-256 only: session-token and link-token hashes at rest, approval and document hashes, receipt and decision hash chains, a dispute pack's digest and its offline re-check (server/dispute-pack-verify.ts), file and release fingerprints, the SHA-256 of a WebAuthn RP id; SHA-256 over pre-v3 recovery codes (layered under scrypt, server/core.ts layerLegacyCodes); the SHA-256 of a WebAuthn assertion's clientDataJSON, in the data a passkey signs over a workspace's currency configuration (chain/rail/webauthn.ts); and a one-way digest of a session's stored hash, naming the session in Ask's spending records (server/ask-models.ts).",
-  "node:crypto.createHmac": "HMAC-SHA-256: the keyring's metadata check (server/keys.ts) and AWS Signature V4 for the off-site copy (server/offsite.ts).",
-  "node:crypto.createPublicKey": "P-256 public keys (JWK) to verify passkey signatures without the server (evidence re-verification, server/evidence-verify.ts; vault signers, server/rail-signers.ts, chain/rail/signers.ts, chain/rail/host.ts; a workspace's currency configuration, chain/rail/webauthn.ts; scripts/security.ts).",
+  "node:crypto.createHash": "SHA-256 only: session-token and link-token hashes at rest, approval and document hashes, receipt and decision hash chains, a dispute pack's digest and its offline re-check (server/dispute-pack-verify.ts), file and release fingerprints, the SHA-256 of a WebAuthn RP id; SHA-256 over pre-v3 recovery codes (layered under scrypt, server/core.ts layerLegacyCodes); the SHA-256 of a WebAuthn assertion's clientDataJSON, in the data a passkey signs over a workspace's currency configuration (chain/rail/webauthn.ts); and a one-way digest of a session's stored hash, naming the session in Ask's spending records (server/ask-models.ts). R14: the PKCE S256 challenge of a Google sign-in (server/google.ts pkceChallenge), and its check by the stand-in issuer.",
+  "node:crypto.createHmac": "HMAC-SHA-256: the keyring's metadata check (server/keys.ts) and AWS Signature V4 for the off-site copy (server/offsite.ts). R14: the per-address salt of a sign-in tag, HMAC-SHA-256 of the lower-cased address under the installation's own random salt (server/auth.ts emailTag).",
+  "node:crypto.createPublicKey": "P-256 public keys (JWK) to verify passkey signatures without the server (evidence re-verification, server/evidence-verify.ts; vault signers, server/rail-signers.ts, chain/rail/signers.ts, chain/rail/host.ts; a workspace's currency configuration, chain/rail/webauthn.ts; scripts/security.ts). R14: the RSA public keys of Google's JWKS, to verify ID tokens (server/google.ts); the stand-in issuer's public key in its tests.",
   "node:crypto.createSecretKey": "Wraps 32 random bytes as a secret KeyObject (server/keys.ts).",
-  "node:crypto.createSign": "ECDSA P-256 signing by the software authenticator, for tests and scripts only (server/softauthn.ts); never a person's key.",
-  "node:crypto.generateKeyPairSync": "Key pairs made for tests and rehearsals only: the software authenticator's P-256 credential, an Ed25519 key the security suite offers to prove it is refused, a rehearsal's TLS key.",
+  "node:crypto.createSign": "ECDSA P-256 signing by the software authenticator, for tests and scripts only (server/softauthn.ts); never a person's key. R14: RS256 signing of ID tokens by the local stand-in issuer, for tests only (server/oidc-standin.ts); never Google's key.",
+  "node:crypto.generateKeyPairSync": "Key pairs made for tests and rehearsals only: the software authenticator's P-256 credential, an Ed25519 key the security suite offers to prove it is refused, a rehearsal's TLS key. R14: the stand-in issuer's RSA-2048 key, made for each test run (server/oidc-standin.ts).",
   "node:crypto.hkdfSync": "HKDF-SHA-256: two keys from the KEK, one to wrap data keys and one for the keyring's HMAC (server/keys.ts); the vault host's per-purpose keys from its master secret (chain/rail/keys.ts).",
-  "node:crypto.randomBytes": "The CSPRNG for every secret and id: session tokens (256 bits), CSRF tokens (192), CSP nonces (144), approval nonces (128), recovery and contact codes (80 bits, stored with scrypt), link tokens, salts, data keys and KEKs (256), the vault service's bearer token and master secret (256), object ids (50 random bits: identifiers, not secrets).",
+  "node:crypto.randomBytes": "The CSPRNG for every secret and id: session tokens (256 bits), CSRF tokens (192), CSP nonces (144), approval nonces (128), recovery and contact codes (80 bits, stored with scrypt), link tokens, salts, data keys and KEKs (256), the vault service's bearer token and master secret (256), object ids (50 random bits: identifiers, not secrets). R14: the state, nonce, PKCE verifier and browser binding of a Google sign-in (256 bits each, server/google.ts); the digits that make a handle free (server/access.ts, not a secret).",
   "node:crypto.randomUUID": "Identifiers that are not secrets (the vault service's request ids, chain/rail).",
-  "node:crypto.scrypt": "Password hashing (N=2^17, r=8, p=1, 32-byte key, per-user 128-bit salt: server/auth.ts) and recovery-code checks off the event loop (N=2^14: server/passkeys.ts).",
+  "node:crypto.scrypt": "Password hashing (N=2^17, r=8, p=1, 32-byte key, per-user 128-bit salt: server/auth.ts) and recovery-code checks off the event loop (N=2^14: server/passkeys.ts). R14: the sign-in tag of an address and a password, at the password hash's own cost, so a sign-in by address costs one derivation whoever uses the address (server/auth.ts emailTag).",
   "node:crypto.scryptSync": "Recovery and contact codes at rest (N=2^14, r=8, p=1: server/passkeys.ts) and the layering of pre-v3 codes (server/core.ts).",
-  "node:crypto.timingSafeEqual": "Constant-time comparison of every secret: password hashes, recovery codes, reference secrets, the CSRF token (since R13 hardening), the vault service's bearer token, the adviser's token, keyring checks.",
-  "node:crypto.verify": "ECDSA P-256 verification of stored passkey signatures without the server's own code path (server/evidence-verify.ts, server/rail-signers.ts, scripts/security.ts); and of the passkey assertions over a workspace's currency configuration, checked by the vault service before anything is deployed for it, as the owner account would check them (chain/rail/webauthn.ts verifyAssertionOffChain, money-model S5).",
+  "node:crypto.timingSafeEqual": "Constant-time comparison of every secret: password hashes, recovery codes, reference secrets, the CSRF token (since R13 hardening), the vault service's bearer token, the adviser's token, keyring checks. R14: sign-in tags, the nonce of an ID token and the browser binding of a Google sign-in.",
+  "node:crypto.verify": "ECDSA P-256 verification of stored passkey signatures without the server's own code path (server/evidence-verify.ts, server/rail-signers.ts, scripts/security.ts); and of the passkey assertions over a workspace's currency configuration, checked by the vault service before anything is deployed for it, as the owner account would check them (chain/rail/webauthn.ts verifyAssertionOffChain, money-model S5). R14: RS256 (RSASSA-PKCS1-v1_5 with SHA-256, keys of 2048 bits or more) verification of Google ID tokens (server/google.ts verifyIdToken).",
   "solidity.signatures-or-hashes": "On chain: QEDOwnerAccount verifies passkey (P-256, EIP-7951 precompile) signatures over EIP-712 digests; the bounty and dispute escrows hash and check signed terms (keccak256, ECDSA). Outside this app's runtime; Slither and Forge are their checks.",
   "viem.hashTypedData": "EIP-712 digests of the bounty board's terms (chain/rail/bounties.ts).",
   "viem.keccak256": "Keccak-256 for chain digests, ids and EIP-712 parts (chain/rail).",
@@ -208,6 +208,9 @@
   "scripts/wallet-sealing.ts": [
    "node:crypto.createHash"
   ],
+  "server/access.ts": [
+   "node:crypto.randomBytes"
+  ],
   "server/adviser.ts": [
    "node:crypto.createHash",
    "node:crypto.timingSafeEqual"
@@ -223,6 +226,7 @@
    "node:crypto.createHash"
   ],
   "server/auth.ts": [
+   "node:crypto.createHmac",
    "node:crypto.randomBytes",
    "node:crypto.scrypt",
    "node:crypto.timingSafeEqual"
@@ -242,18 +246,26 @@
    "node:crypto.randomBytes",
    "node:crypto.scryptSync"
   ],
+  "server/dispute-pack-verify.ts": [
+   "node:crypto.createHash"
+  ],
   "server/earn-chain.ts": [
    "node:crypto.createHash"
   ],
   "server/engine.ts": [
    "node:crypto.randomBytes"
   ],
-  "server/dispute-pack-verify.ts": [
-   "node:crypto.createHash"
-  ],
   "server/evidence-verify.ts": [
    "node:crypto.createHash",
    "node:crypto.createPublicKey",
+   "node:crypto.verify"
+  ],
+  "server/google.ts": [
+   "node:crypto.KeyObject",
+   "node:crypto.createHash",
+   "node:crypto.createPublicKey",
+   "node:crypto.randomBytes",
+   "node:crypto.timingSafeEqual",
    "node:crypto.verify"
   ],
   "server/keys.ts": [
@@ -270,6 +282,13 @@
   "server/offsite.ts": [
    "node:crypto.createHash",
    "node:crypto.createHmac"
+  ],
+  "server/oidc-standin.ts": [
+   "node:crypto.KeyObject",
+   "node:crypto.createHash",
+   "node:crypto.createSign",
+   "node:crypto.generateKeyPairSync",
+   "node:crypto.randomBytes"
   ],
   "server/passkeys.ts": [
    "@simplewebauthn/server",
