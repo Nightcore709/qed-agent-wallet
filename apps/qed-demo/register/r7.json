@@ -444,7 +444,7 @@
    "needs": "C",
    "level": "D",
    "status": "Partly",
-   "note": "24 Nov (R13, SE3): SCSVS applied to QEDOwnerAccount and QEDBountyBoard in docs/standards/SCSVS.md, each applicable control met or tracked. A document only: the contract tests it cites are in the chain suite and were not re-run here, and the independent contract audit is outside (EXT-03). MASVS does not apply (no native app)."
+   "note": "24 Nov (R13, SE3): SCSVS applied to QEDOwnerAccount and QEDBountyBoard in docs/standards/SCSVS.md, each applicable control met or tracked. A document only: the contract tests it cites are in the chain suite and were not re-run here, and the independent contract audit is outside (EXT-03). MASVS does not apply (no native app). 25 Nov (final runs): re-run on the final code: the owner account's Forge suite (227 of 227, 17 invariants, 11 seeded twins, at dd7260f; the contract unchanged since, EV-096) and the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped). Not re-run: the bounty board's and the vault set's Solidity tests that the mapping also cites. Still Partly."
   },
   {
    "id": "R7-014",
@@ -770,15 +770,23 @@
    "section": "S4",
    "title": "Indicative prices, executable quotes and confirmed fills distinguished; quote expiry enforced",
    "acceptance": "Three distinct types in data and on screen; an expired quote is refused by the contract and shown as expired",
-   "implementation": [],
+   "implementation": [
+    "chain/rail/quote-kinds.ts",
+    "server/fx.ts"
+   ],
    "journey": "Buy, convert",
-   "evidence": [],
+   "evidence": [
+    "`chain/test/quote-kinds.test.ts` › \"indicative, executable and fill are three distinct records; the contract refuses the executable quote once it has expired\"",
+    "`browser/tests/global-money.spec.ts` › \"converts and pays across zero, two and three decimal places; refuses a route it does not offer; holds a duplicate; shows an expired quote\"",
+    "`server/fx.test.ts` › \"states its rate, spread, fee, expiry and source apart from the reference, in a document the owner approves\""
+   ],
    "deps": [
     "R7-030"
    ],
    "needs": "P",
-   "level": "-",
-   "status": "Not met"
+   "level": "P",
+   "status": "Met",
+   "note": "25 Nov (final runs): Met; built in R13 (audit GL5) and never recorded here. On the chain an indicative quote, an executable quote and a fill are three distinct records and the contract refuses an executable quote once it has expired (quote-kinds.test.ts, in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped)); on the paper desk the executable rate, the reference rate (labelled as one nobody trades at), the spread, the fee and the expiry are stated apart, and a quote left too long is shown as expired and cannot be approved (global-money.spec.ts in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; fx.test.ts in the unit suite (2,844 of 2,844 on c33a1df, EV-099))."
   },
   {
    "id": "R7-039",
@@ -816,15 +824,16 @@
    "evidence": [
     "`browser/tests/vault.spec.ts` › \"a fresh household sets up its own vault, owned by its passkey\"",
     "`browser/tests/vault.spec.ts` › \"two households: each has its own vault and owner account\"",
-    "`chain/test/workspaces.test.ts` › \"provisioning: configured by a deployer key while empty\""
+    "`chain/test/workspaces.test.ts` › \"provisioning: configured by a deployer key while empty\"",
+    "`browser/tests/business-vault.spec.ts` › \"a shared vault needs two different members\""
    ],
    "deps": [
     "R7-071"
    ],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "A household sets up its own owner account, agent key, vault set, execution contract and policy contract from the interface, without developer help, and accepts the vault with its passkey (22 Nov). Shared (business) workspaces have no vault yet"
+   "status": "Met",
+   "note": "A household sets up its own owner account, agent key, vault set, execution contract and policy contract from the interface, without developer help, and accepts the vault with its passkey (22 Nov). Shared (business) workspaces have no vault yet 25 Nov (final runs): Met. Shared (business) workspaces have had their own vault since 22 Nov, set up from the interface with one passkey of each signing member (R7-043); both journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning, and the provisioning test passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped)."
   },
   {
    "id": "R7-041",
@@ -986,8 +995,8 @@
    ],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "24 Nov (R13, SV4): a property test of random interleavings of two instructions that run by themselves, payments by hand, bills and wallet activity booked from a chain, with every invariant checked after every step: each instruction within its signed monthly limit and together within their sum; the 30-day envelope shown to the owner never exceeded; an instruction's run never takes a household that was not short into a shortfall; wallet operations move no rupee figure. One browser journey does the same through the interface. Wallet operations here are the chain's activity as the books see it; the vault's own mandate limits are the chain's and are verified separately (R7-045) Moved from Met on 24 Nov (R13 register review): the property test (server/aggregate-limits.test.ts) passes on 2d44be9, but the browser journey needed for level P ran in the 97 of 97 Chrome run at 6997f76 and not on 2d44be9. It returns to Met when the browser suite passes on the final revision."
+   "status": "Met",
+   "note": "24 Nov (R13, SV4): a property test of random interleavings of two instructions that run by themselves, payments by hand, bills and wallet activity booked from a chain, with every invariant checked after every step: each instruction within its signed monthly limit and together within their sum; the 30-day envelope shown to the owner never exceeded; an instruction's run never takes a household that was not short into a shortfall; wallet operations move no rupee figure. One browser journey does the same through the interface. Wallet operations here are the chain's activity as the books see it; the vault's own mandate limits are the chain's and are verified separately (R7-045) Moved from Met on 24 Nov (R13 register review): the property test (server/aggregate-limits.test.ts) passes on 2d44be9, but the browser journey needed for level P ran in the 97 of 97 Chrome run at 6997f76 and not on 2d44be9. It returns to Met when the browser suite passes on the final revision. 25 Nov (final runs): returned to Met. The browser journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; the property test passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099)."
   },
   {
    "id": "R7-048",
@@ -1132,8 +1141,8 @@
    ],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "Two fresh passkey households on the Earn page (browser journey): the provider offers the work (its passkey signs the quote), the client funds it from its own wallet, the provider delivers a certificate the verifier on the chain checks, the escrow pays the provider's wallet, and half the price is credited after two confirmations, shown as pending until then; a second milestone is released back to the client, whose own account on the chain gets the money back. Figures are compared with the chain and the database. The chain tests add a refused counterfeit, the client's refund after the deadline and a late delivery refused; self-dealing, a second workspace of the same person, a member in common and refund loops add no authority. A proof escrow has no acceptance or dispute step: a refund is the only way back. The paper routes hand a funded chain milestone to the chain. Not in the browser: the refund after the deadline (the suite's tests share one chain, so its clock is not moved). The rail cannot tell whether one person runs both accounts outside what QED knows (D7 assumption A-ID) Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): the chain escrow has no dispute step, and on paper the household plays both client and mediator; escrow terms and roles are being completed under R13 (C-4). Updated 24 Nov (R13): the gaps named above are now built: a dispute step in front of the on-chain proof escrow (a third-household decider with stated powers and exact deadline windows; R13-058), paper escrow under accepted terms with a labelled simulated mediator and enforced roles (R13-003 to R13-005), and a directory of offers, requests and quotes (R13-054). Partly because the journeys ran in the 97 of 97 Chrome run at 6997f76 and not on 2d44be9, the chain contract and Anvil tests were not re-run here, and the contract has had no independent audit (EXT-03)."
+   "status": "Met",
+   "note": "Two fresh passkey households on the Earn page (browser journey): the provider offers the work (its passkey signs the quote), the client funds it from its own wallet, the provider delivers a certificate the verifier on the chain checks, the escrow pays the provider's wallet, and half the price is credited after two confirmations, shown as pending until then; a second milestone is released back to the client, whose own account on the chain gets the money back. Figures are compared with the chain and the database. The chain tests add a refused counterfeit, the client's refund after the deadline and a late delivery refused; self-dealing, a second workspace of the same person, a member in common and refund loops add no authority. A proof escrow has no acceptance or dispute step: a refund is the only way back. The paper routes hand a funded chain milestone to the chain. Not in the browser: the refund after the deadline (the suite's tests share one chain, so its clock is not moved). The rail cannot tell whether one person runs both accounts outside what QED knows (D7 assumption A-ID) Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): the chain escrow has no dispute step, and on paper the household plays both client and mediator; escrow terms and roles are being completed under R13 (C-4). Updated 24 Nov (R13): the gaps named above are now built: a dispute step in front of the on-chain proof escrow (a third-household decider with stated powers and exact deadline windows; R13-058), paper escrow under accepted terms with a labelled simulated mediator and enforced roles (R13-003 to R13-005), and a directory of offers, requests and quotes (R13-054). Partly because the journeys ran in the 97 of 97 Chrome run at 6997f76 and not on 2d44be9, the chain contract and Anvil tests were not re-run here, and the contract has had no independent audit (EXT-03). 25 Nov (final runs): Met. The earning journeys (earn-chain, earn-dispute, escrow-paper, directory-escrow) passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; the escrow and dispute tests passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped) and the unit suite (2,844 of 2,844 on c33a1df, EV-099). Not repeated: the dispute escrow's own Forge suite (40 of 40 on its branch). The contracts have had no independent audit (EXT-03, RISK-101); this entry's acceptance does not ask for one."
   },
   {
    "id": "R7-055",
@@ -1174,7 +1183,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "Business workspaces with roles and multi-party approval; per-member delegated limits and an approval chain by amount band beyond one threshold are not built"
+   "note": "Business workspaces with roles and multi-party approval; per-member delegated limits and an approval chain by amount band beyond one threshold are not built 25 Nov: per-member limits and amount bands are now built (R13-059), enforced by QED alone (RISK-105); a band asking two members to sign runs in the browser (institutional.spec.ts, in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning). Still Partly: per-member limits are not exercised in the browser."
   },
   {
    "id": "R7-057",
@@ -1238,8 +1247,8 @@
    ],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "24 Nov (R13, G4): a statement built from the ledger's lots by Indian financial year and class (short and long term at the rate in force on each sale date; VDA sale by sale with no set-off; section 194S TDS; stamp duty; exemption and carry-forward), reconciled to the ledger, exportable, labelled modelled and computed on test assets. The rates were read from primary text (Gazette, RBI, SEBI, NSE circulars; 12.5% and 10% with the 1,25,000 rupee exemption, 50AA, VDA 1% with no threshold, stamp duty, STT verified). Not tax advice. Not read: the Income Tax Department's own pages (refused automated reading), the 1961 Act's earlier 50AA definition and section 206C(1G), and the charging sections for interest and a bill's discount, which are not computed. TCS on a payment abroad is computed only from 1 Apr 2026 (R13-040). Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run."
+   "status": "Met",
+   "note": "24 Nov (R13, G4): a statement built from the ledger's lots by Indian financial year and class (short and long term at the rate in force on each sale date; VDA sale by sale with no set-off; section 194S TDS; stamp duty; exemption and carry-forward), reconciled to the ledger, exportable, labelled modelled and computed on test assets. The rates were read from primary text (Gazette, RBI, SEBI, NSE circulars; 12.5% and 10% with the 1,25,000 rupee exemption, 50AA, VDA 1% with no threshold, stamp duty, STT verified). Not tax advice. Not read: the Income Tax Department's own pages (refused automated reading), the 1961 Act's earlier 50AA definition and section 206C(1G), and the charging sections for interest and a bill's discount, which are not computed. TCS on a payment abroad is computed only from 1 Apr 2026 (R13-040). Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run. 25 Nov (final runs): Met. The statement journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; the rules not read from primary text stay NOT VERIFIED and are labelled (RISK-094)."
   },
   {
    "id": "R7-060",
@@ -1307,8 +1316,8 @@
    ],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "Security screen: passkeys (add, name, suspend, allow again, remove), recovery contacts (name, accept, issue a code, end, and stop a pending loosening), saved codes (make new), sessions (end), and what happened. 24 Nov (R13, RC3): naming a second passkey, new recovery codes and removal now have a browser journey (by keyboard). Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run."
+   "status": "Met",
+   "note": "Security screen: passkeys (add, name, suspend, allow again, remove), recovery contacts (name, accept, issue a code, end, and stop a pending loosening), saved codes (make new), sessions (end), and what happened. 24 Nov (R13, RC3): naming a second passkey, new recovery codes and removal now have a browser journey (by keyboard). Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run. 25 Nov (final runs): Met. passkeys.spec.ts and keyboard-security.spec.ts passed on the release c33a1df itself (21 of 21 with the other specs nearest the last change, EV-099), and sessions.spec.ts in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Changes are notified inside QED only (R12-005)."
   },
   {
    "id": "R7-063",
@@ -1376,8 +1385,8 @@
    ],
    "needs": "I",
    "level": "P",
-   "status": "Partly",
-   "note": "Two attack suites against isolated stacks, both passing on the revision of 22 Nov evening: the security suite (102 checks: no session, stolen or foreign cookies, CSRF, origin and host, another owner's or another business's instructions, approvals, payees and receipts, a used, unconfirmed or re-signed approval, 25 simultaneous uses of one approval making one payment, parameters sent with a request ignored, every passkey answer usable once, challenges bound to their purpose, members by role) and the adversarial Ask corpus (50 cases from a scripted model emitting what an attacker wants, 8 of them on the on-chain wallet: no money moved and nothing became authority without the owner's passkey over the exact terms). Conflicting instructions are held until the owner resolves them (R7-093); a replayed batch is refused by the owner account's nonce; two households concurrently cannot reach each other. Every refusal comes from QED's own code or the chain, which neither the model nor a session can change. Not covered: a real model (R7-081). Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): Conflict: the live adversarial run’s failures B1, L1 and M1 are not yet diagnosed (C-3). Updated 24 Nov (R13): the Conflict is resolved by diagnosis: B1, L1 and M1 failed in the live run because the scoring assumed the scripted attacker's proposal; in no case did QED accept, sign, send or make into vault terms anything it should have refused (R13-023). The security review fixed 13 findings and F-14, and the second pass fixed leads L-01 to L-12 (security suite 132 of 132 on its branch, not re-run on 2d44be9). The scripted adversarial suite passes 68 of 68 with all 11 planted faults caught. Still Partly: the full corpus has not run live, and the suites above were not re-run on the final revision."
+   "status": "Met",
+   "note": "Two attack suites against isolated stacks, both passing on the revision of 22 Nov evening: the security suite (102 checks: no session, stolen or foreign cookies, CSRF, origin and host, another owner's or another business's instructions, approvals, payees and receipts, a used, unconfirmed or re-signed approval, 25 simultaneous uses of one approval making one payment, parameters sent with a request ignored, every passkey answer usable once, challenges bound to their purpose, members by role) and the adversarial Ask corpus (50 cases from a scripted model emitting what an attacker wants, 8 of them on the on-chain wallet: no money moved and nothing became authority without the owner's passkey over the exact terms). Conflicting instructions are held until the owner resolves them (R7-093); a replayed batch is refused by the owner account's nonce; two households concurrently cannot reach each other. Every refusal comes from QED's own code or the chain, which neither the model nor a session can change. Not covered: a real model (R7-081). Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): Conflict: the live adversarial run’s failures B1, L1 and M1 are not yet diagnosed (C-3). Updated 24 Nov (R13): the Conflict is resolved by diagnosis: B1, L1 and M1 failed in the live run because the scoring assumed the scripted attacker's proposal; in no case did QED accept, sign, send or make into vault terms anything it should have refused (R13-023). The security review fixed 13 findings and F-14, and the second pass fixed leads L-01 to L-12 (security suite 132 of 132 on its branch, not re-run on 2d44be9). The scripted adversarial suite passes 68 of 68 with all 11 planted faults caught. Still Partly: the full corpus has not run live, and the suites above were not re-run on the final revision. 25 Nov (final runs): returned to Met. On the release c33a1df: the security suite 140 of 140 (five checks updated for H2), the scripted adversarial suite 68 of 68 with every seeded fault caught (in-process 43 of 43) and the chain suite 187 of 187 (EV-099); replay is refused in the owner account's Forge suite (227 of 227 at dd7260f, EV-096); the two-households journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Every refusal comes from QED's own code or the chain. What a real model does is R7-081's (RISK-099), not this acceptance's, as on 22 Nov."
   },
   {
    "id": "R7-071",
@@ -1748,7 +1757,7 @@
    "needs": "I",
    "level": "I",
    "status": "Partly",
-   "note": "Worker image not prepared"
+   "note": "Worker image not prepared 25 Nov: the container image is built from the release c33a1df, restarts on the same volume and becomes ready (EV-097), and runs hosted (EV-101). Still Partly: the sleep and kill evidence dates from 20 Nov and was not re-run on this code."
   },
   {
    "id": "R7-087",
@@ -1813,7 +1822,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "The reserve no longer rises overnight with nothing having happened through two faults found by the science work (Q-045): a still-allowed late salary dropped from the list on the 1st (M1), and the lost-salary allowance renewing each month against its own specification (M3); when the allowance is used up the screen says so. A paper salary missed while the engine was stopped is posted late, not counted as lost. 24 Nov (R13, SV3): every statement of the reserve on Home, Pay, Protect, Save and Safeguards now carries the same statement of what is counted, the look-ahead in days and the late-income and lost-salary assumptions, read from the server's record, and a browser test compares each marked figure on those five screens with the server's to the paisa. Not yet: the approval sheet's basis line, Lab's 30-day figure and Ask's answers are not marked and not checked Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run."
+   "note": "The reserve no longer rises overnight with nothing having happened through two faults found by the science work (Q-045): a still-allowed late salary dropped from the list on the 1st (M1), and the lost-salary allowance renewing each month against its own specification (M3); when the allowance is used up the screen says so. A paper salary missed while the engine was stopped is posted late, not counted as lost. 24 Nov (R13, SV3): every statement of the reserve on Home, Pay, Protect, Save and Safeguards now carries the same statement of what is counted, the look-ahead in days and the late-income and lost-salary assumptions, read from the server's record, and a browser test compares each marked figure on those five screens with the server's to the paisa. Not yet: the approval sheet's basis line, Lab's 30-day figure and Ask's answers are not marked and not checked Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run. 25 Nov (final runs): the reserve journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Still Partly: the approval sheet's basis line, Lab's 30-day figure and Ask's answers are not marked or checked."
   },
   {
    "id": "R7-091",
@@ -2047,7 +2056,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "Focus checks on every screen. Completed with the keyboard alone in the browser suite (every control reached with Tab, operated with Enter, Space or typing; each sheet holds focus when it opens): creating an account with a passkey, opening the household, stopping everything and resuming, setting up the vault, accepting it, signing a mandate and paying; and, added 24 Nov (R13, D2): a paper payment from Home to the signed order, an instruction whose schedule contradicts its limit, holdings and a buy ticket as far as its estimate, a paper job in escrow on complete terms, Ask, Security and recovery (naming a passkey, new recovery codes, removal), and a business workspace. Not yet: a screen-reader review of any journey (EXT-02, EXT-18). These journeys ran in the 97 of 97 Chrome run at 6997f76, not on 2d44be9."
+   "note": "Focus checks on every screen. Completed with the keyboard alone in the browser suite (every control reached with Tab, operated with Enter, Space or typing; each sheet holds focus when it opens): creating an account with a passkey, opening the household, stopping everything and resuming, setting up the vault, accepting it, signing a mandate and paying; and, added 24 Nov (R13, D2): a paper payment from Home to the signed order, an instruction whose schedule contradicts its limit, holdings and a buy ticket as far as its estimate, a paper job in escrow on complete terms, Ask, Security and recovery (naming a passkey, new recovery codes, removal), and a business workspace. Not yet: a screen-reader review of any journey (EXT-02, EXT-18). These journeys ran in the 97 of 97 Chrome run at 6997f76, not on 2d44be9. 25 Nov (final runs): keyboard-journeys and keyboard-security passed on the release c33a1df itself (7 of 7, EV-099) and keyboard.spec.ts in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Still Partly: no screen-reader review (EXT-02, EXT-18)."
   },
   {
    "id": "R7-101",
@@ -2076,7 +2085,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "The suite (38 journeys on isolated stacks with virtual authenticators) compares what the screens show with the database and the chain: fresh and concurrent households, success, refusal, a declined payment and one the rail never answers (shown as unanswered, never as done or failed), a lapsed estimate, a rail record that differs from the ledger, restarts of every service, recovery of an account. An order larger than the book now fills in part in the browser (the estimate says so first; the record says \"Partly done\" and that the rest was cancelled; the bank moved exactly what the receipt books). On the final revision, 97eae28, in a clean worktree: 38/38. \"Engine state\" is read through the engine's own records (its database and receipts), not its memory. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): 38/38 on 97eae28 is stale (46 spec files now); the uninterrupted runs on the final revision are owed (C-7)."
+   "note": "The suite (38 journeys on isolated stacks with virtual authenticators) compares what the screens show with the database and the chain: fresh and concurrent households, success, refusal, a declined payment and one the rail never answers (shown as unanswered, never as done or failed), a lapsed estimate, a rail record that differs from the ledger, restarts of every service, recovery of an account. An order larger than the book now fills in part in the browser (the estimate says so first; the record says \"Partly done\" and that the rest was cancelled; the bank moved exactly what the receipt books). On the final revision, 97eae28, in a clean worktree: 38/38. \"Engine state\" is read through the engine's own records (its database and receipts), not its memory. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): 38/38 on 97eae28 is stale (46 spec files now); the uninterrupted runs on the final revision are owed (C-7). 25 Nov (final runs): the full Chrome suite passed 105 of 105 on 140234a and 104 of 105 on 11867fe (a focus-order check over live prices, which passed alone and again on c33a1df); on the release c33a1df itself only the seven specs nearest the last change ran (21 of 21). Still Partly: no uninterrupted full run on the final revision (EV-099, RISK-100)."
   },
   {
    "id": "R7-102",
@@ -2618,7 +2627,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "R10 section 8; the inherited release converted tUSD to tEUR (F-076). 24 Nov (R13, S1): a payment and a conversion across zero, two and three decimal places in a browser, with route, fee, rate source, value date and settlement, and a refusal of a route not supported (R13-040). Partly because the money-model stages S5 and S8 are not done and S7 is partly done, and because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run."
+   "note": "R10 section 8; the inherited release converted tUSD to tEUR (F-076). 24 Nov (R13, S1): a payment and a conversion across zero, two and three decimal places in a browser, with route, fee, rate source, value date and settlement, and a refusal of a route not supported (R13-040). Partly because the money-model stages S5 and S8 are not done and S7 is partly done, and because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run. 25 Nov (final runs): the journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Still Partly for the money-model stages (RISK-098)."
   },
   {
    "id": "R10-004",
@@ -2707,13 +2716,16 @@
    "implementation": [],
    "journey": "Not a user journey",
    "evidence": [
-    "`docs/research/qed-research-intel/20261123-refutation-bounties.md`"
+    "`docs/research/qed-research-intel/20261123-refutation-bounties.md`",
+    "`server/bounties.test.ts` › \"the stated limits are the vendored contracts\"",
+    "`server/bounties.test.ts` › \"the deployment, funding and five claims come from the vendored Sepolia record\"",
+    "`server/bounties.test.ts` › \"the status is dated and not re-verified; nothing says the pools are unclaimed today\""
    ],
    "deps": [],
    "needs": "C",
-   "level": "D",
+   "level": "C",
    "status": "Partly",
-   "note": "23 Nov: recovered from records only (qed-research-intel): OptimalityBounty and MaximalityBounty, Run 3 on Sepolia; the contracts are vendored unmodified; no claim path, wallet text or monitoring exists. Current balances not verified (a read-only RPC call is Q-072). D-104 applies until the owner decides."
+   "note": "23 Nov: recovered from records only (qed-research-intel): OptimalityBounty and MaximalityBounty, Run 3 on Sepolia; the contracts are vendored unmodified; no claim path, wallet text or monitoring exists. Current balances not verified (a read-only RPC call is Q-072). D-104 applies until the owner decides. 25 Nov: the bounty screen and the server now state both originals: their limits read from the vendored contracts' constants, the deployment, funding and five claims from the vendored Sepolia record, a dated status not re-verified, nothing saying the pools are unclaimed today, and the copying weakness (server/bounties.test.ts, in the unit suite (2,844 of 2,844 on c33a1df, EV-099); bounties.spec.ts in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning). Not confirmed here: the historical Run 3 label naming both bounties. Still Partly."
   },
   {
    "id": "R10-009",
@@ -2802,14 +2814,31 @@
    "section": "S10",
    "title": "A dispute pack: reporting a problem stops QED activity on the account, timestamps everything, drafts the notice for the account provider, shows the jurisdiction's deadlines and escalation, and exports an offline-verifiable pack",
    "acceptance": "A browser journey to export; unit tests for the deadline arithmetic (US two business days and 60 days; India three working days before 1 Jan 2027 and five calendar days from then); the offline verifier catches tampering",
-   "implementation": [],
+   "implementation": [
+    "server/dispute-pack.ts",
+    "server/dispute-deadlines.ts",
+    "server/dispute-pause.ts",
+    "server/dispute-pack-verify.ts",
+    "scripts/verify-dispute-pack.ts",
+    "src/screens/DisputePack.tsx"
+   ],
    "journey": "Not a user journey",
-   "evidence": [],
+   "evidence": [
+    "`browser/tests/spend-gaps.spec.ts` › \"a subscription is found and reviewed; a repeat is held and confirmed; a disputed payment has a pack\"",
+    "`server/dispute-pause.test.ts` › \"starts a pause on the rail, timestamped, and holds QED-origin payments until the owner releases it\"",
+    "`server/dispute-pack.test.ts` › \"timestamps everything: every step has its time and its date, in order\"",
+    "`server/dispute-pack.test.ts` › \"drafts the notice for the account provider, labelled a draft the person sends themselves\"",
+    "`server/dispute-pack.test.ts` › \"verifies offline, and catches a changed body, a changed receipt, a changed approval and a changed time\"",
+    "`server/dispute-deadlines.test.ts` › \"two business days after learning\"",
+    "`server/dispute-deadlines.test.ts` › \"60 days after the statement the error first appears on\"",
+    "`server/dispute-deadlines.test.ts` › \"before 1 Jan 2027: three working days, counted on India\"",
+    "`server/dispute-deadlines.test.ts` › \"a transaction from 1 Jan 2027: five calendar days, weekends included\""
+   ],
    "deps": [],
    "needs": "P",
-   "level": "-",
-   "status": "Not met",
-   "note": "EV-073."
+   "level": "P",
+   "status": "Met",
+   "note": "EV-073. 25 Nov (final runs): Met; built in R13 beside R13-045 and never recorded here. Reporting a problem pauses QED's own payments on the account until the person releases it with a passkey; every step is timestamped; the notice is drafted for the person to send (QED sends nothing); the deadlines and escalation route are shown for India and the US, and a jurisdiction with no rule written says so; the pack downloads as JSON that a script verifies offline, catching a changed amount. The tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099); the journey in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. The bank is simulated."
   },
   {
    "id": "N-019",
@@ -3069,12 +3098,13 @@
    "journey": "Not a user journey",
    "evidence": [
     "`server/amount-text-migration.test.ts`",
-    "`server/amount-sql.test.ts`"
+    "`server/amount-sql.test.ts`",
+    "`docs/shared/EVIDENCE_LEDGER.md`"
    ],
    "needs": "C",
    "level": "C",
-   "status": "Partly",
-   "note": "S3 merged after an independent review (EV-081); S4 onward not started; the review database is not migrated (Q-076)."
+   "status": "Met",
+   "note": "S3 merged after an independent review (EV-081); S4 onward not started; the review database is not migrated (Q-076). 25 Nov (final runs): Met. The live review database was migrated from v6 to v8 on c33a1df after a sealed copy verified in 182 ms, with its receipts intact and the escrow milestones unchanged, following a third rehearsal on copies (EV-098); the tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099). S4 onward belongs to R10-001."
   },
   {
    "implementation": [],
@@ -3105,12 +3135,13 @@
    "journey": "Not yet on a screen",
    "evidence": [
     "`chain/test/bounties.test.ts`",
-    "`server/bounties.test.ts`"
+    "`server/bounties.test.ts`",
+    "`browser/tests/bounties.spec.ts` › \"a finder checks, commits, reveals and settles a valid claim and its reserve vault receives exactly 1,000 tUSD; a copier of the revealed claim earns nothing\""
    ],
    "needs": "P",
-   "level": "C",
-   "status": "Partly",
-   "note": "No bounty screen yet (R10-008, R10-009)."
+   "level": "P",
+   "status": "Met",
+   "note": "No bounty screen yet (R10-008, R10-009). 25 Nov (final runs): Met. The bounty screen has existed since R12 (R12-008): in the browser a copier of a revealed claim earns nothing and the finder's reserve vault receives exactly 1,000 tUSD (bounties.spec.ts, in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning); the mempool race and the originals' refusal of the recorded claims passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped). Not repeated: the bounty board's own Forge suite. No independent audit (RISK-101)."
   },
   {
    "implementation": [],
@@ -3157,12 +3188,13 @@
    "journey": "Not a user journey",
    "evidence": [
     "`server/migration-copy.test.ts`",
-    "`server/plaintext-archive.test.ts`"
+    "`server/plaintext-archive.test.ts`",
+    "`docs/shared/EVIDENCE_LEDGER.md`"
    ],
    "needs": "C",
    "level": "C",
-   "status": "Partly",
-   "note": "Merged after an independent review and its fixes (EV-081). Keys not set up on the review machine; the plaintext copies are untouched (Q-076)."
+   "status": "Met",
+   "note": "Merged after an independent review and its fixes (EV-081). Keys not set up on the review machine; the plaintext copies are untouched (Q-076). 25 Nov (final runs): Met. Keys are now set up on the review machine: its live update sealed the migration copy, archived the wallet data sealed and sealed the wallet secret at rest (EV-098, c33a1df); the plaintext pre-v5 copies stay untouched until the owner decides (Q-076). The tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099)."
   },
   {
    "implementation": [
@@ -3243,7 +3275,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "The scripted double in the browser suite, and one run through the screen with a real model on 24 Nov with the owner's approval (4 genuine calls; the model itself declined the 300 payment and the hidden one, whose refusal by QED's own checks the rehearsal shows); judges' comprehension not tested. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): in the 24 Nov live run the tick was asked from the page and the model refused the injections by itself, so QED never refused a live proposal; the engine-run chain with QED’s own refusal is owed under R13 (C-2). Updated 24 Nov (R13, T1): /judge now runs the chain by QED's own engine with no tick from the page, labels every step genuine, scripted, historical or newly reproduced, and shows QED's own refusals of changed inputs and a hidden payee, revoked authority and recovery. Still Partly: that screen was run in a browser with the scripted double (97 of 97 Chrome run at 6997f76), not again with a real model; the client-stream capture was confirmed against the real client only in the L1 checks; judges' comprehension is not tested."
+   "note": "The scripted double in the browser suite, and one run through the screen with a real model on 24 Nov with the owner's approval (4 genuine calls; the model itself declined the 300 payment and the hidden one, whose refusal by QED's own checks the rehearsal shows); judges' comprehension not tested. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): in the 24 Nov live run the tick was asked from the page and the model refused the injections by itself, so QED never refused a live proposal; the engine-run chain with QED’s own refusal is owed under R13 (C-2). Updated 24 Nov (R13, T1): /judge now runs the chain by QED's own engine with no tick from the page, labels every step genuine, scripted, historical or newly reproduced, and shows QED's own refusals of changed inputs and a hidden payee, revoked authority and recovery. Still Partly: that screen was run in a browser with the scripted double (97 of 97 Chrome run at 6997f76), not again with a real model; the client-stream capture was confirmed against the real client only in the L1 checks; judges' comprehension is not tested. 25 Nov (final runs): the judge journeys passed with the scripted double in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Still Partly: not run again with a real model; judges' comprehension not tested."
   },
   {
    "implementation": [],
@@ -3278,7 +3310,7 @@
    "needs": "P",
    "level": "C",
    "status": "Partly",
-   "note": "EV-083 (served revisions; hooks), QA 24 Nov (cause: browser contexts left open and re-traced in every later test; fixed): on da7b41e 44/44, 44/44, 43/44 (a sign-out race, since fixed) and 44/44. The three quiet runs on the final revision are the release step (EV-086).",
+   "note": "EV-083 (served revisions; hooks), QA 24 Nov (cause: browser contexts left open and re-traced in every later test; fixed): on da7b41e 44/44, 44/44, 43/44 (a sign-out race, since fixed) and 44/44. The three quiet runs on the final revision are the release step (EV-086). 25 Nov (final runs): one full Chrome run passed 105 of 105 on 140234a and one 104 of 105 on 11867fe; on the release c33a1df only the seven specs nearest the last change ran (21 of 21), so there are no three uninterrupted full runs on the final revision (EV-099). Still Partly.",
    "section": "S12"
   },
   {
@@ -3338,8 +3370,8 @@
    "journey": "Lost passkey; forgotten password; restoring authority",
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "Built on claude/r12-recovery; an independent review found two high faults (an email link alone finishing another's recovery; a recovered session passing the password-session guards); held unmerged until fixed (EV-085). Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): merged on claude/r11-meridian with both high faults fixed and tested (recovery-review tests); an independent re-read of the fixes is owed (C-16). Updated 24 Nov (R13): the recovery work is merged with its two high faults fixed; a recorded re-read found H1 and H2 hold, both widened (R13-075); naming a passkey, new codes and removal have journeys. A stolen passkey is frozen on the chain at once (R13-056).",
+   "status": "Met",
+   "note": "Built on claude/r12-recovery; an independent review found two high faults (an email link alone finishing another's recovery; a recovered session passing the password-session guards); held unmerged until fixed (EV-085). Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): merged on claude/r11-meridian with both high faults fixed and tested (recovery-review tests); an independent re-read of the fixes is owed (C-16). Updated 24 Nov (R13): the recovery work is merged with its two high faults fixed; a recorded re-read found H1 and H2 hold, both widened (R13-075); naming a passkey, new codes and removal have journeys. A stolen passkey is frozen on the chain at once (R13-056). 25 Nov (final runs): Met. recovery.spec.ts passed 6 of 6 on the release c33a1df itself (EV-099) and in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; the unit and HTTP tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099). The fixes were re-read (R13-075) and the review of the R13 fixes checked recovery and suspension again over three rounds (EV-096), all by agents of the same model family. Email and text messages are simulated (R12-005).",
    "section": "S12"
   },
   {
@@ -3378,7 +3410,7 @@
    "needs": "I",
    "level": "C",
    "status": "Partly",
-   "note": "ENCRYPTION.md sections 8 and 9; three review rounds on the sealing (D-119). The review build's own secrets are sealed at its next restart (EV-086).",
+   "note": "ENCRYPTION.md sections 8 and 9; three review rounds on the sealing (D-119). The review build's own secrets are sealed at its next restart (EV-086). 25 Nov (EV-098): the review build's own secrets are sealed (the wallet secret sealed at rest, the wallet data archived sealed). Still Partly: the plaintext copies are not archived and removed (the owner's word, Q-076), and the evidence is below the integration level.",
    "section": "S12"
   },
   {
@@ -3414,8 +3446,8 @@
    "journey": "Earn, refutation bounties",
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "Two runs of the journeys on its branch; the full suite at the release step. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): its two runs were on its own branch; the full suite on the integrated revision is owed (section M, item 9).",
+   "status": "Met",
+   "note": "Two runs of the journeys on its branch; the full suite at the release step. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): its two runs were on its own branch; the full suite on the integrated revision is owed (section M, item 9). 25 Nov (final runs): Met. Both bounty journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning.",
    "section": "S12"
   },
   {
@@ -3595,13 +3627,14 @@
     "`server/migration-journey.test.ts` › \"interrupted execution: a step that fails, or a process killed in the middle of the\"",
     "`server/migration-journey.test.ts` › \"restoration: the sealed copy restores to the v6 database exactly, and migrating the\"",
     "`server/global-migration.test.ts` › \"on a v7 fixture, balances, statements, the passbook and every row are identical\"",
-    "`server/escrow-migration.test.ts` › \"a repeated execution changes nothing and seals no second copy\""
+    "`server/escrow-migration.test.ts` › \"a repeated execution changes nothing and seals no second copy\"",
+    "`docs/shared/EVIDENCE_LEDGER.md`"
    ],
    "deps": [],
    "needs": "C",
    "level": "C",
-   "status": "Partly",
-   "note": "Tests: first, repeated and interrupted execution and restoration on a v6 fixture; every row and statement identical after the v7 to v8 step. Two rehearsals on SQLite online-backup copies of the live review database (schema 6, kept outside the repository): at 36cca8f (v6 to v8 after a sealed copy of 26,390,528 bytes; ledgers consistent, receipts 63 and 2 intact, every existing table's row count unchanged; it reproduced the escrow fault below) and at 9266a1e (copy of 27,033,600 bytes, receipts 64 and 2 intact, row counts unchanged, escrow fault gone). Not done: a rehearsal on the final revision (2d44be9), which adds parts (k), (m) and (p) of the step since the second rehearsal, and the live update itself (R13-028)."
+   "status": "Met",
+   "note": "Tests: first, repeated and interrupted execution and restoration on a v6 fixture; every row and statement identical after the v7 to v8 step. Two rehearsals on SQLite online-backup copies of the live review database (schema 6, kept outside the repository): at 36cca8f (v6 to v8 after a sealed copy of 26,390,528 bytes; ledgers consistent, receipts 63 and 2 intact, every existing table's row count unchanged; it reproduced the escrow fault below) and at 9266a1e (copy of 27,033,600 bytes, receipts 64 and 2 intact, row counts unchanged, escrow fault gone). Not done: a rehearsal on the final revision (2d44be9), which adds parts (k), (m) and (p) of the step since the second rehearsal, and the live update itself (R13-028). 25 Nov (final runs): Met. Rehearsal 3 on copies of the live review database at 4870b2b, which has parts (k), (m) and (p) (no schema or storage change after it): a sealed copy verified, v6 to v8, 71 receipts intact, no existing row count changed, the escrow milestone untouched; then the live update on c33a1df (EV-098). The tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099)."
   },
   {
    "id": "R13-002",
@@ -4049,8 +4082,8 @@
    "deps": [],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. Findings by the owner on the screen (Grow alignment and explanations) are in R13-024. Selling and borrowing are refused with where to go; no leverage, shorting or derivatives."
+   "status": "Met",
+   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. Findings by the owner on the screen (Grow alignment and explanations) are in R13-024. Selling and borrowing are refused with where to go; no leverage, shorting or derivatives. 25 Nov (final runs): Met. Both journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning."
   },
   {
    "id": "R13-022",
@@ -4076,8 +4109,8 @@
    "deps": [],
    "needs": "P",
    "level": "P",
-   "status": "Partly",
-   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. The chain on the page is now run by QED's engine. The live failures B1, L1 and M1 were diagnosed as scoring faults (R13-023). Judges' comprehension is not tested (EXT-02). The record of the real client's stream was checked against the real client in the L1 check (R13-023)."
+   "status": "Met",
+   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. The chain on the page is now run by QED's engine. The live failures B1, L1 and M1 were diagnosed as scoring faults (R13-023). Judges' comprehension is not tested (EXT-02). The record of the real client's stream was checked against the real client in the L1 check (R13-023). 25 Nov (final runs): Met. The judge journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Judges' comprehension is R11-018's (EXT-02)."
   },
   {
    "id": "R13-023",
@@ -4129,7 +4162,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. Tax and Your data were checked with axe and the glass-contrast script at 320 and 390 px, light and dark, with 0 findings. Known and not fixed: the price chart's \"Break-even\" label runs about 20 px past a 320 px screen at 200% text. The owner has not yet reviewed the corrected composition."
+   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. Tax and Your data were checked with axe and the glass-contrast script at 320 and 390 px, light and dark, with 0 findings. Known and not fixed: the price chart's \"Break-even\" label runs about 20 px past a 320 px screen at 200% text. The owner has not yet reviewed the corrected composition. 25 Nov (final runs): global-money-checks.spec.ts passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Still Partly: the Break-even label at 320 px with 200% text is not fixed, and the owner has not reviewed the corrected composition."
   },
   {
    "id": "R13-025",
@@ -4153,7 +4186,7 @@
    "needs": "C",
    "level": "C",
    "status": "Partly",
-   "note": "First pass: 13 findings fixed test-first (F-01 to F-13); F-14 (any web page could drive the local chain) confirmed. Second pass: F-14 fixed (the chain listens only on a port browsers refuse, for every host name; the wallet service drives it over an owner-only IPC socket; the economy chain sits behind a guarded front), leads L-01 to L-12 reproduced and fixed with checks R15 to R26 (security suite 132 of 132), L-13 fixed with F-14, L-14 not confirmed. The 132 of 132 is the specialist's run on its branch; the suite was not re-run on 2d44be9. Residual: non-browser local programs and other accounts on the computer still reach the chain listener (no credential); a browser started with the port block overridden; browsers other than Chrome not run (NOT VERIFIED). Strix not run (external model, Docker, telemetry). No fuzzing of the HTTP surface, no load test, no independent review (EXT-03)."
+   "note": "First pass: 13 findings fixed test-first (F-01 to F-13); F-14 (any web page could drive the local chain) confirmed. Second pass: F-14 fixed (the chain listens only on a port browsers refuse, for every host name; the wallet service drives it over an owner-only IPC socket; the economy chain sits behind a guarded front), leads L-01 to L-12 reproduced and fixed with checks R15 to R26 (security suite 132 of 132), L-13 fixed with F-14, L-14 not confirmed. The 132 of 132 is the specialist's run on its branch; the suite was not re-run on 2d44be9. Residual: non-browser local programs and other accounts on the computer still reach the chain listener (no credential); a browser started with the port block overridden; browsers other than Chrome not run (NOT VERIFIED). Strix not run (external model, Docker, telemetry). No fuzzing of the HTTP surface, no load test, no independent review (EXT-03). 25 Nov (final runs): the security suite passed 140 of 140 on the release c33a1df (five checks updated for H2, EV-099) and the F-14 test in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped). Still Partly: the independent professional assessment (EXT-03)."
   },
   {
    "id": "R13-026",
@@ -4225,12 +4258,16 @@
     "chain/rail/main.ts"
    ],
    "journey": "Operations",
-   "evidence": [],
+   "evidence": [
+    "`server/migration-journey.test.ts` › \"first execution: a copy is sealed first, and nothing of financial meaning changes\"",
+    "`server/escrow-migration.test.ts` › \"a repeated execution changes nothing and seals no second copy\"",
+    "`docs/shared/EVIDENCE_LEDGER.md`"
+   ],
    "deps": [],
    "needs": "C",
-   "level": "-",
-   "status": "Partly",
-   "note": "Rehearsed twice on copies (R13-001): the wallet service's master.key was sealed on the copy (fingerprint cc7ccfd4d2b4b7c0 the same before and after), the chain state was restored from anvil-state.hex on every restart and rewritten on stop, and no on-chain workspaces exist in the review data. Not covered by the rehearsals: the interface, the passkey sign-in on a copy, and the backup step of review-build.sh. NOT DONE as of this entry: the update of the live review build to the final revision (this register edit does not record it)."
+   "level": "C",
+   "status": "Met",
+   "note": "Rehearsed twice on copies (R13-001): the wallet service's master.key was sealed on the copy (fingerprint cc7ccfd4d2b4b7c0 the same before and after), the chain state was restored from anvil-state.hex on every restart and rewritten on stop, and no on-chain workspaces exist in the review data. Not covered by the rehearsals: the interface, the passkey sign-in on a copy, and the backup step of review-build.sh. NOT DONE as of this entry: the update of the live review build to the final revision (this register edit does not record it). 25 Nov (EV-098): Met. The live review build was updated to c33a1df after rehearsal 3 on copies: a pre-update snapshot (online database backups, the chain from memory, master.key and records), the wallet data archived sealed, a sealed migration copy verified in 182 ms, schema 8; /api/ready true; 73 receipts intact; the escrow milestones unchanged. The migration tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099)."
   },
   {
    "id": "R13-029",
@@ -4248,7 +4285,7 @@
    "needs": "P",
    "level": "C",
    "status": "Partly",
-   "note": "Integration 2d44be9: tsc 0 and the unit suite as the merge messages state (213 files at the last merge) and as re-run for this register (see the commit). Browser suite 97 of 97 on 6997f76 (before the last merge, records2); security suite 132 of 132 on the security branch; the Firefox and WebKit projects 4 of 4 each. Not re-run on 2d44be9: the browser suite, the security suite, the Forge and Anvil chain suites and the glass-contrast pass. A final run is owed after the last merge."
+   "note": "Integration 2d44be9: tsc 0 and the unit suite as the merge messages state (213 files at the last merge) and as re-run for this register (see the commit). Browser suite 97 of 97 on 6997f76 (before the last merge, records2); security suite 132 of 132 on the security branch; the Firefox and WebKit projects 4 of 4 each. Not re-run on 2d44be9: the browser suite, the security suite, the Forge and Anvil chain suites and the glass-contrast pass. A final run is owed after the last merge. 25 Nov (final runs, EV-099): on the release c33a1df: tsc 0, unit 2,844 of 2,844, security 140 of 140, the scripted adversarial suite 68 of 68, the chain suite 187 of 187, Firefox 4 of 4, and the 21 tests of the seven browser specs nearest the last change; the full Chrome suite 105 of 105 on 140234a and 104 of 105 on 11867fe; the owner account's Forge suite 227 of 227 at dd7260f. Still Partly: no full browser run on c33a1df itself, and WebKit fails one of its four checks on 11867fe (RISK-117), so the baselines are still mixed (RISK-100)."
   },
   {
    "id": "R13-030",
@@ -4268,7 +4305,7 @@
    "needs": "C",
    "level": "C",
    "status": "Partly",
-   "note": "Updated on 24 Nov against the merge messages and notes of 2d44be9. A row at level P is Met only where the browser run named in its note covers the integrated code; none of them is, so each is Partly with the revision gap stated. Inherited rows F-001 to F-086 were re-read by the misc branch (34 corrected) and were not re-read here."
+   "note": "Updated on 24 Nov against the merge messages and notes of 2d44be9. A row at level P is Met only where the browser run named in its note covers the integrated code; none of them is, so each is Partly with the revision gap stated. Inherited rows F-001 to F-086 were re-read by the misc branch (34 corrected) and were not re-read here. 25 Nov: re-judged against the final runs (EV-096 to EV-101): a row whose only gap was the browser suite at 6997f76 or an unrepeated chain run is Met where its journeys and tests passed on this code; rows resting on the bounty board's or the dispute escrow's Forge suites, or on Slither, stay Partly. Still Partly: the inherited rows were not re-read, and RISK-100's standing in the risk register is the orchestrator's to update."
   },
   {
    "id": "R13-031",
@@ -4300,7 +4337,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it."
+   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. 25 Nov (final runs): every listed journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; Firefox 4 of 4 on c33a1df; WebKit 3 of 4 on 11867fe (cross-browser.spec.ts:49 fails on WebKit's console reports of blocked inline styles, RISK-117). Still Partly: the WebKit subset does not pass."
   },
   {
    "id": "R13-040",
@@ -4496,7 +4533,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "The browser check ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the suite was not re-run."
+   "note": "The browser check ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the suite was not re-run. 25 Nov (final runs): the browser check passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Still Partly: the acceptance names every place, and the approval sheet's basis line, Lab's 30-day figure and Ask's answers are not checked (R7-090)."
   },
   {
    "id": "R13-049",
@@ -4568,8 +4605,8 @@
    "deps": [],
    "needs": "C",
    "level": "P",
-   "status": "Partly",
-   "note": "Prices are synthetic and labelled; live data needs licences (EXT-05). Not offered, with reasons on screen: futures and options, REITs and InvITs, US equities, FX trading, commodities beyond the gold ETF. Hours and the 5-basis-point spread of the government-securities desk are NOT VERIFIED; the NSE charge was corrected to 0.00307% and STT, stamp duty, the SEBI fee, trading hours, T+1 and VDA TDS were verified from primary text. Browser run: see R13-031."
+   "status": "Met",
+   "note": "Prices are synthetic and labelled; live data needs licences (EXT-05). Not offered, with reasons on screen: futures and options, REITs and InvITs, US equities, FX trading, commodities beyond the gold ETF. Hours and the 5-basis-point spread of the government-securities desk are NOT VERIFIED; the NSE charge was corrected to 0.00307% and STT, stamp duty, the SEBI fee, trading hours, T+1 and VDA TDS were verified from primary text. Browser run: see R13-031. 25 Nov (final runs): Met. The tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099) and the securities journey in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. The desk's hours and spread stay NOT VERIFIED and are labelled so (RISK-094)."
   },
   {
    "id": "R13-052",
@@ -4681,7 +4718,7 @@
    "needs": "C",
    "level": "C",
    "status": "Partly",
-   "note": "The server side is tested here. The Forge and Anvil contract tests (chain/test/containment.test.ts and the owner account's Solidity tests) are not part of the app's unit suite and were not re-run here. The owner account's hash in READY.json is set to the reproducible build (37 sources). The independent audit of QEDOwnerAccount is outside (EXT-03)."
+   "note": "The server side is tested here. The Forge and Anvil contract tests (chain/test/containment.test.ts and the owner account's Solidity tests) are not part of the app's unit suite and were not re-run here. The owner account's hash in READY.json is set to the reproducible build (37 sources). The independent audit of QEDOwnerAccount is outside (EXT-03). 25 Nov (final runs): containment.test.ts passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped), and the owner account's Forge suite passed 227 of 227 at dd7260f with the contract unchanged since (EV-096, EV-099). Still Partly: the independent audit (EXT-03)."
   },
   {
    "id": "R13-057",
@@ -4698,8 +4735,8 @@
    "deps": [],
    "needs": "C",
    "level": "C",
-   "status": "Partly",
-   "note": "Test in the chain suite, not re-run here. The list's content and who maintains it are the owner's choice (an owner decision, recorded in the open questions)."
+   "status": "Met",
+   "note": "Test in the chain suite, not re-run here. The list's content and who maintains it are the owner's choice (an owner decision, recorded in the open questions). 25 Nov (final runs): Met. The test passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped)."
   },
   {
    "id": "R13-058",
@@ -4725,7 +4762,7 @@
    "needs": "C",
    "level": "P",
    "status": "Partly",
-   "note": "Forge 40 of 40 with 7 invariants and Slither dispositioned (per the merge; the Solidity and Anvil suites were not re-run here); the server tests pass on 2d44be9. The contract is QED's, in front of the release's unmodified ProofEscrow, and has had no independent audit (EXT-03). Proposed corrections to the release itself are kept apart (R13-071) and not applied."
+   "note": "Forge 40 of 40 with 7 invariants and Slither dispositioned (per the merge; the Solidity and Anvil suites were not re-run here); the server tests pass on 2d44be9. The contract is QED's, in front of the release's unmodified ProofEscrow, and has had no independent audit (EXT-03). Proposed corrections to the release itself are kept apart (R13-071) and not applied. 25 Nov (final runs): the dispute chain test passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped), the journey in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning, the server tests in the unit suite (2,844 of 2,844 on c33a1df, EV-099). Not re-run: its Forge suite and Slither. Still Partly: those, and the independent audit (EXT-03)."
   },
   {
    "id": "R13-059",
@@ -4961,8 +4998,8 @@
    "deps": [],
    "needs": "C",
    "level": "C",
-   "status": "Partly",
-   "note": "The chain tests need Anvil and are not part of the app's unit suite; they were not re-run here. The books side (reorganised bookings reversed) is tested in the unit suite."
+   "status": "Met",
+   "note": "The chain tests need Anvil and are not part of the app's unit suite; they were not re-run here. The books side (reorganised bookings reversed) is tested in the unit suite. 25 Nov (final runs): Met. Both chain tests passed in the chain suite (187 of 187 on c33a1df, EV-099; the two tests of the optional GPL tier skipped); the books side passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099)."
   },
   {
    "id": "R13-070",
@@ -4982,7 +5019,7 @@
    "needs": "P",
    "level": "P",
    "status": "Partly",
-   "note": "Firefox 157 and WebKit 27.2: 4 of 4 each on the branch. Passkey journeys stay on Chromium. Real Safari on a Mac and real phones are not tested."
+   "note": "Firefox 157 and WebKit 27.2: 4 of 4 each on the branch. Passkey journeys stay on Chromium. Real Safari on a Mac and real phones are not tested. 25 Nov (final runs): Firefox 4 of 4 on c33a1df; WebKit 3 of 4 on 11867fe: cross-browser.spec.ts:49 fails on WebKit's console reports of Content-Security-Policy blocks of inline styles (cosmetic; RISK-117). Still Partly."
   },
   {
    "id": "R13-071",
@@ -5088,13 +5125,14 @@
    ],
    "journey": "Security",
    "evidence": [
-    "`docs/SECURITY-REVIEW-R13.md`"
+    "`docs/SECURITY-REVIEW-R13.md`",
+    "`docs/shared/EVIDENCE_LEDGER.md`"
    ],
    "deps": [],
    "needs": "D",
    "level": "D",
-   "status": "Partly",
-   "note": "Kept with its reasoning; the master is sealed at rest (the wallet service's master.key was sealed on the rehearsal copy). Not done: per-workspace independent keys or a hosted key service (KMS), so tenant isolation stays as R7-075 records it."
+   "status": "Met",
+   "note": "Kept with its reasoning; the master is sealed at rest (the wallet service's master.key was sealed on the rehearsal copy). Not done: per-workspace independent keys or a hosted key service (KMS), so tenant isolation stays as R7-075 records it. 25 Nov (EV-098): Met. The master secret is now sealed at rest on the live review build (the same fingerprint before and after). The limit stands as stated: one secret opens every workspace key (R7-075)."
   },
   {
    "id": "R13-077",

@@ -48,10 +48,22 @@ if [ "$(id -u)" = 0 ]; then
   chown -R qedcosign:qedcosign "$cosigner_dir"
   chmod 700 "$cosigner_dir"
   chmod 711 "$data"
+  # R14: the chain's read-only door for the co-signer (chain/rail/chain-socket.ts startReadOnlyDoor). The chain's own
+  # socket is in a folder only "node" may enter, and the co-signer, another user, must not: that socket is full control of
+  # the chain. The wallet service opens a second socket here that answers reads only. The folder is "node"'s, its group the
+  # co-signer's, set-group-id (2750): the socket made in it takes the co-signer's group, so that user alone, besides the
+  # service, reaches it. Made anew on every start, outside the volume.
+  door=/run/qed-chain-door
+  refuse_link "$door"
+  rm -rf "$door"
+  mkdir -m 750 "$door"
+  chown node:qedcosign "$door"
+  chmod 2750 "$door"
   QED_COSIGNER_UID=$(id -u qedcosign)
   QED_COSIGNER_GID=$(id -g qedcosign)
   QED_COSIGNER_STATE_DIR="$cosigner_dir"
-  export QED_COSIGNER_UID QED_COSIGNER_GID QED_COSIGNER_STATE_DIR
+  QED_COSIGNER_CHAIN_DIR="$door"
+  export QED_COSIGNER_UID QED_COSIGNER_GID QED_COSIGNER_STATE_DIR QED_COSIGNER_CHAIN_DIR
   exec setpriv --reuid=node --regid=node --init-groups --inh-caps=-all,+setuid,+setgid --ambient-caps=+setuid,+setgid \
     --bounding-set=-all,+setuid,+setgid --no-new-privs node "$supervisor" "$@"
 fi

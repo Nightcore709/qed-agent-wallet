@@ -3,16 +3,25 @@
  * key; held in memory while the disk cannot be written and written, with their own times, when it can.
  * QED_SEED_FAIL=1 makes the last test fail on purpose.
  */
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { openDb } from './core.ts'
 import { flushHeld, heldCount, incidentOpen, incidentsView, noteIncident, openIncident, probeStorage, resolveIncident, storageErrorKind } from './incidents.ts'
+import { testKeys } from './key-fixture.ts'
 import { toSchemaV7 } from './schema-fixture.ts'
 
 const T = 1_800_000_000_000
 const tmp = () => mkdtempSync(join(tmpdir(), 'qed-incidents-'))
+// Opening a v7 file migrates it, and every migration of a file first seals a copy under the migration-copy key, an empty
+// database's too (migration-copy.ts): scratch keys, in a folder of their own (a key may not lie in the database's folder),
+// as the other migration suites have. Without them this test used the keys in ~/.qed/keys (the owner's, on the owner's
+// computer), and where there are none (a fresh GitHub runner) the migration was refused, key_missing.
+const keys = testKeys(mkdtempSync(join(tmpdir(), 'qed-incidents-keys-')))
+const keyDirBefore = process.env.QED_KEY_DIR
+beforeAll(() => { process.env.QED_KEY_DIR = keys.dir })
+afterAll(() => { if (keyDirBefore === undefined) delete process.env.QED_KEY_DIR; else process.env.QED_KEY_DIR = keyDirBefore; rmSync(dirname(keys.dir), { recursive: true, force: true }) })
 
 describe('the incident log', () => {
   it('records opened, events, what was affected, resolved and when; one open incident per key', () => {
@@ -92,7 +101,7 @@ describe('the incident log', () => {
       const path = join(dir, 'qed.db')
       openDb(path).close()
       toSchemaV7(path)
-      const v7 = openDb(path)   // migrates back up (a sealed copy is not needed for an empty database)
+      const v7 = openDb(path)   // migrates back up, after sealing a copy under the scratch migration-copy key
       expect(v7.all<{ name: string }>(`SELECT name FROM sqlite_master WHERE name IN ('incidents', 'incident_events')`).map((r) => r.name).sort()).toEqual(['incident_events', 'incidents'])
       v7.close()
     } finally { rmSync(dir, { recursive: true, force: true }) }

@@ -5,7 +5,7 @@
  * (`/data/review-account.json`, `/data/qed.db`); vite.config.ts now refuses the folder. This starts a dev server
  * with the project's own config and asks for a file placed in data/ by every path that reached it.
  */
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createServer, type ViteDevServer } from 'vite'
 import { afterAll, beforeAll, expect, it } from 'vitest'
@@ -41,7 +41,7 @@ const get = async (path: string): Promise<{ status: number; body: string }> => {
   return { status: r.status, body: await r.text() }
 }
 
-it('refuses a file in data/ by its path, by /@fs/, encoded, with a query and in another case', async () => {
+it('refuses a file in data/ by its path, by /@fs/, encoded and with a query', async () => {
   expect(base).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/)
   for (const path of [
     `/data/${probeName}`,
@@ -49,12 +49,22 @@ it('refuses a file in data/ by its path, by /@fs/, encoded, with a query and in 
     `/%64ata/${probeName}`,
     `/data/${probeName}?raw`,
     `/data/${probeName}?import`,
-    `/DATA/${probeName}`,
   ]) {
     const r = await get(path)
     expect(r.body, path).not.toContain('must not be served')
     expect(r.status, path).toBe(403)
   }
+})
+
+// /DATA/ names data/ itself only where the volume ignores letter case (macOS's default APFS): there it is refused like
+// /data/. On a case-sensitive volume (Linux's ext4, as on GitHub's ubuntu-24.04 runner) it names a folder that does not
+// exist, and the server answers 200 with the app page, as for any unknown address; the body shows no file was served.
+it('in another case: refused where the volume finds data/ by that name; elsewhere the app page, never the file', async () => {
+  const path = `/DATA/${probeName}`
+  const r = await get(path)
+  expect(r.body, path).not.toContain('must not be served')
+  if (existsSync(join(app, 'DATA', probeName))) expect(r.status, path).toBe(403)
+  else expect(r.body, path).toContain('<div id="root">')
 })
 
 it('a doubled slash gets the app page, not the file', async () => {

@@ -23,11 +23,24 @@ type J = Record<string, any>
 // A port of its own for each run: suites in other worktrees run the same files at the same time (a fixed port let one run's
 // requests reach another's server). Was 9413.
 const PORT = 20000 + Math.floor(Math.random() * 20000)
+// The API thread's time budget (server/guard.ts, lead L-14) is kept per address in memory for the server's life, and every
+// request here comes from 127.0.0.1, so with the default (20 s a minute) the whole file shared one budget: on a slower
+// machine (GitHub's ubuntu-24.04 runner) the tests before M4 used it up, M4 met 429 too_costly before too_many, and the
+// tests after it failed in the same minute. This file tests the password routes' own limits, not that throttle
+// (server/guard.test.ts does), so this isolated test stack's budget is set above what one thread can spend in a minute
+// (QED_TEST_STACK=1 allows raising it, guard.ts costBudget): however slow the machine, it is never reached. Both
+// variables are set only while startApi reads the budget, so no other part of the server sees them.
+const COST_BUDGET_ENV = { QED_TEST_STACK: '1', QED_COST_MS_PER_MINUTE: String(10 * 60_000) }
+function withEnv<T>(vars: Record<string, string>, fn: () => T): T {
+  const was = Object.fromEntries(Object.keys(vars).map((k) => [k, process.env[k]]))
+  Object.assign(process.env, vars)
+  try { return fn() } finally { for (const [k, v] of Object.entries(was)) if (v === undefined) delete process.env[k]; else process.env[k] = v }
+}
 
 describe('changing and removing a password', () => {
   const dir = mkdtempSync(join(tmpdir(), 'qed-password-change-'))
   let api: ReturnType<typeof startApi>
-  beforeAll(() => { api = startApi(loadConfig({ QED_DB: join(dir, 'qed.db'), QED_API_PORT: String(PORT) })) })
+  beforeAll(() => { api = withEnv(COST_BUDGET_ENV, () => startApi(loadConfig({ QED_DB: join(dir, 'qed.db'), QED_API_PORT: String(PORT) }))) })
   afterAll(() => { api.close(); rmSync(dir, { recursive: true, force: true }) })
   // Every test comes from 127.0.0.1: the per-address limits (and sign-up's and sign-in's) start afresh for each, so one
   // test's calls never end another's. The limits stay in the product; the tests that are about them set them up.

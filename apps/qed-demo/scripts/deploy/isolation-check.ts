@@ -1,7 +1,9 @@
 /**
  * R13 review fix F3: the deployed image's process isolation, checked from inside the running container (Linux only).
  *
- *   docker exec <container> node scripts/deploy/isolation-check.ts
+ *   docker exec --privileged <container> node scripts/deploy/isolation-check.ts
+ *
+ * (--privileged: reading another user's /proc/<pid>/environ needs it; without it check 3 fails closed with "unreadable".)
  *
  * Prints PASS or FAIL for each check and exits non-zero if any fails (or if it cannot run them):
  *   1. the co-signer runs as another user than the wallet service, not root, with no capability and no way to gain one;
@@ -10,6 +12,12 @@
  *   3. no process under process 1 holds QED_KEK in its /proc/<pid>/environ: neither the name nor the key itself;
  *   4. the co-signer still signs: the wallet service's /cosigner/self-test returns a signature by the co-signer's key, made
  *      by the co-signer's own process.
+ *   5. (R14) the co-signer's user cannot open the chain's own socket, which is full control of the chain; the read-only
+ *      door it is given answers a read and refuses a call that would change the chain.
+ * And one LIMIT line, not counted as a check while the limit stands (RISK-114): whether the co-signer's user reaches
+ * Anvil's loopback TCP listener, which has no credential. It does in this image, so the door is the only path the
+ * co-signer is given and uses, not a confinement. A chain with no TCP listener, or in its own network namespace, makes
+ * that line a PASS.
  * Needs root (docker exec's default user in this image) to read every process's /proc entries; it changes nothing.
  * Processes started by `docker exec` (this one included) are not under process 1 and are not scanned: they carry
  * whatever environment the exec gives them.
@@ -133,7 +141,40 @@ async function main(): Promise<number> {
     check('co-signer signs', false, e instanceof Error ? e.message : String(e))
   }
 
+  // 5. (R14) the chain: its own socket closed to the co-signer's user, its read-only door open to it, for reads only;
+  // and the LIMIT: Anvil's loopback TCP listener, which this image does not close to any local user (RISK-114)
+  const limits: string[] = []
+  try {
+    const endpoint = JSON.parse(readFileSync(join(railData, 'rail', 'anvil.endpoint.json'), 'utf8')) as { socket?: string; url?: string }
+    const door = join(wenv.get('QED_COSIGNER_CHAIN_DIR') ?? '/run/qed-chain-door', 'chain.sock')
+    const asked = spawnSync(process.execPath, ['-e', `
+      const net = require('node:net'); const [own, door, url] = JSON.parse(process.argv[1]); const out = {};
+      const tcp = (url) => new Promise((done) => { if (!url) return done({ error: 'no address' }); const u = new URL(url); const s = net.connect(Number(u.port), u.hostname); let b = ''; const end = (v) => { s.destroy(); done(v) };
+        const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_blockNumber', params: [] });
+        s.on('error', (e) => end({ error: e.code })); s.on('connect', () => s.write('POST / HTTP/1.1\\r\\nHost: ' + u.host + '\\r\\nContent-Type: application/json\\r\\nContent-Length: ' + Buffer.byteLength(body) + '\\r\\nConnection: close\\r\\n\\r\\n' + body));
+        s.on('data', (d) => { b += d }); s.on('end', () => end({ answered: /"result":"0x[0-9a-f]+"/.test(b) })); setTimeout(() => end({ error: 'timeout' }), 5000) });
+      const ask = (path, lines) => new Promise((done) => { const s = net.connect(path); let b = ''; const end = (v) => { s.destroy(); done(v) };
+        s.on('error', (e) => end({ error: e.code })); s.on('connect', () => s.write(lines.map((l) => JSON.stringify(l) + '\\n').join('')));
+        s.on('data', (d) => { b += d; const got = b.split('\\n').filter(Boolean); if (got.length >= lines.length) end({ answers: got.map((x) => JSON.parse(x)) }) }); setTimeout(() => end({ error: 'timeout' }), 5000) });
+      (async () => {
+        out.own = await ask(own, [{ jsonrpc: '2.0', id: 1, method: 'eth_blockNumber', params: [] }]);
+        out.door = await ask(door, [{ jsonrpc: '2.0', id: 1, method: 'eth_blockNumber', params: [] }, { jsonrpc: '2.0', id: 2, method: 'anvil_setBalance', params: ['0x0000000000000000000000000000000000000001', '0x1'] }]);
+        out.tcp = await tcp(url);
+        process.stdout.write(JSON.stringify(out)) })()`, JSON.stringify([endpoint.socket ?? '', door, endpoint.url ?? ''])], { uid: co.uid, gid: co.gid, encoding: 'utf8', timeout: 20_000 })
+    const got = JSON.parse(asked.stdout || '{}') as { own?: { error?: string; answers?: unknown[] }; door?: { error?: string; answers?: { id: number; result?: string; error?: { code: number } }[] }; tcp?: { error?: string; answered?: boolean } }
+    // a read (eth_blockNumber) only: the probe changes nothing on the chain
+    if (got.tcp?.answered) limits.push(`the co-signer's user reaches the chain's loopback TCP listener (${endpoint.url}), which answered a read and asks for no credential: the read-only door is the only path the co-signer is given and uses, not a confinement (RISK-114)`)
+    else check('co-signer cannot reach the chain\'s TCP listener', got.tcp?.error === 'ECONNREFUSED' || got.tcp?.answered === false, !got.tcp ? 'the probe did not run' : `the listener ${got.tcp.error ? `refused with ${got.tcp.error}` : 'did not answer a read'}`)
+    check('co-signer cannot open the chain\'s own socket', got.own?.error === 'EACCES' || got.own?.error === 'EPERM', got.own?.answers ? 'it was answered there' : `refused with ${got.own?.error ?? 'nothing (the probe did not run)'}`)
+    const read = got.door?.answers?.find((x) => x.id === 1), write = got.door?.answers?.find((x) => x.id === 2)
+    check('co-signer reads the chain by its read-only door', typeof read?.result === 'string' && /^0x[0-9a-f]+$/.test(read.result), got.door?.error ? `the door refused the connection with ${got.door.error}` : `eth_blockNumber answered ${read?.result ?? 'nothing'}`)
+    check('the read-only door refuses a call that would change the chain', write?.error?.code === -32601 && write.result === undefined, write ? `anvil_setBalance: ${write.error ? `refused (${write.error.code})` : 'ANSWERED'}` : 'no answer')
+  } catch (e) {
+    check('the chain\'s read-only door', false, e instanceof Error ? e.message : String(e))
+  }
+
   for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'} ${r.name}: ${r.detail}`)
+  for (const l of limits) console.log(`LIMIT ${l}`)
   const failed = results.filter((r) => !r.ok).length
   console.log(failed ? `${failed} of ${results.length} checks failed` : `all ${results.length} checks passed`)
   return failed ? 1 : 0
