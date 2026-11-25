@@ -520,7 +520,7 @@ function Position({ jobs, chain }: { jobs: Job[]; chain: ChainView | null }) {
   const label = `Work on paper at true scale: ${fmt.inr(s.paid, true)} paid to you, ${fmt.inr(s.you, true)} held waiting on your move, ${fmt.inr(s.them, true)} held waiting on the client${s.disputed ? `, ${fmt.inr(s.disputed, true)} held and disputed` : ''}${s.back ? `, ${fmt.inr(s.back, true)} back to the client` : ''}: ${fmt.inr(total, true)} in all, of which ${fmt.inr(held, true)} is held in escrow.`
   return (
     <section className="panel er-position" aria-labelledby="er-pos-h">
-      <div className={`er-pos-main ${total ? '' : 'er-pos-solo'}`}>
+      <div className="er-pos-main">
         <div className="er-pos-fig">
           <div className="er-pos-head"><h2 id="er-pos-h">Held in escrow for you</h2><span className="small faint">Practice money, on paper</span></div>
           <p className={`er-hero ${held ? '' : 'none'}`} data-resolve=""><Rupees paise={held} /></p>
@@ -546,7 +546,14 @@ function Position({ jobs, chain }: { jobs: Job[]; chain: ChainView | null }) {
             <div className="tile"><p className="k"><i className="er-sw them" aria-hidden="true" />Waits on the client</p><p className="v">{fmt.inr(s.them + s.disputed, true)}</p><p className="s">{s.disputed ? <><i className="er-sw disputed" aria-hidden="true" />{fmt.inr(s.disputed, true)} of it disputed</> : s.themN ? 'Delivered; the client, played by you, decides, or the job\'s terms do when the review ends' : 'Nothing delivered is waiting'}</p></div>
             <div className="tile"><p className="k"><i className="er-sw back" aria-hidden="true" />Back to the client</p><p className="v">{fmt.inr(s.back, true)}</p><p className="s">{s.back ? 'Returned from escrow; never yours' : 'Nothing returned'}</p></div>
           </div>
-        ) : null}
+        ) : (
+          <ol className="er-how" aria-label="How paid work runs here">
+            <li><b>You and the client agree the terms.</b> Each deadline, and what happens when it passes, is written in them first.</li>
+            <li><b>The client puts the money in escrow.</b> It is held, not yours yet. On paper, QED keeps the record; you play the client too.</li>
+            <li><b>You deliver and the client accepts, or disputes.</b> A dispute is decided by a simulated mediator.</li>
+            <li><b>The money is released to you, or goes back.</b> Each step is yours to take.</li>
+          </ol>
+        )}
       </div>
       {onChain.length ? <p className="er-pos-chain small">In test rupees, through the escrow on the chain{chain?.reachable === false ? ', as last read (its service is not answering)' : ''}: {listed(onChain)}. <a href="#cw-h">See that work</a></p> : null}
     </section>

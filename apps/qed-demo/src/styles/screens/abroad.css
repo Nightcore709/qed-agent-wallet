@@ -19,21 +19,37 @@
 .ccy-src ul { margin: var(--s2) 0 0; padding-left: 1.1em; display: grid; gap: 4px; }
 /* on a phone the balance goes under the currency's name, so the name keeps its width */
 .ccy { container-type: inline-size; }
+/* R14: in a wide panel (Save) the total leads on the left and the rows run beside it; stacked wherever it is narrower (Home's column, a phone) */
+@container (min-width: 760px) {
+  .ccy-body { display: grid; grid-template-columns: minmax(220px, 3fr) minmax(0, 9fr); gap: var(--s6); align-items: start; }
+  .ccy-body .ccy-total { margin-bottom: 0; }
+}
 @container (max-width: 440px) {
   .ccy-row { grid-template-columns: 3.4em minmax(0, 1fr); }
   .ccy-bal { grid-column: 2; text-align: start; }
 }
 
-/* Save: the three panels of this part in two independent columns, one on a phone */
-.ccy-save { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
-.ccy-save > .ccy { grid-column: 1; grid-row: 1 / span 2; }
-@media (max-width: 900px) { .ccy-save { grid-template-columns: minmax(0, 1fr); } .ccy-save > .ccy { grid-row: auto; } }
+/* Save (R14): balances, the desk and the goal in another currency, each the whole width and composed in columns inside:
+   no panel of this part stands beside a hole, whatever the household holds. */
+.ccy-save { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
 
 /* ------------------------------------------------------------------------------------------------ the paper desk */
-.fx-form, .fxg-form, .ab-add, .ab-pay { display: grid; gap: var(--s3); align-items: end; }
-.fx-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.fx-form > .btn { grid-column: 1 / -1; justify-self: start; }
-.fx-form + .note, .fx-form ~ .small { margin-top: var(--s3); }
+/* R14: each form is rows of fields on one baseline (components.css .fields), then its action on a row of its own with
+   the one line that says what it costs; the long rules are behind a disclosure under it */
+.fx-form, .fxg-form, .ab-add, .ab-pay { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+.fx-form { container-type: inline-size; }
+/* four fields: two rows of two (layout rule L3), and one line of four where each is wide enough to show a currency's
+   name in full */
+@container (min-width: 1000px) { .form-grid.fx-fields, .form-grid.fxg-fields { --cols: 4; } }
+/* a payee abroad has four or five fields: with five, the account takes the last row, never half of it */
+.ab-add-fields > .field:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.fx-go, .ab-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); }
+.fx-go > p { flex: 1 1 28ch; min-width: 0; }
+.fx-go > .btn, .ab-go > .btn, .fxg-acts > .btn, .fxg-head > .btn, .fxg-lead > .btn { --h: 46px; }
+.fx-form + .note { margin-top: var(--s3); }
+.fx-desk { display: flex; flex-direction: column; }
+.fx-more, .fx-past { margin-top: var(--s2); }
+.fx-form + .fx-more, .fx-fill + .fx-more { margin-top: var(--s3); }
 .fx-fill, .ab-sent { margin-top: var(--s4); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 78%, transparent); border: 1px solid var(--rim); }
 .fx-fill-head, .ab-sent-head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2) var(--s3); margin-bottom: var(--s3); }
 .fx-facts { display: grid; gap: var(--s2); margin: 0; }
@@ -43,25 +59,37 @@
 /* a narrow card says each fact's label above its value, never in a column too thin to read */
 .fx-fill, .ab-sent, .ab-facts { container-type: inline-size; }
 @container (max-width: 520px) { .fx-facts > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
-.fx-past, .ab-past { margin-top: var(--s4); font-size: var(--t-small); color: var(--ink-2); }
+.ab-past { margin-top: var(--s4); }
+.fx-past, .ab-past { font-size: var(--t-small); color: var(--ink-2); }
 .fx-past ul, .ab-past ul { list-style: none; margin: var(--s2) 0 0; padding: 0; display: grid; gap: var(--s2); }
 .fx-past li, .ab-past li { display: flex; flex-wrap: wrap; gap: 2px var(--s3); align-items: baseline; }
 
 /* ------------------------------------------------------------------------------------------------ a goal in another currency */
-.fxg-list { list-style: none; margin: 0 0 var(--s4); padding: 0; display: grid; gap: var(--s4); }
-.fxg { display: grid; gap: var(--s2); }
+.fxg-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s5); }
+.fxg-list + .fxg-form { margin-top: var(--s5); padding-top: var(--s5); border-top: 1px solid var(--rule); }
+.fx-goals { container-type: inline-size; }
+.fxg-head > div { display: grid; gap: 2px; min-width: 0; }
+.fxg-head { align-items: center; }
+/* a goal (R14): where it stands on the left (its name, the bar, the figure, the way to stop it), what is left and how
+   it is counted on the right; one column wherever the panel is narrow */
+.fxg { display: grid; gap: var(--s3); }
+.fxg + .fxg { padding-top: var(--s5); border-top: 1px solid var(--rule); }
+.fxg-lead, .fxg-says { display: grid; gap: var(--s2); align-content: start; min-width: 0; }
+.fxg-lead > .btn { justify-self: start; margin-top: var(--s1); }
+@container (min-width: 760px) { .fxg { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s8); } }
 .fxg-top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2px var(--s3); color: var(--ink); }
 .fxg-top span { color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
 .fxg-bar { height: 10px; border-radius: var(--r-pill); background: color-mix(in oklab, var(--well) 70%, transparent); border: 1px solid var(--rim); overflow: hidden; }
 .fxg-bar i { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
 .fxg-fig { font-variant-numeric: tabular-nums lining-nums; }
-.fxg-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.fxg-acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s2); }
-.fxg > .btn { justify-self: start; }
+.fxg-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
 
 /* ------------------------------------------------------------------------------------------------ payments abroad (Spend) */
-.ab-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s5); align-items: start; }
-@media (max-width: 900px) { .ab-grid { grid-template-columns: minmax(0, 1fr); } .fx-form, .fxg-form { grid-template-columns: minmax(0, 1fr); } }
+/* R14: who and how much on the left, the route and this year's limit on the right, two halves; the long rules are behind
+   a disclosure under the limit. While a payee is being added the form takes the width and the facts follow it. */
+.ab-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s6); align-items: start; }
+.ab-grid.adding { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 900px) { .ab-grid { grid-template-columns: minmax(0, 1fr); } }
 .ab-form { display: grid; gap: var(--s4); min-width: 0; }
 .ab-payees { border: 0; margin: 0; padding: 0; display: grid; gap: var(--s2); min-width: 0; }
 .ab-payee { display: flex; align-items: flex-start; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); cursor: pointer;
@@ -70,8 +98,15 @@
 .ab-payee input { margin-top: .3em; accent-color: var(--brand); }
 .ab-payee span { display: grid; min-width: 0; }
 .ab-payee small { font-size: var(--t-small); color: var(--ink-2); overflow-wrap: anywhere; }
-.ab-payees > .btn { justify-self: start; }
-.ab-add, .ab-pay { padding: var(--s4); border-radius: var(--r-md); border: 1px dashed var(--rim); }
-.ab-add > .btn, .ab-pay > .btn { justify-self: start; }
+.ab-payees > .btn { justify-self: start; margin-top: var(--s1); }
+.ab-payees > .legend { margin-bottom: var(--s2); padding: 0; }
+.ab-add, .ab-pay { padding: var(--s4) var(--s5); border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 40%, transparent); border: 1px solid var(--rim); }
+.ab-add-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); }
+.ab-add-head h3 { font-size: var(--t-body); font-weight: 650; }
 .ab-held-acts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
-.ab-facts { display: grid; gap: var(--s3); min-width: 0; }
+.ab-facts { display: grid; gap: var(--s3); align-content: start; min-width: 0; }
+.ab-facts > .small { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+.ab-lrs { display: grid; gap: 2px; padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 70%, transparent); border: 1px solid var(--rim); }
+.ab-lrs-k { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); }
+.ab-lrs-v { color: var(--ink-2); font-variant-numeric: tabular-nums lining-nums; }
+.ab-lrs-v b { color: var(--ink); font-weight: 650; }

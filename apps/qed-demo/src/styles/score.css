@@ -1,12 +1,10 @@
 /* The score (src/ui/score.tsx; DESIGN.md M6): the bank's balance at worst as true steps on a lit line, what falls due
    marked on its day, a what-if drawn dashed over it, and what each standing authority may do on the same days under it.
-   On a wide screen a rail (Save's what-if) stands beside the chart and the instructions; on a narrow one it follows the
-   chart, before the instructions. The what-if has one colour, c6, and nothing else in the chart uses it. */
+   A rail (Save's what-if) follows the chart and the instructions, across the width, at every size (R14: beside the chart
+   it stood far taller than the chart and left a hole under it). The what-if has one colour, c6, and nothing else in the
+   chart uses it. */
 
-.sc { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "chart" "rail" "lanes" "foot"; gap: var(--s5); }
-@media (min-width: 1100px) {
-  .sc.with-rail { grid-template-columns: minmax(0, 1fr) minmax(320px, 368px); grid-template-rows: auto auto 1fr auto; grid-template-areas: "head head" "chart rail" "lanes rail" "foot foot"; column-gap: var(--s6); }
-}
+.sc { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "chart" "lanes" "rail" "foot"; gap: var(--s5); }
 .sc-head { grid-area: head; display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s5); flex-wrap: wrap; }
 .sc-title h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.018em; }
 .sc-title p { margin-top: 4px; font-size: var(--t-small); color: var(--ink-3); max-width: 66ch; }
@@ -32,14 +30,15 @@
 .sc-svg text { font: 560 var(--t-micro)/1 var(--font); fill: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
 .sc-grid { stroke: var(--rule); stroke-dasharray: 2 6; }
 .sc-month { stroke: var(--rule-2); stroke-dasharray: 1 4; }
-.sc-fill-top { stop-color: var(--c2); stop-opacity: .24; } .sc-fill-bottom { stop-color: var(--c2); stop-opacity: 0; }
+.sc-fill-top { stop-color: var(--c2); stop-opacity: .15; } .sc-fill-bottom { stop-color: var(--c2); stop-opacity: 0; }
 .sc-hatch { stroke: var(--part-kept); stroke-width: 1.2; }
-.sc-kept { opacity: .55; }
-.sc-glow { fill: none; stroke: var(--c2); stroke-width: 6; opacity: .5; }
+.sc-kept { opacity: .42; }
+/* R14: the line's light is a trace, not a second line; colour is kept for the lowest point alone (as horizon.css) */
+.sc-glow { fill: none; stroke: var(--c2); stroke-width: 5; opacity: .22; }
 .sc-line { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
 /* with a what-if drawn, the recorded line steps back to be the reference and the what-if leads */
 .is-whatif .sc-line { stroke: var(--ink-2); stroke-width: 1.8; }
-.is-whatif .sc-glow { opacity: .2; }
+.is-whatif .sc-glow { opacity: .12; }
 .is-whatif .sc-area { opacity: .4; }
 .sc-wline { fill: none; stroke: var(--c6); stroke-width: 2.6; stroke-dasharray: 7 4; stroke-linejoin: round; }
 .sc-gap-tint { fill: color-mix(in oklab, var(--c6) 8%, transparent); }
@@ -47,13 +46,6 @@
 .sc-short { fill: color-mix(in oklab, var(--loss) 24%, transparent); }
 .sc-zero { stroke: var(--loss); stroke-width: 1.2; stroke-dasharray: 4 4; }
 .sc-svg .sc-zero-text { fill: var(--loss); font-weight: 650; paint-order: stroke; stroke: color-mix(in oklab, var(--ground) 70%, transparent); stroke-width: 4px; stroke-linejoin: round; }
-.sc-mark { stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; }
-.sc-mark.in { stroke: var(--gain); }
-.sc-mark.wif { stroke: var(--c6); }
-.sc-svg .sc-mark-text { fill: var(--ink-2); font-weight: 600; paint-order: stroke; stroke: var(--ground); stroke-width: 5px; stroke-linejoin: round; }
-.sc-svg .sc-mark-text.in { fill: var(--gain); }
-.sc-svg .sc-mark-text.wif { fill: var(--c6); }
-.sc-svg .sc-kept-text { fill: var(--ink-2); font-weight: 650; paint-order: stroke; stroke: var(--ground); stroke-width: 6px; stroke-linejoin: round; }
 .sc-low-line { stroke: var(--due); stroke-width: 1; stroke-dasharray: 2 4; opacity: .8; }
 .sc-low-halo { fill: color-mix(in oklab, var(--due-mark) 26%, transparent); animation: sc-halo 2.6s var(--ease-move) infinite; transform-box: fill-box; transform-origin: center; }
 .sc-low-dot { fill: var(--due-mark); stroke: var(--sheet); stroke-width: 2.5; }
@@ -61,7 +53,7 @@
 .sc-wlow-halo { fill: color-mix(in oklab, var(--c6) 26%, transparent); animation: sc-halo 2.6s var(--ease-move) infinite; transform-box: fill-box; transform-origin: center; }
 .sc-wlow-dot { fill: var(--c6); stroke: var(--sheet); stroke-width: 2.5; }
 @keyframes sc-halo { 50% { transform: scale(1.35); opacity: .4; } }
-.sc-svg .sc-today { fill: var(--brand); font-weight: 700; }
+.sc-svg .sc-today { fill: var(--ink-2); font-weight: 700; }
 .sc-cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
 .sc-dot { fill: var(--sheet); stroke: var(--ink); stroke-width: 2.5; }
 .sc-dot.wif { stroke: var(--c6); }
@@ -71,9 +63,8 @@
 @keyframes sc-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 
 /* the reading: a glass label over the plot, above the point (or under it near the top) */
-.sc-tip { position: absolute; z-index: 4; pointer-events: none; transform: translate(-50%, -100%); min-width: 184px; max-width: 292px; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
+.sc-tip { position: absolute; z-index: 4; pointer-events: none; min-width: 184px; max-width: min(292px, 100%); padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
   background: var(--pane-3); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); font-size: var(--t-small); line-height: 1.35; display: grid; gap: 2px; }
-.sc-tip.below { transform: translate(-50%, 0); }
 .sc-tip-day { font-size: var(--t-micro); color: var(--ink-3); font-weight: 600; }
 .sc-tip b { font-size: var(--t-lead); font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; }
 .sc-tip b.short { color: var(--loss); }
@@ -90,7 +81,7 @@
 .sc-key > span { display: inline-flex; align-items: center; gap: 6px; }
 .sc-key b { color: var(--ink-2); font-weight: 650; }
 .sc-key i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; flex: none; }
-.sc-key .k-line { height: 2px; background: var(--ink); box-shadow: 0 0 6px var(--c2); }
+.sc-key .k-line { height: 2px; background: var(--ink); }
 .sc-key .k-kept { background: repeating-linear-gradient(135deg, var(--part-kept) 0 1.5px, transparent 1.5px 5px); box-shadow: inset 0 0 0 1px var(--part-kept); }
 .sc-key .k-low { width: 10px; border-radius: 50%; background: var(--due-mark); }
 .sc-key .k-wif { width: 18px; height: 0; border-radius: 0; border-top: 2.5px dashed var(--c6); }

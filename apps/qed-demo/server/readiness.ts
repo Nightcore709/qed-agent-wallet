@@ -178,6 +178,9 @@ const OPERATIONS = new Set([
   // the hosting provider's configuration change and its date, the Node version on this computer, and the downtime of
   // each deployment (deployment, tools and deadlines: the team's own operations)
   'RISK-095', 'RISK-107', 'RISK-118',
+  // R14: the release checks' labelled test accounts left on the hosted service (deployment) and the browser suite's
+  // timing under heavy load on the team's computer (its own test tooling)
+  'RISK-119', 'RISK-120',
 ])
 
 /** A risk's standing in words, without the register's references. */

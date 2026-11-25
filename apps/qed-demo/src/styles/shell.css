@@ -19,14 +19,30 @@ a.brand:hover .logo-meridian { animation: meridian-turn 1.2s var(--ease-move); }
 .practice-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .practice-chip .short { display: none; }
 
-.app { min-height: 100vh; min-height: 100dvh; padding: 0 0 124px; }
+/* The bars rule (R14 layout rule L1, DESIGN.md). Two bars are pinned to the window: the top bar and the bottom
+   navigation. Nothing may be unreadable or unreachable under either, at any width:
+     1. each bar is solid enough on its own (--bar, 97%) that page text never reads through it; the blur is a finish,
+        not what legibility rests on (a browser that draws no backdrop blur showed the page's words inside the bars);
+     2. a scrim stands behind each bar, from the window's edge to the bar: the page fades out as it passes under, so no
+        line of text is cut in half beside a bar or shows in the strip between a bar and the window's edge;
+     3. the page ends clear of the bottom navigation: its foot padding is the navigation's measured height (--bar-bottom,
+        App.tsx usePinnedBars) and a step of air, so the last control can always be scrolled above it;
+     4. what takes focus, and what an address's #anchor names, is scrolled clear of both (base.css: the scroller's
+        scroll-padding is the bars' measured heights);
+     5. what sticks inside the page sticks under the top bar: top: calc(var(--bar-top) + a step). */
+.app { min-height: 100vh; min-height: 100dvh; padding: 0 0 calc(var(--bar-bottom, 84px) + var(--s10) + env(safe-area-inset-bottom)); }
+.app::before, .app::after { content: ""; position: fixed; left: 0; right: 0; z-index: calc(var(--z-bar) - 1); pointer-events: none; }
+/* from the window's top to the middle of the top bar: solid over the strip above the bar, gone by the bar's middle */
+.app::before { top: 0; height: calc(var(--bar-top, 74px) * .5 + 6px); background: linear-gradient(var(--ground) 28%, transparent); }
+/* from a step above the navigation to the window's foot: the page fades as it nears the navigation and is gone under it */
+.app::after { bottom: 0; height: calc(var(--bar-bottom, 84px) + var(--s8) + env(safe-area-inset-bottom)); background: linear-gradient(transparent, color-mix(in oklab, var(--ground) 74%, transparent) 52%, color-mix(in oklab, var(--ground) 84%, transparent)); }
 
 /* ------------------------------------------------------------------------------------------------ the top bar */
 .topbar {
   position: sticky; top: 12px; z-index: var(--z-bar); margin: 12px auto 14px; width: min(var(--page), calc(100% - 32px));
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 460px) minmax(0, 1fr); align-items: center; gap: var(--s3);
   min-height: 60px; padding: 8px 10px 8px 14px; border-radius: var(--r-pill); border: 1px solid var(--rim);
-  background: linear-gradient(170deg, var(--gloss), transparent 40% 70%, var(--gloss)), var(--pane-3);
+  background: linear-gradient(170deg, var(--gloss), transparent 40% 70%, var(--gloss)), var(--bar);
   backdrop-filter: blur(var(--blur)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
   box-shadow: var(--lift-2);
 }
@@ -116,7 +132,7 @@ a.brand:hover .logo-meridian { animation: meridian-turn 1.2s var(--ease-move); }
 .dock {
   position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); translate: -50% 0; z-index: var(--z-dock);
   display: flex; align-items: center; gap: 2px; padding: 6px; border-radius: var(--r-pill); border: 1px solid var(--rim);
-  background: linear-gradient(175deg, var(--gloss), transparent 45% 75%, var(--gloss)), var(--pane-3);
+  background: linear-gradient(175deg, var(--gloss), transparent 45% 75%, var(--gloss)), var(--bar);
   backdrop-filter: blur(var(--blur)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
   box-shadow: var(--lift-3); isolation: isolate;
 }
@@ -147,7 +163,8 @@ a.brand:hover .logo-meridian { animation: meridian-turn 1.2s var(--ease-move); }
 }
 /* phones: the bar holds the mark, QED's state and the account; the dock carries Ask in its middle */
 @media (max-width: 759px) {
-  .app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+  .app { padding-bottom: calc(var(--bar-bottom, 80px) + var(--s6) + env(safe-area-inset-bottom)); }
+  .app::after { height: calc(var(--bar-bottom, 80px) + var(--s5) + env(safe-area-inset-bottom)); }
   .topbar { top: 8px; margin: 8px auto 10px; width: calc(100% - 20px); grid-template-columns: minmax(0, 1fr) auto; min-height: 54px; padding: 6px 6px 6px 10px; }
   .topbar .ask-field { display: none; }
   .topbar .brand b { font-size: var(--t-body); }
@@ -295,24 +312,44 @@ a.brand:hover .logo-meridian { animation: meridian-turn 1.2s var(--ease-move); }
 .ticks svg { width: 18px; height: 18px; color: var(--gain); margin-top: 2px; }
 label.check.confirm { padding: 14px 16px; border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 60%, transparent); border: 1px solid var(--rim); font-weight: 580; }
 
-/* opening the household: the form, and where it leaves you */
-.setup { width: min(1180px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: var(--s8); align-items: start; }
+/* opening the household: the form, and where it leaves you. The form is the two columns: the figures in their groups;
+   beside them the summary and the one action, which stay in view and end level with the form (R14 L2). Below 1024 px
+   one column in the order it is read: the figures, where they leave you, the action. */
+.setup { width: min(1180px, 100%); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 400px); gap: var(--s6) var(--s8); align-items: start; }
+.setup-form { display: grid; gap: var(--s5); min-width: 0; container-type: inline-size; }
 .setup-group { display: grid; gap: var(--s4); padding: var(--s6); border-radius: var(--r-lg); border: 1px solid var(--rim); box-shadow: var(--lift-1); background: linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane-2); backdrop-filter: blur(var(--blur-2)); -webkit-backdrop-filter: blur(var(--blur-2)); }
 .setup-group > legend { float: left; width: 100%; padding: 0; font-size: var(--t-h3); font-weight: 650; margin-bottom: var(--s1); }
-.setup-preview { position: sticky; top: var(--s6); padding: var(--s8) var(--s6) var(--s6); display: grid; gap: var(--s2); }
+/* a field beside what it decides: the control keeps a field's width, its words take the rest */
+.setup-ccy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3) var(--s5); align-items: end; }
+.setup-ccy-says { display: grid; gap: var(--s1); align-content: end; min-width: 0; padding-bottom: 2px; }
+.setup-ccy-says p { max-width: 46ch; }
+/* the rate the example was converted at: the figure in one line, its source under it, in the panel's own voice */
+.setup-basis { display: grid; gap: var(--s1); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 46%, transparent); border: 1px solid var(--rule-2); }
+.setup-basis b { font-weight: 620; }
+/* a group's two parts, each with its own name: what you have (two figures), what you owe (three), never an odd one out */
+.setup-sub { display: grid; gap: var(--s3); }
+.setup-sub + .setup-sub { padding-top: var(--s4); border-top: 1px solid var(--rule); }
+.setup-sub-h { font-size: var(--t-small); font-weight: 650; color: var(--ink-3); letter-spacing: .02em; }
+.setup-side { display: grid; gap: var(--s4); min-width: 0; }
+@media (min-width: 1024px) { .setup-side { position: sticky; } }
+.setup-preview { padding: var(--s8) var(--s6) var(--s5); display: grid; gap: var(--s2); container-type: inline-size; }
 .sp-label { font-size: var(--t-body); font-weight: 580; color: var(--ink-2); }
-.sp-figure { font-size: var(--t-fig-l); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); }
+.sp-figure { font-size: var(--t-fig-l-fit); font-weight: 650; letter-spacing: var(--track-fig); line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
 .sp-sub { font-size: var(--t-small); color: var(--ink-2); }
 .sp-rows { display: grid; margin-top: var(--s4); }
-.sp-rows div { display: flex; justify-content: space-between; gap: var(--s4); padding: 10px 0; border-top: 1px solid var(--rule); font-size: var(--t-body); }
-.sp-rows dt { color: var(--ink-2); } .sp-rows dd { font-weight: 650; font-variant-numeric: tabular-nums; }
+/* every row: its name on the left, its figure on the right; a row's explanation runs under both */
+.sp-rows div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--s4); align-items: baseline; padding: 10px 0; border-top: 1px solid var(--rule); font-size: var(--t-body); }
+.sp-rows dt { color: var(--ink-2); } .sp-rows dd { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .sp-rows dd.neg { color: var(--loss); }
-.sp-rows dd small { display: block; font-size: var(--t-micro); font-weight: 430; color: var(--ink-3); }
+.sp-rows dd.sp-note { grid-column: 1 / -1; text-align: left; white-space: normal; font-size: var(--t-micro); font-weight: 430; color: var(--ink-3); }
 .sp-verdict { margin-top: var(--s3); padding: 12px 14px; border-radius: var(--r-md); background: color-mix(in oklab, var(--well) 60%, transparent); font-size: var(--t-small); line-height: 1.45; color: var(--ink); }
 .sp-verdict.warn { background: var(--due-bg); }
+.setup-go { display: grid; gap: var(--s2); justify-items: center; text-align: center; }
 .setup-head { width: min(1180px, 100%); margin: 0 auto var(--s6); }
 .setup-head h1 { font-size: var(--t-display); letter-spacing: var(--track-hero); line-height: 1; }
-@media (max-width: 1023px) { .setup { grid-template-columns: minmax(0, 1fr); } .setup-preview { position: static; order: -1; } }
+.setup-head p { max-width: 68ch; }
+@media (max-width: 1023px) { .setup { grid-template-columns: minmax(0, 1fr); } }
+@container (max-width: 520px) { .setup-ccy { grid-template-columns: minmax(0, 1fr); align-items: start; } }
 @media (max-width: 759px) {
   .onboard-top { grid-template-columns: 1fr auto; padding: var(--s3) var(--s4); border-radius: var(--r-lg); width: calc(100% - 20px); }
   .steps { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
@@ -325,12 +362,13 @@ label.check.confirm { padding: 14px 16px; border-radius: var(--r-md); background
 }
 
 /* print: the page without the bars, the dock and buttons */
-@media print { .topbar, .dock, .atmos, .btn { display: none !important; } .main { backdrop-filter: none; background: none; border: 0; box-shadow: none; } }
+@media print { .topbar, .dock, .atmos, .btn, .app::before, .app::after { display: none !important; } .main { backdrop-filter: none; background: none; border: 0; box-shadow: none; } }
 
 /* Ask (screens/Ask.tsx): the conversation runs to the window's edge, its composer docked above the dock; on a phone the
    dock steps aside while the composer has the keyboard. Keyed to the route in the shell's first render, so nothing moves
    when Ask's own code arrives (a flex shell here moved the body 8 px: CLS 0.047). */
 .app.is-ask { padding-bottom: 0; }
+.app.is-ask::after { display: none; } /* Ask's composer is docked above the navigation with its own ground (ask.css) */
 .app.is-ask > .main { padding-bottom: 0; border-bottom-width: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 .app.is-ask > .dock { transition: transform var(--d3) var(--ease-out), opacity var(--d2) var(--ease-out); }
 @media (max-width: 759px) {

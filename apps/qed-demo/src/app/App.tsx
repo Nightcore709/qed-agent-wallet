@@ -11,7 +11,7 @@ import { type ComponentType, lazy, type ReactNode, Suspense, useCallback, useEff
 import { type Id, t, useT } from '../lib/i18n.ts'
 import { api, ApiError, beginSignOut, endSignOut, fmt, handAsk, match, navigate, onSignedOut, setCsrf, setDisplayZone, setHomeCurrency, startLive, stopLive, useData, useLocation, useNow } from '../lib/core.ts'
 import { addPasskey, confirmWithPasskey, deviceWords, passkeyAutofillAvailable, passkeysAvailable, signIn, signInWithAutofill, signInWithPassword, signUp, signUpWithPassword, stopAutofill } from '../lib/passkey.ts'
-import { Btn, Crumb, Field, Link, Loading, Logo, MoneyInput, Note, Orb, PasswordField, Problem, Seal, SectionNav, type SessionInfo, SessionCtx, Sheet, SourceNote, useAction, useSession } from '../ui/kit.tsx'
+import { Btn, Crumb, Field, Link, Loading, Logo, MoneyInput, Note, Orb, PasswordField, Problem, Seal, SectionNav, type SessionInfo, SessionCtx, Sheet, SourceNote, useAction, useSession, useStickySide } from '../ui/kit.tsx'
 import { applyFx, type Fx, readFx, setFx, useArrival, useDockIndicator, useSection } from '../ui/motion.ts'
 import { HomeScreen } from '../screens/Home.tsx'
 
@@ -521,13 +521,16 @@ function Setup() {
   const set = (k: string) => (x: number | null) => setV((s) => ({ ...s, [k]: x }))
   // R13 S7: the home currency is chosen here and not changed afterwards. The rupee writes nothing; another converts the example's figures once, at a recorded rate that is named beside them.
   const [ccy, setCcy] = useState<string>('INR')
-  const [basis, setBasis] = useState<string | null>(null)
+  // Until the household is opened, this form is where the home currency is chosen: every draw of it writes the figures in
+  // the currency chosen here, whatever the session last said (a session read again mid-form reads the rupee, R14).
+  setHomeCurrency(ccy)
+  const [basis, setBasis] = useState<HomeBasisView | null>(null)
   const [ccyError, setCcyError] = useState<string | null>(null)
   const pick = async (c: string) => {
     setCcyError(null)
     try {
-      const r = await api<{ opening: Record<string, number>; profile: Record<string, number>; basisWords: string | null }>('GET', `/api/household/defaults?currency=${encodeURIComponent(c)}`)
-      setHomeCurrency(c); setCcy(c); setBasis(r.basisWords)
+      const r = await api<{ opening: Record<string, number>; profile: Record<string, number>; basis: HomeBasisView | null }>('GET', `/api/household/defaults?currency=${encodeURIComponent(c)}`)
+      setHomeCurrency(c); setCcy(c); setBasis(r.basis)
       setV({ bank: r.opening.bank ?? 0, card: r.opening.card ?? 0, personalLoan: r.opening.personalLoan ?? 0, homeLoan: r.opening.homeLoan ?? 0, fd: r.opening.fd ?? 0, income: r.profile.income ?? 0, spending: r.profile.spending ?? 0, line: r.profile.line ?? 0, personalLoanEmi: r.profile.personalLoanEmi ?? 0, homeLoanEmi: r.profile.homeLoanEmi ?? 0 })
     } catch (e) { setCcyError(e instanceof Error ? e.message : 'The example figures could not be read.') }
   }
@@ -542,43 +545,71 @@ function Setup() {
   const worst = n('bank') + n('fd') - n('card') - n('personalLoanEmi') - n('homeLoanEmi')
   const monthly = n('income') - n('spending') - n('personalLoanEmi') - n('homeLoanEmi')
   const above = n('line') > worst
+  const currencies = session.homeCurrencies ?? [{ code: 'INR', name: 'Indian rupee' }]
+  const ccyName = currencies.find((c) => c.code === ccy)?.name ?? ccy
+  // R14 L2: the summary and the one action stay in view beside the form and end level with it (kit.tsx useStickySide)
+  const side = useStickySide<HTMLElement>()
   return (
     <main className="onboard-main wide" id="content">
       <div className="stack setup-head" style={{ ['--gap' as string]: '8px' }}>
         <h1>Open your paper household</h1>
         <p className="muted">QED starts from these figures and checks every action against them. They are practice money: change them to resemble your own, or keep the example.</p>
       </div>
-      <div className="setup">
-        <form className="setup-form stack" style={{ ['--gap' as string]: '28px' }} onSubmit={(e) => { e.preventDefault(); void go.run() }}>
+      {/* the form is the two columns: the figures on the left; beside them, where they leave you and the one action */}
+      <form className="setup" onSubmit={(e) => { e.preventDefault(); void go.run() }}>
+        <div className="setup-form">
           <fieldset className="setup-group"><legend>Your home currency</legend>
-            <p className="muted small">Every figure below, and everything QED writes to you, is in it. Choose it now: it is not changed afterwards. Buying funds, shares and coins, the rupee desk and payments abroad work in rupees only, and stay closed to a household in another currency.</p>
-            <div className="form-grid"><Field label="Home currency" error={ccyError ?? go.error?.fields.homeCurrency}>{(p) => <select className="input" {...p} value={ccy} onChange={(e) => void pick(e.target.value)}>{(session.homeCurrencies ?? [{ code: 'INR', name: 'Indian rupee' }]).map((c) => <option key={c.code} value={c.code}>{c.name} ({c.code})</option>)}</select>}</Field></div>
-            {basis ? <Note tone="qed">{basis}</Note> : null}</fieldset>
-          <fieldset className="setup-group"><legend>What you have and owe today</legend><div className="form-grid">{money('bank', 'In your bank account')}{money('fd', 'In a fixed deposit')}{money('card', 'Owed on your credit card')}{money('personalLoan', 'Owed on a personal loan')}{money('homeLoan', 'Owed on a home loan')}</div></fieldset>
-          <fieldset className="setup-group"><legend>What comes in and goes out each month</legend><div className="form-grid">{money('income', 'Salary, each month')}{money('spending', 'Everyday spending, each month')}{money('personalLoanEmi', 'Personal loan instalment')}{money('homeLoanEmi', 'Home loan instalment')}</div></fieldset>
-          <fieldset className="setup-group"><legend>Your floor</legend><p className="muted small">QED's own purchases are refused if they would take your worst case below this.</p><div className="form-grid">{money('line', 'Worst case must stay above')}</div>
+            <div className="setup-ccy">
+              <Field label="Home currency" hint="It cannot be changed after you open the household." error={ccyError ?? go.error?.fields.homeCurrency}>{(p) => <select className="input" {...p} value={ccy} onChange={(e) => void pick(e.target.value)}>{currencies.map((c) => <option key={c.code} value={c.code}>{c.name} ({c.code})</option>)}</select>}</Field>
+              <div className="setup-ccy-says">
+                <p>Every figure below, and everything QED writes to you, is in this currency.</p>
+                <p className="muted small">Buying funds, shares and coins, the rupee desk and payments abroad work in rupees only, and stay closed to a household in another currency.</p>
+              </div>
+            </div>
+            {/* the rate the example was converted at, then where it comes from: the figure first, its source under it (R14) */}
+            {basis ? (
+              <div className="setup-basis" role="status">
+                <p><b>The example figures are converted at {basis.rupeesPerUnit} rupees to one {ccyName}.</b> Change any of them to your own.</p>
+                <p className="small muted">Rate: {basis.source} ({basis.label}). Rounded {basis.rounding}.</p>
+              </div>
+            ) : null}
+          </fieldset>
+          <fieldset className="setup-group"><legend>What you have and owe today</legend>
+            <div className="setup-sub" role="group" aria-labelledby="su-have"><p className="setup-sub-h" id="su-have">You have</p><div className="form-grid cols-2">{money('bank', 'In your bank account')}{money('fd', 'In a fixed deposit')}</div></div>
+            <div className="setup-sub" role="group" aria-labelledby="su-owe"><p className="setup-sub-h" id="su-owe">You owe</p><div className="form-grid cols-3">{money('card', 'On your credit card')}{money('personalLoan', 'On a personal loan')}{money('homeLoan', 'On a home loan')}</div></div>
+          </fieldset>
+          <fieldset className="setup-group"><legend>What comes in and goes out each month</legend><div className="form-grid cols-2">{money('income', 'Salary, each month')}{money('spending', 'Everyday spending, each month')}{money('personalLoanEmi', 'Personal loan instalment')}{money('homeLoanEmi', 'Home loan instalment')}</div></fieldset>
+          <fieldset className="setup-group"><legend>Your floor</legend>
+            <div className="setup-ccy">
+              {money('line', 'Worst case must stay above')}
+              <div className="setup-ccy-says"><p className="muted small">QED's own purchases are refused if they would take your worst case below this. You can still go below it by hand.</p></div>
+            </div>
             {above ? <Note tone="wait">This floor is above where you start, so QED could not buy anything for you until that changes.</Note> : null}</fieldset>
           {go.error && Object.keys(go.error.fields).length === 0 ? <Problem error={go.error} /> : null}
-          <div className="row"><Btn tone="fill" className="lg" type="submit" busy={go.busy}>Open the household</Btn><span className="small faint">You can change every figure later.</span></div>
-        </form>
-        <aside className="setup-preview field-hero" aria-label="Where these figures leave you">
-          <p className="sp-label">Room above your floor</p>
-          <p className="sp-figure">{fmt.money(Math.max(0, worst - n('line')))}</p>
-          <p className="sp-sub">What QED could spend for you, only under instructions you sign, before your worst case reaches your floor</p>
-          <dl className="sp-rows">
-            <div><dt>You have, less what you owe</dt><dd className={have - owe < 0 ? 'neg' : ''}>{fmt.money(have - owe)}<small>{fmt.money(have)} less {fmt.money(owe)}; a home is not counted, only its loan</small></dd></div>
-            <div><dt>Coming in each month</dt><dd>{fmt.money(n('income'))}</dd></div>
-            <div><dt>Going out each month</dt><dd>{fmt.money(n('spending') + n('personalLoanEmi') + n('homeLoanEmi'))}</dd></div>
-            <div><dt>Left over each month</dt><dd className={monthly < 0 ? 'neg' : ''}>{fmt.money(monthly)}</dd></div>
-            <div><dt>Worst case after this month's dues</dt><dd>{fmt.money(worst)}</dd></div>
-            <div><dt>Your floor</dt><dd>{fmt.money(n('line'))}</dd></div>
-          </dl>
-          {above ? <p className="sp-verdict warn">Your floor is above your worst case: QED would refuse every purchase.</p> : null}
+        </div>
+        <aside className="setup-side sticky-side" ref={side} aria-label="Where these figures leave you">
+          <div className="setup-preview field-hero">
+            <p className="sp-label">Room above your floor</p>
+            <p className="sp-figure">{fmt.money(Math.max(0, worst - n('line')))}</p>
+            <p className="sp-sub">What QED could spend for you, only under instructions you sign, before your worst case reaches your floor</p>
+            <dl className="sp-rows">
+              <div><dt>You have, less what you owe</dt><dd className={have - owe < 0 ? 'neg' : ''}>{fmt.money(have - owe)}</dd><dd className="sp-note">{fmt.money(have)} less {fmt.money(owe)}; a home is not counted, only its loan</dd></div>
+              <div><dt>Coming in each month</dt><dd>{fmt.money(n('income'))}</dd></div>
+              <div><dt>Going out each month</dt><dd>{fmt.money(n('spending') + n('personalLoanEmi') + n('homeLoanEmi'))}</dd></div>
+              <div><dt>Left over each month</dt><dd className={monthly < 0 ? 'neg' : ''}>{fmt.money(monthly)}</dd></div>
+              <div><dt>Worst case after this month's dues</dt><dd>{fmt.money(worst)}</dd></div>
+              <div><dt>Your floor</dt><dd>{fmt.money(n('line'))}</dd></div>
+            </dl>
+            {above ? <p className="sp-verdict warn">Your floor is above your worst case: QED would refuse every purchase.</p> : null}
+          </div>
+          <div className="setup-go"><Btn tone="fill" className="lg block" type="submit" busy={go.busy}>Open the household</Btn><p className="small faint">You can change every figure later.</p></div>
         </aside>
-      </div>
+      </form>
     </main>
   )
 }
+/** The rate a household's example figures were converted at, as the server recorded it (server/home-currency.ts HomeBasis). */
+interface HomeBasisView { currency: string; rupeesPerUnit: string; source: string; label: string; rounding: string }
 
 /**
  * The one control that pauses QED, in the sidebar on every page and in the top bar on a phone. Its label is QED's state;

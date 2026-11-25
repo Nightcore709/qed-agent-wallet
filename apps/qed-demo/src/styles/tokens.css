@@ -11,6 +11,7 @@
  *   ground                                the page under the atmosphere
  *   pane / pane-2 / pane-3                glass: resting panels, raised and interactive, sheets and menus
  *   sheet / sheet-2 / well                opaque surfaces for what must never show the page through it; inset fields
+ *   bar                                   the top bar and the bottom navigation: 97% solid, so page text is never read through them
  *   rim / gloss / edge-hi / edge-lo       the glass's border, its diagonal sheen, its lit and shaded inner edges
  *   ink / ink-2 / ink-3 / ink-4           figures and names, explanations, metadata (all 4.5:1 or more), disabled only
  *   act / on-act / act-2                  the one primary action of a view (champagne at night, espresso by day)
@@ -82,6 +83,8 @@
   --stage: oklch(99.4% .005 85 / .3);
   --pane: oklch(99.6% .004 85 / .58); --pane-2: oklch(99.8% .003 85 / .74); --pane-3: oklch(99.8% .003 85 / .9);
   --sheet: oklch(99.4% .004 85); --sheet-2: oklch(97.6% .007 80); --well: oklch(93.4% .011 76);
+  /* the bars pinned to the window (R14 L1): solid enough that the page under them never reads through, blur or no blur */
+  --bar: oklch(99.2% .004 85 / .97);
   --rim: oklch(100% 0 0 / .7); --rim-out: oklch(38% .03 60 / .12); --gloss: oklch(100% 0 0 / .55);
   --edge-hi: oklch(100% 0 0 / .95); --edge-lo: oklch(40% .03 60 / .10);
   --ink: oklch(21.5% .018 52); --ink-2: oklch(36% .018 54); --ink-3: oklch(44.5% .016 56); --ink-4: oklch(66% .012 60);
@@ -124,7 +127,7 @@
   :root:not([data-theme="light"]) {
     --ground: oklch(12.2% .006 68);
     --stage: oklch(14% .007 68 / .32); --pane: oklch(21.5% .009 70 / .54); --pane-2: oklch(25.5% .01 72 / .62); --pane-3: oklch(21% .009 70 / .9);
-    --sheet: oklch(18% .008 70); --sheet-2: oklch(21.5% .009 70); --well: oklch(10.5% .005 68);
+    --sheet: oklch(18% .008 70); --sheet-2: oklch(21.5% .009 70); --well: oklch(10.5% .005 68); --bar: oklch(19.5% .009 70 / .97);
     --rim: oklch(96% .02 78 / .12); --rim-out: oklch(0% 0 0 / .35); --gloss: oklch(98% .02 82 / .09);
     --edge-hi: oklch(98% .02 82 / .17); --edge-lo: oklch(0% 0 0 / .42);
     --ink: oklch(95.5% .012 84); --ink-2: oklch(84.5% .013 80); --ink-3: oklch(74.5% .013 78); --ink-4: oklch(56% .012 66);
@@ -157,7 +160,7 @@
 :root[data-theme="dark"] {
   --ground: oklch(12.2% .006 68);
   --stage: oklch(14% .007 68 / .32); --pane: oklch(21.5% .009 70 / .54); --pane-2: oklch(25.5% .01 72 / .62); --pane-3: oklch(21% .009 70 / .9);
-  --sheet: oklch(18% .008 70); --sheet-2: oklch(21.5% .009 70); --well: oklch(10.5% .005 68);
+  --sheet: oklch(18% .008 70); --sheet-2: oklch(21.5% .009 70); --well: oklch(10.5% .005 68); --bar: oklch(19.5% .009 70 / .97);
   --rim: oklch(96% .02 78 / .12); --rim-out: oklch(0% 0 0 / .35); --gloss: oklch(98% .02 82 / .09);
   --edge-hi: oklch(98% .02 82 / .17); --edge-lo: oklch(0% 0 0 / .42);
   --ink: oklch(95.5% .012 84); --ink-2: oklch(84.5% .013 80); --ink-3: oklch(74.5% .013 78); --ink-4: oklch(56% .012 66);

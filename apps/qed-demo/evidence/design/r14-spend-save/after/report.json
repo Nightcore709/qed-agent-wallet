@@ -1,0 +1,274 @@
+{
+ "inr-empty-spend-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-chain-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-save-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-chain-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-save-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-chain-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-save-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-spend-chain-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-empty-save-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-chain-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-save-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-chain-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-save-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-chain-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-save-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-chain-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-save-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-empty-spend-1440.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-spend-chain-1440.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-save-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-empty-spend-1024.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-spend-chain-1024.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-save-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-empty-spend-768.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-spend-chain-768.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-save-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-empty-spend-390.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-spend-chain-390.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-empty-save-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-data-spend-1440.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-spend-chain-1440.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-save-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-data-spend-1024.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-spend-chain-1024.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-save-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-data-spend-768.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-spend-chain-768.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-save-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-data-spend-390.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-spend-chain-390.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-save-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-chain-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-save-1440.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-chain-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-save-1024.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-chain-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-save-768.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-spend-chain-390.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-chain-save-390.png": {
+  "errors": [],
+  "overflow": []
+ }
+}

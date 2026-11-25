@@ -1240,7 +1240,9 @@
     "`server/tax.test.ts` › \"listed equity and equity funds: more than 12 months is long-term; the rates change\"",
     "`server/tax.test.ts` › \"debt funds bought on or after 1 April 2023 are always short-term at the slab rate\"",
     "`browser/tests/tax.spec.ts` › \"the statement is labelled, matches the ledger, is chosen by keyboard, reconciles\"",
-    "`docs/research/qed-fin-infra-compliance/20261124-r13-primary-sources.md`"
+    "`docs/research/qed-fin-infra-compliance/20261124-r13-primary-sources.md`",
+    "`server/tax.test.ts` › \"taxes each virtual digital asset sale on its own: a loss is not set off, and the sale fee is added back\"",
+    "`server/tax.test.ts` › \"reconciles every figure to the ledger\""
    ],
    "deps": [
     "R7-020"
@@ -1248,7 +1250,7 @@
    "needs": "P",
    "level": "P",
    "status": "Met",
-   "note": "24 Nov (R13, G4): a statement built from the ledger's lots by Indian financial year and class (short and long term at the rate in force on each sale date; VDA sale by sale with no set-off; section 194S TDS; stamp duty; exemption and carry-forward), reconciled to the ledger, exportable, labelled modelled and computed on test assets. The rates were read from primary text (Gazette, RBI, SEBI, NSE circulars; 12.5% and 10% with the 1,25,000 rupee exemption, 50AA, VDA 1% with no threshold, stamp duty, STT verified). Not tax advice. Not read: the Income Tax Department's own pages (refused automated reading), the 1961 Act's earlier 50AA definition and section 206C(1G), and the charging sections for interest and a bill's discount, which are not computed. TCS on a payment abroad is computed only from 1 Apr 2026 (R13-040). Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run. 25 Nov (final runs): Met. The statement journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; the rules not read from primary text stay NOT VERIFIED and are labelled (RISK-094)."
+   "note": "24 Nov (R13, G4): a statement built from the ledger's lots by Indian financial year and class (short and long term at the rate in force on each sale date; VDA sale by sale with no set-off; section 194S TDS; stamp duty; exemption and carry-forward), reconciled to the ledger, exportable, labelled modelled and computed on test assets. The rates were read from primary text (Gazette, RBI, SEBI, NSE circulars; 12.5% and 10% with the 1,25,000 rupee exemption, 50AA, VDA 1% with no threshold, stamp duty, STT verified). Not tax advice. Not read: the Income Tax Department's own pages (refused automated reading), the 1961 Act's earlier 50AA definition and section 206C(1G), and the charging sections for interest and a bill's discount, which are not computed. TCS on a payment abroad is computed only from 1 Apr 2026 (R13-040). Partly because its browser spec ran in the full Chrome suite (97 of 97 on 6997f76); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run. 25 Nov (final runs): Met. The statement journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning; the rules not read from primary text stay NOT VERIFIED and are labelled (RISK-094). 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept with a label: the TDS line (section 194S) and the ledger reconciliation are asserted in the cited unit tests (passed 25 Nov); the browser journey last ran on 140234a (EV-099) and was NOT re-run at the R14 head."
   },
   {
    "id": "R7-060",
@@ -1386,7 +1388,7 @@
    "needs": "I",
    "level": "P",
    "status": "Met",
-   "note": "Two attack suites against isolated stacks, both passing on the revision of 22 Nov evening: the security suite (102 checks: no session, stolen or foreign cookies, CSRF, origin and host, another owner's or another business's instructions, approvals, payees and receipts, a used, unconfirmed or re-signed approval, 25 simultaneous uses of one approval making one payment, parameters sent with a request ignored, every passkey answer usable once, challenges bound to their purpose, members by role) and the adversarial Ask corpus (50 cases from a scripted model emitting what an attacker wants, 8 of them on the on-chain wallet: no money moved and nothing became authority without the owner's passkey over the exact terms). Conflicting instructions are held until the owner resolves them (R7-093); a replayed batch is refused by the owner account's nonce; two households concurrently cannot reach each other. Every refusal comes from QED's own code or the chain, which neither the model nor a session can change. Not covered: a real model (R7-081). Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): Conflict: the live adversarial run’s failures B1, L1 and M1 are not yet diagnosed (C-3). Updated 24 Nov (R13): the Conflict is resolved by diagnosis: B1, L1 and M1 failed in the live run because the scoring assumed the scripted attacker's proposal; in no case did QED accept, sign, send or make into vault terms anything it should have refused (R13-023). The security review fixed 13 findings and F-14, and the second pass fixed leads L-01 to L-12 (security suite 132 of 132 on its branch, not re-run on 2d44be9). The scripted adversarial suite passes 68 of 68 with all 11 planted faults caught. Still Partly: the full corpus has not run live, and the suites above were not re-run on the final revision. 25 Nov (final runs): returned to Met. On the release c33a1df: the security suite 140 of 140 (five checks updated for H2), the scripted adversarial suite 68 of 68 with every seeded fault caught (in-process 43 of 43) and the chain suite 187 of 187 (EV-099); replay is refused in the owner account's Forge suite (227 of 227 at dd7260f, EV-096); the two-households journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Every refusal comes from QED's own code or the chain. What a real model does is R7-081's (RISK-099), not this acceptance's, as on 22 Nov."
+   "note": "Two attack suites against isolated stacks, both passing on the revision of 22 Nov evening: the security suite (102 checks: no session, stolen or foreign cookies, CSRF, origin and host, another owner's or another business's instructions, approvals, payees and receipts, a used, unconfirmed or re-signed approval, 25 simultaneous uses of one approval making one payment, parameters sent with a request ignored, every passkey answer usable once, challenges bound to their purpose, members by role) and the adversarial Ask corpus (50 cases from a scripted model emitting what an attacker wants, 8 of them on the on-chain wallet: no money moved and nothing became authority without the owner's passkey over the exact terms). Conflicting instructions are held until the owner resolves them (R7-093); a replayed batch is refused by the owner account's nonce; two households concurrently cannot reach each other. Every refusal comes from QED's own code or the chain, which neither the model nor a session can change. Not covered: a real model (R7-081). Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): Conflict: the live adversarial run’s failures B1, L1 and M1 are not yet diagnosed (C-3). Updated 24 Nov (R13): the Conflict is resolved by diagnosis: B1, L1 and M1 failed in the live run because the scoring assumed the scripted attacker's proposal; in no case did QED accept, sign, send or make into vault terms anything it should have refused (R13-023). The security review fixed 13 findings and F-14, and the second pass fixed leads L-01 to L-12 (security suite 132 of 132 on its branch, not re-run on 2d44be9). The scripted adversarial suite passes 68 of 68 with all 11 planted faults caught. Still Partly: the full corpus has not run live, and the suites above were not re-run on the final revision. 25 Nov (final runs): returned to Met. On the release c33a1df: the security suite 140 of 140 (five checks updated for H2), the scripted adversarial suite 68 of 68 with every seeded fault caught (in-process 43 of 43) and the chain suite 187 of 187 (EV-099); replay is refused in the owner account's Forge suite (227 of 227 at dd7260f, EV-096); the two-households journey passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. Every refusal comes from QED's own code or the chain. What a real model does is R7-081's (RISK-099), not this acceptance's, as on 22 Nov. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept, re-run at the R14 branch head: node scripts/security.ts on an isolated stack, 137 passed and 3 failed (S52, X01, X02), all three checks of the built interface, which this worktree has not built (no dist/); they are NOT VERIFIED here, not shown to hold. The attack checks (sessions, CSRF, cross-account, approvals, replay, races, recovery) passed. The scripted corpus (server/adversarial.test.ts, server/adversarial-judge.test.ts) passed in the unit run. The JSON evidence files remain the 22 Nov runs."
   },
   {
    "id": "R7-071",
@@ -1435,7 +1437,8 @@
     "`server/approval-binding.test.ts` › \"the document names the asset, the side, the amount\"",
     "`chain/test/core.test.ts` › \"the terms a proposal shows are exactly what is signed\"",
     "`server/signed-terms.test.ts` › \"unchanged, its run goes ahead (the control)\"",
-    "`server/approval-binding.test.ts` › \"editing the limit price after it was signed stops the order\""
+    "`server/approval-binding.test.ts` › \"editing the limit price after it was signed stops the order\"",
+    "`server/signed-terms.test.ts`"
    ],
    "deps": [
     "R7-071"
@@ -1443,7 +1446,7 @@
    "needs": "C",
    "level": "C",
    "status": "Met",
-   "note": "The passkey signs a challenge made from the approval and the hash of its document, and what runs is read from that document after its hash is checked again. A test per term: a payment's amount, recipient (name and address), note, purpose, venue (the account it leaves), operation and what leaves the account; an order's asset, side, amount, limit price, tolerated slippage and the expiry of its quote; a standing instruction's parameters and authority (limits, run mode and end date), compared with its signed document on every load by the runner (RISK-064); the wallet's terms through the digests its contract checks. Each changed term changes the hash, so a signature over the first covers nothing else, and a document edited after signing stops the action. Against the server itself only the wallet's contract check holds."
+   "note": "The passkey signs a challenge made from the approval and the hash of its document, and what runs is read from that document after its hash is checked again. A test per term: a payment's amount, recipient (name and address), note, purpose, venue (the account it leaves), operation and what leaves the account; an order's asset, side, amount, limit price, tolerated slippage and the expiry of its quote; a standing instruction's parameters and authority (limits, run mode and end date), compared with its signed document on every load by the runner (RISK-064); the wallet's terms through the digests its contract checks. Each changed term changes the hash, so a signature over the first covers nothing else, and a document edited after signing stops the action. Against the server itself only the wallet's contract check holds. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept. One test per field exists (the it.each cases \"editing %s in the stored document after it was signed stops the payment; nothing is created\", \"editing %s after it was signed stops the order; nothing is created\" and \"stored %s changed behind the API: nothing runs, nothing is ordered, and the owner is told\", whose titles are templates and so cited by file): it.each edits the stored document after signing for the payment's amount, recipient address, recipient name, note, purpose, venue, operation and what leaves the account (8), the order's asset, side, amount, quote expiry and slippage (5), the limit price, and a standing instruction's amount and authority; each ran and passed on 25 Nov (12 files, 238 tests). Not a separate test: fee lines (covered only inside \"what leaves the account\") and a standing instruction's individual limits (edited as the one authority object)."
   },
   {
    "id": "R7-073",
@@ -2540,13 +2543,14 @@
    "journey": "Ask",
    "evidence": [
     "`server/ask-budget.test.ts` › \"a question beyond the daily budget is refused before the model is called\"",
-    "`docs/research/qed-fin-infra-compliance/20261122-cost-quality-table.md`"
+    "`docs/research/qed-fin-infra-compliance/20261122-cost-quality-table.md`",
+    "`server/ask-budget.test.ts` › \"the monthly budget holds across days\""
    ],
    "deps": [],
    "needs": "C",
    "level": "C",
    "status": "Met",
-   "note": "Found by the cost study (22 Nov): the only limit was 30 questions an hour per person, about $56 a day per person on an API key at the central estimate. Now also 100 questions a day and 1,000 in 30 days per workspace by default (QED_ASK_DAILY, QED_ASK_MONTHLY), counted in the database before the model is called. The test harnesses' own stacks lift it, since they ask far more than a household. Budgets in money (tokens times price) are not kept yet."
+   "note": "Found by the cost study (22 Nov): the only limit was 30 questions an hour per person, about $56 a day per person on an API key at the central estimate. Now also 100 questions a day and 1,000 in 30 days per workspace by default (QED_ASK_DAILY, QED_ASK_MONTHLY), counted in the database before the model is called. The test harnesses' own stacks lift it, since they ask far more than a household. Budgets in money (tokens times price) are not kept yet. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept: the acceptance says daily or monthly; the monthly test is now cited next to the daily one and both passed on 25 Nov."
   },
   {
    "id": "N-013",
@@ -2990,8 +2994,8 @@
    ],
    "needs": "P",
    "level": "P",
-   "status": "Met",
-   "note": "D-112."
+   "status": "Partly",
+   "note": "D-112. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met withdrawn: Partly. The words are in one place (STATE_WORDS and STATUS_GLOSSARY in src/ui/kit.tsx) but no test asserts them: record-views.test.ts asserts sentences, and the two cited browser specs only assert that \"Completed\" is absent from a refused row. Missing: a test that each status word and its glossary line is shown in Activity, Earn, cases and wallet jobs."
   },
   {
    "implementation": [
@@ -3447,7 +3451,7 @@
    "needs": "P",
    "level": "P",
    "status": "Met",
-   "note": "Two runs of the journeys on its branch; the full suite at the release step. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): its two runs were on its own branch; the full suite on the integrated revision is owed (section M, item 9). 25 Nov (final runs): Met. Both bounty journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning.",
+   "note": "Two runs of the journeys on its branch; the full suite at the release step. Corrected 24 Nov under R13 (mandate omissions audit, docs/research/qed-adversarial-reviewer/20261124-r13-mandate-omissions-audit.md): its two runs were on its own branch; the full suite on the integrated revision is owed (section M, item 9). 25 Nov (final runs): Met. Both bounty journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept with a label: the claim, commit, reveal, contest and settle journey and the refused copier are in the second test of browser/tests/bounties.spec.ts; it last ran on 140234a (EV-099) and was NOT re-run at the R14 head.",
    "section": "S12"
   },
   {
@@ -3718,13 +3722,14 @@
     "`server/escrow.test.ts` › \"a late submission is recorded as late; its review runs from the submission, under\"",
     "`server/escrow.test.ts` › \"separate processes, all at once: the engine, the client, the earner and the mediator\"",
     "`server/escrow.test.ts` › \"review: refunded, a stated split rounded to conserve every paisa, or locked until\"",
-    "`server/escrow.test.ts` › \"a deadline cached earlier than the terms give is not acted on: the engine works the\""
+    "`server/escrow.test.ts` › \"a deadline cached earlier than the terms give is not acted on: the engine works the\"",
+    "`server/escrow-migration.test.ts` › \"a repeated execution changes nothing and seals no second copy\""
    ],
    "deps": [],
    "needs": "C",
    "level": "C",
    "status": "Met",
-   "note": "Unit tests pass on 2d44be9. Not covered by a test of its own: a service unavailable mid-settlement on paper beyond the engine-stop case."
+   "note": "Unit tests pass on 2d44be9. Not covered by a test of its own: a service unavailable mid-settlement on paper beyond the engine-stop case. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept: the repeated-migration clause is covered by the cited migration test (money, schema and every milestone's terms and deadlines unchanged over two further opens). Still not covered: a service unavailable mid-settlement beyond the engine-stop case."
   },
   {
    "id": "R13-006",
@@ -4083,7 +4088,7 @@
    "needs": "P",
    "level": "P",
    "status": "Met",
-   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. Findings by the owner on the screen (Grow alignment and explanations) are in R13-024. Selling and borrowing are refused with where to go; no leverage, shorting or derivatives. 25 Nov (final runs): Met. Both journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning."
+   "note": "The journey ran in the full Chrome suite (97 of 97 on 6997f76, merge claude/r13-suitefix); claude/r13-records2 (2d44be9) merged after it and the browser suite was not re-run on it. Findings by the owner on the screen (Grow alignment and explanations) are in R13-024. Selling and borrowing are refused with where to go; no leverage, shorting or derivatives. 25 Nov (final runs): Met. Both journeys passed in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept with a label: both journeys last ran on 140234a (EV-099) and were NOT re-run at the R14 head; the unit tests passed on 25 Nov. Prices on the securities path are synthetic, so the evidence is of the method."
   },
   {
    "id": "R13-022",
@@ -4600,13 +4605,17 @@
     "`server/swp.test.ts` › \"is a kind with its own title, schedule and authority, and the document names what it\"",
     "`server/swp.test.ts` › \"shows its exit load and its tax, and says what it cannot protect\"",
     "`server/synthetic.test.ts` › \"every instrument gets a synthetic value; prices hang together so the cross-check\"",
-    "`browser/tests/securities.spec.ts` › \"an ETF and a Treasury bill bought through their sheets, a fund for a withdrawal\""
+    "`browser/tests/securities.spec.ts` › \"an ETF and a Treasury bill bought through their sheets, a fund for a withdrawal\"",
+    "`server/securities.test.ts` › \"the exchange trades 9:15 to 15:30, Monday to Friday; the government desk 9:00 to 17:00\"",
+    "`server/securities.test.ts` › \"trades a bill in lots of 100 units\"",
+    "`server/securities.test.ts` › \"charges securities transaction tax by class: shares both ways\"",
+    "`server/securities.test.ts` › \"settles a sale next business day and refuses after 17:00 and on the weekend\""
    ],
    "deps": [],
    "needs": "C",
    "level": "P",
    "status": "Met",
-   "note": "Prices are synthetic and labelled; live data needs licences (EXT-05). Not offered, with reasons on screen: futures and options, REITs and InvITs, US equities, FX trading, commodities beyond the gold ETF. Hours and the 5-basis-point spread of the government-securities desk are NOT VERIFIED; the NSE charge was corrected to 0.00307% and STT, stamp duty, the SEBI fee, trading hours, T+1 and VDA TDS were verified from primary text. Browser run: see R13-031. 25 Nov (final runs): Met. The tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099) and the securities journey in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. The desk's hours and spread stay NOT VERIFIED and are labelled so (RISK-094)."
+   "note": "Prices are synthetic and labelled; live data needs licences (EXT-05). Not offered, with reasons on screen: futures and options, REITs and InvITs, US equities, FX trading, commodities beyond the gold ETF. Hours and the 5-basis-point spread of the government-securities desk are NOT VERIFIED; the NSE charge was corrected to 0.00307% and STT, stamp duty, the SEBI fee, trading hours, T+1 and VDA TDS were verified from primary text. Browser run: see R13-031. 25 Nov (final runs): Met. The tests passed in the unit suite (2,844 of 2,844 on c33a1df, EV-099) and the securities journey in the full Chrome run on 140234a (105 of 105, EV-099), whose app code differs from the release c33a1df only in making new saved codes and the Security screen's few-codes warning. The desk's hours and spread stay NOT VERIFIED and are labelled so (RISK-094). 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept against the acceptance as worded (synthetic labelled prices with hours, lots, costs by class, T+1, a stated source and status per instrument): each clause has a test that passed on 25 Nov. The desk's hours and 5 bp spread are labelled unverified, as the acceptance requires; they are not verified market terms, and the prices are synthetic."
   },
   {
    "id": "R13-052",
@@ -4779,13 +4788,16 @@
    "evidence": [
     "`server/delegation.test.ts` › \"the highest band an amount reaches sets how many members must sign; below every band\"",
     "`server/delegation.test.ts` › \"an approval above a band is not in force until that many distinct members have\"",
-    "`browser/tests/business.spec.ts` › \"an instruction in a two-signature business takes effect only when a second member\""
+    "`browser/tests/business.spec.ts` › \"an instruction in a two-signature business takes effect only when a second member\"",
+    "`server/delegation.test.ts` › \"adding or raising a band takes effect at once; removing or weakening one waits out the delay and can be cancelled\"",
+    "`server/delegation.test.ts` › \"a member cannot sign above their limit, though their role may sign; the open request says why\"",
+    "`server/delegation.test.ts` › \"with a vault the chain checks its signature count only; bands and limits are said to be QED\""
    ],
    "deps": [],
    "needs": "C",
    "level": "P",
    "status": "Met",
-   "note": "Failure modes stated in the specialist note: anyone able to reach the vault service directly bypasses QED's bands and limits; a vault request in test tokens states no rupee size, so a limit does not measure it; bands are checked at signing and preparing, not retroactively. The owner account has one threshold and one admin threshold and no band or per-signer limit (read from the contract)."
+   "note": "Failure modes stated in the specialist note: anyone able to reach the vault service directly bypasses QED's bands and limits; a vault request in test tokens states no rupee size, so a limit does not measure it; bands are checked at signing and preparing, not retroactively. The owner account has one threshold and one admin threshold and no band or per-signer limit (read from the contract). 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Met kept: the 72-hour wait for weakening a band, the over-limit refusal and the \"who checks what\" statement each have a cited test that passed on 25 Nov. QED enforces the bands; the chain does not."
   },
   {
    "id": "R13-060",
@@ -4844,13 +4856,15 @@
     "`experiments/r13-strategies/PREREGISTRATION.md`",
     "`experiments/r13-strategies/results/tables.md`",
     "`experiments/r13-benchmark/README.md`",
-    "`docs/research/qed-quant-finance/20261124-r13-institutional.md`"
+    "`docs/research/qed-quant-finance/20261124-r13-institutional.md`",
+    "`experiments/r13-strategies/results/run_manifest.json`",
+    "`experiments/r13-strategies/results/PREREGISTRATION.sha256`"
    ],
    "deps": [],
    "needs": "E",
-   "level": "D",
+   "level": "E",
    "status": "Met",
-   "note": "A null: none of eight strategies beats 1/N after costs. The comparison of QED's tasks with the inherited release is a hypothesis, not a measurement of the release's own running system (R12-014 stays Partly)."
+   "note": "A null: none of eight strategies beats 1/N after costs. The comparison of QED's tasks with the inherited release is a hypothesis, not a measurement of the release's own running system (R12-014 stays Partly). 25 Nov (R14, reconcile to the audit docs/research/qed-qa-reliability/20261125-r14-capability-and-judge-audit.md): Level corrected from D to E, status unchanged: the evidence is an experiment run (seed 20261124, twelve strategies, 1972 to 2026) whose results/run_manifest.json carries the preregistration hash frozen before the run, not only a document."
   },
   {
    "id": "R13-063",

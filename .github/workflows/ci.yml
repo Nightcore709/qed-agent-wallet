@@ -67,7 +67,18 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@v1
       - run: npm ci
       - run: forge build
-      - run: npm run verify
+      # Every claim is re-derived in full from one public RPC. A single public endpoint can answer "not found" for an
+      # old receipt from one of its pruned or lagging nodes (seen twice on 25 Nov 2026 with publicnode, which serves the
+      # same receipts at other times), so the whole verification is retried in full against other independent public
+      # endpoints. It passes only if one endpoint confirms every claim; nothing is skipped or loosened.
+      - name: npm run verify (any one independent public RPC must confirm every claim)
+        run: |
+          for rpc in https://ethereum-sepolia-rpc.publicnode.com https://sepolia.gateway.tenderly.co https://1rpc.io/sepolia; do
+            echo "::group::verify against $rpc"
+            if RPC_URL="$rpc" npm run verify; then echo "::endgroup::"; echo "::notice title=verify::every claim confirmed by $rpc"; exit 0; fi
+            echo "::endgroup::"; echo "::warning title=verify::$rpc did not confirm every claim; trying the next endpoint"
+          done
+          echo "::error title=verify::no public endpoint confirmed every claim"; exit 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

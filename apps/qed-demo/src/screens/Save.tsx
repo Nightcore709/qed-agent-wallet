@@ -20,10 +20,10 @@ import { homeCurrency } from '../../shared/home-money.ts'
 import type { GoalsView, Home, Liquidity, PassbookView, ProgramSummary } from '../lib/types.ts'
 import { GoalCard } from '../ui/goal.tsx'
 import { dayName, FloorRule, NO_WHAT_IF, Paise, runwayOf, scoreLanes, type WalletGrants, type WhatIf, whatIf, whatIfChoices, type WhatIfResult, whatIfSum } from '../ui/charts.tsx'
-import { Btn, Field, Link, MoneyBar, MoneyInput, Note, Problem, Swatch, useMasonry } from '../ui/kit.tsx'
+import { Btn, EmptyState, Field, Link, MoneyBar, MoneyInput, Note, Problem, Swatch } from '../ui/kit.tsx'
 import { ReserveBasis } from '../ui/reserve.tsx'
 import { Score } from '../ui/score-lazy.tsx' // the chart is its own chunk, fetched once the figure and controls are drawn (R12 perf)
-import { Envelope, ReserveAllows, type ReserveData, ReserveShort, Skel, Terms } from './Safeguards.tsx'
+import { Envelope, NotCounted, ReserveAllows, type ReserveData, ReserveShort, Skel, Terms } from './Safeguards.tsx'
 // The on-chain wallet's part is its own chunk, fetched once Save's figure and controls are drawn: it was the larger
 // part of what a phone waited for before Save's figure (R12 perf, D-R12-G1; measured 2.61 s with it, 2.42 s without).
 const WalletSetAside = lazy(() => import('./WalletInline.tsx').then((m) => ({ default: m.WalletSetAside })))
@@ -83,7 +83,6 @@ function SaveBody({ h, data, expected, progs, vault, goals, reload }: { h: Home;
   const lanes = scoreLanes({ programs: h.programs, expected: expected ?? [], today: l.today, stopped: !!h.stop, worst: o.worst, wallet: v ? { mandate: v.mandate, policy: v.policy, reserveDecimals: decimals } : null })
   // goals have their own panel above; this part lists the instructions that move idle cash
   const saving = (progs.data?.programs ?? []).filter((p) => p.pillar === 'save' && p.kind !== 'goal' && ['active', 'paused', 'draft'].includes(p.state))
-  const board = useMasonry()
 
   // the what-if: harder assumptions tried here and drawn over the recorded line; nothing is saved or sent
   const [w, setW] = useState<WhatIf>(NO_WHAT_IF)
@@ -117,7 +116,7 @@ function SaveBody({ h, data, expected, progs, vault, goals, reload }: { h: Home;
             { op: '=', hero: true, k: <><Swatch tone={isShort ? 'short' : 'free'} />{isShort ? 'Short' : 'Free to use'}</>, v: <Paise paise={isShort ? l.short : free} />, tone: isShort ? 'short' : undefined, s: isShort ? 'Something due could not be paid at worst' : 'No day needs it, even at worst' },
           ]} />
           <ReserveShort l={l} />
-          <ReserveAllows l={l} profile={h.profile} onSaved={reload} />
+          <ReserveAllows l={l} profile={h.profile} onSaved={reload} notCounted={false} />
         </section>
         <Dues l={l} />
       </div>
@@ -136,17 +135,30 @@ function SaveBody({ h, data, expected, progs, vault, goals, reload }: { h: Home;
           foot={<><Link to="/passbook">Every line of your bank account, and what is expected<ChevronRight aria-hidden="true" /></Link><Link to="/protect">Review and change what QED may do<ChevronRight aria-hidden="true" /></Link></>} />
       </section>
 
-      <div className="board sv-board" ref={board}>
-        <section data-col="2" className="panel sv-kept" aria-labelledby="kept-h">
+      {/* R14: the most the instructions could take over the floor on the left, what is kept and set aside beside both on
+          the right; the two columns end on one line (save.css .sv-board). In the page, and so for the keyboard and on a
+          phone, the left column comes first. */}
+      <div className="sv-board">
+        <Envelope env={data.envelope} />
+
+        <section className="panel sv-floor fills" aria-labelledby="floor-h">
+          <div className="panel-head"><h2 id="floor-h">Your floor</h2><p>If markets fell to your limits</p></div>
+          <p className="sv-lead-k">{o.worst.cushion >= 0 ? 'Above your floor' : 'Below your floor'}</p>
+          <p className={`sv-lead ${o.worst.cushion < 0 ? 'short' : ''}`}><Paise paise={Math.abs(o.worst.cushion)} /></p>
+          <p className="sv-floor-says"><b>{fmt.money(o.worst.gHat, true)}</b> would be left if every holding fell by its limit at once; your floor is <b>{fmt.money(o.worst.line, true)}</b>, so you are <b className={o.worst.cushion < 0 ? 'short' : ''}>{fmt.money(Math.abs(o.worst.cushion), true)} {o.worst.cushion >= 0 ? 'above' : 'below'}</b> it. QED refuses its own purchases that would take you below it.</p>
+          {!o.worst.valid ? <Note tone="void" title="This figure cannot be relied on right now">{o.worst.invalidReasons.join('. ')}. While that lasts QED refuses purchases that depend on it.</Note> : null}
+          <FloorRule worst={o.worst.gHat} fall={o.worst.holdingsValue - o.worst.holdingsWorst} floor={o.worst.line} />
+          <p className="sv-more-link"><Link to="/safeguards#floor">Your floor, line by line, and how to change it<ChevronRight aria-hidden="true" /></Link></p>
+        </section>
+
+        <section className="panel sv-kept fills" aria-labelledby="kept-h">
           <div className="panel-head"><h2 id="kept-h">Kept and set aside, each with its limit</h2><p>What may hold money back, and the most each may move</p></div>
-          <section className="sv-part" aria-labelledby="own-h">
+          <section className="sv-part fills" aria-labelledby="own-h">
             <div className="sv-part-head"><h3 id="own-h">Saving on its own</h3><p>Instructions that move idle cash</p></div>
             {!progs.data && !progs.error ? <Skel h={64} r={14} /> : progs.error ? <Problem error={progs.error} /> : saving.length === 0 ? (
-              <div className="sv-none">
-                <span className="glyph" aria-hidden="true"><PiggyBank /></span>
-                <div><h4>No saving instruction yet</h4><p>QED can keep a buffer in your bank and move the rest into a liquid fund, bringing it back when the buffer runs low.{l.free > 0 ? ` Today ${fmt.money(l.free, true)} is free: no day needs it.` : ''}</p></div>
-                <Link className="btn sm" to="/instructions/new?kind=sweep"><Plus aria-hidden="true" />Write a saving instruction</Link>
-              </div>
+              <EmptyState fill as="h4" icon={<PiggyBank />} title="No saving instruction yet" action={<Link className="btn sm" to="/instructions/new?kind=sweep"><Plus aria-hidden="true" />Write a saving instruction</Link>}>
+                QED can keep a buffer in your bank and move the rest into a liquid fund, bringing it back when the buffer runs low.{l.free > 0 ? ` Today ${fmt.money(l.free, true)} is free: no day needs it.` : ''}
+              </EmptyState>
             ) : (
               <ul className="sv-saves">
                 {saving.map((p) => {
@@ -164,23 +176,11 @@ function SaveBody({ h, data, expected, progs, vault, goals, reload }: { h: Home;
               </ul>
             )}
           </section>
-          <section className="sv-part" aria-labelledby="chain-h">
+          <section className="sv-part fills" aria-labelledby="chain-h">
             <div className="sv-part-head"><h3 id="chain-h">Set aside on the chain</h3><p>Test rupees on a local chain</p></div>
             <div className="sv-chain"><Suspense fallback={<div aria-busy="true"><p className="loading-line">Reading the wallet on the chain…</p><Skel h={160} r={16} /></div>}><WalletSetAside /></Suspense></div>
             {v ? <DollarReserve v={v} decimals={decimals} /> : null}
           </section>
-        </section>
-
-        <Envelope env={data.envelope} />
-
-        <section data-col="1" className="panel sv-floor" aria-labelledby="floor-h">
-          <div className="panel-head"><h2 id="floor-h">Your floor</h2><p>If markets fell to your limits</p></div>
-          <p className="sv-lead-k">{o.worst.cushion >= 0 ? 'Above your floor' : 'Below your floor'}</p>
-          <p className={`sv-lead ${o.worst.cushion < 0 ? 'short' : ''}`}><Paise paise={Math.abs(o.worst.cushion)} /></p>
-          <p className="sv-floor-says"><b>{fmt.money(o.worst.gHat, true)}</b> would be left if every holding fell by its limit at once; your floor is <b>{fmt.money(o.worst.line, true)}</b>, so you are <b className={o.worst.cushion < 0 ? 'short' : ''}>{fmt.money(Math.abs(o.worst.cushion), true)} {o.worst.cushion >= 0 ? 'above' : 'below'}</b> it. QED refuses its own purchases that would take you below it.</p>
-          {!o.worst.valid ? <Note tone="void" title="This figure cannot be relied on right now">{o.worst.invalidReasons.join('. ')}. While that lasts QED refuses purchases that depend on it.</Note> : null}
-          <FloorRule worst={o.worst.gHat} fall={o.worst.holdingsValue - o.worst.holdingsWorst} floor={o.worst.line} />
-          <p className="sv-more-link"><Link to="/safeguards#floor">Your floor, line by line, and how to change it<ChevronRight aria-hidden="true" /></Link></p>
         </section>
       </div>
     </>
@@ -213,11 +213,9 @@ function Goals({ goals, onChanged }: { goals: Resource<GoalsView>; onChanged: ()
         {list.length ? <Link className="btn sm" to="/instructions/new?kind=goal"><Plus aria-hidden="true" />Save for another goal</Link> : null}
       </div>
       {!goals.data ? (goals.error ? <Problem error={goals.error} /> : <Skel h={180} r={18} />) : list.length === 0 ? (
-        <div className="sv-none">
-          <span className="glyph" aria-hidden="true"><Target /></span>
-          <div><h3>No goal yet</h3><p>Name an amount and a date, a holiday in March or school fees in June. QED works out what to set aside each month, asks before each one, and keeps the money where no instruction can spend it until you release it.</p></div>
-          <Link className="btn sm" to="/instructions/new?kind=goal"><Plus aria-hidden="true" />Save for a goal</Link>
-        </div>
+        <EmptyState across icon={<Target />} title="No goal yet" action={<Link className="btn sm" to="/instructions/new?kind=goal"><Plus aria-hidden="true" />Save for a goal</Link>}>
+          Name an amount and a date, a holiday in March or school fees in June. QED works out what to set aside each month, asks before each one, and keeps the money where no instruction can spend it until you release it.
+        </EmptyState>
       ) : (
         <ul className="sv-goal-list">{list.map((g) => <li key={g.id}><GoalCard g={g} onChanged={onChanged} /></li>)}</ul>
       )}
@@ -248,7 +246,9 @@ function ReserveBar({ l, may }: { l: Liquidity; may: number }) {
 }
 
 const DUE_KIND: Record<string, string> = { emi: 'Your bank takes it', bill: 'A registered bill' }
-const CAP = 8
+// R14: five dated lines, then the rest folded with its sum: the statement stays about as tall as the figure's own panel
+// beside it, so neither is left with a hole (it was eight, and the pair stood up to 200 px apart)
+const CAP = 5
 /**
  * What the figure pays for, as a statement: each bill and instalment through the hardest day on its own day, then the
  * everyday spending to that day, less income certain to have arrived first. Read down, it adds up to what must stay.
@@ -278,7 +278,10 @@ function Dues({ l }: { l: Liquidity }) {
         </dl>
       ) : null}
       {all && items.length > CAP + 1 ? <p className="sv-dues-less"><button type="button" className="linkish" aria-expanded={true} onClick={() => setAll(false)}>Show the first {CAP} only</button></p> : null}
+      <div className="sv-dues-foot">
+      <NotCounted l={l} />
       <p className="sv-dues-note">{a.income > 0 ? (fc ? <>QED counts on the salary due {fmt.isoDay(fc.due)}{fc.by !== fc.due ? ` only from ${fmt.isoDay(fc.by)}, the latest it may arrive` : ''}.{a.lostSalaries > 0 ? ` ${a.lostSalaries === 1 ? 'The one before it is' : 'The ones before it are'} treated as lost.` : ''} </> : `No salary is counted on in the next ${l.horizonDays} days. `) : null}The figure is the least that pays everything listed, each at its worst. It does not cover a bill that is not on record, or spending above your figure.</p>
+      </div>
       {!l.sustainable ? <Note tone="wait" title="More may be needed than this">The hardest day found is at the end of the {l.horizonDays} days QED looks ahead, so the figure is still rising where the look-ahead stops. The usual reason is that your recorded outgoings are larger than your income.</Note> : null}
     </section>
   )
@@ -339,7 +342,7 @@ function WhatIfRail({ l, r, w, setW, bill, setBill, more, setMore, choices, beyo
       </div>
       <p className="sv-wi-says">Try a harder month. The worst case is worked out again, here in your browser, and drawn over the recorded line. Nothing is saved, and no check QED makes uses it.</p>
       <p className="sr" role="status">{said}</p>
-      <form className="sv-wi-form" aria-label="What if" onSubmit={(e) => e.preventDefault()}>
+      <form className="form-grid fields sv-wi-form" aria-label="What if" onSubmit={(e) => e.preventDefault()}>
         <Field label="You spend this today" hint="By hand, any way you pay">{(p) => <MoneyInput {...p} value={w.spend > 0 ? w.spend : null} onChange={(x) => setW((c) => ({ ...c, spend: x ?? 0 }))} />}</Field>
         {s ? <Field label={`The salary due ${fmt.isoDay(s.due)} comes`} hint={s.allowed > 0 ? `You already allow for ${s.allowed} day${s.allowed === 1 ? '' : 's'} late` : 'You allow for it on its day'}>{(p) => (
           <select {...p} className="input" value={lateValue} onChange={(e) => { const x = e.target.value; setW((c) => ({ ...c, salaryLost: x === 'never', salaryLate: x === 'never' || x === 'as' ? 0 : Number(x) })) }}>
@@ -347,19 +350,15 @@ function WhatIfRail({ l, r, w, setW, bill, setBill, more, setMore, choices, beyo
             {LATE.filter((d) => d > s.allowed && !s.clashes(d)).map((d) => <option key={d} value={d}>{d} days late</option>)}
             <option value="never">Never</option>
           </select>)}</Field>
-          : <div className="field"><span className="sv-wi-label">A late or lost salary</span><p className="hint">{l.assumptions.income > 0 ? `No salary is counted on in the ${n} days drawn, so none can be later here.` : 'No salary is recorded for this household.'}</p></div>}
-        <div className="sv-wi-pair">
+          : <div className="field"><span className="legend sv-wi-label">A late or lost salary</span><p className="hint">{l.assumptions.income > 0 ? `No salary is counted on in the ${n} days drawn, so none can be later here.` : 'No salary is recorded for this household.'}</p></div>}
           <Field label="A bill or instalment is larger" hint={picked ? `${fmt.money(-picked.amount, true)} as recorded, due ${dayName(picked.date)}` : choices.bills.length ? 'Which one' : `None is named in the ${n} days drawn`}>{(p) => (
             <select {...p} className="input" value={bill} onChange={(e) => setBill(e.target.value)} disabled={choices.bills.length === 0}>
               <option value="">None</option>
               {choices.bills.map((x) => <option key={`${x.date}|${x.label}`} value={`${x.date}|${x.label}`}>{x.label}, {dayName(x.date)}</option>)}
             </select>)}</Field>
           <Field label="Larger by" hint={picked ? 'How much more it could be' : 'Choose which one first'}>{(p) => <MoneyInput {...p} value={more} onChange={setMore} />}</Field>
-        </div>
-        <div className="sv-wi-pair">
           <Field label="A new cost each month" hint="On the same day each month">{(p) => <MoneyInput {...p} value={w.monthly?.amount ?? null} onChange={(x) => setW((c) => ({ ...c, monthly: x ? { amount: x, day: c.monthly?.day ?? 1 } : null }))} />}</Field>
           <Field label="On day" hint="1 to 28">{(p) => <select {...p} className="input" value={w.monthly?.day ?? 1} onChange={(e) => setW((c) => ({ ...c, monthly: c.monthly ? { ...c.monthly, day: Number(e.target.value) } : null }))} disabled={!w.monthly}>{DAYS.map((d) => <option key={d} value={d}>{d}</option>)}</select>}</Field>
-        </div>
       </form>
 
       {r.changed ? <WhatIfResultView r={r} l={l} beyond={beyond} /> : <p className="sv-wi-idle">Nothing is changed yet. Set any of these to see that month on the chart.</p>}
