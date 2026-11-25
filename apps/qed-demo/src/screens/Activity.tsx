@@ -20,6 +20,7 @@ import type { Job as WalletJob } from '../../chain/types.ts'
 import { homeCurrency, homeSign, UNITS_WORD } from '../../shared/home-money.ts'
 import { api, fmt, navigate, rupeesToPaise, useData, useNow, zoneDay, zoneHead, zoneIso, zoneName } from '../lib/core.ts'
 import { fundLine } from '../lib/fund-stages.ts'
+import { expiredLine, standsUntilLine } from '../lib/order-expiry.ts'
 import { closeTo, nameWords } from '../lib/fuzzy.ts'
 import { useUrlState } from '../lib/url-state.ts'
 import { checkDates, dayStartIst, isDate, istDate, nextDay, periodFileName, periodOf, periodWords } from '../../shared/period.ts'
@@ -195,7 +196,10 @@ function actionDetail(a: ActivityAction): string[] {
   if (said) d.push(said)
   if (a.kind === 'order' && a.instrument && n(a.result.filledQty) > 0) d.push(`${qtyText(a.result.filledQty, a.instrument.baseScale)} ${unitsWord(a.instrument.kind, a.instrument.baseAsset)}`)
   if (WAITING.has(a.state) && a.state !== 'awaiting_approval') d.push(fragment(inProgressLine(a)))
-  if (['failed', 'rejected', 'cancelled', 'expired', 'partial'].includes(a.state) && a.error) d.push(fragment(a.error))
+  const stands = standsUntilLine(a), ended = expiredLine(a)
+  if (stands) d.push(stands)
+  if (ended) d.push(ended)
+  else if (['failed', 'rejected', 'cancelled', 'expired', 'partial'].includes(a.state) && a.error) d.push(fragment(a.error))
   // a dispute pack can be made for a payment that is disputed or whose outcome is uncertain (server/dispute-pack.ts)
   if (a.packReason && a.packReason !== 'disputed') d.push('Its outcome is in doubt: a dispute pack can be made from its record')
   const checks = a.decision.checks ?? []

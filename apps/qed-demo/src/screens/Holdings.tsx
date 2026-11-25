@@ -34,6 +34,7 @@ import { ActionDoc, ApprovalSheet, type PendingApproval } from '../ui/instrument
 import { Paise } from '../ui/charts.tsx'
 import { Basis, Btn, EmptyState, Field, Link, MoneyInput, Note, Problem, Stamp, StateStamp, useAction, useSession, useStickySide } from '../ui/kit.tsx'
 import { Skel, useHashTarget } from '../ui/page.tsx'
+import { expiredLine, standsUntilLine } from '../lib/order-expiry.ts'
 import { atomsText, dailyWord, deskStatus, fromOf, isoDayOf, isUnits, MINUS, pctText, placesOf, quantityText, show, tickerOf, unitsWord } from '../ui/prices.ts'
 import { useMedia } from '../ui/viewport.ts'
 import { dayOf, dayText, istDay } from '../../shared/day-text.ts'
@@ -499,7 +500,7 @@ function promiseOf(fund: boolean, side: 'buy' | 'sell', type: 'market' | 'limit'
   const pc = `${(slip / 100).toLocaleString('en-IN', { maximumFractionDigits: 1 })}%`
   const budget = side === 'buy' ? ` A buy never spends more than you enter, ${fund ? 'stamp duty' : 'fee'} included.` : ''
   if (fund) return { yes: `The NAV for its own day, whatever that NAV is.${budget}`, no: `That NAV, and so how many units ${side === 'buy' ? 'you get' : 'you are paid for'}: it is published after the ${cutoff} India time cut-off.` }
-  if (type === 'limit') return { yes: `It fills only at your price or better.${budget}`, no: 'That it fills at all: what does not fill waits for your price, or until you cancel it.' }
+  if (type === 'limit') return { yes: `It fills only at your price or better.${budget}`, no: 'That it fills at all: what does not fill waits for your price until the time you chose, or until you cancel it.' }
   if (type === 'stop') return { yes: `Nothing is sold until buyers offer your level or less; then it fills only within ${pc} of the best price, and the rest is cancelled.`, no: 'The price it sells at, or that it fills.' }
   return { yes: `It fills only within ${pc} of the best price when it is sent; what cannot fill inside that is cancelled.${budget}`, no: 'The prices shown here or in the estimate, or that all of it fills.' }
 }
@@ -515,6 +516,9 @@ function Ticket({ market, home, onDone, preset, onPick }: { market: Market; home
   const [type, setType] = useState<'market' | 'limit' | 'stop'>('market')
   const [price, setPrice] = useState('')
   const [slip, setSlip] = useState(100)
+  const [stands, setStands] = useState<'gtc' | 'day' | 'until'>('gtc')
+  const [untilDate, setUntilDate] = useState('')
+  const [untilTime, setUntilTime] = useState('15:00')
   const [pv, setPv] = useState<(PendingApproval & ActionPreview) | null>(null)
   const inst = tradable.find((i) => i.id === id)
   const fund = inst?.kind === 'mutual_fund'
@@ -528,7 +532,7 @@ function Ticket({ market, home, onDone, preset, onPick }: { market: Market; home
     else if (all) body.sellAll = true
     else body.qty = qty.trim()
     if (security) body.type = 'market'
-    else if (!fund) { body.type = type; body.maxSlippageBps = slip; if (type === 'limit') body.limitPrice = price.replace(/[,\s]/g, ''); if (type === 'stop') body.stopPrice = price.replace(/[,\s]/g, '') }
+    else if (!fund) { body.type = type; body.maxSlippageBps = slip; if (type === 'limit') { body.limitPrice = price.replace(/[,\s]/g, ''); body.validity = stands; if (stands === 'until') { body.untilDate = untilDate; body.untilTime = untilTime } } if (type === 'stop') body.stopPrice = price.replace(/[,\s]/g, '') }
     setPv(await api<PendingApproval & ActionPreview>('POST', '/api/actions/preview', body))
   })
   const f = preview.error?.fields ?? {}
@@ -566,6 +570,11 @@ function Ticket({ market, home, onDone, preset, onPick }: { market: Market; home
       {!fund && !security ? <div className="form-grid">
         <Field label="How">{(p) => <select {...p} className="input" value={type} onChange={(e) => setType(e.target.value as 'market' | 'limit' | 'stop')}><option value="market">Now, at the prices on the book</option><option value="limit">Only at my price or better</option>{side === 'sell' ? <option value="stop">Later, if the price falls to a level</option> : null}</select>}</Field>
         {type !== 'market' ? <Field label={type === 'limit' ? 'My price, in rupees' : 'Sell when buyers offer this or less'} error={f.limitPrice ?? f.stopPrice}>{(p) => <input {...p} className="input" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />}</Field> : null}
+        {type === 'limit' ? <Field label="How long it stands" hint="When the time comes, what has not filled is cancelled and the money or holding set aside for it is free again. What filled stays." error={f.validity}>{(p) => <select {...p} className="input" value={stands} onChange={(e) => setStands(e.target.value as 'gtc' | 'day' | 'until')}><option value="gtc">Until I cancel it</option><option value="day">Until the end of today, India time</option><option value="until">Until a date and time I choose</option></select>}</Field> : null}
+        {type === 'limit' && stands === 'until' ? <>
+          <Field label="Stands until this date, India time" hint="Within 90 days from now." error={f.untilDate}>{(p) => <input {...p} className="input" type="date" value={untilDate} onChange={(e) => setUntilDate(e.target.value)} />}</Field>
+          <Field label="At this time, India time">{(p) => <input {...p} className="input" type="time" value={untilTime} onChange={(e) => setUntilTime(e.target.value)} />}</Field>
+        </> : null}
         {type !== 'limit' ? <Field label="Worst price to accept" hint="Away from the best price at that moment. What cannot fill inside it is cancelled.">{(p) => <select {...p} className="input" value={slip} onChange={(e) => setSlip(Number(e.target.value))}><option value={50}>0.5%</option><option value={100}>1%</option><option value={200}>2%</option><option value={500}>5%</option></select>}</Field> : null}
       </div> : null}
       {side === 'buy' ? <p className="small muted ticket-floor"><i className={`gr-sw ${w.cushion >= 0 ? 'room' : 'short'}`} aria-hidden="true" />{w.cushion >= 0 ? <>QED refuses a purchase that would take your worst case below your floor: {fmt.money(w.cushion, true)} of room now. The estimate shows the room after this order.</> : <>Your worst case is {fmt.money(-w.cushion, true)} below your floor, so QED refuses a purchase that lowers it further.</>}</p> : null}
@@ -609,7 +618,9 @@ function Fills({ market }: { market: Market }) {
               <p className="small muted">{filled
                 ? <>{a.params.side === 'sell' ? 'Sold' : 'Bought'} <b className="gr-n">{qty} {unit}</b> for <b className="gr-n">{fmt.inr(amount, true)}</b>{fees ? <>, fees and taxes {fmt.inr(fees, true)}</> : null}; filled {at ? `${fmt.day(at)}, ${fmt.time(at, true)}` : ''} {book}.</>
                 : a.state === 'working' || a.state === 'submitting' || a.state === 'planned' ? <>{a.instrument?.kind === 'mutual_fund' && a.state !== 'planned' ? fundLine(a, Date.now()) : 'Not filled yet.'}</>
-                  : <>Nothing filled{a.error ? `: ${a.error}` : '.'}</>}</p>
+                  : a.state === 'expired' ? <>Nothing filled.</> : <>Nothing filled{a.error ? `: ${a.error}` : '.'}</>}</p>
+              {standsUntilLine(a) ? <p className="small muted">{standsUntilLine(a)}.</p> : null}
+              {expiredLine(a) ? <p className="small muted">{expiredLine(a)}.</p> : null}
             </li>
           )
         })}</ul>

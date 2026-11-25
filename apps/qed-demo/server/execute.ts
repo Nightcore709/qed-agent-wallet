@@ -22,7 +22,7 @@ import { type OrderRequest, PaperDebtVenue, PaperExchangeVenue, TERMINAL_ORDER, 
 import { fromAmountText } from '../shared/amount-text.ts'
 import { floorToStep, fraction, mulDiv, notional, parseDec, parsePrice, pow10 } from '../shared/fixed.ts'
 import { withHome } from './home-currency.ts'
-import { homeMoneyExact } from '../shared/home-money.ts'
+import { homeMoney, homeMoneyExact } from '../shared/home-money.ts'
 import { canonical } from '../shared/sha256.ts'
 
 const big = (s: string | undefined | null): bigint => BigInt(s ?? '0')
@@ -331,6 +331,8 @@ function submit(ctx: Ctx, a: ActionRow): ActionRow {
       clientRef: a.economic_id, userId: a.user_id, instrumentId: p.instrumentId, side: p.side, type: p.type,
       ...(p.qty ? { qty: big(p.qty) } : {}), ...(p.amount ? { amount: big(p.amount) } : {}),
       ...(p.limitPrice ? { limitPrice: p.limitPrice } : {}), ...(p.stopPrice ? { stopPrice: p.stopPrice } : {}), ...(p.maxSlippageBps !== undefined ? { maxSlippageBps: p.maxSlippageBps } : {}),
+      // a resting order's time, read from the signed terms; an order whose terms carry none (placed before expiry existed) stands until cancelled
+      ...(p.validity && p.validity.kind !== 'gtc' ? { expiresAt: p.validity.expiresAt } : {}),
     }
     const vo = venueFor(ctx, inst).submit(req)
     return save(ctx, a, { state: 'working', result: { venueOrderId: vo.id, venueState: vo.state, ...(inst.kind === 'mutual_fund' ? { registrarAt: vo.createdAt } : {}) }, time: 'submitted', attempt: a.attempt + 1 })
@@ -389,7 +391,17 @@ function bookFill(ctx: Ctx, a: ActionRow, inst: Instrument, vo: VenueOrder, f: V
   })
 }
 
-function settleOrder(ctx: Ctx, a: ActionRow): ActionRow {
+const paiseText = (p: bigint): string => homeMoney(Number(p), undefined, { paise: true })
+
+/** An expired order, in plain words: what stood until when, what had filled before, and what is free again. */
+function expiryNotice(ctx: Ctx, a: ActionRow, inst: Instrument, vo: VenueOrder, moved: bigint, remaining: bigint, expiredAt: number): void {
+  const filled = vo.filledQty > 0n
+  const before = filled ? `Before then ${qtyText(vo.filledQty, inst)} ${inst.base_asset} filled${vo.side === 'buy' ? `, which cost ${paiseText(moved)}` : `, which brought in ${paiseText(moved)}`}.` : 'Nothing had filled.'
+  const freed = vo.side === 'buy' ? `${paiseText(remaining)} that was set aside for it is free again.` : `${qtyText(remaining, inst)} ${inst.base_asset} that was set aside for it is free to use again.`
+  notice(ctx.db, a.user_id, { level: 'info', kind: 'order-expired', title: `${describe(ctx, a)}: expired`, body: `It stood until ${whenIst(expiredAt)}. ${before} ${freed}`, subject: a.id, dedupe: `expired:${a.id}` }, ctx.clock.now())
+}
+
+export function settleOrder(ctx: Ctx, a: ActionRow): ActionRow {
   const { db } = ctx
   const p = a.params as OrderParams
   const inst = instrument(db, p.instrumentId)!
@@ -425,12 +437,27 @@ function settleOrder(ctx: Ctx, a: ActionRow): ActionRow {
     return next
   }
   return db.tx(() => {
+    // Read the action again under the write lock: the engine and an API cancel may settle it at the same moment. The one that
+    // comes second finds it finished and changes nothing, so it can neither strip what the first recorded nor audit a second ending.
+    const current = getAction(db, a.id)
+    if (!current || TERMINAL_ACTION.has(current.state)) return current ?? a
+    a = current
+    // What the order still had reserved, read just before it is freed: after an expiry that is the unfilled remainder only
+    // (every fill used up its own part of the reservation when it was booked), and it is freed, and said, exactly once.
+    const open = db.get<{ t: string }>('SELECT amount_text t FROM holds WHERE user_id = ? AND ref = ? AND released_at IS NULL', a.user_id, `act:${a.id}`)
+    const remaining = open ? fromAmountText(open.t, `the reservation act:${a.id}`) : 0n
     releaseHold(db, a.user_id, `act:${a.id}`, now)
+    if (vo.state === 'expired') {
+      const expiredAt = typeof vo.meta.expiredAt === 'number' ? vo.meta.expiredAt : now
+      Object.assign(result, { expired: true, expiredAt, ...(vo.side === 'buy' ? { releasedPaise: remaining.toString() } : { releasedQty: remaining.toString() }) })
+      expiryNotice(ctx, a, inst, vo, moved, remaining, expiredAt)
+    }
     if (inst.kind === 'mutual_fund' && vo.side === 'buy' && vo.filledQty === 0n) {
       post(db, { userId: a.user_id, ts: now, kind: 'fund-purchase-returned', ref: `mf:${a.economic_id}:refund`, memo: `Money returned: ${inst.name} order was not accepted`, meta: { actionId: a.id, paper: true },
         lines: [{ account: 'bank', amount: big(p.amount) }, { account: 'clear:mf', amount: -big(p.amount) }] })
     }
-    const state: ActionState = vo.state === 'filled' ? 'done' : vo.state === 'partially_filled' ? 'partial' : vo.state === 'rejected' ? 'rejected' : vo.state === 'expired' ? 'expired' : 'cancelled'
+    // an expiry after a part fill is a partly done order, as a cancel after one is (money moved; `result.expired` says why it ended)
+    const state: ActionState = vo.state === 'filled' ? 'done' : vo.state === 'partially_filled' ? 'partial' : vo.state === 'rejected' ? 'rejected' : vo.state === 'expired' ? (vo.filledQty > 0n ? 'partial' : 'expired') : 'cancelled'
     const withTime = a.times.executed || vo.fills.length === 0 ? a : save(ctx, a, { time: 'executed' })
     return save(ctx, withTime, { state, result, error: vo.rejectReason, time: 'finished' })
   })
@@ -610,6 +637,7 @@ function finishWithReceipt(ctx: Ctx, a: ActionRow): ActionRow {
     decision: { decidedAt: a.policy.decidedAt ?? null, checks: a.policy.checks ?? [] },
     ...(instrumentInfo ? { instrument: instrumentInfo } : {}), venue, ...(costs ? { costs } : {}), ledgerEntries: rec.entries, reconciliation: { state: rec.state, breaks: rec.breaks, checkedAt: now },
     times: { ...a.times, reconciled: now }, economicId: a.economic_id, params: a.params,
+    ...(a.result.expired ? { expiry: { expiredAt: a.result.expiredAt, filledQty: a.result.filledQty, movedPaise: a.result.movedPaise, releasedPaise: a.result.releasedPaise ?? null, releasedQty: a.result.releasedQty ?? null } } : {}),
   }
   return db.tx(() => {
     const r = issueReceipt(db, a.user_id, a.state === 'blocked' ? 'refusal' : a.kind, a.id, body, now)

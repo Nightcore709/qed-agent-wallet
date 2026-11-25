@@ -274,6 +274,8 @@ export const fmt = {
   dayYear: (ms: number): string => { const p = parts(ms); return `${p.d} ${MONTHS[p.m]} ${p.y}` },
   time: (ms: number, seconds = false): string => { const p = parts(ms); return `${p2(p.hh)}:${p2(p.mm)}${seconds ? `:${p2(p.ss)}` : ''}` },
   dayTime: (ms: number): string => `${fmt.day(ms)}, ${fmt.time(ms)}`,
+  /** The date with its year, the minute and the zone: "18 Nov 2026, 11:00 IST". */
+  at: (ms: number): string => `${fmt.dayYear(ms)}, ${fmt.time(ms)} ${zoneLabel(ms, displayZone)}`,
   full: (ms: number): string => `${fmt.dayYear(ms)}, ${fmt.time(ms, true)} ${zoneLabel(ms, displayZone)}`,
   /** "in 42 minutes", "3 hours ago". */
   rel: (ms: number, now: number): string => {

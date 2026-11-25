@@ -14,7 +14,7 @@
  *                     test payee (decline@paper, slow@paper, timeout@paper, reverse@paper), as provider sandboxes do.
  */
 import { withAgentIdentity } from './agent-identity.ts'
-import { addDays, type Clock, type Db, ist, istInstant, j, newId, parse } from './core.ts'
+import { addDays, type Clock, type Db, ist, istInstant, j, newId, parse, whenIst } from './core.ts'
 import { type Book, fetchCoindcxBook, type Market } from './market.ts'
 import { type Instrument, instrument, term, termValue } from './registry.ts'
 import { fromAmountText } from '../shared/amount-text.ts'
@@ -29,6 +29,8 @@ export type OrderState = 'new' | 'accepted' | 'funded' | 'filled' | 'partially_f
 export interface OrderRequest {
   clientRef: string; userId: string; instrumentId: string; side: Side; type: OrderType
   qty?: bigint; amount?: bigint; limitPrice?: string; stopPrice?: string; maxSlippageBps?: number; sellAll?: boolean
+  /** A resting order only: the instant it stops standing. Absent means good until cancelled. */
+  expiresAt?: number
 }
 export interface VenueFill { id: string; ts: number; effectiveDate: string | null; qty: bigint; price: string; amount: bigint; fee: bigint; tax: bigint; cashAt: number | null; cashDone: boolean; snapshotId: string | null; note: string | null }
 export interface VenueOrder {
@@ -38,6 +40,8 @@ export interface VenueOrder {
   /** When the fund house received a purchase's money (paper-mf buys); null before then, and for everything else. */
   fundsAt: number | null
 }
+/** The states in which an order can still fill, be cancelled or expire. */
+const OPEN_ORDER: ReadonlySet<string> = new Set(['new', 'accepted'])
 export const TERMINAL_ORDER: ReadonlySet<OrderState> = new Set(['filled', 'partially_filled', 'rejected', 'cancelled', 'expired'])
 
 const big = (v: unknown): bigint => (typeof v === 'bigint' ? v : BigInt(Math.trunc(Number(v ?? 0))))
@@ -101,6 +105,34 @@ export abstract class OrderVenue {
     if (!o) return undefined
     if (!TERMINAL_ORDER.has(o.state)) this.setState(o.id, o.filledQty > 0n ? 'partially_filled' : 'cancelled', o.filledQty > 0n ? 'Cancelled after a partial fill' : 'Cancelled before any fill')
     return this.get(clientRef)
+  }
+  /**
+   * End a resting order whose time has come: state `expired`, what filled before stays. One guarded change in one
+   * transaction: it applies only while the order is still open and its time has been reached, so it can never follow a
+   * fill that completed the order or a cancel, and a fill that arrives later is refused (work, below). Returns whether
+   * it applied. The caller frees what was reserved (execute.ts settleOrder), once, from the terminal state.
+   */
+  expire(clientRef: string, at: number = this.clock.now()): boolean {
+    return this.db.tx(() => {
+      const row = this.db.get<Record<string, unknown>>('SELECT * FROM pv_orders WHERE venue = ? AND client_ref = ?', this.name, clientRef)
+      if (!row || !OPEN_ORDER.has(String(row.state))) return false
+      const meta = parse<Record<string, unknown>>(row.meta_json, {})
+      const due = meta.expiresAt
+      if (typeof due !== 'number' || due > at) return false
+      const note = big(row.filled_qty) > 0n
+        ? `Expired: its time (${whenIst(due)}) came before all of it had filled; what had filled stays.`
+        : `Expired: its time (${whenIst(due)}) came and nothing had filled.`
+      return this.db.run(`UPDATE pv_orders SET state = 'expired', reject_reason = ?, updated_at = ?, meta_json = ? WHERE id = ? AND state IN ('new', 'accepted')`,
+        note, this.clock.now(), j({ ...meta, expiredAt: due }), String(row.id)).changes > 0
+    })
+  }
+  /** Expire every open order of this venue whose time has come (the tick, and the first tick after a restart). */
+  expireDue(): number {
+    const now = this.clock.now()
+    const due = this.db.all<{ client_ref: string }>(`SELECT client_ref FROM pv_orders WHERE venue = ? AND state IN ('new', 'accepted') AND json_extract(meta_json, '$.expiresAt') <= ?`, this.name, now)
+    let n = 0
+    for (const d of due) if (this.expire(d.client_ref, now)) n++
+    return n
   }
   protected snapshot(instrumentId: string, kind: string, body: unknown): string {
     const id = newId('snap', this.clock.now())
@@ -233,13 +265,15 @@ export class PaperCryptoVenue extends OrderVenue {
     if (byQty && (req.qty! <= 0n || req.qty! % r.step !== 0n)) return reject(`Quantity must be a positive multiple of ${inst.meta.qtyStep ?? 'the step size'}.`)
     if (byAmount && req.amount! < r.minNotional) return reject(`Below the venue minimum of ₹${inst.meta.minNotional ?? '100'}.`)
     if (req.type === 'limit' && !req.limitPrice) return reject('A limit order needs a limit price.')
+    if (req.expiresAt !== undefined && req.type !== 'limit') return reject('Only a resting order can have a time it stands until.')
+    if (req.expiresAt !== undefined && req.expiresAt <= this.clock.now()) return reject('The time you chose for it to stand until had already passed when it was placed.')
     if (req.type === 'stop' && (!req.stopPrice || req.side !== 'sell')) return reject('Only sell-stop orders are supported, and they need a stop price.')
     if (req.type === 'market' && byQty && r.maxMarketQty !== null && req.qty! > r.maxMarketQty) return reject(`Above the venue's market-order limit of ${inst.meta.maxMarketQty} ${inst.base_asset}.`)
     if (req.side === 'sell') {
       const free = venueHolding(this.db, req.userId, inst.id) - venueOpenSells(this.db, req.userId, inst.id)
       if (req.qty! > free) return reject('The venue does not hold enough to sell that quantity.')
     }
-    return this.insert(req, req.type === 'market' ? 'new' : 'accepted', null, { tif: req.type === 'market' ? 'IOC' : 'GTC' }, req.qty ?? null)
+    return this.insert(req, req.type === 'market' ? 'new' : 'accepted', null, { tif: req.type === 'market' ? 'IOC' : req.expiresAt !== undefined ? 'GTD' : 'GTC', ...(req.expiresAt !== undefined ? { expiresAt: req.expiresAt } : {}) }, req.qty ?? null)
   }
 
   private used(instId: string, side: Side, now: number): (price: string) => bigint {
@@ -254,6 +288,8 @@ export class PaperCryptoVenue extends OrderVenue {
 
   /** Advance open orders against current real market data. */
   async tick(): Promise<void> {
+    // first, whatever has run out of time, so nothing that is past its time is worked against the book (also the catch-up after a restart)
+    this.expireDue()
     const open = this.db.all<Record<string, unknown>>(`SELECT * FROM pv_orders WHERE venue = ? AND state IN ('new', 'accepted') ORDER BY created_at`, this.name)
     for (const row of open) {
       const o = loadOrder(this.db, row)
@@ -270,6 +306,7 @@ export class PaperCryptoVenue extends OrderVenue {
     const inst = instrument(this.db, o.instrumentId)!
     const now = this.clock.now()
     const maxAge = inst.meta.execMaxAgeMs ?? 15_000
+    if (typeof o.meta.expiresAt === 'number' && now >= o.meta.expiresAt) { this.expire(o.clientRef, now); return }
 
     if (o.type === 'stop') {
       const bid = this.market.get(inst.id, 'bid')
@@ -313,11 +350,16 @@ export class PaperCryptoVenue extends OrderVenue {
     if (o.filledQty === 0n && m.filledAmount < r.minNotional && (o.type !== 'limit')) { this.setState(o.id, 'rejected', `The fill would be below the venue minimum of ₹${inst.meta.minNotional ?? '100'}.`); return }
 
     const execTs = this.clock.now()
-    const snapshotId = this.snapshot(inst.id, 'book', {
-      provider: book.provider, sourceTs: book.sourceTs, recvTs: book.recvTs, ageMsAtExecution: execTs - book.recvTs,
-      bids: book.bids.slice(0, 10), asks: book.asks.slice(0, 10), bound: bound === null ? null : (Number(bound) / 10 ** PRICE_SCALE).toString(), side: o.side,
-    })
     this.db.tx(() => {
+      // The order was read before the book was fetched: read it again under the write lock. If it was ended meanwhile (an expiry,
+      // a cancel, in this process or another), or its time has come, nothing is filled: the expiry and a fill never both apply.
+      const cur = this.db.get<{ state: string }>('SELECT state FROM pv_orders WHERE id = ?', o.id)
+      if (!cur || !OPEN_ORDER.has(cur.state)) return
+      if (typeof o.meta.expiresAt === 'number' && execTs >= o.meta.expiresAt) { this.expire(o.clientRef, execTs); return }
+      const snapshotId = this.snapshot(inst.id, 'book', {
+        provider: book.provider, sourceTs: book.sourceTs, recvTs: book.recvTs, ageMsAtExecution: execTs - book.recvTs,
+        bids: book.bids.slice(0, 10), asks: book.asks.slice(0, 10), bound: bound === null ? null : (Number(bound) / 10 ** PRICE_SCALE).toString(), side: o.side,
+      })
       for (const p of m.pieces) {
         const fee = fraction(p.amount, r.feeRate, 'up')
         const tax = o.side === 'sell' ? fraction(p.amount, r.tdsRate, 'up') : 0n

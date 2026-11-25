@@ -1,6 +1,7 @@
 /** Shared server types: the execution context, program authority, and the stored shapes of runs and actions. */
 import { type Clock, type Db, parse } from './core.ts'
 import type { Market } from './market.ts'
+import type { OrderValidity } from './validity.ts'
 import type { OrderType, RailName, Side, Venues } from './venues.ts'
 
 export interface Ctx { db: Db; clock: Clock; market: Market; venues: Venues }
@@ -45,6 +46,8 @@ export interface OrderParams {
   /** Atoms as decimal text. */
   qty?: string; amount?: string
   limitPrice?: string; stopPrice?: string; maxSlippageBps?: number; sellAll?: boolean
+  /** How long a resting order stands; absent on orders placed before it existed, which stand until cancelled. Signed with the rest. */
+  validity?: OrderValidity
   purpose: string
   /** A withdrawal plan's sale: the rupees it was asked to bring in, which its limits are counted in (policy.ts). */
   swpPaise?: string

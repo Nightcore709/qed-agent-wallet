@@ -36,8 +36,12 @@ jobs:
       - run: forge build
       - run: npx tsc -p tsconfig.json
       - run: npm run test:ts
-      - run: npm run test:demo
+      # The interactive demo's tests exist only on the branch Railway followed for the October demo; on main they are skipped
+      - name: npm run test:demo
+        if: ${{ hashFiles('agent/test/demo.test.mjs') != '' }}
+        run: npm run test:demo
       - name: Interactive browser API-to-contract real Anvil acceptance test
+        if: ${{ hashFiles('agent/test/demo.integration.mjs') != '' }}
         run: |
           set -o pipefail
           echo "::notice::$(anvil --version | head -1)"
