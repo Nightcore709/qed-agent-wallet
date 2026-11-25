@@ -188,7 +188,7 @@ export function stations(ix: JudgeIndex, tickCase: CaseLike | null, hashCheck: {
     facts: [
       ...(objective ? [{ label: 'Objective', value: objective }] : []),
       ...(m ? [{ label: 'Mandate', value: `Version ${m.version}, signed with your passkey ${when(m.signedAt)}` }, { label: 'Limits', value: mandateWords(m, a) }, ...(m.purpose ? [{ label: 'Its purpose, as signed', value: m.purpose }] : [])] : []),
-      { label: 'Where it is enforced', value: ix.wallet.chainId === 31337 ? 'A test chain on this computer (chain 31337), test tokens of no value' : ix.wallet.network ?? 'No chain yet' },
+      { label: 'Where it is enforced', value: ix.wallet.chainId === 31337 ? 'A test chain on this QED installation (chain 31337), test tokens of no value' : ix.wallet.network ?? 'No chain yet' },
     ],
     groups: [], caseId: m?.jobCaseId ?? null,
   })

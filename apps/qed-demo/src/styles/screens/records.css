@@ -26,6 +26,13 @@
 .yd-block { display: grid; gap: var(--s3); justify-items: start; min-width: 0; }
 .yd-block h3 { font-size: var(--t-h3); }
 .yd-block .field { width: min(100%, 360px); }
+.yd-block:has(> .yd-del) { justify-items: stretch; }
+.yd-del { display: grid; gap: var(--s5) var(--s8); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.yd-del-info, .yd-del-act { display: grid; gap: var(--s4); min-width: 0; align-content: start; justify-items: start; }
+.yd-del-info section { display: grid; gap: var(--s2); }
+.yd-del h4 { font-size: var(--t-small); font-weight: 650; color: var(--ink); }
+.yd-del-act { padding: var(--s4) var(--s5); border-radius: var(--r-md); border: 1px solid var(--rule-2); background: color-mix(in oklab, var(--pane-2) 60%, transparent); }
+@media (min-width: 900px) { .yd-del { grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); } }
 .yd-schedule { display: block; } /* a details box laid out as a grid shrank its text to a sliver on a phone once opened; its content stacks as blocks */
 .yd-body { display: grid; gap: var(--s3); grid-template-columns: minmax(0, 1fr); min-width: 0; }
 .yd-schedule summary { cursor: pointer; }

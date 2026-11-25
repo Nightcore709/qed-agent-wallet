@@ -14,7 +14,7 @@
  * the missed runs of one instruction on one day are one row. The period shown is the span every list read covers in
  * full, so the rows and the summary never stop short in one account while running on in the other.
  */
-import { ChevronDown, ChevronRight, Download, FileSearch, ReceiptText, ScrollText, Search, SlidersHorizontal, Wallet, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Download, FileSearch, FolderOpen, List as ListIcon, ReceiptText, ScrollText, Search, SlidersHorizontal, Wallet, X } from 'lucide-react'
 import { type MouseEvent, type ReactNode, useCallback, useId, useRef, useState, useSyncExternalStore } from 'react'
 import type { Job as WalletJob } from '../../chain/types.ts'
 import { homeCurrency, homeSign, UNITS_WORD } from '../../shared/home-money.ts'
@@ -117,7 +117,7 @@ export const whoName = (e: { who: Who; by?: string }): string => (e.who === 'you
 const whoClass = (w: Who): string => (w === 'qed' ? 'by-qed' : w === 'you' ? 'by-you' : 'by-other')
 /** Who a movement QED only observed is credited to: the party the books name, the escrow or faucet by what it is, else the chain. */
 const observedBy = (cp: { kind: string; label: string | null } | null): string =>
-  cp?.label ?? (cp?.kind === 'escrow' ? 'The escrow contract' : cp?.kind === 'faucet' ? 'The local chain\'s faucet' : cp?.kind === 'conversion' ? 'The conversion venue' : cp?.kind === 'workspace' ? 'Another wallet on this computer' : 'The chain')
+  cp?.label ?? (cp?.kind === 'escrow' ? 'The escrow contract' : cp?.kind === 'faucet' ? 'The local chain\'s faucet' : cp?.kind === 'conversion' ? 'The conversion venue' : cp?.kind === 'workspace' ? 'Another wallet on this QED installation' : 'The chain')
 
 /** One thing that happened, as the day book shows it. */
 export interface DayEvent {
@@ -572,7 +572,8 @@ export function rangesFrom(t: RangeText): { ranges: Ranges; errors: Partial<Reco
 }
 
 /** What Activity is asked to find: the search, the filters and the four range fields as typed. */
-export interface Find { q: string; f: Filters; rt: RangeText }
+/** `view: 'list'` is the day book's list; absent is the folders (R14: the folders are what Activity opens on). */
+export interface Find { q: string; f: Filters; rt: RangeText; view?: 'list' }
 const FILTER_KEYS = ['account', 'who', 'state', 'kind', 'direction'] as const
 const RANGE_KEYS = ['min', 'max', 'first', 'last'] as const
 /** The search and filters a link asks for (?q=, ?direction=out, ?min=1000, ?first=2026-11-02 …); a value it does not know is left out. */
@@ -581,7 +582,7 @@ export function findFrom(q: URLSearchParams): Find {
   for (const k of FILTER_KEYS) { const v = q.get(k); if (v !== null && (FILTER_CHOICES[k].options as [string, string][]).some(([o]) => o === v)) (f as unknown as Record<string, string>)[k] = v }
   const rt: RangeText = { ...NO_RANGE_TEXT }
   for (const k of RANGE_KEYS) rt[k] = (q.get(k) ?? '').slice(0, 40)
-  return { q: (q.get('q') ?? '').slice(0, 200), f, rt }
+  return { q: (q.get('q') ?? '').slice(0, 200), f, rt, ...(q.get('view') === 'list' ? { view: 'list' as const } : {}) }
 }
 /** The search and filters as the address writes them: only what differs from showing everything, in a fixed order. */
 export function findQuery(x: Find): string {
@@ -589,6 +590,7 @@ export function findQuery(x: Find): string {
   if (x.q) p.set('q', x.q)
   for (const k of FILTER_KEYS) if (x.f[k] !== 'all') p.set(k, x.f[k])
   for (const k of RANGE_KEYS) if (x.rt[k]) p.set(k, x.rt[k])
+  if (x.view === 'list') p.set('view', 'list')
   return p.toString()
 }
 
@@ -709,9 +711,10 @@ const decimal = (raw: number, places: number): string => {
  * A row's details as sentences: each fragment with a capital and one full stop (none added after a question or an
  * exclamation), joined by a space. The screen and the CSV file both write details through this.
  */
-export function detailText(detail: string[]): string {
-  return detail.map((d) => d.trim()).filter(Boolean).map((d) => d.replace(/^./, (c) => c.toUpperCase())).map((d) => (/[.!?…]$/.test(d) ? d : `${d}.`)).join(' ')
+export function detailItems(detail: string[]): string[] {
+  return detail.map((d) => d.trim()).filter(Boolean).map((d) => d.replace(/^./, (c) => c.toUpperCase())).map((d) => (/[.!?…]$/.test(d) ? d : `${d}.`))
 }
+export function detailText(detail: string[]): string { return detailItems(detail).join(' ') }
 /** What a day book file says before its table: the days it covers, the rows chosen, and when it was read. */
 export interface DayBookAbout { period: string; rows: string; readAt: string }
 /**
@@ -796,7 +799,9 @@ function RowCells({ e, all, open, onToggle, toggleId, cols, cases }: { e: DayEve
   const many = all.length > 1
   const sum = many ? total(all) : e.amount
   const by = whoName(e)
-  const detail = detailText(e.detail)
+  const items = detailItems(e.detail)
+  const [more, setMore] = useState(false)
+  const moreId = useId()
   const first = all[all.length - 1]!
   const state = e.stamp ? <Stamp tone={e.stamp.tone}>{e.stamp.word}</Stamp> : <StateStamp state={e.state} recon={e.recon} />
   const trace = many ? null : <Trace e={e} cases={cases} />
@@ -810,7 +815,8 @@ function RowCells({ e, all, open, onToggle, toggleId, cols, cases }: { e: DayEve
         {e.account === 'wallet' ? <span className="chip ac-acct">On-chain wallet</span> : null}
         {many ? <span className="ac-times">{all.length} times</span> : null}
       </span>
-      {detail ? <span className="ac-detail">{detail}</span> : null}
+      {items.length ? <span className="ac-more"><button type="button" className="linkish ac-each" aria-expanded={more} aria-controls={moreId} onClick={() => setMore((x) => !x)}>{more ? <ChevronDown aria-hidden="true" /> : <ChevronRight aria-hidden="true" />}{more ? 'Hide the details' : 'Every detail and time'}</button></span> : null}
+      {items.length ? <ul id={moreId} className="ac-detail" hidden={!more}>{items.map((d, i) => <li key={i}>{d}</li>)}</ul> : null}
       {!cols.who ? <span className="ac-by"><b className={whoClass(e.who)}>{by}</b>, under {e.account === 'wallet' ? lower(e.under) : e.under === 'Your approval' ? 'your approval' : e.under === 'Your request' ? 'your own request' : `“${e.under}”`}</span> : null}
       {!cols.state ? <span className="ac-state-in">{state}{trace}</span> : null}
       {many ? <button type="button" className="linkish ac-each" aria-expanded={open} aria-controls={open ? toggleId : undefined} onClick={onToggle}>{open ? <ChevronDown aria-hidden="true" /> : <ChevronRight aria-hidden="true" />}{open ? 'Hide each' : `Show each of the ${all.length}`}</button> : null}
@@ -939,15 +945,24 @@ export function ActivityScreen() {
   // field that is wrong says so and is not (rangesFrom)
   const [find, setFind] = useUrlState<Find>('/activity', findFrom, findQuery)
   const { f, q, rt } = find
-  const setF = (u: (x: Filters) => Filters) => setFind((v) => ({ ...v, f: u(v.f) }))
-  const setQ = (t: string) => setFind((v) => ({ ...v, q: t }))
-  const setRt = (u: (x: RangeText) => RangeText) => setFind((v) => ({ ...v, rt: u(v.rt) }))
+  // finding or filtering opens the list: the folders are what the page opens on, and what is found is rows
+  const setF = (u: (x: Filters) => Filters) => setFind((v) => ({ ...v, f: u(v.f), view: 'list' }))
+  const setQ = (t: string) => setFind((v) => ({ ...v, q: t, ...(t ? { view: 'list' as const } : {}) }))
+  const setRt = (u: (x: RangeText) => RangeText) => setFind((v) => ({ ...v, rt: u(v.rt), view: 'list' }))
+  const list = find.view === 'list'
+  const setView = (to: 'folders' | 'list') => setFind((v) => { const { view: _v, ...rest } = v; return to === 'list' ? { ...v, view: 'list' } : rest })
   const { ranges, errors: rangeErrors } = rangesFrom(rt)
   const ranged = ranges.first !== null || ranges.last !== null
   const searchRef = useRef<HTMLInputElement>(null)
+  const forced = inForce(f, ranges, q)
+  const filtersOn = forced.filter((x) => x.key !== 'q').length
+  const filtered = filtersOn > 0
+  const searching = queryTerms(q).length > 0
   const searchId = useId(), statesId = useId(), filtersId = useId(), rangesId = useId()
   const [statesOpen, setStatesOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(() => !!(rt.min || rt.max || rt.first || rt.last))
+  const moreId = useId()
   const mid = useMedia('(max-width: 1099px)'), narrow = useMedia('(max-width: 759px)')
   const cols: Cols = { when: !narrow, who: !mid, under: !mid, state: !narrow }
   const span = 2 + Number(cols.when) + Number(cols.who) + Number(cols.under) + Number(cols.state)
@@ -996,13 +1011,61 @@ export function ActivityScreen() {
   const records = <Link to="/vault/records">The on-chain wallet's own records</Link>
   const sentence = 'Everything done in your name, by you and by QED under what you signed, in your bank account and on your on-chain wallet. Each row opens its record, with every check and its receipt. This is a record of what has happened: reading it moves no money.'
 
+  const refocus = () => searchRef.current?.focus()
+  const everything = () => { setFind({ q: '', f: NO_FILTER, rt: NO_RANGE_TEXT, view: 'list' }); refocus() }
+  const clearOne = (x: InForce) => {
+    if (x.clear.q !== undefined) setQ('')
+    if (x.clear.filters) setF((v) => ({ ...v, ...x.clear.filters }))
+    if (x.key === 'amount') setRt((v) => ({ ...v, min: '', max: '' }))
+    if (x.key === 'dates') setRt((v) => ({ ...v, first: '', last: '' }))
+    refocus()
+  }
+
+  // the one bar under the heading: folders or list, the words to find, the filters. It needs no data, so it is the same
+  // while the rows load (nothing below it moves when they arrive)
+  const bar = (foot: ReactNode) => (
+    <form className="ac-find" role="search" aria-label="Find in the day book" onSubmit={(e) => e.preventDefault()}>
+      <div className="ac-bar">
+        <div className="ac-view" role="group" aria-label="What to show">
+          <button type="button" className="ac-view-btn" aria-pressed={!list} onClick={() => setView('folders')}><FolderOpen aria-hidden="true" />Records</button>
+          <button type="button" className="ac-view-btn" aria-pressed={list} onClick={() => setView('list')}><ListIcon aria-hidden="true" />Day book</button>
+        </div>
+        <div className="ac-search">
+          <label htmlFor={searchId}>Search</label>
+          <div className="ac-search-box">
+            <Search aria-hidden="true" />
+            <input ref={searchRef} id={searchId} type="search" className="input" value={q} placeholder="Payee, amount, instruction, check" autoComplete="off" spellCheck={false} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Escape' && q) { e.preventDefault(); setQ('') } }} />
+            {q ? <button type="button" className="icon-btn ac-search-clear" aria-label="Clear the search" onClick={() => { setQ(''); searchRef.current?.focus() }}><X aria-hidden="true" /></button> : null}
+          </div>
+        </div>
+        {/* the filters fold under one button that says how many are on; pressing it opens the list, where they apply */}
+        <button type="button" className="btn sm ac-filters-toggle" aria-expanded={list && filtersOpen} aria-controls={filtersId} onClick={() => { if (!list) { setView('list'); setFiltersOpen(true) } else setFiltersOpen((x) => !x) }}>
+          <SlidersHorizontal aria-hidden="true" />{filtersOn ? `Filters: ${filtersOn} on` : 'Filters'}<ChevronDown aria-hidden="true" />
+        </button>
+      </div>
+      <div id={filtersId} className="ac-panel" hidden={!list || !filtersOpen}>
+        <div className="ac-filters" role="group" aria-label="Filter the day book">
+          {(['account', 'who', 'state', 'kind', 'direction'] as (keyof Filters)[]).filter((k) => k !== 'account' || hasWallet).map((k) => (
+            <FilterSelect key={k} name={k} value={f[k]} onChange={(v) => setF((x) => ({ ...x, [k]: v } as Filters))} />
+          ))}
+          <button type="button" className="btn sm ac-more-toggle" aria-expanded={moreOpen} aria-controls={rangesId} onClick={() => setMoreOpen((x) => !x)}>More filters<ChevronDown aria-hidden="true" /></button>
+        </div>
+        <div id={rangesId} className="ac-ranges" role="group" aria-label="Narrow by amount and dates" hidden={!moreOpen}>
+          <RangePair legend={`Amount, in ${UNITS_WORD[homeCurrency()]}`} hint="Test rupees on the on-chain wallet" kind="amount" text={rt} errors={rangeErrors} onChange={(k, v) => setRt((x) => ({ ...x, [k]: v }))} />
+          <RangePair legend="Dates, India time" kind="dates" text={rt} errors={rangeErrors} onChange={(k, v) => setRt((x) => ({ ...x, [k]: v }))} />
+        </div>
+      </div>
+      {!list && (filtered || searching) ? <p className="ac-kept small muted">A search or filter is kept: <button type="button" className="linkish" onClick={() => setView('list')}>show {filtered && searching ? 'the rows it finds' : 'the rows'} in the day book</button>.</p> : null}
+      {foot}
+    </form>
+  )
   const receiptsButton = <Btn busy={receiptFile.busy} disabled={!receipts.data?.chain.count} onClick={() => void receiptFile.run()}><Download aria-hidden="true" />Every receipt (JSON)</Btn>
   if (!data.data) {
     return (
       <div className="ac">
         <ActivityHead at="actions" actions={<><Btn disabled><Download aria-hidden="true" />Download the day book (CSV)</Btn>{receiptsButton}</>} aside={hasWallet ? <span className="ac-head-link">{records}</span> : null}>{sentence}</ActivityHead>
-        {data.error ? <div className="ac-problem"><Problem error={data.error} /><Btn small onClick={data.reload}>Try again</Btn></div> : <LogSkeleton />}
-        {shelf}
+        {bar(null)}
+        {list ? (data.error ? <div className="ac-problem"><Problem error={data.error} /><Btn small onClick={data.reload}>Try again</Btn></div> : <LogSkeleton />) : shelf}
       </div>
     )
   }
@@ -1016,10 +1079,6 @@ export function ActivityScreen() {
   const lists = f.account === 'bank' ? bankLists : f.account === 'wallet' ? walletLists : [...bankLists, ...walletLists]
   const from = periodStart(lists)
   const inPeriod = [...bankRows, ...walletRows].filter((e) => from === null || e.ts >= from).sort((a, b) => b.ts - a.ts)
-  const forced = inForce(f, ranges, q)
-  const filtersOn = forced.filter((x) => x.key !== 'q').length
-  const filtered = filtersOn > 0
-  const searching = queryTerms(q).length > 0
   const shown = inPeriod.filter(matches(f)).filter(inRanges(ranges)).filter(matchesQuery(q))
   const close = searching ? closeSpellings(q, shown) : []
   const days = byDay(shown, now)
@@ -1035,15 +1094,6 @@ export function ActivityScreen() {
   const first = cut || ranges.first === null ? (reach !== null ? istDate(reach) : ranges.first ?? today) : ranges.first
   const period = periodOf('dates', now, { first, last: ranges.last !== null && ranges.last >= first ? ranges.last : today < first ? first : today })
   const periodText = `${periodWords(period, now)}${cut && from !== null ? `; rows before ${fmt.dayTime(from)} were not read` : ''}`
-  const refocus = () => searchRef.current?.focus()
-  const everything = () => { setFind({ q: '', f: NO_FILTER, rt: NO_RANGE_TEXT }); refocus() }
-  const clearOne = (x: InForce) => {
-    if (x.clear.q !== undefined) setQ('')
-    if (x.clear.filters) setF((v) => ({ ...v, ...x.clear.filters }))
-    if (x.key === 'amount') setRt((v) => ({ ...v, min: '', max: '' }))
-    if (x.key === 'dates') setRt((v) => ({ ...v, first: '', last: '' }))
-    refocus()
-  }
   const csv = () => save(periodFileName('qed-day-book', period, now).replace(/\.csv$/, filtered || searching ? '-selection.csv' : '.csv'), dayBookCsv(shown, { period: periodText, rows: forced.length ? forced.map((x) => x.words).join('; ') : 'Every row in the period', readAt: fmt.full(now) }), 'text/csv;charset=utf-8')
 
   const actions_ = <><Btn onClick={csv} disabled={!shown.length}><Download aria-hidden="true" />Download {filtered || searching ? 'the rows found' : 'the day book'} (CSV)</Btn>{receiptsButton}</>
@@ -1052,50 +1102,27 @@ export function ActivityScreen() {
     <div className="ac">
       <ActivityHead at="actions" actions={actions_} aside={hasWallet ? <span className="ac-head-link">{records}</span> : null}>{sentence}</ActivityHead>
       <Problem error={receiptFile.error} />
-      {/* what happened comes first; with nothing yet, the shelf of records stands in for it */}
-      {inPeriod.length === 0 && !ranged ? shelf : null}
-      {inPeriod.length === 0 && !ranged ? (
+      {bar(list ? <>
+        {/* the number found, announced as it changes (WCAG 4.1.3); the button that clears sits beside it, outside what is announced */}
+        <div className="ac-find-foot">
+          <p className="ac-count" role="status">{filtered || searching ? `Showing ${shown.length} of ${inPeriod.length} ${inPeriod.length === 1 ? 'entry' : 'entries'}.` : `${inPeriod.length} entr${inPeriod.length === 1 ? 'y' : 'ies'}`}{close.length ? ` Close spellings included: ${close.map(([t, w]) => `“${t}” read as “${w}”`).join(', ')}.` : ''}</p>
+          {filtered || searching ? <button type="button" className="linkish ac-count-clear" onClick={everything}>Show everything</button> : null}
+          <button type="button" className="ac-states-toggle" aria-expanded={statesOpen} aria-controls={statesId} onClick={() => setStatesOpen((x) => !x)}>What the states mean<ChevronDown aria-hidden="true" /></button>
+        </div>
+        {/* every status word in one sentence, in the order an action moves (kit.tsx STATUS_GLOSSARY) */}
+        <dl id={statesId} className="ac-glossary" hidden={!statesOpen}>{STATUS_GLOSSARY.map(([w, m]) => <div key={w}><dt>{w}</dt><dd>{m}</dd></div>)}</dl>
+      </> : null)}
+      {/* the folders come first: the records filed by kind, each a press away (R14, owner: the folder view is the page) */}
+      {!list ? shelf : null}
+      {!list && inPeriod.length === 0 && !ranged ? (
         <div className="empty-state ac-empty">
           <span className="glyph"><ReceiptText aria-hidden="true" /></span>
           <h2>Nothing has happened yet</h2>
           <p>What you do, and what QED does under what you sign, appears here as it happens: each payment, order and change of authority with its checks, its receipt and what it left in your account.</p>
           <div className="row"><Link className="btn fill" to="/pay">Pay someone</Link><Link className="btn" to="/instructions/new">Write an instruction</Link></div>
         </div>
-      ) : <>
-        <form className="ac-find" role="search" aria-label="Find in the day book" onSubmit={(e) => e.preventDefault()}>
-          <div className="ac-search">
-            <label htmlFor={searchId}>Search</label>
-            <div className="ac-search-box">
-              <Search aria-hidden="true" />
-              <input ref={searchRef} id={searchId} type="search" className="input" value={q} placeholder="Payee, amount, instruction, check" autoComplete="off" spellCheck={false} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Escape' && q) { e.preventDefault(); setQ('') } }} />
-              {q ? <button type="button" className="icon-btn ac-search-clear" aria-label="Clear the search" onClick={() => { setQ(''); searchRef.current?.focus() }}><X aria-hidden="true" /></button> : null}
-            </div>
-          </div>
-          {/* on a phone the filters fold under one button that says how many are on; the search stays open */}
-          {narrow ? <button type="button" className="btn sm ac-filters-toggle" aria-expanded={filtersOpen} aria-controls={`${filtersId} ${rangesId}`} onClick={() => setFiltersOpen((x) => !x)}>
-            <SlidersHorizontal aria-hidden="true" />{filtersOn ? `Filters: ${filtersOn} on` : 'Filters'}<ChevronDown aria-hidden="true" />
-          </button> : null}
-          <div id={filtersId} className="ac-filters" role="group" aria-label="Filter the day book" hidden={narrow && !filtersOpen}>
-            {(['account', 'who', 'state', 'kind', 'direction'] as (keyof Filters)[]).filter((k) => k !== 'account' || hasWallet).map((k) => (
-              <FilterSelect key={k} name={k} value={f[k]} onChange={(v) => setF((x) => ({ ...x, [k]: v } as Filters))} />
-            ))}
-          </div>
-          {/* the amount and the dates, each a pair of fields, on a row of their own across the bar */}
-          <div id={rangesId} className="ac-ranges" role="group" aria-label="Narrow by amount and dates" hidden={narrow && !filtersOpen}>
-            <RangePair legend={`Amount, in ${UNITS_WORD[homeCurrency()]}`} hint="Test rupees on the on-chain wallet" kind="amount" text={rt} errors={rangeErrors} onChange={(k, v) => setRt((x) => ({ ...x, [k]: v }))} />
-            <RangePair legend="Dates, India time" kind="dates" text={rt} errors={rangeErrors} onChange={(k, v) => setRt((x) => ({ ...x, [k]: v }))} />
-          </div>
-          {/* how many rows that leaves, and what the state words mean, on one line under the filters */}
-          <div className="ac-find-foot">
-            {/* the number found, announced as it changes (WCAG 4.1.3); the button that clears sits beside it, outside what is announced */}
-            <p className="ac-count" role="status">{filtered || searching ? `Showing ${shown.length} of ${inPeriod.length} ${inPeriod.length === 1 ? 'entry' : 'entries'}.` : `${inPeriod.length} entr${inPeriod.length === 1 ? 'y' : 'ies'}`}{close.length ? ` Close spellings included: ${close.map(([t, w]) => `“${t}” read as “${w}”`).join(', ')}.` : ''}</p>
-            {filtered || searching ? <button type="button" className="linkish ac-count-clear" onClick={everything}>Show everything</button> : null}
-            <button type="button" className="ac-states-toggle" aria-expanded={statesOpen} aria-controls={statesId} onClick={() => setStatesOpen((x) => !x)}>What the states mean<ChevronDown aria-hidden="true" /></button>
-          </div>
-          {/* every status word in one sentence, in the order an action moves (kit.tsx STATUS_GLOSSARY) */}
-          <dl id={statesId} className="ac-glossary" hidden={!statesOpen}>{STATUS_GLOSSARY.map(([w, m]) => <div key={w}><dt>{w}</dt><dd>{m}</dd></div>)}</dl>
-        </form>
-
+      ) : null}
+      {list ? <>
         <Totals s={s} from={start} period={ranged ? periodWords(period, now) : null} filtered={filtered || searching} receiptsChain={receipts.data?.chain ?? null} decisionChain={decisions.data ?? null} showBank={f.account !== 'wallet' && s.bank.rows > 0} showWallet={f.account !== 'bank' && s.wallet.rows > 0} narrow={narrow} />
 
         {days.length === 0 ? (
@@ -1120,18 +1147,16 @@ export function ActivityScreen() {
             </table>
           </section>
         )}
-      </>}
+      </> : null}
       {book.error ? <p className="small faint">The bank statement could not be read just now, so the balance after each payment and order is not shown. {book.error.message}</p> : null}
       {hasWallet && wallet.error ? <p className="small faint">The on-chain wallet's own list could not be read just now, so its rows are missing here. {wallet.error.message} {records}</p> : null}
-      {from !== null && inPeriod.length > 0 ? (
+      {list && from !== null && inPeriod.length > 0 ? (
         <div className="ac-earlier">
           <p className="small muted">Shown from {fmt.dayTime(from)}, as far back as {bankCut && walletCut ? 'both accounts\' lists' : walletCut ? 'the on-chain wallet\'s list' : 'the bank account\'s lists'} were read.{walletCut && !bankCut ? <> Its earlier requests are in {records}; earlier bank rows show with Account set to Bank account.</> : null}</p>
           {bankCut && limit < 300 ? <Btn onClick={() => setLimit(Math.min(300, limit + 100))}>Show earlier than {fmt.dayTime(from)}</Btn> : null}
         </div>
       ) : null}
-      {/* the records filed by kind: a second way in, after the day book (R11 review: the day book led only below two screens of folders on a phone) */}
-      {inPeriod.length > 0 ? shelf : null}
-      {inPeriod.length > 0 ? <p className="ac-foot small faint">“Checks passed” counts the checks recorded for an action at the moment it was decided: the instruction in force and inside its limits, fresh and confirmed prices, the money there, the reserve and the floor. A refusal is a check that failed, and nothing was sent.</p> : null}
+      {list && inPeriod.length > 0 ? <p className="ac-foot small faint">“Checks passed” counts the checks recorded for an action at the moment it was decided: the instruction in force and inside its limits, fresh and confirmed prices, the money there, the reserve and the floor. A refusal is a check that failed, and nothing was sent.</p> : null}
     </div>
   )
 }

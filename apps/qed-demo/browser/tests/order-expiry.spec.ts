@@ -89,7 +89,9 @@ test('a limit order placed to stand a few minutes expires, its money is freed on
   const words = /Expired at \d+ \w+ \d{4}, \d\d:\d\d IST, ₹0\.00 filled before, ₹1,000\.00 released/
   await page.goto(`${s.base}/holdings`)
   await expect(page.locator('.gr-fills').getByText(words)).toBeVisible()
-  await page.goto(`${s.base}/activity`)
+  await page.goto(`${s.base}/activity?view=list`)
+  await page.getByRole('button', { name: 'Every detail and time' }).first().waitFor() // the rows load after the page
+  for (const b of await page.getByRole('button', { name: 'Every detail and time' }).all()) await b.click() // R14: each row's full details sit behind this button
   await expect(page.getByText(words).first()).toBeVisible()
   await page.goto(`${s.base}/record/${id}`)
   await expect(page.getByText(words).first()).toBeVisible()
@@ -148,7 +150,9 @@ test('a limit order that part-filled and then expired is a partly done order: th
   await expect(page.getByText('Asked for; nothing moved')).toHaveCount(0)
   await expect(page.getByText('Left your bank account').first()).toBeVisible()
   await expect(page.getByText(words).first()).toBeVisible()
-  await page.goto(`${s.base}/activity`)
+  await page.goto(`${s.base}/activity?view=list`)
+  await page.getByRole('button', { name: 'Every detail and time' }).first().waitFor() // the rows load after the page
+  for (const b of await page.getByRole('button', { name: 'Every detail and time' }).all()) await b.click() // R14: each row's full details sit behind this button
   await expect(page.getByText(/Bought .+, in part/).first()).toBeVisible()
   await expect(page.getByText(words).first()).toBeVisible()
 })

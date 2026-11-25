@@ -12,7 +12,7 @@
  *  - response: pressing that control once all three hold, the longest event duration of that press (pointer down to
  *             the next frame, the Event Timing API's measure behind INP).
  *
- * LCP is kept beside them for reference. Lab figures on this computer: desktop, or QED_PROFILE=phone (390 x 844, CPU
+ * LCP is kept beside them for reference. Lab figures on this QED installation: desktop, or QED_PROFILE=phone (390 x 844, CPU
  * slowed 4x, a slow 4G link: 150 ms, 1.6 Mb/s down, 750 kb/s up). Not field data from people's devices.
  *
  *   QED_FIXTURE_FILE=data/design-fixture.json node scripts/usable.ts [out.json] [route ...]

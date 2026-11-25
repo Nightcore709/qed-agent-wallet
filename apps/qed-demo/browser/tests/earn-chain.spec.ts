@@ -205,8 +205,9 @@ test('an earning job between two fresh households through the screens: offered, 
   expect(b.words).toBe('valueless test tokens on a local chain')
   for (const e of b.entries) expect(e.effectiveTs).toBeLessThanOrEqual(e.entryTs)
   expect(query<{ n: number }>(`SELECT COUNT(*) n FROM entries WHERE user_id = ? AND kind = 'chain-payment'`, P.personId)[0]!.n).toBe(1)
-  await P.page.goto('/activity')
+  await P.page.goto('/activity?view=list') // R14: the day book is the list; each row's every time and chain fact is behind its own button
   const detailOf = (what: RegExp) => P.page.locator('tr').filter({ has: P.page.getByRole('link', { name: what }) }).locator('.ac-detail')
+  for (const what of [/^Paid CloudCo/, /^Delivered work to the escrow/]) await P.page.locator('tr').filter({ has: P.page.getByRole('link', { name: what }) }).getByRole('button', { name: 'Every detail and time' }).click()
   const paidRow = detailOf(/^Paid CloudCo/), earned = detailOf(/^Delivered work to the escrow/)
   await expect(paidRow).toContainText(/Paid CloudCo \(3\.00 test rupees out\): took effect \d{1,2} \w{3} \d{4}, [\d:]+ IST on the chain/, { timeout: 30_000 })
   await expect(paidRow).toContainText(/Entered in your books \d{1,2} \w{3} \d{4}, [\d:]+ IST/)

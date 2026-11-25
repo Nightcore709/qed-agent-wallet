@@ -1,7 +1,7 @@
 /**
  * A household's watchlist (R14, Grow): the names it watches, each row built from the market data QED already holds and
  * nothing else. A row has the latest price with the provider that gave it, the time of that price, and whether the price is
- * observed (read from a public source) or synthetic (generated on this computer: the paper exchange); the change since the
+ * observed (read from a public source) or synthetic (generated on this QED installation: the paper exchange); the change since the
  * price at the moment the name was added (stored then: price, type, provider and times); and a stale flag by the source's own
  * freshness rule (market.ts freshness). It moves no money, places no order and gives no advice: buying or selling from a
  * row opens the ordinary ticket, which keeps its approval.

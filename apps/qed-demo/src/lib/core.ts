@@ -38,7 +38,7 @@ export async function api<T = Record<string, unknown>>(method: 'GET' | 'POST' | 
       ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }),
     })
   } catch {
-    throw new ApiError(0, 'unreachable', 'QED\'s service on this computer is not answering. Check that it is running, then try again.')
+    throw new ApiError(0, 'unreachable', 'QED\'s service on this QED installation is not answering. Check that it is running, then try again.')
   }
   let json: unknown = null
   try { json = await res.json() } catch { /* an empty or non-JSON reply is handled below */ }
@@ -302,7 +302,7 @@ export const fmt = {
   },
 }
 
-const SOURCES: Record<string, string> = { coindcx: 'CoinDCX', binance: 'Binance', coinbase: 'Coinbase', amfi: 'AMFI', frankfurter: 'the ECB, through Frankfurter', nyfed: 'the New York Fed', mfapi: 'mfapi.in', test: 'a test fixture', 'synthetic-markets': 'synthetic prices generated on this computer (not market data)', synthetic: 'synthetic values generated on this computer (presentation mode)' }
+const SOURCES: Record<string, string> = { coindcx: 'CoinDCX', binance: 'Binance', coinbase: 'Coinbase', amfi: 'AMFI', frankfurter: 'the ECB, through Frankfurter', nyfed: 'the New York Fed', mfapi: 'mfapi.in', test: 'a test fixture', 'synthetic-markets': 'synthetic prices generated on this QED installation (not market data)', synthetic: 'synthetic values generated on this QED installation (presentation mode)' }
 /** The name of a data source as a person would say it. */
 export const sourceName = (id: string | null | undefined): string => (id ? SOURCES[id] ?? id : 'an unnamed source')
 

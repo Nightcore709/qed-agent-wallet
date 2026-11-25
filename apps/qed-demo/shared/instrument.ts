@@ -346,7 +346,7 @@ export const VENUES: readonly Venue[] = [
 export const NETWORKS: readonly Network[] = [
   { id: 'eip155:1', name: 'Ethereum mainnet', gasAsset: 'eip155:1/slip44:60', finality: { kind: 'finalized-checkpoint' }, source: 'CAIP-2 test case; EIP-155 chain id 1' },
   { id: 'eip155:11155111', name: 'Ethereum Sepolia (test network)', gasAsset: 'eip155:11155111/slip44:60', finality: { kind: 'finalized-checkpoint' }, source: 'The release\'s deployment (chain/vendor/evidence/ethereum-sepolia/manifest.json, chainId 11155111)', fixture: 'a public test network; its ether has no value' },
-  { id: 'eip155:31337', name: 'Local Anvil chain', gasAsset: 'eip155:31337/slip44:60', finality: { kind: 'confirmations', depth: 2 }, source: 'chain/rail/config.ts (chain id 31337); R7 decision D6 (two confirmations by default)', fixture: 'a chain running on this computer; nothing on it has value' },
+  { id: 'eip155:31337', name: 'Local Anvil chain', gasAsset: 'eip155:31337/slip44:60', finality: { kind: 'confirmations', depth: 2 }, source: 'chain/rail/config.ts (chain id 31337); R7 decision D6 (two confirmations by default)', fixture: 'a chain running on this QED installation; nothing on it has value' },
 ]
 
 const nativeEther = (network: Network): TokenInstrument => ({

@@ -86,10 +86,10 @@ export const isNameOutcome = (v: unknown): v is NameOutcome => typeof v === 'str
 
 /**
  * Where the answer comes from, and what it cannot tell (R13 section 4: local name matching is not verification by a
- * financial institution). The directory is PAPER_DIRECTORY above, on this computer; nothing is asked of a bank or of NPCI.
+ * financial institution). The directory is PAPER_DIRECTORY above, on this QED installation; nothing is asked of a bank or of NPCI.
  */
 export const NAME_CHECK_LIMITS = 'It can say only whether a name matches the one held for the address, not who controls the account or whether someone is pressing you to pay.'
-const PAPER = `Made when the payee was added, against the paper bank's own directory on this computer; no real bank or NPCI was asked. ${NAME_CHECK_LIMITS}`
+const PAPER = `Made when the payee was added, against the paper bank's own directory on this QED installation; no real bank or NPCI was asked. ${NAME_CHECK_LIMITS}`
 /**
  * The check as a line of a payment's terms and of the payee: what the paper bank answered, and in the note whose check it
  * was. `outcome` null is a payee added before QED checked names.
@@ -111,7 +111,7 @@ export function nameCheckWords(outcome: NameOutcome | null, registered: string |
  * names are not said twice): null on a match.
  */
 export function nameCheckAdvice(o: NameOutcome): string | null {
-  const end = 'It is the paper bank\'s own directory on this computer: no real bank or NPCI was asked, and it cannot tell who controls the account or whether someone is pressing you to pay.'
+  const end = 'It is the paper bank\'s own directory on this QED installation: no real bank or NPCI was asked, and it cannot tell who controls the account or whether someone is pressing you to pay.'
   switch (o) {
     case 'match': return null
     case 'close': return `Use its name if this is who you mean to pay; to keep yours, say you checked the address with the payee yourself. ${end}`
@@ -123,7 +123,7 @@ export function nameCheckAdvice(o: NameOutcome): string | null {
 
 /** What adding a payee needs the owner to see and confirm, in a sentence or two: null on a match. */
 export function nameCheckAddMessage(c: NameCheck, typed: string, handle: string): string | null {
-  const end = 'It is the paper bank\'s own directory on this computer: no real bank or NPCI was asked, and it cannot tell who controls the account or whether someone is pressing you to pay.'
+  const end = 'It is the paper bank\'s own directory on this QED installation: no real bank or NPCI was asked, and it cannot tell who controls the account or whether someone is pressing you to pay.'
   switch (c.outcome) {
     case 'match': return null
     case 'close': return `The paper bank holds a slightly different name for ${handle}: ${c.registeredName}, not ${typed}. Use its name if this is who you mean to pay; to keep yours, say you checked the address with the payee yourself. ${end}`

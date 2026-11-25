@@ -127,8 +127,8 @@ export function JudgeScreen() {
           <p className="jg-who-word"><Stamp tone={proposer.tone === 'ok' ? 'ok' : proposer.tone === 'wait' ? 'wait' : 'plain'}>{proposer.word}</Stamp></p>
           <p>{proposer.says}</p>
           <ul className="jg-who-list small">
-            <li>{d.presentation ? 'Paper prices are made up on this computer (presentation mode): no market was asked. Conversions on the wallet trade against the test market\'s own pools on the local chain.' : 'Conversions on the wallet trade against the test market\'s own pools on the local chain; paper prices are live market observations.'}</li>
-            <li>{d.wallet.chainId === 31337 ? 'The wallet runs on a test chain on this computer (chain 31337), with test tokens of no value. It is not a public network.' : d.wallet.state === 'ready' ? (d.wallet.network ?? 'The wallet\'s network is not named.') : 'No on-chain wallet yet.'}</li>
+            <li>{d.presentation ? 'Paper prices are made up on this QED installation (presentation mode): no market was asked. Conversions on the wallet trade against the test market\'s own pools on the local chain.' : 'Conversions on the wallet trade against the test market\'s own pools on the local chain; paper prices are live market observations.'}</li>
+            <li>{d.wallet.chainId === 31337 ? 'The wallet runs on a test chain on this QED installation (chain 31337), with test tokens of no value. It is not a public network.' : d.wallet.state === 'ready' ? (d.wallet.network ?? 'The wallet\'s network is not named.') : 'No on-chain wallet yet.'}</li>
             <li>Your passkey signs; the model holds no key, signs nothing and executes nothing.</li>
             {d.models ? <li>{d.models.readOnly ? `Ask is read-only now: ${d.models.readOnly.message}` : `Model answers have cost ${usd(d.models.spentUsd.budget)} of this installation's ${usd(d.models.spentUsd.budgetLimit)} budget, priced from the tokens each response reported (${d.models.priceSource}).`}</li> : null}
           </ul>

@@ -114,7 +114,7 @@ export class SyntheticProvider implements Provider {
     this.seedHistory(now)
     this.lastAt = now
     this.tick(now)
-    this.market.status(SYNTHETIC, 'live', { messages: 0, extra: { note: 'Presentation mode: every value is generated on this computer.' } })
+    this.market.status(SYNTHETIC, 'live', { messages: 0, extra: { note: 'Presentation mode: every value is generated on this QED installation.' } })
     this.timer = setInterval(() => {
       if (syntheticPaused()) { this.market.status(SYNTHETIC, 'degraded', { error: PAUSED_TEXT, extra: { testMode: true, paused: true } }); return }
       const t = this.market.clock.now(); this.tick(t); this.market.status(SYNTHETIC, 'live', { messages: 1, ...(syntheticNavThrough() ? { extra: { testMode: true, note: NAV_AHEAD_TEXT } } : {}) })

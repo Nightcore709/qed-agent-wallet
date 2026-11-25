@@ -74,7 +74,7 @@ describe('the settings (QED_DELIVERY=postmark)', () => {
 
 describe('the stand-in can never be selected in a production-like configuration', () => {
   const url = 'http://127.0.0.1:9911'
-  it('is honoured on an isolated test stack with no public origin, on this computer, over http', () => {
+  it('is honoured on an isolated test stack with no public origin, on this QED installation, over http', () => {
     expect(postmarkBaseUrl({ QED_TEST_STACK: '1', QED_POSTMARK_URL: url }, null)).toEqual({ baseUrl: url, standIn: true })
     expect(postmarkBaseUrl({ QED_TEST_STACK: '1', QED_POSTMARK_URL: 'http://localhost:9911/' }, null)).toEqual({ baseUrl: 'http://localhost:9911', standIn: true })
     expect(loadConfig({ QED_DB: ':memory:', ...GOOD, QED_TEST_STACK: '1', QED_POSTMARK_URL: url }).postmark).toMatchObject({ baseUrl: url, standIn: true })

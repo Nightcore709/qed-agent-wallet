@@ -13,7 +13,7 @@
  *      included; a process that is merely stalled or suspended keeps it, so nothing takes over from it. Two engines
  *      started together, two engines with the same pid (every container's first process is pid 1) and an engine
  *      whose heartbeat only looks old (a stalled process, a clock step) are all refused.
- *   2. The heartbeat check at start: a fresh heartbeat of another live process on this computer refuses the start.
+ *   2. The heartbeat check at start: a fresh heartbeat of another live process on this QED installation refuses the start.
  *   3. Ownership on every tick and beat: the heartbeat row names this engine's instance. If another engine has
  *      written it (a lock that could not exclude: a network file system, a lock file deleted while held), this engine
  *      stops acting at once and reports it, rather than acting beside the other.

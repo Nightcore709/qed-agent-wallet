@@ -6,7 +6,7 @@
  *   node scripts/judge-journey.ts [--out <dir>]            the scripted test double proposes (the default)
  *   QED_AI_PROVIDER=claude-cli node scripts/judge-journey.ts --real-model [--out <dir>]
  *                                                          a real model proposes: the Claude command-line client signed
- *                                                          in on this computer, which uses that account's allowance.
+ *                                                          in on this QED installation, which uses that account's allowance.
  *                                                          Run it only with the owner's approval.
  *
  * The stack is browser/support/stack.ts startExtraStack: its own database in a scratch directory, engine and API on

@@ -380,7 +380,7 @@ describe('Evidence: what kind of evidence each case is, and what executed and re
   })
 
   it('says what executed: the transactions and their blocks, a paper fill, or nothing', () => {
-    expect(executedWords({ outcome: 'executed', venue: 'local-chain' }, { executed: true }, { transactions: [{ status: 'success', block: '59', chain: 'vault' }] })).toBe('One transaction on the local test chain on this computer; 1 of 1 succeeded, in block 59.')
+    expect(executedWords({ outcome: 'executed', venue: 'local-chain' }, { executed: true }, { transactions: [{ status: 'success', block: '59', chain: 'vault' }] })).toBe('One transaction on the local test chain on this QED installation; 1 of 1 succeeded, in block 59.')
     expect(executedWords({ outcome: 'executed', venue: 'paper' }, { executed: true }, { venue: { kind: 'paper' }, transactions: [] })).toMatch(/^Filled by a paper venue/)
     expect(executedWords({ outcome: 'refused', venue: 'local-chain' }, { executed: false }, { transactions: [] })).toBe('Nothing: it was refused before anything was sent.')
   })

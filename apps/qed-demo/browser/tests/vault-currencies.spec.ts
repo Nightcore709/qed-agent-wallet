@@ -35,7 +35,7 @@ test('a household chooses test euros, yen and dinars at setup under its passkey,
   await page.goto('/vault')
   await expect(treasury(page).locator('.lead')).toHaveText('€1,095.24')
   // every figure in the wallet's own tokens: the page's words, and the amount fields' sign (never the rupee's)
-  await expect(page.locator('.vt-head')).toContainText('Test euros and test yen on a chain that runs on this computer')
+  await expect(page.locator('.vt-head')).toContainText('Test euros and test yen on a chain that runs on this QED installation')
   const perPayment = page.getByLabel('Most in one payment, in test euros')
   await expect(perPayment).toBeVisible()
   await expect(page.locator('.money', { has: perPayment })).toHaveAttribute('data-sign', '€')

@@ -278,7 +278,7 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
               <Landmark aria-hidden="true" /><span><b>Bank account</b><small>{fmt.money(o.bank, true)} in it, {fmt.money(free, true)} free to use</small></span>
             </button>
             <button type="button" aria-pressed={from === 'wallet'} onClick={() => setFrom('wallet')}>
-              <CreditCard aria-hidden="true" /><span><b>On-chain wallet</b><small>{w ? `${fmt.money(Number(w.treasury.balance), true)} in test rupees${w.treasury.paused ? ', paused' : ''}` : vault ? (vault.setUp ? 'Being set up' : 'Not set up yet') : 'Test rupees on a chain on this computer'}</small></span>
+              <CreditCard aria-hidden="true" /><span><b>On-chain wallet</b><small>{w ? `${fmt.money(Number(w.treasury.balance), true)} in test rupees${w.treasury.paused ? ', paused' : ''}` : vault ? (vault.setUp ? 'Being set up' : 'Not set up yet') : 'Test rupees on a chain on this QED installation'}</small></span>
             </button>
           </div>
         </Step>
@@ -647,7 +647,7 @@ function AddPayee({ onAdded, focus, rule }: { onAdded: (id: string) => void; foc
       <div className="pay-add-go"><Btn type="submit" tone={asked ? undefined : 'fill'} busy={add.busy} disabled={!!asked && !checked}>{asked ? (asked.outcome === 'close' ? 'Add it with the name I gave' : 'Add it anyway') : 'Add this payee'}</Btn>
         <p className="pay-quiet">The name is checked before the payee is saved. A match cannot tell who controls the account.</p></div>
       <details className="disclose pay-add-more"><summary>What the name check is, and a new payee's first day</summary>
-        <p>Before a payee is saved, QED checks the name you give against the paper bank's own directory on this computer, not a real bank or NPCI. A match cannot tell who controls the account, or whether someone is pressing you to pay. {rule.off ? 'Payments to a new payee do not wait: you switched that off in Safeguards.' : `In a payee's first 24 hours, a payment that takes what you send it above ${fmt.money(rule.above)} waits ${rule.wait} before it is sent.`}</p>
+        <p>Before a payee is saved, QED checks the name you give against the paper bank's own directory on this QED installation, not a real bank or NPCI. A match cannot tell who controls the account, or whether someone is pressing you to pay. {rule.off ? 'Payments to a new payee do not wait: you switched that off in Safeguards.' : `In a payee's first 24 hours, a payment that takes what you send it above ${fmt.money(rule.above)} waits ${rule.wait} before it is sent.`}</p>
       </details>
     </form>
   )

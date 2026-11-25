@@ -81,7 +81,7 @@ const SHOTS = process.env.QED_BOUNTY_SHOTS
 const bounties = (page: Page) => page.goto(`${s.base}/earn/bounties`)
 const make = (page: Page) => page.getByRole('region', { name: 'Make a claim' })
 const mine = (page: Page, bounty: string) => page.getByRole('region', { name: 'Your claims' }).getByRole('article', { name: new RegExp(`^Bounty ${bounty}:`) })
-const onBoard = (page: Page, bounty: string) => page.getByRole('region', { name: 'On this computer\'s chain' }).getByRole('listitem').filter({ has: page.getByRole('heading', { name: new RegExp(`^Bounty ${bounty}:`) }) })
+const onBoard = (page: Page, bounty: string) => page.getByRole('region', { name: 'On this QED installation\'s chain' }).getByRole('listitem').filter({ has: page.getByRole('heading', { name: new RegExp(`^Bounty ${bounty}:`) }) })
 /** Choose a bounty, paste the claim, and ask the judge. */
 async function ask(page: Page, bounty: string, claim: unknown): Promise<Locator> {
   const m = make(page)
@@ -108,7 +108,7 @@ test('a household without a wallet: Earn links to the bounties; the statements e
   await page.getByRole('link', { name: 'Refutation bounties' }).click()
   await expect(page).toHaveURL(/\/earn\/bounties$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Refutation bounties')
-  await expect(page.getByText('Test chain on this computer; tokens of no value')).toBeVisible()
+  await expect(page.getByText('Test chain on this QED installation; tokens of no value')).toBeVisible()
   // what the household can do: set its wallet up (no claim form without one)
   const note = page.getByText('Set up your on-chain wallet to claim')
   await expect(note).toBeVisible({ timeout: 20_000 })
@@ -166,7 +166,7 @@ test('a finder checks, commits, reveals and settles a valid claim and its reserv
   await expect(ruling).toBeVisible({ timeout: 20_000 })
   await expect(ruling.getByText(/^The theorem holds for this claim: the certified netting cancels 169(\.00)? tUSD and the challenger 162(\.00)? tUSD, which is not more\. Nothing would be paid\.$/)).toBeVisible()
   await expect(ruling.getByText('TheoremHolds(169000000, 162000000)')).toBeVisible()
-  await expect(ruling.getByText(/^Reproduced on this computer: the judge here gives exactly the answer recorded on Sepolia for claim BM1 on 19 Oct 2026, 22:4\d:\d\d UTC \(historical, not re-verified\)\.$/)).toBeVisible()
+  await expect(ruling.getByText(/^Reproduced on this QED installation: the judge here gives exactly the answer recorded on Sepolia for claim BM1 on 19 Oct 2026, 22:4\d:\d\d UTC \(historical, not re-verified\)\.$/)).toBeVisible()
   await asked.getByRole('button', { name: 'Commit the claim' }).click()
   const rejected = asked.getByRole('alert').filter({ hasText: 'Refused by QED\'s checks: the judge rejects this claim' })
   await expect(rejected).toBeVisible({ timeout: 20_000 })

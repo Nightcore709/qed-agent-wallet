@@ -49,7 +49,7 @@ export function benchmarkChoices(db: Db): Choice[] {
     const n = db.get<{ n: number }>('SELECT COUNT(*) n FROM daily_values WHERE instrument_id = ?', i.id)!.n
     const synthetic = i.provider === 'synthetic-markets'
     out.push({ id: i.id, label: i.name, group: i.kind === 'mutual_fund' ? 'Mutual funds' : i.kind === 'etf' ? 'ETFs' : i.kind === 'equity' ? 'Shares' : 'Government securities', observations: n, usable: n >= MIN_HISTORY,
-      note: n < MIN_HISTORY ? `Only ${n} daily value${n === 1 ? '' : 's'} on record: too few to compare against.` : synthetic ? 'A synthetic price series generated on this computer, not market data.' : 'Published NAVs on record.' })
+      note: n < MIN_HISTORY ? `Only ${n} daily value${n === 1 ? '' : 's'} on record: too few to compare against.` : synthetic ? 'A synthetic price series generated on this QED installation, not market data.' : 'Published NAVs on record.' })
   }
   out.push({ id: EQUAL_WEIGHT, label: 'Equal weight of everything you have held (1/N)', group: 'Your own holdings', observations: 0, usable: true, note: 'Each holding with a daily history gets the same share every day. It ignores trading costs, so it flatters itself.' })
   return out

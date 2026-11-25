@@ -1,5 +1,5 @@
 /**
- * The production rehearsal, on this computer only (apps/qed-demo/docs/PRODUCTION.md, section 12).
+ * The production rehearsal, on this QED installation only (apps/qed-demo/docs/PRODUCTION.md, section 12).
  *
  *   node scripts/prod-rehearsal.ts [--port 7443] [--dist <built interface folder>] [--out <report.json>] [--keep]
  *
@@ -293,7 +293,7 @@ try {
 
 const passed = checks.filter((c) => c.ok).length
 const report = {
-  rehearsal: 'production settings on this computer (scripts/prod-rehearsal.ts)', when: new Date().toISOString(), origin: ORIGIN,
+  rehearsal: 'production settings on this QED installation (scripts/prod-rehearsal.ts)', when: new Date().toISOString(), origin: ORIGIN,
   node: process.version, chrome: browserInfo.chrome ?? null, openssl: spawnSync(process.env.QED_OPENSSL ?? 'openssl', ['version'], { encoding: 'utf8' }).stdout.trim(),
   certificate: { subject: x509.subject, subjectAltName: x509.subjectAltName, validTo: x509.validTo, keyType: 'EC P-256', made: 'at run time in a private temporary folder, deleted afterwards' },
   settings: { QED_PUBLIC_ORIGIN: ORIGIN, QED_TLS_CERT_FILE: '<temporary>', QED_TLS_KEY_FILE: '<temporary>', QED_PRESENTATION: '1', QED_AI_PROVIDER: 'none', vaultService: 'none' },

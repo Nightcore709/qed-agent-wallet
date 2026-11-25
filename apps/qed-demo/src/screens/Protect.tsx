@@ -123,7 +123,7 @@ const Narrow = createContext(false)
 /**
  * Where a rule holds, in words with its enforcer's mark: a neutral chip, never the green of a passed check. What
  * enforces a rule says how far it reaches, not that the owner is safe (R13: no reassuring badge stronger than the
- * evidence; QED's server holds only while QED is sound, and the chain here is a test chain on this computer).
+ * evidence; QED's server holds only while QED is sound, and the chain here is a test chain on this QED installation).
  */
 function Scope({ by, children }: { by: 'server' | 'cosigner' | 'chain'; children: ReactNode }) {
   const I = by === 'server' ? Server : by === 'cosigner' ? Signature : Link2
@@ -334,7 +334,7 @@ export function ProtectScreen() {
         <Yours progs={progs} envelope={liq.data?.envelope ?? null} liq={liq.data?.liquidity ?? null} home={home.data} payees={payees.data?.payees ?? null} now={now} acting={acting} pause={pause} />
       </Band>
 
-      <Band kind="enforced" id="enforced" title="Enforced" lead="What refuses, not just tells: QED's server on every action, whatever you set, and on your on-chain wallet the chain, which holds even if QED is wrong or taken over. Test money, on a chain on this computer." busy={!vault.data && !vault.error}>
+      <Band kind="enforced" id="enforced" title="Enforced" lead="What refuses, not just tells: QED's server on every action, whatever you set, and on your on-chain wallet the chain, which holds even if QED is wrong or taken over. Test money, on a chain on this QED installation." busy={!vault.data && !vault.error}>
         <Enforced sec={sec.data} vault={vault.data} error={vault.error} chain={chain} delay={signers.data?.delaySeconds ?? null} />
       </Band>
 
@@ -401,7 +401,7 @@ function Ladder({ vault, chain, error }: { vault: VaultBrief | null; chain: Chai
     { key: 'model', icon: <MessagesSquare />, name: 'The model behind Ask', does: 'Only proposes. It holds no credential and can approve, send or change nothing.', chip: <Stamp tone="plain">Enforces nothing</Stamp> },
     { key: 'server', icon: <Server />, name: "QED's server", does: 'Fixed code checks every action against your rules and its own before anything is sent. No model decides. It holds only while QED itself is sound.', chip: <Scope by="server">Every action</Scope> },
     { key: 'cosigner', icon: <Signature />, name: 'The co-signer', does: chain ? (m?.fields.requireCosign === false ? 'Your mandate in force does not ask for its signature.' : `A second key${own ? ', in its own process,' : ''} signs each payment and conversion from your on-chain wallet, by its own rules.`) : noWallet, chip: chain ? (m?.fields.requireCosign === false ? <Stamp tone="plain">Not required</Stamp> : <Scope by="cosigner">Each payment</Scope>) : <Stamp tone="plain">No wallet</Stamp> },
-    { key: 'chain', icon: <Link2 />, name: 'The chain', does: chain ? "The wallet's contract refuses a payment beyond your mandate and a conversion at a worse price; its own account takes only your passkeys' signatures. Here it is a test chain on this computer, and the contracts are not externally audited." : noWallet, chip: chain ? <Scope by="chain">Even if QED's server fails</Scope> : <Stamp tone="plain">No wallet</Stamp> },
+    { key: 'chain', icon: <Link2 />, name: 'The chain', does: chain ? "The wallet's contract refuses a payment beyond your mandate and a conversion at a worse price; its own account takes only your passkeys' signatures. Here it is a test chain on this QED installation, and the contracts are not externally audited." : noWallet, chip: chain ? <Scope by="chain">Even if QED's server fails</Scope> : <Stamp tone="plain">No wallet</Stamp> },
     { key: 'paper', icon: <Landmark />, name: 'Your bank, rails and venues', does: "Paper in this build: QED's own ledger stands in for them, so they add no check of their own.", chip: <Stamp tone="plain">Paper</Stamp> },
   ]
   return (
@@ -466,7 +466,7 @@ function Watched({ sec, secError, home, engine, incidents, now }: { sec: Securit
       now={down ? <><Stamp tone="void">Not running</Stamp><span>{beat ? `Last heartbeat ${fmt.rel(beat, now)}.` : 'No heartbeat on record.'} Nothing is watched or carried out.</span></>
         : stop ? <><Stamp tone="wait">{stop.protectiveContinues ? 'Paused, protection on' : 'Paused'}</Stamp><span>Since {fmt.dayTime(stop.at)}. {stop.protectiveContinues ? 'Only protective selling can run.' : 'Nothing runs.'}</span></>
         : engine ? <><Stamp tone="ok">Running</Stamp><span>Heartbeat {beat ? fmt.age(Math.max(0, now - beat)) : 'not yet heard'}.</span></> : <span className="skel pr-skel-line" />}
-      what="Carries out your instructions and watches prices, on this computer; QED sees it from the engine's own heartbeat. Its one pause control is the status button in the top bar."
+      what="Carries out your instructions and watches prices, on this QED installation; QED sees it from the engine's own heartbeat. Its one pause control is the status button in the top bar."
       meta={[['If it goes wrong', 'Nothing runs, protective selling included. Runs it misses are skipped, not made up later.']]} />,
     <Tile key="incidents" id="pr-incidents" title="Faults and how they ended" tone={incidents?.open.length ? 'void' : undefined}
       now={!incidents ? <span className="skel pr-skel-line" /> : incidents.open.length
@@ -690,7 +690,7 @@ function OnChain({ vault, error, chain, delay }: { vault: VaultBrief | null; err
           <div className="pr-mandate"><Suspense fallback={null}><WalletMandate /></Suspense></div>
         </Tile>
         <Tile title="A second signature on every payment" tag={<KindTag kind="enforced" by="cosigner" />}
-          now={<>{m?.fields.requireCosign === false ? <Stamp tone="plain">Not required</Stamp> : <Scope by="cosigner">Required</Scope>}<span>{own ? 'The co-signer runs as its own process on this computer, with its own key.' : 'The co-signer runs inside the wallet service, with its own key.'}</span></>}
+          now={<>{m?.fields.requireCosign === false ? <Stamp tone="plain">Not required</Stamp> : <Scope by="cosigner">Required</Scope>}<span>{own ? 'The co-signer runs as its own process on this QED installation, with its own key.' : 'The co-signer runs inside the wallet service, with its own key.'}</span></>}
           what="Every payment and conversion from the wallet also needs the co-signer's signature."
           meta={[['What enforces it', 'The co-signer, by its own rules, your authority budget among them; the contract refuses what it has not signed'], ['If QED fails', m ? `The co-signer still refuses what breaks its rules. Taken over too: at most ${fmt.money(worst, true)} in 24 hours, only to payees you approved.` : 'The co-signer still refuses what breaks its rules.']]} />
         <Tile title="The best price on every conversion" tag={<KindTag kind="enforced" by="chain" />}

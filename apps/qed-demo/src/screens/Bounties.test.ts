@@ -102,7 +102,7 @@ describe('the steps of a claim: commit, reveal after the delay, the contest, set
   })
 })
 
-describe('a bounty\'s phase on this computer\'s chain', () => {
+describe('a bounty\'s phase on this QED installation\'s chain', () => {
   it('open, in its contest, ready to settle, paid and closed; whether the recipient is this household', () => {
     expect(phaseWords(bounty(), at())).toEqual({ word: 'Open', tone: 'ok', open: true, say: 'Open for claims: 1,000.00 tUSD in the pool.' })
     const contest = phaseWords(bounty({ phase: 'contest', winner: OTHER, recipient: OTHER, contestEndsAt: S + 8 }), at())
@@ -132,7 +132,7 @@ describe('every failure says what happened and what the person can do next', () 
     expect(e(403, 'not_permitted').next).toBe('Ask the workspace\'s owner or an operator to claim it.')
   })
   it('the wallet service not answering: nothing was sent; the answer lost: the same request again, never twice', () => {
-    const off = e(503, 'rail_off', 'The on-chain vault service is not running on this computer.')
+    const off = e(503, 'rail_off', 'The on-chain vault service is not running on this QED installation.')
     expect([off.title, off.next]).toEqual(['The wallet service is not answering', 'Nothing was sent. Start the vault service, then try again.'])
     expect(e(503, 'rail_starting').title).toBe('The wallet service is starting')
     const lost = e(504, 'rail_outcome_unknown')
@@ -152,7 +152,7 @@ describe('the wallet service\'s part of the page, when it cannot answer for this
     expect(unavailableWords({ code: 'vault_not_set_up', reason: 'This household has no on-chain vault yet.' })).toMatchObject({ title: 'Set up your on-chain wallet to claim', to: { href: '/vault', label: 'Set up your on-chain wallet' }, retry: false })
     // the next step is an action and what still stands, never the reason again
     expect(unavailableWords({ code: 'vault_not_set_up', reason: 'This household has no on-chain vault yet.' }).next).toBe('Set it up, then come back here to make a claim. The bounties\' statements and the Sepolia record on this page do not depend on it.')
-    const off = unavailableWords({ code: 'rail_off', reason: 'The on-chain vault service is not running on this computer.' })
+    const off = unavailableWords({ code: 'rail_off', reason: 'The on-chain vault service is not running on this QED installation.' })
     expect([off.title, off.retry]).toEqual(['The wallet service is not answering', true])
     expect(off.next).toBe('The bounties\' statements and the Sepolia record on this page do not depend on it. Your claims are kept by the service and its chain; a claim must still be revealed before it lapses, so start the service again before then.')
     expect(unavailableWords({ code: 'bounties_off', reason: null }).title).toBe('The bounty board is turned off on this vault service')

@@ -135,7 +135,7 @@ describe('an order\'s approval names who it goes to, the asset, the route and wh
   it('a market buy on the order book and a fund purchase each open with where, what and how, and end with what follows once approved', async () => {
     const k = makeKit(); k.btc(6_600_000); k.nav('amfi:118701', '2026-11-17', '6500.0000')
     const coin = await previewAction(k.ctx, k.userId, { kind: 'order', instrumentId: 'coindcx:BTCINR', side: 'buy', type: 'market', amount: 500_000 })
-    expect(coin.lines.slice(0, 3).map((l) => [l.label, l.value])).toEqual([['Placed with', "CoinDCX's order book, on paper"], ['Asset', 'BTC, for Indian rupees'], ['Route', 'A paper venue on this computer']])
+    expect(coin.lines.slice(0, 3).map((l) => [l.label, l.value])).toEqual([['Placed with', "CoinDCX's order book, on paper"], ['Asset', 'BTC, for Indian rupees'], ['Route', 'A paper venue on this QED installation']])
     expect(coin.lines.at(-1)).toMatchObject({ label: 'Once you approve', value: 'It fills at once against the book, no worse than your worst price' })
     expect(coin.lines.some((l) => l.label === 'Leaves your bank')).toBe(true) // the amount stays where it was
     const fund = await previewAction(k.ctx, k.userId, { kind: 'order', instrumentId: 'amfi:118701', side: 'buy', type: 'nav', amount: 500_000 })

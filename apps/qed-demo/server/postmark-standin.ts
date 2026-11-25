@@ -5,7 +5,7 @@
  * requests (a status and an ErrorCode), to be slow, or to treat an address as inactive.
  *
  * It is not Postmark and nothing presents it as Postmark: QED uses it only on an isolated test stack (QED_TEST_STACK=1,
- * no public origin, an http:// origin on this computer; postmark-config.ts postmarkBaseUrl). Used by tests only.
+ * no public origin, an http:// origin on this QED installation; postmark-config.ts postmarkBaseUrl). Used by tests only.
  */
 import { createServer, type IncomingMessage, type Server } from 'node:http'
 

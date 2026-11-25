@@ -108,7 +108,7 @@ const PLAIN: Record<string, [Area, string]> = {
   'RISK-038': ['running', 'A lapsed broker login can hold up every instruction, bills included, not only those that use that broker.'],
   'RISK-041': ['signing', 'An account that signs in with a password alone has no second factor, and the password cannot be changed here.'],
   'RISK-042': ['protection', 'What must stay in the bank covers only payments on record, 150 days ahead; a payment that comes into view later can raise it, and a run can then be refused.'],
-  'RISK-043': ['running', 'QED runs on this computer: while it sleeps nothing runs, and what fell due is recorded as missed, never done late.'],
+  'RISK-043': ['running', 'QED runs on this QED installation: while it sleeps nothing runs, and what fell due is recorded as missed, never done late.'],
   // how far attacks through Ask have been tried against a real model is said once, under RISK-099
   'RISK-044': ['privacy', 'When you use Ask, a model sees a summary of your position.'],
   'RISK-046': ['law', 'The market data here may be used for the owner\'s own review only; showing it publicly would need each provider\'s permission.'],
@@ -177,7 +177,7 @@ const OPERATIONS = new Set([
   // the encryption work's faults before its merge (this computer's copies of the review data), and what restarting the
   // review build would change (the team's own operations)
   'RISK-085', 'RISK-090',
-  // the hosting provider's configuration change and its date, the Node version on this computer, and the downtime of
+  // the hosting provider's configuration change and its date, the Node version on this QED installation, and the downtime of
   // each deployment (deployment, tools and deadlines: the team's own operations)
   'RISK-095', 'RISK-107', 'RISK-118',
   // R14: the release checks' labelled test accounts left on the hosted service (deployment) and the browser suite's

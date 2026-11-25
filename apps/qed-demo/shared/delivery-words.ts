@@ -23,8 +23,8 @@ export function noDeliveryWords(what: NoDeliveryCase): string {
 export type OutboxCase = 'reset' | 'recover' | 'confirm'
 export function outboxWords(what: OutboxCase, typed: string): { title: string; body: string } {
   switch (what) {
-    case 'reset': return { title: 'Kept in the simulated outbox, not sent', body: `If an account with a confirmed email address matches “${typed}”, the message that would go to that address is kept in the simulated outbox on this computer: nothing was sent. Its link works once, for 30 minutes.` }
-    case 'recover': return { title: 'Kept in the simulated outbox, not sent', body: `If an account with a confirmed email address matches “${typed}”, the recovery link that would go to that address is kept in the simulated outbox on this computer: nothing was sent. It works once, for an hour.` }
+    case 'reset': return { title: 'Kept in the simulated outbox, not sent', body: `If an account with a confirmed email address matches “${typed}”, the message that would go to that address is kept in the simulated outbox on this QED installation: nothing was sent. Its link works once, for 30 minutes.` }
+    case 'recover': return { title: 'Kept in the simulated outbox, not sent', body: `If an account with a confirmed email address matches “${typed}”, the recovery link that would go to that address is kept in the simulated outbox on this QED installation: nothing was sent. It works once, for an hour.` }
     case 'confirm': return { title: `Kept in the simulated outbox, not sent to ${typed}`, body: 'Open the link in the kept message, or type its code under Security and recovery: nothing was sent. The address receives your security notices once confirmed.' }
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Grow's "Watching" panel (R14): the names the household follows, each with its latest price, where the price came from,
- * the time of it, whether it is observed (read from a public source) or synthetic (generated on this computer), and the
+ * the time of it, whether it is observed (read from a public source) or synthetic (generated on this QED installation), and the
  * change since the name was added. The server builds every row from the market data QED already holds (server/watchlist.ts);
  * nothing here works out a price. A row can be removed, can start a test of an idea, and can open the ordinary ticket,
  * which keeps its approval: nothing is bought or sold from this list. Anyone in the workspace can read it; a viewer cannot
@@ -108,7 +108,7 @@ export function Watching({ market }: { market: Market }) {
       {add.error ? <Problem error={add.error} /> : null}
       {remove.error ? <Problem error={remove.error} /> : null}
       <p className="small muted gr-watch-note" role="status" aria-live="polite">{said}</p>
-      <p className="small muted">Prices are never refreshed on their own. Each says its source and its own time. Synthetic prices are generated on this computer and are not market data. Rupee prices are in rupees.</p>
+      <p className="small muted">Prices are never refreshed on their own. Each says its source and its own time. Synthetic prices are generated on this QED installation and are not market data. Rupee prices are in rupees.</p>
     </section>
   )
 }

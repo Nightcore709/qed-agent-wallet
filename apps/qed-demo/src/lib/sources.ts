@@ -11,7 +11,7 @@ export type SourceKind = 'paper' | 'chain' | 'market' | 'fund' | 'modelled' | 'h
 
 export const SOURCES: Record<SourceKind, { label: string; says: string }> = {
   paper: { label: 'Paper bank', says: 'QED\'s own record of simulated money for practice. No real bank or institution holds it.' },
-  chain: { label: 'Test chain', says: 'Test tokens on a chain that runs on this computer. They have no value, are not rupees and are not a security.' },
+  chain: { label: 'Test chain', says: 'Test tokens on a chain that runs on this QED installation. They have no value, are not rupees and are not a security.' },
   market: { label: 'Market price', says: 'A price observed from a market source, shown with its time. It moves, and it can be out of date.' },
   fund: { label: 'Fund value', says: 'A mutual fund\'s published value for a stated day (its NAV). Not a live price.' },
   modelled: { label: 'Modelled', says: 'Worked out by QED from assumptions it states. Not a quote, a promise or a published term.' },

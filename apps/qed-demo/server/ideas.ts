@@ -336,13 +336,13 @@ export async function investigate(ctx: Ctx, userId: string, text: unknown, answe
     return { vs: c.vs, difference: d, says }
   })
   const basis: Investigation['evidence']['basis'] = !ideaSeries ? 'none' : synthetic ? 'synthetic' : 'recorded'
-  const sourceText = synthetic ? 'synthetic prices generated on this computer, not market data' : [...sources].some((s) => s.startsWith('mfapi') || s.startsWith('amfi')) ? 'published NAVs this app recorded (AMFI; earlier history back-filled from mfapi.in)' : sources.size ? `values this app recorded (${[...sources].join(', ')})` : 'no recorded prices'
+  const sourceText = synthetic ? 'synthetic prices generated on this QED installation, not market data' : [...sources].some((s) => s.startsWith('mfapi') || s.startsWith('amfi')) ? 'published NAVs this app recorded (AMFI; earlier history back-filled from mfapi.in)' : sources.size ? `values this app recorded (${[...sources].join(', ')})` : 'no recorded prices'
   const says: string[] = []
   if (!ideaSeries) says.push(`QED has no recorded daily prices for ${name}, so the record says nothing about how it would have done. No figure is shown for it rather than a guess.`)
   if (roll) says.push(`${roll.windows.toLocaleString('en-IN')} past ${cadence === 'monthly' ? 'years of monthly purchases' : 'one-year windows'}, started on each recorded day from ${withYear(roll.firstStart)} to ${withYear(roll.lastStart)}, valued after costs and modelled tax.`)
   else if (ideaSeries) says.push(`The record of ${name} is shorter than a year and a day, so no one-year window can be worked out.`)
   for (const c of claims) says.push(c.says)
-  if (synthetic) says.push('Every price here is synthetic, generated on this computer: this shows the method, not markets.')
+  if (synthetic) says.push('Every price here is synthetic, generated on this QED installation: this shows the method, not markets.')
   const notes = [OVERLAP, NOT_FITTED, SURVIVORSHIP, 'Tax as QED models it: not verified against the Income-tax Act 2025, and not tax advice.']
   const detectedBetter = claims.some((c) => c.difference.detectable && c.difference.yearly > 0 && c.vs === 'doing nothing')
   const detectedWorse = claims.some((c) => c.difference.detectable && c.difference.yearly < 0)
@@ -382,7 +382,7 @@ export async function investigate(ctx: Ctx, userId: string, text: unknown, answe
   if (cadence === 'once' && free - amount < profile.spending && amount <= free) against.push(`It leaves ${inr(free - amount)} free, less than a month of your declared spending (${inr(profile.spending)}).`)
   if (concentration) against.push(concentration)
   if (!fund && !sec) against.push('Gains on digital assets are taxed at 30% and losses cannot be set off.')
-  if (sec) against.push('Its prices are synthetic, generated on this computer: the record above shows how the method behaves on made-up prices, not how this security did.')
+  if (sec) against.push('Its prices are synthetic, generated on this QED installation: the record above shows how the method behaves on made-up prices, not how this security did.')
   if (impl === 'no') against.unshift(implSays)
   if (afford === 'no') against.unshift(affordSays)
   if (compat === 'no') against.unshift(compatParts[0]!)
