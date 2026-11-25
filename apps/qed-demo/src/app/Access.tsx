@@ -21,6 +21,7 @@ import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'rea
 import { api, ApiError, fmt, navigate, useData, useNow } from '../lib/core.ts'
 import { deviceWords, finishGoogle, finishRecovery, finishRecoveryWithLink, passkeysAvailable, requestAuthority, startRecovery } from '../lib/passkey.ts'
 import { Btn, Field, Logo, Note, PasswordField, Problem, useAction, useSession } from '../ui/kit.tsx'
+import { SavedCodes } from '../ui/SavedCodes.tsx'
 import { noDeliveryWords, type OutboxCase, outboxWords } from '../../shared/delivery-words.ts'
 
 // ------------------------------------------------------------------------------------------------ small parts
@@ -596,7 +597,8 @@ export function LostPasskey({ onBack, onRecovered }: { onBack: () => void; onRec
  */
 export function RecoveredStep({ codes, onDone }: { codes: string[]; onDone: () => void }) {
   const { session } = useSession()
-  const [asked, setAsked] = useState<{ effectiveAt: number } | null>(null)
+  // recoveryCodes: only for a passkey added after a password reset (R2), whose codes come with its request; shown once here
+  const [asked, setAsked] = useState<{ effectiveAt: number; recoveryCodes?: string[] } | null>(null)
   const [showCodes, setShowCodes] = useState(false), [copied, setCopied] = useState(false)
   const ask = useAction(async () => { setAsked(await requestAuthority()) })
   const h = useFocusHeading(asked ? 'asked' : 'back')
@@ -620,6 +622,7 @@ export function RecoveredStep({ codes, onDone }: { codes: string[]; onDone: () =
             <li><KeyRound aria-hidden="true" /><span>Your on-chain wallet then accepts this passkey only under its own rules: its recovery key and its delay, or its other signers.</span></li>
           </ol>
           {asked ? <div role="status"><Note tone="ok" title="Asked">You can look at everything and prepare payments meanwhile. Security and recovery shows the request, and stops it if it was not you.</Note></div> : null}
+          {asked?.recoveryCodes ? <Note tone="wait" title="Save these recovery codes now"><p className="small" style={{ marginBottom: 8 }}>They were made with your request and work from {fmt.full(asked.effectiveAt)}, when this passkey can approve; they then replace any codes made before.</p><SavedCodes codes={asked.recoveryCodes} /></Note> : null}
           <Problem error={ask.error} />
           {codes.length ? (
             <div className="stack" style={{ ['--gap' as string]: '10px' }}>

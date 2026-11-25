@@ -15,7 +15,7 @@ import { emailState, signUpWithEmail } from './access.ts'
 import { login, sessionFor, STEPUP_MS, work } from './auth.ts'
 import { type Db, openDb } from './core.ts'
 import { configureDelivery } from './delivery.ts'
-import { changePassword, PROTECTION_DELAY_MS, removePassword, type RelyingParty, beginAddPasskey, finishAddPasskey, regenerateRecoveryCodes } from './passkeys.ts'
+import { applyDueChanges, changePassword, PROTECTION_DELAY_MS, removePassword, type RelyingParty, beginAddPasskey, finishAddPasskey, regenerateRecoveryCodes } from './passkeys.ts'
 import { addAddress, confirmAddressByLink, requestPasswordReset, resetPassword, usableEmails } from './recovery.ts'
 import { SoftAuthenticator } from './softauthn.ts'
 
@@ -172,8 +172,12 @@ describe('signing in with an email address and a password', () => {
     db.run(`INSERT INTO recovery_contacts (id, person_id, contact_id, requested_at, effective_at, accepted_at) VALUES ('rcl_1', ?, 'usr_c', ?, ?, ?)`, r.personId, T0, T0, T0)
     // (the first device brought its saved codes, F1)
     expect(cred.recoveryCodes).toHaveLength(10)
-    removePassword(db, sessionFor(db, late.token, T0 + 7000)!, '127.0.0.1', T0 + 7500)
-    await expect(login(db, { handle: 'meera@example.in', password: OTHER }, META, T0 + 8000)).rejects.toMatchObject({ code: 'bad_credentials' })
+    // R14 (SECURITY.md 8j (c)): the removal is scheduled; the password is untouched until the protection delay has passed
+    const asked = removePassword(db, sessionFor(db, late.token, T0 + 7000)!, '127.0.0.1', T0 + 7500)
+    expect(asked.effectiveAt).toBe(T0 + 7500 + PROTECTION_DELAY_MS)
+    expect(db.get<{ pw_hash: string }>('SELECT pw_hash FROM users WHERE id = ?', r.personId)!.pw_hash.startsWith('scrypt$')).toBe(true)
+    expect(applyDueChanges(db, asked.effectiveAt)).toBe(1)
+    await expect(login(db, { handle: 'meera@example.in', password: OTHER }, META, asked.effectiveAt + 500)).rejects.toMatchObject({ code: 'bad_credentials' })
     expect(db.get('SELECT 1 x FROM email_logins WHERE person_id = ?', r.personId)).toBeUndefined()
   }, 120_000)
 

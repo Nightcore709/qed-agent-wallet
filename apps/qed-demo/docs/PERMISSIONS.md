@@ -61,7 +61,7 @@ How to read it (ASVS 5.0 V8.1.1, V8.2.1):
 | POST | `/api/security/contacts/:id/accept` | yes | the person (any workspace) | none | one |
 | POST | `/api/security/contacts/:id/remove` | yes | the person (any workspace) | none | one |
 | POST | `/api/security/contacts/:id/code` | yes | the person (any workspace) | none | one |
-| POST | `/api/security/changes/:id/cancel` | yes | the person (any workspace) | none | one |
+| POST | `/api/security/changes/:id/cancel` | yes | the person (any workspace) | none | own |
 | POST | `/api/security/recovery-codes` | yes | the person (any workspace) | none | own |
 | POST | `/api/security/recoveries/:id/cancel` | yes | the person (any workspace) | none | one |
 | POST | `/api/security/sessions/end-others` | yes | the person (any workspace) | none | one |

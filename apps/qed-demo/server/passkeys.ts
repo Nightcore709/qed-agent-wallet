@@ -13,7 +13,8 @@
  *                 account, and the one made inside the wallet's set-up), and shown once on the next screen. H2 lets the only
  *                 usable passkey make codes at once; so if codes were optional, the first holder of a device (a thief with
  *                 a synced passkey) could mint the tie-breaker and lock the owner out. A second device and a completed
- *                 recovery make none, as before R14.
+ *                 recovery make none, as before R14. A passkey added after a password reset gets them with its request for
+ *                 approval authority, usable only once that authority is given (R2: keepPendingCodes).
  *   Sign-in       discoverable credentials, user verification required (the authenticator checks the fingerprint, face
  *                 or device PIN; the server only ever sees a signature).
  *   Approval      the challenge is derived from the approval's id and the hash of its exact terms, so the signature is
@@ -36,9 +37,12 @@
  *                 adds no signer. Meanwhile any older passkey with full authority removes it at once, not after the
  *                 protection delay, and the person is told when it is added and when it is removed. A passkey registered
  *                 by a recovery keeps the recovery's own rules (it signs in only until a delayed restoration).
- *   Password      an account opened with a password (D-094) changes it with the strongest confirmation it can give
- *                 and removes it only with a passkey, keeping a way back in; either ends every other session
- *                 (changePassword, removePassword; RISK-076).
+ *   Password      an account opened with a password (D-094) changes it with the strongest confirmation it can give, at
+ *                 once, ending every other session (changePassword); it removes it only with a passkey, keeping a way back
+ *                 in, and the removal waits (removePassword; RISK-076).
+ *   Ways back in  (R14, SECURITY.md 8j (c)) ending a recovery contact who has accepted, removing the password and removing
+ *                 or changing a confirmed email address wait PROTECTION_DELAY_MS, are told at once on every channel, and are
+ *                 cancelled by any passkey of the person or one of their saved codes (FALLBACK_REMOVALS).
  *   Authority     (R12) a passkey has 'full' authority (signs in, confirms changes, approves) or 'signin' authority. A
  *                 passkey registered by an account recovery, or added with the password after a password reset, signs
  *                 in only: it approves no payment, instruction or wallet change, confirms no change to protections and
@@ -56,7 +60,7 @@ import { ABSOLUTE_MS, capSessions, checkNewPassword, checkRetyped, dummyHash, em
 import { AppError, audit, bad, type Config, type Db, emit, j, layerDigest, LEGACY_LAYER, legacyLayerSalt, newId, parse, whenIst } from './core.ts'
 import { sha256hex } from './receipts.ts'
 import { notice } from './execute.ts'
-import { notifyChannels, redactSpent } from './delivery.ts'
+import { maskAddress, notifyChannels, redactSpent } from './delivery.ts'
 import { PROFILE_KEYS, saveProfile, validateProfile } from './household.ts'
 import { homeMoneyExact } from '../shared/home-money.ts'
 
@@ -248,9 +252,12 @@ export function securityEvent(db: Db, personId: string, kind: string, detail: un
   // ... and the codes the first device brings (R14, F1) are told in that device's own notice ('first-passkey-added')
   const withDevice = kind === 'recovery-codes-made' && ['first-device'].includes((detail as { reason?: string } | null)?.reason ?? '')
   if (told && !partOfRecovery && !withDevice) {
-    notice(db, personId, { level: 'action', kind: 'security-change', title: told[0], body: told[1], subject: kind, dedupe: `security:${kind}:${now}` }, now)
+    // a removal of a way back in says when it takes effect, so that it can be cancelled in time (8j (c), R14)
+    const at = (detail as { effectiveAt?: unknown } | null)?.effectiveAt
+    const body = told[1].replace('{when}', typeof at === 'number' ? whenIst(at) : 'its delay ends')
+    notice(db, personId, { level: 'action', kind: 'security-change', title: told[0], body, subject: kind, dedupe: `security:${kind}:${now}` }, now)
     // And on every address the person has confirmed, outside QED (R12; NIST SP 800-63B-4 sections 4.2.3 and 4.6).
-    notifyChannels(db, personId, { kind, title: told[0], body: told[1] }, now)
+    notifyChannels(db, personId, { kind, title: told[0], body }, now)
   }
 }
 
@@ -265,6 +272,12 @@ const SENSITIVE: Record<string, [string, string]> = {
   'member-granted': ['A member was given authority in a shared workspace', `No member who may sign cancelled it while it waited. Workspace shows every member and their role. ${IF_NOT_YOU}`],
   'contact-grant-scheduled': ['Someone you are a recovery contact for is giving a member authority', 'In a shared workspace of theirs, a member is to be given authority to act. It takes effect only after a delay, and any member who may sign can cancel it. If they did not tell you about it, call them on a number you already have.'],
   'passkey-removed': ['A passkey was removed from your account', `It can no longer sign for you. ${IF_NOT_YOU}`],
+  // removing a way back in waits the protection delay (SECURITY.md 8j (c), R14): told when it is asked for, with when it
+  // takes effect ({when}), and again when it does ('email-removed', 'password-removed')
+  'recovery-contact-removal-scheduled': ['A recovery contact is to be removed from your account', `They stay your recovery contact until {when}, and can still issue you a recovery code until then. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. ${IF_NOT_YOU}`],
+  'contact-role-ending-scheduled': ['Someone you are a recovery contact for is removing you', 'You stay their recovery contact until {when}. If they did not tell you about it, call them on a number you already have: someone else may be using their account, and they can cancel the removal with one of their passkeys or a saved recovery code.'],
+  'email-removal-scheduled': ['An email address is to be removed from your account', `It stays on your account, and keeps receiving your security notices, until {when}. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. ${IF_NOT_YOU}`],
+  'password-removal-scheduled': ['Your password is to be removed', `It keeps working until {when}; from then the account signs in only with its passkeys. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. If you think someone knows the password, change it now instead: a change takes effect at once. ${IF_NOT_YOU}`],
   'passkey-removal-scheduled': ['A passkey is to be removed from your account', `It will be removed when its delay ends; any of your passkeys can cancel that. ${IF_NOT_YOU}`],
   'passkey-suspended': ['A passkey of your account was suspended', `It cannot sign or sign in until it is restored. ${IF_NOT_YOU}`],
   'password-changed': ['Your password was changed', `Every other session was signed out. ${IF_NOT_YOU}`],
@@ -272,7 +285,7 @@ const SENSITIVE: Record<string, [string, string]> = {
   'recovery-started': ['A recovery of your account has started', `It can be completed only after its delay, and any of your passkeys, or a recovery contact, can cancel it. ${IF_NOT_YOU}`],
   'recovery-completed': ['A recovery of your account was completed', `A new passkey now signs in to the account. It cannot approve payments, instructions or wallet changes until it is given approval authority, which waits and can be stopped. ${IF_NOT_YOU}`],
   'recovery-cancelled': ['A recovery of your account was stopped', 'It was cancelled from one of your devices or by a recovery contact, and cannot be completed. If you were the one trying to get back in, start again; if not, nothing more is needed.'],
-  'authority-restore-requested': ['A passkey of your account asked for approval authority', `When its wait ends it can approve payments, instructions and wallet changes. Any of your other passkeys, or a recovery contact, can stop it before then. ${IF_NOT_YOU}`],
+  'authority-restore-requested': ['A passkey of your account asked for approval authority', `When its wait ends it can approve payments, instructions and wallet changes. Any of your other passkeys, or a recovery contact, can stop it before then. A passkey added after a password reset also gets new saved recovery codes with its request, shown to the session that asked: they work only from the end of the wait, and then replace every earlier code. ${IF_NOT_YOU}`],
   'authority-restored': ['A passkey of your account can now approve', `It was added by a recovery or after a password reset, and its wait has ended. ${IF_NOT_YOU}`],
   'loosening-cancelled': ['A change that would have loosened your protections was stopped', 'One of your recovery contacts stopped it before its delay ended, so nothing was loosened. If you asked for it yourself, ask again; it waits its delay again. If you did not, someone may have your sign-in: check Security and recovery.'],
   'authority-restore-cancelled': ['A request for approval authority was stopped', 'The passkey that asked still signs in only. If it was yours, ask again; if not, suspend it under Security and recovery.'],
@@ -633,17 +646,52 @@ export function regenerateJustMadeCodes(db: Db, s: Session, now: number): string
   })
 }
 
+/** What is kept of a set of codes: one salt, and each code's scrypt. */
+export interface KeptCodes { salt: string; hashes: string[] }
+/** Ten new codes and what is kept of them, not yet the person's: storeCodes makes them so. */
+export function newCodeSet(): { codes: string[]; kept: KeptCodes } {
+  const salt = randomBytes(16).toString('hex')
+  const codes: string[] = [], hashes: string[] = []
+  for (let i = 0; i < CODES; i++) { const code = newCode(); codes.push(code); hashes.push(scryptCode(salt, code)) }
+  return { codes, kept: { salt, hashes } }
+}
+/** Makes a set the person's codes: every earlier unused one stops working. */
+function storeCodes(db: Db, personId: string, kept: KeptCodes, now: number): void {
+  db.run('UPDATE recovery_codes SET replaced_at = ? WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', now, personId)
+  for (const h of kept.hashes) db.run(`INSERT INTO recovery_codes (id, person_id, salt, code_hash, created_at, algo) VALUES (?, ?, ?, ?, ?, 'scrypt')`, newId('rcv', now), personId, kept.salt, h, now)
+}
 /** Ten new codes, shown once; earlier unused codes stop working. */
 export function makeRecoveryCodes(db: Db, personId: string, now: number): string[] {
-  db.run('UPDATE recovery_codes SET replaced_at = ? WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', now, personId)
-  const salt = randomBytes(16).toString('hex')
-  const codes: string[] = []
-  for (let i = 0; i < CODES; i++) {
-    const code = newCode()
-    db.run(`INSERT INTO recovery_codes (id, person_id, salt, code_hash, created_at, algo) VALUES (?, ?, ?, ?, ?, 'scrypt')`, newId('rcv', now), personId, salt, scryptCode(salt, code), now)
-    codes.push(code)
-  }
-  return codes
+  const set = newCodeSet()
+  storeCodes(db, personId, set.kept, now)
+  return set.codes
+}
+
+/**
+ * R2 (second review of the F1 fix, SECURITY.md 8k). A passkey added after a password reset signs in only and brings no
+ * codes: a reset proves the mailbox, not the owner. Without more, once its authority was restored the account had one
+ * usable passkey and no codes, so whoever first opened a fresh session with it could mint the H2 tie-breaker. So its codes
+ * are made when it asks for its authority (recovery.ts finishAuthorityRequest), shown once to the session that asked, and
+ * kept here, apart from the account's codes, under the request's id: no act that takes a code can match them. When the
+ * authority is restored, by the wait (applyDueChanges) or by another passkey (grantAuthorityNow), they become the
+ * account's codes and every earlier one stops working, as at a first device (R1). A request stopped in any way (by the
+ * passkey itself, another passkey, a recovery contact, a second reset, a suspension, a lapse) never restores, so its set
+ * never becomes usable, and the next sweep (applyDueChanges) removes what was kept of it.
+ */
+const pendingKey = (changeId: string): string => `pending-codes:${changeId}`
+export function keepPendingCodes(db: Db, personId: string, changeId: string, kept: KeptCodes): void {
+  db.run('INSERT INTO meta (key, value) VALUES (?, ?)', pendingKey(changeId), j({ person: personId, ...kept }))
+}
+/** The set kept with this request becomes the person's codes, inside the caller's transaction; said in the history. */
+export function activatePendingCodes(db: Db, personId: string, changeId: string, now: number): boolean {
+  const kept = parse<(KeptCodes & { person: string }) | null>(db.get<{ value: string }>('SELECT value FROM meta WHERE key = ?', pendingKey(changeId))?.value, null)
+  db.run('DELETE FROM meta WHERE key = ?', pendingKey(changeId))
+  if (!kept || kept.person !== personId || kept.hashes.length !== CODES) return false
+  const earlier = unusedCodes(db, personId) > 0
+  storeCodes(db, personId, kept, now)
+  securityEvent(db, personId, earlier ? 'recovery-codes-replaced' : 'recovery-codes-made', { reason: 'authority-restored' }, now)
+  audit(db, now, personId, 'system', 'recovery-codes.make', personId, { reason: 'authority-restored', changeId })
+  return true
 }
 
 export function regenerateRecoveryCodes(db: Db, s: Session, now: number, spentCodeId?: string): string[] {
@@ -708,20 +756,67 @@ export function acceptContact(db: Db, s: Session, linkId: string, now: number): 
   })
 }
 
-/** The person ends a contact (with a fresh passkey confirmation), or the contact steps down. At once, either way. */
-export function removeContact(db: Db, s: Session, linkId: string, now: number): void {
+/**
+ * The person ends a contact (with a fresh passkey confirmation not in its cool-off), or the contact steps down.
+ * Ending a contact who has accepted removes a way back in (SECURITY.md 8j (c), R14): it is scheduled, takes effect after
+ * PROTECTION_DELAY_MS, is told now to the person on every channel and to the contact, who keeps the role meanwhile, and
+ * any passkey of the person, or one of their saved codes, cancels it (cancelScheduledChangeWithCode). Withdrawing a request
+ * the contact never accepted (it was never a way back in) and stepping down (the contact's own decision, confirmed as
+ * strongly as they can) take effect at once, as before.
+ */
+export function removeContact(db: Db, s: Session, linkId: string, now: number): { removed: true } | ScheduledFallback {
   const l = db.get<ContactLink>('SELECT * FROM recovery_contacts WHERE id = ? AND (person_id = ? OR contact_id = ?) AND removed_at IS NULL', linkId, s.userId, s.userId)
   if (!l) throw new AppError(404, 'not_found', 'That recovery contact was not found, or it already ended.')
   if (l.person_id === s.userId && !s.stepUpFresh) throw stepUpNeeded()
   if (l.person_id === s.userId) refuseCoolingOff(db, s, 'end a recovery contact', now)
   // Stepping down removes someone else's second way back in, so the contact confirms as strongly as they can.
   if (l.contact_id === s.userId && !strongConfirm(db, s, now)) throw confirmNeeded(db, s, 'step down as a recovery contact', now)
+  if (l.person_id === s.userId && l.accepted_at !== null) {
+    const contact = handleOf(db, l.contact_id)
+    return scheduleFallbackRemoval(db, { personId: s.userId, requestedBy: s.confirmedBy ?? s.credentialId ?? null }, { kind: 'remove-contact', subject: linkId, detail: { contact }, event: 'recovery-contact-removal-scheduled', already: 'Ending this recovery contact is already scheduled.' }, now,
+      (effectiveAt) => securityEvent(db, l.contact_id, 'contact-role-ending-scheduled', { for: handleOf(db, l.person_id), effectiveAt }, now))
+  }
+  db.tx(() => endContactLink(db, l, s.userId, now))
+  return { removed: true }
+}
+
+/** Ends a contact link now, with what goes with it: its unused codes stop working, both sides are told, and a removal of it still waiting has nothing left to do. */
+function endContactLink(db: Db, l: ContactLink, by: string, now: number, applying = ''): void {
+  db.run('UPDATE recovery_contacts SET removed_at = ?, removed_by = ? WHERE id = ?', now, by, l.id)
+  db.run('UPDATE contact_codes SET replaced_at = ? WHERE link_id = ? AND used_at IS NULL AND replaced_at IS NULL', now, l.id)
+  db.run(`UPDATE scheduled_changes SET cancelled_at = ?, cancelled_by = 'no-longer-valid' WHERE kind = 'remove-contact' AND subject = ? AND id != ? AND cancelled_at IS NULL AND applied_at IS NULL`, now, l.id, applying)
+  securityEvent(db, l.person_id, 'recovery-contact-ended', { contact: handleOf(db, l.contact_id), by: by === l.person_id ? 'you' : 'the contact' }, now)
+  securityEvent(db, l.contact_id, 'recovery-contact-role-ended', { for: handleOf(db, l.person_id) }, now)
+}
+
+// ---------------------------------------------------------------------------------------------- removing a way back in (8j (c))
+
+/**
+ * The scheduled changes that remove one of the person's ways back in (SECURITY.md 8j (c), R14): a recovery contact who has
+ * accepted, a confirmed email address, the password. Before R14 each took effect at once on a passkey confirmation, so one
+ * stolen passkey could strip them before the owner noticed. Each now waits PROTECTION_DELAY_MS on the mechanism every other
+ * weakening uses (scheduled_changes, applyDueChanges); any passkey of the person that can confirm cancels it
+ * (cancelScheduledChange), and so does one of their saved codes, from any of their sessions (cancelScheduledChangeWithCode).
+ */
+export const FALLBACK_REMOVALS: readonly string[] = ['remove-contact', 'remove-address', 'remove-password']
+export type ScheduledFallback = { scheduled: true; changeId: string; effectiveAt: number }
+
+/**
+ * Schedules the removal of a way back in, after the caller's own checks, and tells the person at once (security event,
+ * urgent notice, every confirmed address: securityEvent). `alsoTell` tells whoever else must hear of it in the same
+ * transaction (the contact being removed). `requestedBy`: the passkey that confirmed it, so that suspending that passkey
+ * cancels it (suspendPasskey), as it cancels whatever else that passkey asked for. One waiting removal per subject.
+ */
+export function scheduleFallbackRemoval(db: Db, by: { personId: string; requestedBy: string | null }, r: { kind: string; subject: string; detail: Record<string, unknown>; event: string; already: string }, now: number, alsoTell?: (effectiveAt: number) => void): ScheduledFallback {
+  const changeId = newId('chg', now), effectiveAt = now + PROTECTION_DELAY_MS
   db.tx(() => {
-    db.run('UPDATE recovery_contacts SET removed_at = ?, removed_by = ? WHERE id = ?', now, s.userId, linkId)
-    db.run('UPDATE contact_codes SET replaced_at = ? WHERE link_id = ? AND used_at IS NULL AND replaced_at IS NULL', now, linkId)
-    securityEvent(db, l.person_id, 'recovery-contact-ended', { contact: handleOf(db, l.contact_id), by: l.person_id === s.userId ? 'you' : 'the contact' }, now)
-    securityEvent(db, l.contact_id, 'recovery-contact-role-ended', { for: handleOf(db, l.person_id) }, now)
+    if (db.get('SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = ? AND subject = ? AND cancelled_at IS NULL AND applied_at IS NULL', by.personId, r.kind, r.subject)) throw new AppError(409, 'already_scheduled', r.already)
+    db.run('INSERT INTO scheduled_changes (id, person_id, kind, subject, detail_json, requested_at, requested_by, effective_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', changeId, by.personId, r.kind, r.subject, j(r.detail), now, by.requestedBy, effectiveAt)
+    securityEvent(db, by.personId, r.event, { ...r.detail, changeId, effectiveAt }, now)
+    alsoTell?.(effectiveAt)
+    audit(db, now, by.personId, 'owner', `${r.kind}.schedule`, r.subject, { changeId, effectiveAt })
   })
+  return { scheduled: true, changeId, effectiveAt }
 }
 
 /**
@@ -1010,11 +1105,65 @@ export function scheduleRemovePasskey(db: Db, s: Session & { credentialId?: stri
 
 export function cancelScheduledChange(db: Db, s: Session, changeId: string, now: number): void {
   if (!s.stepUpFresh) throw new AppError(401, 'stepup_required', 'Confirm with one of your passkeys first.')
-  // A person's own change, or a change to a workspace in which this person may sign.
-  const n = db.run(`UPDATE scheduled_changes SET cancelled_at = ?, cancelled_by = ? WHERE id = ? AND cancelled_at IS NULL AND applied_at IS NULL AND (person_id = ?
-      OR workspace_id IN (SELECT workspace_id FROM memberships WHERE person_id = ? AND removed_at IS NULL AND role IN ('owner', 'admin', 'approver')))`, now, s.sessionHash.slice(0, 12), changeId, s.userId, s.userId).changes
-  if (!n) throw new AppError(404, 'not_found', 'That change was not found, or it already took effect.')
-  securityEvent(db, s.userId, 'change-cancelled', { changeId }, now)
+  // A person's own change, or a change to a workspace in which this person may sign. The cancel and what it tells, together.
+  db.tx(() => {
+    const n = db.run(`UPDATE scheduled_changes SET cancelled_at = ?, cancelled_by = ? WHERE id = ? AND cancelled_at IS NULL AND applied_at IS NULL AND (person_id = ?
+        OR workspace_id IN (SELECT workspace_id FROM memberships WHERE person_id = ? AND removed_at IS NULL AND role IN ('owner', 'admin', 'approver')))`, now, s.sessionHash.slice(0, 12), changeId, s.userId, s.userId).changes
+    if (!n) throw new AppError(404, 'not_found', 'That change was not found, or it already took effect.')
+    toldOfCancel(db, s.userId, changeId, 'passkey', now)
+  })
+}
+
+/** What a cancel says: the person's history, the audit, and, for a contact whose ending was cancelled, the contact too (they were told it would end). */
+function toldOfCancel(db: Db, personId: string, changeId: string, how: 'passkey' | 'saved-code' | 'password', now: number): void {
+  const c = db.get<{ kind: string; subject: string }>('SELECT kind, subject FROM scheduled_changes WHERE id = ?', changeId)
+  securityEvent(db, personId, 'change-cancelled', { changeId, kind: c?.kind ?? null, with: how }, now)
+  if (c?.kind === 'remove-contact') {
+    const l = db.get<ContactLink>('SELECT * FROM recovery_contacts WHERE id = ? AND removed_at IS NULL', c.subject)
+    if (l) securityEvent(db, l.contact_id, 'contact-role-continues', { for: handleOf(db, l.person_id) }, now)
+  }
+  audit(db, now, personId, 'owner', 'change.cancel', changeId, { kind: c?.kind ?? null, with: how })
+}
+
+/**
+ * Cancel a scheduled change from the Security screen. A fresh confirmation by any passkey of the person that can confirm
+ * cancels any of their changes, as cancelScheduledChange always has. A removal of a way back in (FALLBACK_REMOVALS, 8j (c))
+ * is also cancelled by one of the person's saved codes, from any of their sessions (one opened with the password included),
+ * for an owner whose passkey is not at hand: cancelling keeps a way back in and grants nothing, so, like the pause with a
+ * saved code (stop-with-code.ts), the code is checked and not used up; someone holding only one of the person's devices
+ * does not have the codes. On an account with no passkey, the password typed again (strongConfirm) cancels one, as it
+ * confirms everything there. Never a session alone, and never another person's change or code.
+ */
+export async function cancelScheduledChangeWithCode(db: Db, s: Session, changeId: string, code: unknown, now: number): Promise<{ cancelled: true; with: 'passkey' | 'saved-code' | 'password' }> {
+  const typed = typeof code === 'string' && code.trim() !== ''
+  const c = db.get<{ kind: string }>('SELECT kind FROM scheduled_changes WHERE id = ? AND person_id = ? AND cancelled_at IS NULL AND applied_at IS NULL', changeId, s.userId)
+  const fallback = !!c && FALLBACK_REMOVALS.includes(c.kind)
+  // A code typed for a removal of a way back in is checked, even beside a fresh passkey confirmation: it is what the
+  // person chose. Anything else is cancelled with a passkey, as before (a passkey's removal, a lowering of protections).
+  if (!(fallback && typed)) {
+    if (s.stepUpFresh) { cancelScheduledChange(db, s, changeId, now); return { cancelled: true, with: 'passkey' } }
+    if (!c) throw typed ? new AppError(404, 'not_found', 'That change was not found, or it already took effect.') : stepUpNeeded()
+    if (!fallback) throw stepUpNeeded()
+  }
+  let how: 'saved-code' | 'password', codeId: string | undefined
+  if (typed) {
+    if (!rateLimit(db, `cancel-code:${s.userId}`, 10, 3600_000, now)) throw new AppError(429, 'too_many', 'Ten saved codes were tried here in the last hour. Try again later, or cancel it with one of your passkeys.')
+    try { codeId = (await savedCodeFor(db, s.userId, code, 'cancel it')).id }
+    catch (e) { audit(db, now, s.userId, 'owner', 'change.cancel-code-failed', changeId, {}); throw e }
+    how = 'saved-code'
+  } else if (strongConfirm(db, s, now)) how = 'password'
+  else {
+    const e = confirmNeeded(db, s, 'cancel it', now)
+    throw e.code === 'stepup_required' && hasPasskey(db, s.userId) ? new AppError(401, 'stepup_required', 'Confirm with one of your passkeys, or enter one of your saved recovery codes, to cancel it.') : e
+  }
+  db.tx(() => {
+    // checked again after the derivation: a code used or replaced meanwhile cancels nothing
+    if (codeId && !db.get('SELECT 1 FROM recovery_codes WHERE id = ? AND used_at IS NULL AND replaced_at IS NULL', codeId)) throw new AppError(409, 'code_used', 'That saved code has just been used or replaced. Enter another one. Nothing was changed.')
+    const n = db.run('UPDATE scheduled_changes SET cancelled_at = ?, cancelled_by = ? WHERE id = ? AND person_id = ? AND cancelled_at IS NULL AND applied_at IS NULL', now, `${how}:${s.sessionHash.slice(0, 12)}`, changeId, s.userId).changes
+    if (!n) throw new AppError(404, 'not_found', 'That change was not found, or it already took effect.')
+    toldOfCancel(db, s.userId, changeId, how, now)
+  })
+  return { cancelled: true, with: how }
 }
 
 /**
@@ -1039,11 +1188,41 @@ export function applyDueChanges(db: Db, now: number): number {
       audit(db, now, r.person_id, 'system', 'recovery.lapse', r.id, {})
     })
   }
-  for (const c of db.all<{ id: string; person_id: string; kind: string; subject: string }>(`SELECT id, person_id, kind, subject FROM scheduled_changes WHERE cancelled_at IS NULL AND applied_at IS NULL AND kind != 'delete-account' AND effective_at <= ?`, now)) {
+  for (const c of db.all<{ id: string; person_id: string; kind: string; subject: string; requested_at: number }>(`SELECT id, person_id, kind, subject, requested_at FROM scheduled_changes WHERE cancelled_at IS NULL AND applied_at IS NULL AND kind != 'delete-account' AND effective_at <= ?`, now)) {
     db.tx(() => {
       // Read again under the write lock: a cancel (from the API, another process) may have landed since the list was read,
       // or another engine applied it. A change cancelled is never applied, and none is applied twice (R13).
       if (!db.get('SELECT 1 FROM scheduled_changes WHERE id = ? AND cancelled_at IS NULL AND applied_at IS NULL', c.id)) return
+      const lapse = (why: string): void => { db.run('UPDATE scheduled_changes SET cancelled_at = ?, cancelled_by = ? WHERE id = ?', now, why, c.id) }
+      // A way back in removed (8j (c), R14), now that its delay has ended, if what it removes is still there to remove
+      if (c.kind === 'remove-contact') {
+        const l = db.get<ContactLink>('SELECT * FROM recovery_contacts WHERE id = ? AND person_id = ? AND removed_at IS NULL', c.subject, c.person_id)
+        if (!l) { lapse('no-longer-valid'); return }
+        endContactLink(db, l, c.person_id, now, c.id)
+        audit(db, now, c.person_id, 'system', 'recovery-contact.remove', c.subject, { changeId: c.id })
+      }
+      if (c.kind === 'remove-address') {
+        // a change of address removes the old one only while the new one is still a confirmed address of the person's
+        const by = parse<{ replacedBy?: string }>(db.get<{ detail_json: string }>('SELECT detail_json FROM scheduled_changes WHERE id = ?', c.id)?.detail_json, {}).replacedBy
+        const p = db.get<{ id: string; kind: string; address: string; verified_at: number | null }>('SELECT id, kind, address, verified_at FROM contact_points WHERE id = ? AND person_id = ? AND removed_at IS NULL', c.subject, c.person_id)
+        const next = by ? db.get<{ kind: string; address: string }>('SELECT kind, address FROM contact_points WHERE id = ? AND person_id = ? AND removed_at IS NULL AND verified_at IS NOT NULL', by, c.person_id) : undefined
+        if (!p || (by && !next)) { lapse('no-longer-valid'); return }
+        endAddress(db, c.person_id, p, now, 'system', next)
+      }
+      if (c.kind === 'remove-password') {
+        // Its checks are made again: a password changed or reset since it was asked for is a later decision and is kept;
+        // without a passkey, or without a way back in without the password (a contact who left meanwhile), it lapses.
+        const changed = !!db.get(`SELECT 1 FROM security_events WHERE person_id = ? AND kind IN ('password-changed', 'password-reset') AND ts >= ?`, c.person_id, c.requested_at)
+        if (!passwordOf(db, c.person_id) || changed) { lapse(changed ? 'password-changed' : 'no-longer-valid'); return }
+        const lacking = hasPasskey(db, c.person_id) ? wayBackWithoutPassword(db, c.person_id, now) : 'The account has no passkey that can sign in.'
+        if (lacking) { lapse('no-longer-valid'); securityEvent(db, c.person_id, 'password-removal-lapsed', { changeId: c.id, why: lacking }, now); return }
+        db.run(`UPDATE users SET pw_hash = '!', failed_logins = 0, locked_until = NULL WHERE id = ?`, c.person_id)
+        storeEmailLogin(db, c.person_id, null, '!', now) // the address no longer signs in: there is no password for it to go with
+        const ended = endPasswordSessions(db, c.person_id, now)
+        endLinks(db, c.person_id, now)
+        securityEvent(db, c.person_id, 'password-removed', { ended, changeId: c.id }, now)
+        audit(db, now, c.person_id, 'system', 'password.remove', c.person_id, { ended, changeId: c.id })
+      }
       if (c.kind === 'remove-passkey') {
         // Never remove the last passkey, even if others were removed meanwhile.
         const others = db.get<{ n: number }>('SELECT COUNT(*) n FROM webauthn_credentials WHERE person_id = ? AND removed_at IS NULL AND suspended_at IS NULL AND id != ?', c.person_id, c.subject)?.n ?? 0
@@ -1063,6 +1242,8 @@ export function applyDueChanges(db: Db, now: number): number {
         db.run(`UPDATE webauthn_credentials SET authority = 'full', authority_reason = NULL WHERE id = ?`, c.subject)
         db.run('UPDATE users SET authority_hold_at = NULL WHERE id = ?', c.person_id)
         securityEvent(db, c.person_id, 'authority-restored', { passkey: cred.name }, now)
+        // R2: the codes made with the request of a passkey added after a password reset become the account's now
+        activatePendingCodes(db, c.person_id, c.id, now)
         audit(db, now, c.person_id, 'system', 'authority.restore', c.subject, { changeId: c.id })
       }
       if (c.kind === 'lower-policy') {
@@ -1122,6 +1303,9 @@ export function applyDueChanges(db: Db, now: number): number {
       applied++
     })
   }
+  // R2: a set kept with a request for authority that is no longer waiting (stopped in any way, or gone with its account)
+  // can never become usable; what was kept of it goes too
+  db.run(`DELETE FROM meta WHERE key LIKE 'pending-codes:%' AND substr(key, 15) NOT IN (SELECT id FROM scheduled_changes WHERE kind = 'restore-authority' AND cancelled_at IS NULL AND applied_at IS NULL)`)
   return applied
 }
 
@@ -1214,7 +1398,10 @@ export async function changePassword(db: Db, s: Session, input: { current?: unkn
     storeEmailLogin(db, s.userId, tag, hash, now)
     const ended = endOtherSessions(db, s, now)
     endLinks(db, s.userId, now)
-    securityEvent(db, s.userId, 'password-changed', { ended }, now)
+    // a removal of the password still waiting was asked for the password this change replaces: the change is the later
+    // decision, so the removal ends with it (8j (c); applyDueChanges also lets it lapse), and the history says so
+    const removalCancelled = db.run(`UPDATE scheduled_changes SET cancelled_at = ?, cancelled_by = 'password-changed' WHERE person_id = ? AND kind = 'remove-password' AND cancelled_at IS NULL AND applied_at IS NULL`, now, s.userId).changes > 0
+    securityEvent(db, s.userId, 'password-changed', { ended, ...(removalCancelled ? { removalCancelled } : {}) }, now)
     audit(db, now, s.userId, 'owner', 'password.change', s.userId, { ended, confirmedWith: passkey ? 'passkey' : 'password' }, ip)
     return { ended }
   })
@@ -1243,31 +1430,62 @@ function wayBackWithoutPassword(db: Db, personId: string, now: number): string |
 }
 
 /**
- * Remove the password: the account then signs in only with its passkeys, and a password someone has learned opens
- * nothing from this moment. Only on an account with a passkey that can sign in, after a fresh confirmation with a
- * passkey (which a password session never gives), and only while a recovery would still work without the password
- * (wayBackWithoutPassword); the conditions are read in the same transaction as the change. A sign-in lock left by
- * wrong passwords is cleared with it, so the handle answers from then on as an unknown one does (review L5). Every
- * other session ends. Nothing in this build adds a password back.
+ * Remove the password: the account then signs in only with its passkeys. Only on an account with a passkey that can sign
+ * in, after a fresh confirmation with a passkey past its cool-off (which a password session never gives), and only while
+ * a recovery would still work without the password (wayBackWithoutPassword); the conditions are read in the same
+ * transaction. R14 (SECURITY.md 8j (c)): the password is a way back in, so its removal is scheduled: it waits
+ * PROTECTION_DELAY_MS, every channel is told now, and any passkey of the person or one of their saved codes cancels it.
+ * When it applies (applyDueChanges) its conditions are read again; then the password stops working, a sign-in lock left by
+ * wrong passwords is cleared with it, so the handle answers as an unknown one does (review L5), and every session the
+ * password opened ends. A password someone has learned is shut out at once by changing it, which stays immediate.
+ * Nothing in this build adds a password back.
  */
-export function removePassword(db: Db, s: Session, ip: string, now: number): { ended: number } {
+export function removePassword(db: Db, s: Session, ip: string, now: number): ScheduledFallback {
   if (!passwordOf(db, s.userId)) throw noPassword()
   if (!hasPasskey(db, s.userId)) throw new AppError(409, 'passkey_needed', 'Add a passkey first. Without its password this account signs in only with its passkeys, and it has none yet.')
   if (!s.stepUpFresh) throw confirmNeeded(db, s, 'remove your password', now)
+  // removing a way back in is a loosening, as changing the password is (COOLING_OFF_WORDS): a passkey added in the last 24 hours asks for none
+  refuseCoolingOff(db, s, 'remove your password', now)
   passwordAttempt(db, s, 'remove', ip, now)
   return db.tx(() => {
     stillAsChecked(db, s, true, 'remove your password', now)
     if (!passwordOf(db, s.userId)) throw noPassword()
     const lacking = wayBackWithoutPassword(db, s.userId, now)
     if (lacking) throw new AppError(409, 'no_way_back', lacking)
-    db.run(`UPDATE users SET pw_hash = '!', failed_logins = 0, locked_until = NULL WHERE id = ?`, s.userId)
-    storeEmailLogin(db, s.userId, null, '!', now) // the address no longer signs in: there is no password for it to go with
-    const ended = endOtherSessions(db, s, now)
-    endLinks(db, s.userId, now)
-    securityEvent(db, s.userId, 'password-removed', { ended }, now)
-    audit(db, now, s.userId, 'owner', 'password.remove', s.userId, { ended }, ip)
-    return { ended }
+    return scheduleFallbackRemoval(db, { personId: s.userId, requestedBy: s.confirmedBy ?? s.credentialId ?? null }, { kind: 'remove-password', subject: s.userId, detail: {}, event: 'password-removal-scheduled', already: 'Removing your password is already scheduled. Cancel it under Security and recovery if you have changed your mind.' }, now)
   })
+}
+
+/**
+ * When a scheduled removal of the password takes effect, the sessions the password opened end. No session that asked for
+ * the removal is still alive by then (ABSOLUTE_MS is shorter than the protection delay), so there is no "this session" to
+ * keep. Returns how many were still in use; rows of sessions that had already lapsed are closed too (review L4).
+ */
+function endPasswordSessions(db: Db, personId: string, now: number): number {
+  const live = db.get<{ n: number }>(`SELECT COUNT(*) n FROM sessions WHERE user_id = ? AND auth_method = 'password' AND revoked_at IS NULL AND expires_at >= ? AND last_seen_at >= ?`, personId, now, now - IDLE_MS)?.n ?? 0
+  db.run(`UPDATE sessions SET revoked_at = ? WHERE user_id = ? AND auth_method = 'password' AND revoked_at IS NULL`, now, personId)
+  return live
+}
+
+/**
+ * Removes an address now: an address never confirmed and a phone number (recovery.ts removeAddress, at once as before),
+ * and a confirmed email address when its scheduled removal applies (applyDueChanges). Its unused link and code stop
+ * working; for an email, every reset or recovery link already sent stops too, since it went to this address as well
+ * (R13 review, R05). A confirmed one is said in the history, with an urgent notice, and is told once more itself:
+ * that it was removed, or, for a change of address, what the address is now.
+ */
+export function endAddress(db: Db, personId: string, p: { id: string; kind: string; address: string; verified_at: number | null }, now: number, actor: 'owner' | 'system', replacedBy?: { kind: string; address: string }): void {
+  db.run('UPDATE contact_points SET removed_at = ?, removed_reason = ? WHERE id = ?', now, replacedBy ? 'replaced' : 'removed by the owner', p.id)
+  if (db.run('UPDATE one_time_tokens SET replaced_at = ? WHERE subject = ? AND used_at IS NULL AND replaced_at IS NULL', now, p.id).changes) redactSpent(db, now)
+  if (p.verified_at === null) return
+  const kind = p.kind === 'phone' ? 'phone' : 'email'
+  if (kind === 'email') endLinks(db, personId, now)
+  const now_ = replacedBy ? maskAddress(replacedBy.kind === 'phone' ? 'phone' : 'email', replacedBy.address) : null
+  securityEvent(db, personId, `${kind}-removed`, { address: maskAddress(kind, p.address), ...(now_ ? { replacedBy: now_ } : {}) }, now)
+  notifyChannels(db, personId, now_
+    ? { kind: `${kind}-changed`, title: kind === 'email' ? 'The email address of your QED account was changed' : 'The phone number of your QED account was changed', body: `It is now ${now_}. This address will receive nothing more from QED.` }
+    : { kind: `${kind}-removed`, title: kind === 'email' ? 'This email address was removed from a QED account' : 'This number was removed from a QED account', body: 'It will receive nothing more from QED.' }, now, [{ kind, address: p.address }], true)
+  audit(db, now, personId, actor, `${kind}.remove`, p.id, now_ ? { replaced: true } : {})
 }
 
 export function revokeSession(db: Db, s: Session, sessionIdPrefix: string, now: number): void {
@@ -1302,6 +1520,12 @@ export function securityView(db: Db, s: Session, now: number): unknown {
       WHERE c.cancelled_at IS NULL AND c.applied_at IS NULL AND (c.person_id = ? OR c.workspace_id IN (SELECT workspace_id FROM memberships WHERE person_id = ? AND removed_at IS NULL AND role IN ('owner', 'admin', 'approver')))
       ORDER BY c.requested_at`, s.userId, s.userId)
     .map((c): Record<string, unknown> => ({ ...c, detail: parse(c.detail_json, {}), detail_json: undefined }))
+  // a way back in that is to be removed (8j (c)): when, and the change that cancels it
+  // (these kinds are only ever the person's own changes, with no workspace)
+  const removal = (kind: string, subject: string): { removalScheduledFor: number | null; removalChangeId: string | null } => {
+    const p = pending.find((c) => c.kind === kind && c.subject === subject)
+    return { removalScheduledFor: (p?.effective_at as number | undefined) ?? null, removalChangeId: (p?.id as string | undefined) ?? null }
+  }
   const contact = (l: ContactLink, other: string) => { const u = db.get<{ handle: string; display_name: string }>('SELECT handle, display_name FROM users WHERE id = ?', other); return { id: l.id, handle: u?.handle ?? '', name: u?.display_name ?? '', requestedAt: l.requested_at, effectiveAt: l.effective_at, acceptedAt: l.accepted_at, active: isActiveLink(l, now) } }
   const mine = db.all<ContactLink>('SELECT * FROM recovery_contacts WHERE person_id = ? AND removed_at IS NULL ORDER BY requested_at', s.userId)
   const theirs = db.all<ContactLink>('SELECT * FROM recovery_contacts WHERE contact_id = ? AND removed_at IS NULL ORDER BY requested_at', s.userId)
@@ -1310,7 +1534,8 @@ export function securityView(db: Db, s: Session, now: number): unknown {
   return {
     // Whether the account has a password, and when it was last changed (null: as set when the account was made); heldUntil:
     // after a reset, until when the password confirms no change to how the account gets back in (review M1).
-    password: { set: hasPw, changedAt: hasPw ? db.get<{ ts: number | null }>(`SELECT MAX(ts) ts FROM security_events WHERE person_id = ? AND kind = 'password-changed'`, s.userId)?.ts ?? null : null, ...(hasPw && passwordHeldUntil(db, s.userId, now) !== null ? { heldUntil: passwordHeldUntil(db, s.userId, now) } : {}) },
+    password: { set: hasPw, changedAt: hasPw ? db.get<{ ts: number | null }>(`SELECT MAX(ts) ts FROM security_events WHERE person_id = ? AND kind = 'password-changed'`, s.userId)?.ts ?? null : null, ...(hasPw && passwordHeldUntil(db, s.userId, now) !== null ? { heldUntil: passwordHeldUntil(db, s.userId, now) } : {}),
+      ...(hasPw ? removal('remove-password', s.userId) : {}) },
     passkeys: creds.map((c) => ({ id: c.id, name: c.name, createdAt: c.created_at, lastUsedAt: c.last_used_at, synced: c.backed_up === 1, removedAt: c.removed_at, suspendedAt: c.suspended_at, current: c.id === s.credentialId,
       // 'full': signs in, confirms and approves; 'signin': added by a recovery or after a password reset (R12)
       authority: c.authority, authorityReason: c.authority_reason,
@@ -1321,13 +1546,15 @@ export function securityView(db: Db, s: Session, now: number): unknown {
       coolOffUntil: c.removed_at === null ? coolingOffUntil(db, c.id, now) : null })),
     authority: authorityOf(db, s.userId),
     // hasPasskey: a contact issues a code only after confirming with their own passkey (issueContactCode).
-    contacts: mine.map((l) => ({ ...contact(l, l.contact_id), hasPasskey: hasPasskey(db, l.contact_id) })),
+    contacts: mine.map((l) => ({ ...contact(l, l.contact_id), hasPasskey: hasPasskey(db, l.contact_id), ...removal('remove-contact', l.id) })),
     // openRecovery / pendingAuthority: what a recovery contact may cancel for the person who trusts them (R12).
     trustedBy: theirs.map((l) => ({ ...contact(l, l.person_id), pendingLoosening: !!db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind IN ('loosen-profile', 'remove-bill') AND cancelled_at IS NULL AND applied_at IS NULL`, l.person_id), openRecovery: !!db.get('SELECT 1 FROM recovery_requests WHERE person_id = ? AND cancelled_at IS NULL AND completed_at IS NULL', l.person_id),
-      pendingAuthority: !!db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = 'restore-authority' AND cancelled_at IS NULL AND applied_at IS NULL`, l.person_id) })),
+      pendingAuthority: !!db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = 'restore-authority' AND cancelled_at IS NULL AND applied_at IS NULL`, l.person_id),
+      // they asked to end this contact (8j (c)): until when this person stays their contact
+      endingAt: db.get<{ at: number }>(`SELECT effective_at at FROM scheduled_changes WHERE person_id = ? AND kind = 'remove-contact' AND subject = ? AND cancelled_at IS NULL AND applied_at IS NULL`, l.person_id, l.id)?.at ?? null })),
     // The addresses that reach the person outside QED: confirmed or waiting for confirmation (server/recovery.ts).
     addresses: db.all<{ id: string; kind: string; address: string; created_at: number; verified_at: number | null; usable_from: number | null; replaces_id: string | null }>('SELECT id, kind, address, created_at, verified_at, usable_from, replaces_id FROM contact_points WHERE person_id = ? AND removed_at IS NULL ORDER BY created_at', s.userId)
-      .map((a) => ({ id: a.id, kind: a.kind, address: a.address, addedAt: a.created_at, confirmedAt: a.verified_at, usableFrom: a.kind === 'email' ? a.usable_from : null, replaces: a.replaces_id })),
+      .map((a) => ({ id: a.id, kind: a.kind, address: a.address, addedAt: a.created_at, confirmedAt: a.verified_at, usableFrom: a.kind === 'email' ? a.usable_from : null, replaces: a.replaces_id, ...removal('remove-address', a.id) })),
     // What a recovery would need besides a saved code: an active contact, or (accounts made before passkeys) the password.
     secondMethod: { contacts: mine.filter((l) => isActiveLink(l, now)).length, password: pw !== '!' },
     // Codes a contact issued for this account that could still be used: the owner should know at once.
@@ -1336,6 +1563,8 @@ export function securityView(db: Db, s: Session, now: number): unknown {
     sessions: db.all<{ id_hash: string; created_at: number; last_seen_at: number; ua: string | null; auth_method: string }>('SELECT id_hash, created_at, last_seen_at, ua, auth_method FROM sessions WHERE user_id = ? AND revoked_at IS NULL AND expires_at > ? ORDER BY last_seen_at DESC', s.userId, now)
       .map((x) => ({ id: x.id_hash.slice(0, 12), current: x.id_hash === s.sessionHash, createdAt: x.created_at, lastSeenAt: x.last_seen_at, device: x.ua, method: x.auth_method })),
     codesAgainUntil: justMadeUntil(db, s, now),
+    // R2: from when the codes made with a waiting request for approval authority will work (they replace every earlier one then)
+    codesFrom: (pending.find((c) => c.kind === 'restore-authority' && db.get('SELECT 1 FROM meta WHERE key = ?', pendingKey(c.id as string)))?.effective_at as number | undefined) ?? null,
     recoveryCodesLeft: db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', s.userId)?.n ?? 0,
     recoveries: db.all<Record<string, unknown>>('SELECT id, started_at, available_at, cancelled_at, completed_at, via, method FROM recovery_requests WHERE person_id = ? ORDER BY started_at DESC LIMIT 10', s.userId),
     scheduled: pending,
