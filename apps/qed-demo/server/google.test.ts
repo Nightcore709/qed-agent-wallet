@@ -12,7 +12,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { signUpWithEmail } from './access.ts'
 import { login, sessionFor, STEPUP_MS } from './auth.ts'
 import { type Db, loadConfig, openDb } from './core.ts'
-import { beginGoogle, finishGoogle, type GoogleConfig, googleConfig, googleIdentities, jwksKeys, pkceChallenge, unlinkGoogle, verifyIdToken } from './google.ts'
+import { beginGoogle, finishGoogle, type GoogleConfig, googleConfig, GOOGLE_ISSUER, googleIdentities, issuerAcceptable, jwksKeys, pkceChallenge, unlinkGoogle, verifyIdToken } from './google.ts'
 import { type StandIn, startOidcStandIn } from './oidc-standin.ts'
 import { beginAddPasskey, beginLogin, beginReauth, finishAddPasskey, finishLogin, regenerateRecoveryCodes, type RelyingParty, revokeSession, signOutOtherSessions, strongConfirm } from './passkeys.ts'
 import { SoftAuthenticator } from './softauthn.ts'
@@ -207,6 +207,42 @@ describe('the flow, against the stand-in issuer', () => {
     const cb2 = await atIssuer(b2.url)
     await expect(finishGoogle(db, G, { code: cb2.code, state: cb2.state, binding: b2.binding }, null, META, T0)).rejects.toMatchObject({ code: 'google_state' })
     expect(idp.tokenRequests.length).toBe(before)
+  })
+
+  describe('the callback\'s iss with Google\'s own issuer configured (RFC 9207)', () => {
+    // Google's issuer, with the stand-in's endpoints and a token signed by the stand-in as if Google had issued it
+    let GG: GoogleConfig
+    beforeAll(() => { GG = { ...G, issuer: GOOGLE_ISSUER, issuers: [GOOGLE_ISSUER, 'accounts.google.com'], standIn: false } })
+    const run = async (iss: string | null | undefined) => {
+      const db = openDb(':memory:')
+      as('g-asha', 'asha@example.in')
+      idp.tamper = { claims: { iss: GOOGLE_ISSUER } }
+      const b = beginGoogle(db, GG, 'signin', null, META.ip, T0)
+      const cb = await atIssuer(b.url)
+      return finishGoogle(db, GG, { code: cb.code, state: cb.state, ...(iss === undefined ? {} : { iss }), binding: b.binding }, null, META, T0)
+    }
+    it('present and matching: accepted', async () => { expect(await run(GOOGLE_ISSUER)).toMatchObject({ purpose: 'signin', created: true }) })
+    it('present and wrong: refused before the code is sent anywhere', async () => {
+      const before = idp.tokenRequests.length
+      await expect(run('https://evil.example')).rejects.toMatchObject({ code: 'google_state' })
+      await expect(run('accounts.google.com')).rejects.toMatchObject({ code: 'google_state' })
+      expect(idp.tokenRequests.length).toBe(before)
+    })
+    it('absent (not sent, null or empty): accepted, because the one configured issuer is Google\'s', async () => {
+      for (const absent of [undefined, null, '']) expect(await run(absent)).toMatchObject({ purpose: 'signin' })
+    })
+    it('absent is never excused for any other issuer, the stand-in included; the ID token\'s own iss is still checked', async () => {
+      expect(issuerAcceptable(undefined, G)).toBe(false)
+      expect(issuerAcceptable(undefined, { issuer: 'https://login.example' })).toBe(false)
+      expect(issuerAcceptable(undefined, { issuer: GOOGLE_ISSUER })).toBe(true)
+      expect(issuerAcceptable(['https://accounts.google.com'], { issuer: GOOGLE_ISSUER })).toBe(false)
+      const db = openDb(':memory:')
+      as('g-asha', 'asha@example.in')
+      idp.tamper = { claims: { iss: 'https://evil.example' } }
+      const b = beginGoogle(db, GG, 'signin', null, META.ip, T0)
+      const cb = await atIssuer(b.url)
+      await expect(finishGoogle(db, GG, { code: cb.code, state: cb.state, binding: b.binding }, null, META, T0)).rejects.toMatchObject({ code: 'google_rejected' })
+    })
   })
 
   it('the issuer refuses a code sent with another verifier, the wrong secret or a second time (PKCE and single use at the stand-in)', async () => {

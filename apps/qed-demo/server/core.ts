@@ -11,6 +11,7 @@ import { registerAmountSql } from './amount-sql.ts'
 import { migrateToV6 } from './migrate-v6.ts'
 import { closeAsFound, MigrationRefused, sealMigrationCopy } from './migration-copy.ts'
 import { type GoogleConfig, googleConfig } from './google-config.ts'
+import { type PostmarkConfig, postmarkConfig } from './postmark-config.ts'
 import { MICROS, PRICES } from './model-prices.ts'
 
 export const SCHEMA_VERSION = '10'
@@ -587,10 +588,12 @@ export interface Config {
   /**
    * How email and text messages leave QED (server/delivery.ts). 'outbox': the local test outbox, the local build's
    * default: nothing is sent, every message is shown on the developer page /dev/outbox as simulated. 'none': no adapter
-   * (the default with a public origin, where the outbox is refused): features that need a message say so. A real
-   * provider is prepared but not configured in this build (docs: SECURITY.md, "Delivery").
+   * (the default with a public origin, where the outbox is refused): features that need a message say so. 'postmark':
+   * email through Postmark (server/postmark.ts), switched on by QED_DELIVERY=postmark with its token and sender address.
    */
-  delivery: 'outbox' | 'none'
+  delivery: 'outbox' | 'none' | 'postmark'
+  /** The Postmark settings with QED_DELIVERY=postmark (server/postmark-config.ts); null otherwise. */
+  postmark: PostmarkConfig | null
   /**
    * The one origin links in messages point to (OWASP: never built from the request's Host header): the public origin,
    * else QED_LINK_ORIGIN when it is one of the allowed origins, else http://localhost:<web port>, where passkeys work.
@@ -748,6 +751,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     adviserToken: (env.QED_ADVISER_TOKEN ?? '').length >= 32 ? env.QED_ADVISER_TOKEN! : null,
     requestsPerMinute: ((asked) => (env.QED_TEST_STACK === '1' ? asked : Math.min(1500, asked)))(Math.max(60, Number(env.QED_REQUESTS_PER_MINUTE) || 1500)),
     delivery: deliveryMode(env, prod.publicOrigin),
+    postmark: env.QED_DELIVERY === 'postmark' ? postmarkConfig(env, prod.publicOrigin) : null,
     linkOrigin: linkOriginOf(env, prod.publicOrigin, uiPorts[1]!, prod.publicOrigin ? [prod.publicOrigin] : allowedHosts.map((h) => `http://${h}`)),
     probeHosts: prod.host ? extraHosts.filter((h) => h !== prod.host) : [],
     readyRequiresWallet: env.QED_READY_REQUIRES_WALLET === '1',
@@ -761,7 +765,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
  */
 function deliveryMode(env: NodeJS.ProcessEnv, publicOrigin: string | null): Config['delivery'] {
   const asked = env.QED_DELIVERY ?? (publicOrigin ? 'none' : 'outbox')
-  if (asked !== 'outbox' && asked !== 'none') throw new Error(`Configuration: QED_DELIVERY must be "outbox" (the local test outbox) or "none" (it was "${asked}"). A real email or text-message provider is not configured in this build.`)
+  if (asked !== 'outbox' && asked !== 'none' && asked !== 'postmark') throw new Error(`Configuration: QED_DELIVERY must be "outbox" (the local test outbox), "none" (no adapter) or "postmark" (email through Postmark; it was "${asked}"). No text-message provider is configured in this build.`)
   if (asked === 'outbox' && publicOrigin) throw new Error('Configuration: QED_DELIVERY=outbox shows every message, reset links included, on a developer page; it is for this computer only and cannot be used with QED_PUBLIC_ORIGIN.')
   return asked
 }

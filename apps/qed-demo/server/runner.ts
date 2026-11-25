@@ -33,7 +33,7 @@ export const MISSED_AFTER_MS = 120_000
 export const APPROVAL_WINDOW_MS = 24 * 3600_000
 const PROTECTIVE_KINDS = new Set(['exit', 'floor'])
 
-export interface RunRow { id: string; user_id: string; program_id: string; version: number; occurrence: string; state: RunState; trigger: Record<string, unknown>; due_at: number; created_at: number; started_at: number | null; finished_at: number | null; deadline_at: number | null; reason: string | null; decision: { plannedAt?: number; actions?: PlannedAction[]; summary?: string[] } }
+export interface RunRow { id: string; user_id: string; program_id: string; version: number; occurrence: string; state: RunState; trigger: Record<string, unknown>; due_at: number; created_at: number; started_at: number | null; finished_at: number | null; deadline_at: number | null; reason: string | null; decision: { plannedAt?: number; actions?: PlannedAction[]; summary?: string[]; owed?: string; neededBy?: number } }
 export const runFromRow = (r: Record<string, unknown>): RunRow => ({
   id: String(r.id), user_id: String(r.user_id), program_id: String(r.program_id), version: Number(r.version), occurrence: String(r.occurrence), state: r.state as RunState,
   trigger: parse<Record<string, unknown>>(r.trigger_json, {}), due_at: Number(r.due_at), created_at: Number(r.created_at), started_at: (r.started_at as number | null) ?? null,
@@ -258,11 +258,15 @@ function processRun(ctx: Ctx, run: RunRow): void {
     }
     const plan = spec.plan(ctx, p, v.params, v.authority, run.trigger, now)
     if (plan.memo) db.run('UPDATE programs SET memo_json = ? WHERE id = ?', j({ ...p.memo, ...plan.memo }), p.id)
-    if (plan.skip || plan.actions.length === 0) return finish(ctx, run, p, 'skipped', plan.skip ?? 'Nothing needed doing.')
+    if (plan.skip || plan.actions.length === 0) {
+      // a withdrawal that could not be made leaves money not withdrawn: the owner is told, as for a run that ends partly done
+      if (plan.owed) notice(db, run.user_id, { level: 'warning', kind: 'run-owed', title: `${p.title}: nothing was withdrawn`, body: plan.owed, subject: p.id, dedupe: `run-owed:${run.id}` }, now)
+      return finish(ctx, run, p, 'skipped', plan.skip ?? 'Nothing needed doing.')
+    }
     // a reported problem holds QED's own payments on that rail, until the person releases the pause (dispute-pause.ts)
     if (plan.actions.some((a) => a.kind === 'payment' && pausedFor(db, run.user_id, a.venue))) return finish(ctx, run, p, 'skipped', PAUSE_REASON)
-    const summary = plan.actions.map((a) => a.summary)
-    db.run('UPDATE runs SET decision_json = ? WHERE id = ?', j({ plannedAt: now, actions: plan.actions, summary }), run.id)
+    const summary = [...plan.actions.map((a) => a.summary), ...(plan.owed ? [plan.owed] : [])]
+    db.run('UPDATE runs SET decision_json = ? WHERE id = ?', j({ plannedAt: now, actions: plan.actions, summary, ...(plan.owed ? { owed: plan.owed } : {}), ...(plan.neededBy !== undefined ? { neededBy: plan.neededBy } : {}) }), run.id)
     if (v.authority.runMode === 'auto') return startExecuting(ctx, run, p, plan.actions, null)
     if (v.authority.runMode === 'approve') {
       db.run(`UPDATE runs SET state = 'awaiting_approval', deadline_at = ? WHERE id = ?`, now + APPROVAL_WINDOW_MS, run.id)
@@ -296,8 +300,11 @@ function processRun(ctx: Ctx, run: RunRow): void {
     const ok = acts.filter((a) => a.state === 'done').length
     const part = acts.filter((a) => a.state === 'partial').length
     const firstError = acts.find((a) => a.error)?.error ?? null
-    if (ok === acts.length) return finish(ctx, run, p, 'done', null)
-    if (ok + part > 0) return finish(ctx, run, p, 'partial', firstError ?? 'Some steps did not complete.')
+    // a run that sold all it planned but could not do all it was asked says what is still owed (the withdrawal plan: a fund it could
+    // not use, or a reserve it keeps), and ends partial so that the owner is told
+    const owed = run.decision.owed ?? null
+    if (ok === acts.length) return owed ? finish(ctx, run, p, 'partial', owed) : finish(ctx, run, p, 'done', null)
+    if (ok + part > 0) return finish(ctx, run, p, 'partial', [firstError ?? 'Some steps did not complete.', owed].filter(Boolean).join(' '))
     if (acts.every((a) => a.state === 'blocked')) return finish(ctx, run, p, 'blocked', firstError ?? 'Refused by your limits.')
     return finish(ctx, run, p, 'failed', firstError ?? 'No step completed.')
   }

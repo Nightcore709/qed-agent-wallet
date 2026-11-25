@@ -456,7 +456,9 @@
   .er-legacy-acts { justify-self: stretch; }
   .er-legacy-acts .btn { flex: 1 1 100%; }
   .er-fields, .er-fields.four { grid-template-columns: minmax(0, 1fr); }
-  .er-days > li { grid-template-columns: 62px minmax(0, 1fr) auto; grid-template-areas: "when what amt" "when how how" "when where where"; }
+  /* R14: the figure, which can carry "in test rupees", takes its own line under what it is: it never squeezes the words */
+  .er-days > li { grid-template-columns: 62px minmax(0, 1fr); grid-template-areas: "when what" "when amt" "when how" "when where"; }
+  .er-in-amt { text-align: left; white-space: normal; }
   .er-in-where { text-align: left; }
   /* the four parts of the work as rows: what each is on the left, its figure on the right, aligned down the panel */
   .er-tiles { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
@@ -523,3 +525,7 @@
 .er-how > li { counter-increment: erhow; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--s3); align-items: baseline; padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); box-shadow: inset 0 0 0 1px var(--rule); color: var(--ink-2); font-size: var(--t-small); line-height: 1.45; }
 .er-how > li::before { content: counter(erhow); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--rim); color: var(--ink); font-weight: 650; font-size: var(--t-micro); }
 .er-how b { color: var(--ink); font-weight: 620; }
+
+/* R14: Earn works in test rupees only; a figure beside a household's own currency says so, and the page says it once */
+.er-unit { font-size: var(--t-small); font-weight: 500; color: var(--ink-3); letter-spacing: 0; white-space: normal; }
+.er-ccy { font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); max-width: 70ch; margin-top: var(--s2); }

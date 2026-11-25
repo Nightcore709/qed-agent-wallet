@@ -21,6 +21,7 @@ describe('redact', () => {
     ['a private key', 'key 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d', '59c6995e998f97'],
     ['a long base64url token', 'token value dGhpcyBpcyBhIHNlY3JldCB0b2tlbiB2YWx1ZSBvayB5ZXM was sent', 'dGhpcyBpcyBh'],
     ['an e-mail address', 'sent the reset link to asha.rao@example.com', 'asha.rao'],
+    ['a Postmark server token header', 'sent X-Postmark-Server-Token: 7c1f0e52-aaaa-bbbb-cccc-0123456789ab to postmark', '7c1f0e52'],
     ['a payment handle', 'payment to landlord@upi refused', 'landlord@upi'],
   ]
   for (const [name, line, secret] of cases) {

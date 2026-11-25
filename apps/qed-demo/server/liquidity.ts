@@ -83,9 +83,10 @@ export function runUsage(db: Db, runId: string, excludeActionId = ''): bigint {
   let total = 0n
   for (const r of rows) {
     const p = parse<OrderParams & PaymentParams>(r.params_json, {} as OrderParams & PaymentParams)
-    if (r.kind === 'order' && p.side === 'sell') continue
+    // a withdrawal plan's sales count against the run's limit, as programUsage counts them; every other kind's sales are not spending
+    if (r.kind === 'order' && p.side === 'sell' && !p.swpPaise) continue
     const res = parse<{ movedPaise?: string }>(r.result_json, {})
-    total += (r.state === 'done' || r.state === 'partial') && res.movedPaise ? BigInt(res.movedPaise) : big(p.amount) + big(p.charge)
+    total += (r.state === 'done' || r.state === 'partial') && res.movedPaise ? BigInt(res.movedPaise) : big(p.swpPaise) + big(p.amount) + big(p.charge)
   }
   return total
 }

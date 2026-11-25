@@ -23,9 +23,9 @@ import { Check, ChevronRight, Plus, RotateCcw, X } from 'lucide-react'
 import { lazy, type MouseEvent, type ReactNode, Suspense, useEffect, useId, useState } from 'react'
 import { api, fmt, type Resource, useData, useNow } from '../lib/core.ts'
 import { nearDay } from '../lib/words.ts'
+import { homeCurrency } from '../../shared/home-money.ts'
 import type { Home, PassbookView, ProgramDetail, ProgramSummary, Receipt, RunView } from '../lib/types.ts'
 import { Btn, Field, Link, Loading, MoneyInput, Note, Problem, Seal, Sheet, Stamp, StateStamp, stateWord, useAction } from '../ui/kit.tsx'
-import { Rupees } from './Home.tsx'
 import { Acceptances, type Choice, choiceFields, defaultChoice, momentWords, type Outcome, outcomeWords, periodWords, type Policy, type TermsDoc, TermsChooser, TermsList, type TermsView, useTermsPreview } from '../ui/earn-terms.tsx'
 
 /*
@@ -194,12 +194,26 @@ export function lineOf(kind: Kind, items: Item[]): { at: Station[]; back: number
   return { at, back, far }
 }
 
+/**
+ * Earn and paper escrow work in rupees only, by design (server/home-currency.ts): never converted. A household whose home
+ * currency is another reads these figures beside its own, so each one says it is in test rupees; a rupee household's
+ * figures are already its own currency.
+ */
+const inRupeeHome = (): boolean => homeCurrency() === 'INR'
+const rs = (paise: number, shown = false): string => (inRupeeHome() ? fmt.inr(paise, shown) : `${fmt.inr(paise, shown)} in test rupees`)
+/** A rupee figure with its paise set small, in rupees whatever the household's home currency is (Home's `Rupees` writes the home currency). */
+function RupeeFigure({ paise }: { paise: number }) {
+  const t = fmt.inr(paise, true), dot = t.lastIndexOf('.')
+  return dot < 0 ? <>{t}</> : <>{t.slice(0, dot)}<span className="paise">{t.slice(dot)}</span></>
+}
+const TestUnit = () => (inRupeeHome() ? null : <small className="er-unit"> in test rupees</small>)
+
 /** A job's money in words: "₹12,000.00 in escrow and ₹18,000.00 delivered, waiting for the client." */
 export function lineWords(role: Role, l: { at: Station[]; back: number }): string {
   const where = (i: number, x: Station): string => i === 0 ? (x.early ? 'not offered yet' : x.lapsed ? 'offered; the offer lapsed' : 'offered, not funded yet')
     : i === 1 ? 'in escrow' : i === 2 ? 'delivered, waiting for the client' : i === 3 ? 'disputed' : role === 'client' ? 'paid to them' : 'paid to you'
-  const parts = l.at.flatMap((x, i) => (x.amount > 0 ? [`${fmt.inr(x.amount, true)} ${where(i, x)}`] : []))
-  if (l.back > 0) parts.push(`${fmt.inr(l.back, true)} back to ${role === 'client' ? 'you' : 'the client'}`)
+  const parts = l.at.flatMap((x, i) => (x.amount > 0 ? [`${rs(x.amount, true)} ${where(i, x)}`] : []))
+  if (l.back > 0) parts.push(`${rs(l.back, true)} back to ${role === 'client' ? 'you' : 'the client'}`)
   return parts.length ? `${listed(parts)}.` : 'Nothing on this job yet.'
 }
 
@@ -337,7 +351,7 @@ export function paperDefault(n: PaperNext): { label: 'If not' | 'Then' | 'Meanwh
     case 'client-may-take-now': return { label, text: 'The client may ask for the money back now; until they do, you can still submit it' }
     case 'refund': return { label, text: `It goes back to the client${when}` }
     case 'release': return { label, text: `It is released to you${when}` }
-    case 'split': return { label, text: `It is split${when}: ${fmt.inr(t.toEarner ?? 0, true)} to you, ${fmt.inr(t.toClient ?? 0, true)} to the client` }
+    case 'split': return { label, text: `It is split${when}: ${rs(t.toEarner ?? 0, true)} to you, ${rs(t.toClient ?? 0, true)} to the client` }
     case 'locked': return { label, text: n.actor === 'both' ? 'Nothing happens on its own: it stays locked in escrow' : `It stays locked in escrow${when}, until both sides agree` }
     case 'nothing': return { label, text: 'Nothing happens on its own until both sides agree terms' }
     case 'not-funded': return { label, text: 'Nothing is in escrow until the paper client accepts' }
@@ -516,14 +530,14 @@ function Position({ jobs, chain }: { jobs: Job[]; chain: ChainView | null }) {
   const pc = (v: number) => `${((v / Math.max(1, total)) * 100).toFixed(3)}%`
   const cp = chain ? partsOf(chain.asProvider.flatMap((j) => j.milestones.map((m) => ({ amount: m.amount, place: chainPlace(m) })))) : null
   const cc = chain ? partsOf(chain.asClient.flatMap((j) => j.milestones.map((m) => ({ amount: m.amount, place: chainPlace(m) })))) : null
-  const onChain = [cp && cp.held ? `${fmt.inr(cp.held, true)} held for you` : '', cp && cp.paid ? `${fmt.inr(cp.paid, true)} paid into your on-chain wallet` : '', cc && cc.held ? `${fmt.inr(cc.held, true)} of yours held for work you pay for` : ''].filter(Boolean)
-  const label = `Work on paper at true scale: ${fmt.inr(s.paid, true)} paid to you, ${fmt.inr(s.you, true)} held waiting on your move, ${fmt.inr(s.them, true)} held waiting on the client${s.disputed ? `, ${fmt.inr(s.disputed, true)} held and disputed` : ''}${s.back ? `, ${fmt.inr(s.back, true)} back to the client` : ''}: ${fmt.inr(total, true)} in all, of which ${fmt.inr(held, true)} is held in escrow.`
+  const onChain = [cp && cp.held ? `${rs(cp.held, true)} held for you` : '', cp && cp.paid ? `${rs(cp.paid, true)} paid into your on-chain wallet` : '', cc && cc.held ? `${rs(cc.held, true)} of yours held for work you pay for` : ''].filter(Boolean)
+  const label = `Work on paper at true scale: ${rs(s.paid, true)} paid to you, ${rs(s.you, true)} held waiting on your move, ${rs(s.them, true)} held waiting on the client${s.disputed ? `, ${rs(s.disputed, true)} held and disputed` : ''}${s.back ? `, ${rs(s.back, true)} back to the client` : ''}: ${rs(total, true)} in all, of which ${rs(held, true)} is held in escrow.`
   return (
     <section className="panel er-position" aria-labelledby="er-pos-h">
       <div className="er-pos-main">
         <div className="er-pos-fig">
           <div className="er-pos-head"><h2 id="er-pos-h">Held in escrow for you</h2><span className="small faint">Practice money, on paper</span></div>
-          <p className={`er-hero ${held ? '' : 'none'}`} data-resolve=""><Rupees paise={held} /></p>
+          <p className={`er-hero ${held ? '' : 'none'}`} data-resolve=""><RupeeFigure paise={held} /><TestUnit /></p>
           <p className="er-hero-sub">{total ? 'Locked in escrow until it is released to you: when the client accepts the work, or as the job\'s terms say when a deadline passes. Until then it is not yours. On paper no account holds it: QED keeps the record.' : 'Nothing is held for you on paper. Open a job below to see how escrowed pay is delivered, decided on and released.'}</p>
           {total ? <>
             <div className="er-bar" role="img" aria-label={label}>
@@ -536,22 +550,22 @@ function Position({ jobs, chain }: { jobs: Job[]; chain: ChainView | null }) {
               </span>
               {held ? <span className="er-bracket" style={{ left: pc(s.paid), width: pc(held) }} /> : null}
             </div>
-            <p className="er-pos-sum" aria-hidden="true"><strong>{fmt.inr(s.paid, true)}</strong> paid + <strong>{fmt.inr(held, true)}</strong> held{s.back ? <> + <strong>{fmt.inr(s.back, true)}</strong> back to the client</> : null} = <strong>{fmt.inr(total, true)}</strong> of work on paper. The bracket is what is held.</p>
+            <p className="er-pos-sum" aria-hidden="true"><strong>{rs(s.paid, true)}</strong> paid + <strong>{rs(held, true)}</strong> held{s.back ? <> + <strong>{rs(s.back, true)}</strong> back to the client</> : null} = <strong>{rs(total, true)}</strong> of work on paper. The bracket is what is held.</p>
           </> : null}
         </div>
         {total ? (
           <div className="er-tiles">
-            <div className="tile"><p className="k"><i className="er-sw paid" aria-hidden="true" />Paid to you</p><p className="v">{fmt.inr(s.paid, true)}</p><p className="s">{s.paid ? 'Released into your bank, each with a receipt' : 'Nothing released yet'}</p></div>
-            <div className="tile"><p className="k"><i className="er-sw you" aria-hidden="true" />Waits on your move</p><p className="v">{fmt.inr(s.you, true)}</p><p className="s">{s.youN ? `${s.youN} milestone${s.youN === 1 ? '' : 's'} where your step is next` : 'None: no step is yours'}</p></div>
-            <div className="tile"><p className="k"><i className="er-sw them" aria-hidden="true" />Waits on the client</p><p className="v">{fmt.inr(s.them + s.disputed, true)}</p><p className="s">{s.disputed ? <><i className="er-sw disputed" aria-hidden="true" />{fmt.inr(s.disputed, true)} of it disputed</> : s.themN ? 'Delivered; the client, played by you, decides, or the job\'s terms do when the review ends' : 'Nothing delivered is waiting'}</p></div>
-            <div className="tile"><p className="k"><i className="er-sw back" aria-hidden="true" />Back to the client</p><p className="v">{fmt.inr(s.back, true)}</p><p className="s">{s.back ? 'Returned from escrow; never yours' : 'Nothing returned'}</p></div>
+            <div className="tile"><p className="k"><i className="er-sw paid" aria-hidden="true" />Paid to you</p><p className="v">{fmt.inr(s.paid, true)}<TestUnit /></p><p className="s">{s.paid ? 'Released into your bank, each with a receipt' : 'Nothing released yet'}</p></div>
+            <div className="tile"><p className="k"><i className="er-sw you" aria-hidden="true" />Waits on your move</p><p className="v">{fmt.inr(s.you, true)}<TestUnit /></p><p className="s">{s.youN ? `${s.youN} milestone${s.youN === 1 ? '' : 's'} where your step is next` : 'None: no step is yours'}</p></div>
+            <div className="tile"><p className="k"><i className="er-sw them" aria-hidden="true" />Waits on the client</p><p className="v">{fmt.inr(s.them + s.disputed, true)}<TestUnit /></p><p className="s">{s.disputed ? <><i className="er-sw disputed" aria-hidden="true" />{fmt.inr(s.disputed, true)} of it disputed</> : s.themN ? 'Delivered; the client, played by you, decides, or the job\'s terms do when the review ends' : 'Nothing delivered is waiting'}</p></div>
+            <div className="tile"><p className="k"><i className="er-sw back" aria-hidden="true" />Back to the client</p><p className="v">{fmt.inr(s.back, true)}<TestUnit /></p><p className="s">{s.back ? 'Returned from escrow; never yours' : 'Nothing returned'}</p></div>
           </div>
         ) : (
           <ol className="er-how" aria-label="How paid work runs here">
-            <li><b>You and the client agree the terms.</b> Each deadline, and what happens when it passes, is written in them first.</li>
-            <li><b>The client puts the money in escrow.</b> It is held, not yours yet. On paper, QED keeps the record; you play the client too.</li>
-            <li><b>You deliver and the client accepts, or disputes.</b> A dispute is decided by a simulated mediator.</li>
-            <li><b>The money is released to you, or goes back.</b> Each step is yours to take.</li>
+            <li><span><b>You and the client agree the terms.</b> Each deadline, and what happens when it passes, is written in them first.</span></li>
+            <li><span><b>The client puts the money in escrow.</b> It is held, not yours yet. On paper, QED keeps the record; you play the client too.</span></li>
+            <li><span><b>You deliver and the client accepts, or disputes.</b> A dispute is decided by a simulated mediator.</span></li>
+            <li><span><b>The money is released to you, or goes back.</b> Each step is yours to take.</span></li>
           </ol>
         )}
       </div>
@@ -585,7 +599,7 @@ function RouteHead({ kind, held }: { kind: Kind; held: number }) {
     <div className="er-ms-head" aria-hidden="true">
       <span className="er-h-main">Milestone</span>
       <span className="er-route">
-        <span className={`er-held ${held > 0 ? 'has' : ''}`}><span>{held > 0 ? `${fmt.inr(held, true)} held` : 'Nothing held'}</span></span>
+        <span className={`er-held ${held > 0 ? 'has' : ''}`}><span>{held > 0 ? `${rs(held, true)} held` : 'Nothing held'}</span></span>
         {STATIONS[kind].map((n) => <span key={n} className="er-stn">{n}</span>)}
       </span>
       <span className="er-h-state">Where it stands</span>
@@ -637,7 +651,7 @@ export function MsRow({ id, kind, place, title, stamp, whoseMove, amount, say, a
       <Route kind={kind} place={place} />
       <div className="er-ms-state"><Stamp tone={moveTone(place)}>{stamp}</Stamp><span className="er-ms-who">{whoseMove}</span></div>
       <div className="er-ms-say">{say}</div>
-      <span className="er-ms-amt">{fmt.inr(amount, true)}</span>
+      <span className="er-ms-amt">{rs(amount, true)}</span>
       {actions ? <div className="er-ms-act">{actions}</div> : null}
       {children}
     </li>
@@ -703,7 +717,7 @@ const PERIOD_ENDED: Record<string, string> = {
 /** A paper step on record in words, after its actor's name (the history and a dispute's statements). */
 export function stepWords(s: PaperStep): string {
   const d = s.detail
-  const amt = (k: string) => fmt.inr(Number(d[k] ?? 0), true)
+  const amt = (k: string) => rs(Number(d[k] ?? 0), true)
   const outcome = d.outcome === 'released' ? `released to you, ${amt('toEarner')}` : d.outcome === 'refunded' ? `refunded to the client, ${amt('toClient')}` : `${amt('toEarner')} to you, ${amt('toClient')} to the client`
   const ended = PERIOD_ENDED[String(d.period)] ?? 'a deadline passed'
   switch (s.step) {
@@ -748,7 +762,7 @@ export function settledWords(m: Milestone): string {
   const by = last ? ENDED_BY[last.step]!(last) : ''
   const on = fmt.day(m.updated_at)
   if (m.state === 'released') return `Paid into your bank account on ${on}${by}, and recorded as earnings.`
-  if (m.state === 'split') return `Split on ${on}${by}: ${fmt.inr(m.paid ?? 0, true)} paid into your bank account, ${fmt.inr(m.back ?? 0, true)} back to the client.`
+  if (m.state === 'split') return `Split on ${on}${by}: ${rs(m.paid ?? 0, true)} paid into your bank account, ${rs(m.back ?? 0, true)} back to the client.`
   if (m.state === 'refunded') return `Returned to the client on ${on}${by}. Nothing was paid to you.`
   return ''
 }
@@ -807,7 +821,7 @@ function DisputeRules({ amount, raisedBy, raisedAt, t, heard, now, cast }: { amo
       <div><dt>Who decides</dt><dd>{deciderWords(cast, t.mediator.may)}</dd></div>
       <div><dt>Evidence</dt><dd>From each side until {momentWords(raisedAt + t.evidence.ms, now)}, up to five statements each.{heard === undefined ? '' : heard ? ' Both sides have been heard.' : ` Waiting for ${other === 'you' ? 'your answer' : `the answer of ${other}`}.`}</dd></div>
       <div><dt>Decision</dt><dd>By {momentWords(raisedAt + t.decision.ms, now)}, once both sides have been heard.</dd></div>
-      <div><dt>Meanwhile</dt><dd>{fmt.inr(amount, true)} stays locked in escrow: neither side can take it. The two sides may still settle it by agreement.</dd></div>
+      <div><dt>Meanwhile</dt><dd>{rs(amount, true)} stays locked in escrow: neither side can take it. The two sides may still settle it by agreement.</dd></div>
       <div><dt>If nobody acts</dt><dd>{disputeDefaults(amount, raisedBy, t, raisedAt, heard === true, now, cast)}</dd></div>
     </dl>
   )
@@ -824,7 +838,7 @@ function DisputeBox({ m, t, cast, now }: { m: Milestone; t: TermsDoc | null; cas
       <h4 className="er-dsp-h">{raiser}<span className="er-dsp-when">Raised {fmt.dayTime(d.raisedAt)}</span></h4>
       <p className="er-dsp-why">“{d.reason}”</p>
       {d.state === 'open' ? (t ? <DisputeRules amount={m.amount} raisedBy={d.raisedBy} raisedAt={d.raisedAt} t={t} heard={d.heardAt !== null} now={now} cast={cast} /> : null)
-        : <p className="er-dsp-out"><strong>Settled {d.decidedAt ? fmt.dayTime(d.decidedAt) : ''}</strong> {how}: {d.outcome === 'released' ? `released to the earner, ${fmt.inr(m.amount, true)}` : d.outcome === 'refunded' ? `refunded to the client, ${fmt.inr(m.amount, true)}` : `${fmt.inr(d.toEarner ?? 0, true)} to the earner, ${fmt.inr(d.toClient ?? 0, true)} to the client`}.</p>}
+        : <p className="er-dsp-out"><strong>Settled {d.decidedAt ? fmt.dayTime(d.decidedAt) : ''}</strong> {how}: {d.outcome === 'released' ? `released to the earner, ${rs(m.amount, true)}` : d.outcome === 'refunded' ? `refunded to the client, ${rs(m.amount, true)}` : `${rs(d.toEarner ?? 0, true)} to the earner, ${rs(d.toClient ?? 0, true)} to the client`}.</p>}
       {said.length ? (
         <ol className="er-dsp-said" aria-label="Evidence, oldest first">
           {said.map((s, i) => <li key={i}><span className="er-dsp-by">{s.person ? s.person : s.actor === 'client' ? 'The client' : 'You'}<small>{fmt.dayTime(s.ts)}</small></span><span>“{String(s.detail.text)}”</span></li>)}
@@ -847,7 +861,7 @@ function StepRecord({ m, cast }: { m: Milestone; cast: Cast }) {
 }
 
 /** A standing offer to settle, in words: "₹6,000.00 to the earner, ₹6,000.00 to the client". */
-export const offerWords = (o: Offer): string => (o.outcome === 'released' ? `all of it to the earner, ${fmt.inr(o.toEarner, true)}` : o.outcome === 'refunded' ? `all of it back to the client, ${fmt.inr(o.toClient, true)}` : `${fmt.inr(o.toEarner, true)} to the earner, ${fmt.inr(o.toClient, true)} to the client`)
+export const offerWords = (o: Offer): string => (o.outcome === 'released' ? `all of it to the earner, ${rs(o.toEarner, true)}` : o.outcome === 'refunded' ? `all of it back to the client, ${rs(o.toClient, true)}` : `${rs(o.toEarner, true)} to the earner, ${rs(o.toClient, true)} to the client`)
 /** Each side's standing offer to settle: it settles the milestone once the other side offers exactly the same. */
 function Offers({ m, cast }: { m: Milestone; cast: Cast }) {
   const o = m.offers
@@ -937,20 +951,20 @@ function PaperSheet({ ask, onClose, onDone }: { ask: Ask | null; onClose: () => 
   return (
     <Sheet open title={head[k]} onClose={onClose}
       foot={<><Btn onClick={onClose}>Cancel</Btn><Btn tone={k === 'give-back' || k === 'agree' || k === 'take-back' || k === 'decide-refunded' ? 'void-fill' : 'fill'} busy={go.busy} onClick={() => void go.run()}>{press[k]}</Btn></>}>
-      <p>For <strong>{m.title}</strong>: {fmt.inr(amount, true)} in escrow. Practice money, on paper.</p>
+      <p>For <strong>{m.title}</strong>: {rs(amount, true)} in escrow. Practice money, on paper.</p>
       {raising && t ? <>
         <p className="small">Before you raise it, this is who decides and how, under the terms both sides accepted, with the dates it would have if raised now:</p>
         <DisputeRules amount={amount} raisedBy={k === 'dispute-work' ? 'client' : 'earner'} raisedAt={now} t={t} now={now} cast={cast} />
       </> : null}
       {k === 'evidence-earner' || k === 'evidence-client' ? <p className="small">Each side may send up to five statements until {m.dispute && t ? momentWords(m.dispute.raisedAt + t.evidence.ms, now) : 'the evidence closes'}. The mediator reads them before deciding.</p> : null}
-      {k === 'give-back' ? <p>{fmt.inr(amount, true)} goes back to the client now and you give up this milestone. It cannot be undone.</p> : null}
-      {k === 'agree' ? <p>{m.state === 'disputed' ? `This ends the dispute: ${fmt.inr(amount, true)} goes back to the client and nothing is paid to you.` : `${fmt.inr(amount, true)} goes back to the client now.`} It cannot be undone.</p> : null}
-      {k === 'take-back' ? <p>{fmt.inr(amount, true)} goes back to the client now, as the terms this milestone was opened on allow, and nothing is paid to you. It cannot be undone.</p> : null}
-      {k === 'decide-released' || k === 'decide-refunded' ? <p>As the simulated mediator you decide that {fmt.inr(amount, true)} {k === 'decide-released' ? 'is released to the earner' : 'is refunded to the client'}, in full. QED's paper escrow carries it out at once; it cannot be undone.</p> : null}
+      {k === 'give-back' ? <p>{rs(amount, true)} goes back to the client now and you give up this milestone. It cannot be undone.</p> : null}
+      {k === 'agree' ? <p>{m.state === 'disputed' ? `This ends the dispute: ${rs(amount, true)} goes back to the client and nothing is paid to you.` : `${rs(amount, true)} goes back to the client now.`} It cannot be undone.</p> : null}
+      {k === 'take-back' ? <p>{rs(amount, true)} goes back to the client now, as the terms this milestone was opened on allow, and nothing is paid to you. It cannot be undone.</p> : null}
+      {k === 'decide-released' || k === 'decide-refunded' ? <p>As the simulated mediator you decide that {rs(amount, true)} {k === 'decide-released' ? 'is released to the earner' : 'is refunded to the client'}, in full. QED's paper escrow carries it out at once; it cannot be undone.</p> : null}
       {k === 'decide-split' ? <>
         <p>As the simulated mediator, say what the earner receives, in whole paise; the rest goes back to the client. QED's paper escrow carries it out at once.</p>
-        <Field label="To the earner" error={f.earnerPaise}>{(p) => <MoneyInput {...p} value={paise} onChange={setPaise} />}</Field>
-        <p className="er-split-rest">To the client: <strong>{paise !== null && paise >= 0 && paise <= amount ? fmt.inr(amount - paise, true) : 'the rest'}</strong></p>
+        <Field label="To the earner" error={f.earnerPaise}>{(p) => <MoneyInput {...p} currency="INR" value={paise} onChange={setPaise} />}</Field>
+        <p className="er-split-rest">To the client: <strong>{paise !== null && paise >= 0 && paise <= amount ? rs(amount - paise, true) : 'the rest'}</strong></p>
       </> : null}
       {writing ? <Field label={raising ? (k === 'dispute-work' ? 'What is wrong with the work' : 'Why the money should not go back') : 'What the mediator should know'} hint={raising ? 'In a sentence: 5 to 300 characters.' : '3 to 600 characters.'} error={field}>
         {(p) => <textarea {...p} className="input" rows={4} maxLength={raising ? 300 : 600} value={words} onChange={(e) => setWords(e.target.value)} />}
@@ -989,18 +1003,18 @@ function SettleSheet({ at, onClose, onDone }: { at: { m: Milestone; side: Side; 
   return (
     <Sheet open title={`Offer a settlement, as ${as}`} onClose={onClose}
       foot={<><Btn onClick={onClose}>Cancel</Btn><Btn tone="fill" busy={go.busy} onClick={() => void go.run()}>{same ? 'Offer the same: settle it' : 'Make this offer'}</Btn></>}>
-      <p>For <strong>{m.title}</strong>: {fmt.inr(m.amount, true)} in escrow. An offer settles it only when the other side has offered exactly the same{at.cast.names ? '' : ': on paper you play the other side too'}. Until then nothing moves.</p>
+      <p>For <strong>{m.title}</strong>: {rs(m.amount, true)} in escrow. An offer settles it only when the other side has offered exactly the same{at.cast.names ? '' : ': on paper you play the other side too'}. Until then nothing moves.</p>
       {theirs ? <p className="er-offer-theirs">{partWords(at.side === 'earner' ? 'client' : 'earner', at.cast)} offered {offerWords(theirs)}, {fmt.dayTime(theirs.at)}. Offering the same settles it now.</p> : null}
       <fieldset className="er-settle">
         <legend className="legend">The outcome you offer</legend>
         {(['released', 'refunded', 'split'] as const).map((o) => (
           <label key={o} className="er-accept-row"><input type="radio" name={`settle-${m.id}`} checked={outcome === o} onChange={() => setOutcome(o)} />
-            <span>{o === 'released' ? `All of it to the earner, ${fmt.inr(m.amount, true)}` : o === 'refunded' ? `All of it back to the client, ${fmt.inr(m.amount, true)}` : 'A split between the two, in whole paise'}</span></label>
+            <span>{o === 'released' ? `All of it to the earner, ${rs(m.amount, true)}` : o === 'refunded' ? `All of it back to the client, ${rs(m.amount, true)}` : 'A split between the two, in whole paise'}</span></label>
         ))}
       </fieldset>
       {outcome === 'split' ? <>
-        <Field label="To the earner" hint={`From ₹0.01 to ${fmt.inr(m.amount - 1, true)}.`} error={f.earnerPaise}>{(p) => <MoneyInput {...p} value={paise} onChange={setPaise} />}</Field>
-        <p className="er-split-rest">To the client: <strong>{paise !== null && paise >= 0 && paise <= m.amount ? fmt.inr(m.amount - paise, true) : 'the rest'}</strong></p>
+        <Field label="To the earner" hint={`From ${rs(1, true)} to ${rs(m.amount - 1, true)}.`} error={f.earnerPaise}>{(p) => <MoneyInput {...p} currency="INR" value={paise} onChange={setPaise} />}</Field>
+        <p className="er-split-rest">To the client: <strong>{paise !== null && paise >= 0 && paise <= m.amount ? rs(m.amount - paise, true) : 'the rest'}</strong></p>
       </> : null}
       {go.error && !f.earnerPaise ? <Problem error={go.error} /> : null}
     </Sheet>
@@ -1050,7 +1064,7 @@ function ProposeSheet({ at, policy, business, members, onClose, onDone }: { at: 
   return (
     <Sheet open title={`Propose terms for ${m.title}`} onClose={onClose}
       foot={<><Btn onClick={onClose}>Cancel</Btn><Btn tone="fill" busy={go.busy || preview.reading} onClick={() => void go.run()}>{`Propose and accept them, as ${PART_NOUN[at.side]}`}</Btn></>}>
-      <p>Complete terms for this milestone alone, {fmt.inr(m.amount, true)} in escrow. Proposing them accepts them for {PART_NOUN[at.side]}; they bind the milestone once {PART_NOUN[other]} accepts them{at.cast.names ? '' : ', which on paper you play too'}, and every deadline counts from then.</p>
+      <p>Complete terms for this milestone alone, {rs(m.amount, true)} in escrow. Proposing them accepts them for {PART_NOUN[at.side]}; they bind the milestone once {PART_NOUN[other]} accepts them{at.cast.names ? '' : ', which on paper you play too'}, and every deadline counts from then.</p>
       <TermsChooser policy={policy} value={choice} onChange={setChoice} errors={errors} delivery={m.state === 'funded'} members={business ? members : undefined} pick={at.side === 'client' ? ['earner', 'mediator'] : ['client', 'mediator']} />
       <TermsRead preview={preview} now={now} roleNames={business ? namesOf(preview.read?.terms, members) : null} empty="Choose the terms above; they are shown here in full before anything is proposed." />
       {go.error && Object.keys(go.error.fields ?? {}).length === 0 ? <Problem error={go.error} /> : null}
@@ -1093,7 +1107,7 @@ function JobTermsSheet({ job, onClose, onDone }: { job: Job | null; onClose: () 
   return (
     <Sheet open title="Accept the terms, as the paper client?" onClose={onClose}
       foot={<><Btn onClick={onClose}>Cancel</Btn><Btn tone="fill" busy={go.busy} onClick={() => void go.run()}>Accept them, as the paper client</Btn></>}>
-      <p>{t.roleNames.earner} proposed these terms for {job.title}. Accepting them as the paper client puts {fmt.inr(total, true)} in escrow on paper, and they then bind the job for good.</p>
+      <p>{t.roleNames.earner} proposed these terms for {job.title}. Accepting them as the paper client puts {rs(total, true)} in escrow on paper, and they then bind the job for good.</p>
       <TermsList terms={t.terms} hash={t.hash} now={now} roleNames={t.roleNames} accepts={t.accepts} />
       {go.error ? <Problem error={go.error} /> : null}
     </Sheet>
@@ -1145,7 +1159,7 @@ function NewJob({ policy, business, members, onDone }: { policy: Policy; busines
         {ms.map((m, i) => (
           <div className="er-fields" key={i}>
             <Field label={`Milestone ${i + 1}`}>{(p) => <input {...p} className="input" maxLength={80} value={m.title} onChange={(e) => patch(i, { title: e.target.value })} />}</Field>
-            <Field label="Paid on acceptance">{(p) => <MoneyInput {...p} value={m.amount} onChange={(v) => patch(i, { amount: v })} />}</Field>
+            <Field label="Paid on acceptance">{(p) => <MoneyInput {...p} currency="INR" value={m.amount} onChange={(v) => patch(i, { amount: v })} />}</Field>
             {ms.length > 1 ? <div className="er-fields-x"><Btn small tone="quiet" onClick={() => setMs((s) => s.filter((_, j) => j !== i))}>Remove</Btn></div> : null}
           </div>
         ))}
@@ -1294,7 +1308,7 @@ function PaperWork({ earn, receipts, primary, onDecided }: { earn: Resource<Earn
       <p className="sr" role="status">{said}</p>
       <Sheet open={!!submitting} title="Submit the work" onClose={() => setSubmitting(null)}
         foot={<><Btn onClick={() => setSubmitting(null)}>Cancel</Btn><Btn tone="fill" busy={submit.busy} onClick={() => void submit.run()}>Submit to the client</Btn></>}>
-        <p>For <strong>{submitting?.m.title}</strong>, {submitting ? fmt.inr(submitting.m.amount, true) : ''} in escrow.</p>
+        <p>For <strong>{submitting?.m.title}</strong>, {submitting ? rs(submitting.m.amount, true) : ''} in escrow.</p>
         {submitting?.t ? <p className="small">Once you submit it, the client has {periodWords(submitting.t.review.ms)} to accept it or dispute it; with no answer by then, {outcomeWords(submitting.t.review.onTimeout, submitting.m.amount)}, as the accepted terms say.</p>
           : submitting ? <p className="small">It has no agreed terms: once you submit it, nothing happens on its own until the client decides or both sides agree terms.</p> : null}
         <Field label="Evidence of the work" hint="A link, a description, or the text itself. QED keeps only its fingerprint, so you can later show that what you submitted has not changed." error={submit.error?.fields.evidence}>{(p) => <textarea {...p} className="input" rows={5} value={evidence} onChange={(e) => setEvidence(e.target.value)} />}</Field>
@@ -1357,7 +1371,7 @@ function MoneyIn({ splitInForce, onDone, onClose }: { splitInForce: boolean; onD
   const [amount, setAmount] = useState<number | null>(null), [kind, setKind] = useState<'earned' | 'topup'>('earned'), [memo, setMemo] = useState('')
   const go = useAction(async () => {
     await api('POST', '/api/money-in', { amount: amount ?? 0, kind, memo })
-    onDone(`${fmt.inr(amount ?? 0, true)} is in your bank account${kind === 'earned' ? (splitInForce ? '. Your income instruction acts on it within a few seconds.' : ', recorded as earnings.') : ', recorded as a top-up, not as income.'}`)
+    onDone(`${rs(amount ?? 0, true)} is in your bank account${kind === 'earned' ? (splitInForce ? '. Your income instruction acts on it within a few seconds.' : ', recorded as earnings.') : ', recorded as a top-up, not as income.'}`)
   })
   return (
     <form className="er-in-form" aria-label="Record money in" onSubmit={(e) => { e.preventDefault(); void go.run() }}>
@@ -1462,7 +1476,7 @@ function MoneyInBook({ home, book, salary, earned, topups, paper, chain, receipt
       <span className="er-in-when">{nearDay(l.at, now)}{l.time ? <small>{fmt.time(l.at)}</small> : null}</span>
       <span className="er-in-what">{l.what}<small className="er-in-from">{l.from}</small></span>
       <div className="er-in-how">{l.how}{l.entryId && byEntry.has(l.entryId) && split ? <SplitOf run={byEntry.get(l.entryId)!} title={split.title} /> : null}</div>
-      <span className={`er-in-amt ${l.income && !coming ? 'in' : ''}`}>+{fmt.inr(l.amount, true)}</span>
+      <span className={`er-in-amt ${l.income && !coming ? 'in' : ''}`}>+{rs(l.amount, true)}</span>
       <small className="er-in-where">{l.where}</small>
     </li>
   )
@@ -1480,7 +1494,7 @@ function MoneyInBook({ home, book, salary, earned, topups, paper, chain, receipt
         : expected.length ? (
           <ul className="er-days" aria-labelledby="exp-h">{expected.map((x, i) => row({ key: `exp-${i}`, at: x.dueAt, time: false, from: 'Your employer', what: x.label,
             how: <>Expected: the salary you recorded, an estimate. <Link to="/safeguards#household">Change it</Link></>, amount: x.amount, where: 'Into your bank', income: true, entryId: null }, true))}</ul>
-        ) : <p className="er-line small faint">{p.income > 0 ? `Your salary of ${fmt.inr(p.income, true)} is expected on day ${p.incomeDay} of the month, after the days shown here.` : 'No salary is recorded for this household.'} <Link to="/safeguards#household">Change them</Link></p>}
+        ) : <p className="er-line small faint">{p.income > 0 ? `Your salary of ${rs(p.income, true)} is expected on day ${p.incomeDay} of the month, after the days shown here.` : 'No salary is recorded for this household.'} <Link to="/safeguards#household">Change them</Link></p>}
       {held.length ? <p className="er-line small">Also held in escrow for you: {listed(held)}. It comes in only when it is released; until then it is not yours.</p> : null}
 
       <p className="er-today" aria-hidden="true"><span>Today</span></p>
@@ -1545,6 +1559,7 @@ export function EarnScreen() {
         <div>
           <h1>Earn</h1>
           <p>Work you are paid for, followed from the offer to the money arriving. What is held in escrow is not yours until it is paid.</p>
+          <p className="er-ccy">Earn works in test rupees, on paper and on the test chain, whatever your home currency is{inRupeeHome() ? '' : `: it never converts them into ${homeCurrency()}`}. They are practice money.</p>
         </div>
         <Link to="/earn/bounties" className="btn">Refutation bounties</Link>
       </header>
