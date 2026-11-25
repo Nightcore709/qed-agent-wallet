@@ -8,6 +8,8 @@
 .sv, .sg, .pb { display: flex; flex-direction: column; gap: var(--s6); }
 .sv > .page-head, .sg > .page-head { margin-bottom: var(--s1); }
 .sv-acts { flex: none; }
+/* every button on Save is a 44 px target, as on Spend (R14; the small ones were 34) */
+.sv .btn, .sv .btn.sm { --h: 44px; }
 
 /* row one: the reserve and what it pays for, one height by design */
 .sv-top { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s5); align-items: stretch; }
@@ -23,7 +25,11 @@
 .sv-hero { margin-top: var(--s2); font-size: var(--t-fig-hero); line-height: .95; font-weight: 640; letter-spacing: var(--track-hero); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
 .sv-hero.short { color: var(--loss); }
 .sv-hero-sub { margin-top: var(--s3); color: var(--ink-2); max-width: 56ch; }
-.sv-reserve > .rv-terms { margin-top: var(--s5); }
+/* R14: beside a taller statement the panel's spare height is shared out above its two lower blocks (auto margins over a
+   least distance kept as padding), never left as one hole at its foot */
+.sv-reserve > .rv-terms { margin-top: auto; padding-top: var(--s5); }
+.sv-reserve > .rv-allow { margin-top: auto; }
+.sv-reserve > :is(.rv-terms, .note):has(+ .rv-allow) { margin-bottom: var(--s6); }
 .sv-reserve > .note { margin-top: var(--s4); }
 
 /* the bank at true scale on the money bar (kit.tsx MoneyBar, components.css): free, what must stay, a shortfall, and the
@@ -89,6 +95,9 @@
 .rv-allows span { color: var(--ink-3); font-size: var(--t-micro); line-height: 1.45; }
 .rv-allows span a { display: inline-block; padding-block: 6px; margin-block: -6px; }
 .rv-allow > .note { margin-top: var(--s4); }
+.rv-allow-head { align-items: center; }
+.rv-allow-head > div { display: grid; gap: 2px; min-width: 0; }
+.rv-allow-head > .btn { --h: 44px; flex: none; }
 .rv-change { margin-top: var(--s4); }
 .rv-change > p { margin-top: var(--s2); }
 .rv-not { margin-top: var(--s2); }
@@ -117,7 +126,8 @@
 .sv-dues { display: flex; flex-direction: column; }
 .sv-dues .panel-head { margin-bottom: var(--s2); }
 .sv-dues-says { margin-bottom: var(--s4); font-size: var(--t-small); color: var(--ink-2); max-width: 60ch; }
-.sv-dues-list { display: grid; font-variant-numeric: tabular-nums lining-nums; }
+/* beside a taller panel the statement's lines share the spare height between them, a little each (R14) */
+.sv-dues-list { display: grid; flex: 1 1 auto; align-content: space-between; font-variant-numeric: tabular-nums lining-nums; }
 .sv-dues-list > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3); align-items: baseline; padding: 9px 0; border-top: 1px solid var(--rule); }
 .sv-dues-list > div:first-child { border-top: 0; padding-top: 0; }
 .sv-dues-list dt { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: var(--s3); align-items: baseline; min-width: 0; }
@@ -126,14 +136,18 @@
 .sv-dues-list .what small { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); letter-spacing: 0; }
 .sv-dues-list dd { text-align: right; font-weight: 640; white-space: nowrap; }
 .sv-dues-list .fold .what { font-weight: 500; }
-.sv-dues-list .fold button { display: inline-block; padding-block: 4px; margin-block: -4px; text-align: left; }
+.sv-dues-list .fold button { display: inline-block; padding-block: 11px; margin-block: -11px; text-align: left; }
 .sv-dues-list > .spend { border-top-style: dashed; border-top-color: var(--rule-2); }
 .sv-dues-list > .income dd { color: var(--gain); }
 .sv-dues-list > .total { margin-top: 2px; padding-top: var(--s3); border-top: 2px solid var(--ink); }
 .sv-dues-list > .total .what { font-weight: 700; }
 .sv-dues-list > .total dd { font-size: var(--t-lead); font-weight: 700; letter-spacing: -.012em; }
 .sv-dues-less { margin-top: var(--s2); font-size: var(--t-small); }
-.sv-dues-note { margin-top: auto; padding-top: var(--s5); font-size: var(--t-micro); color: var(--ink-3); line-height: 1.55; }
+/* R14: what the figure does not count sits under what it pays for, then the note, straight after the total: nothing is
+   pushed to the card's foot with a hole above it */
+.sv-dues-foot { display: grid; gap: var(--s2); margin-top: var(--s4); padding-top: var(--s3); border-top: 1px solid var(--rule); }
+.sv-dues-foot > .rv-not { margin-top: 0; }
+.sv-dues-note { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.55; }
 .sv-dues > .note { margin-top: var(--s4); }
 
 /* ------------------------------------------------------------------------------------------------ the cash flow and the what-if */
@@ -145,9 +159,12 @@
 .sv-wi-head h3:focus:not(:focus-visible) { outline: none; }
 .sv-wi-tag { font-size: var(--t-micro); font-weight: 600; color: var(--ink-2); padding: 3px 10px; border-radius: var(--r-pill); border: 1px dashed var(--rule-2); }
 .sv-wi-says { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
-.sv-wi-form { display: grid; gap: var(--s4); margin-top: var(--s1); }
-.sv-wi-pair { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s3); align-items: end; }
-.sv-wi-form .field > label, .sv-wi-label { font-size: var(--t-small); font-weight: 620; color: var(--ink); }
+/* R14: the what-if's six fields on one baseline (components.css .fields). In a narrow rail the two single fields take
+   the width and each pair shares a row; from 600 px two equal columns; from 900 px three columns of two, each column one
+   thing that could go wrong (today and the salary, a larger bill, a new monthly cost), filled downwards. */
+.sv-wi .sv-wi-form { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); column-gap: var(--s3); margin-top: var(--s1); }
+.sv-wi-form > .field:nth-child(-n+2) { grid-column: 1 / -1; }
+.sv-wi-form .field > label, .sv-wi-form .field > .sv-wi-label { font-size: var(--t-small); font-weight: 620; color: var(--ink); }
 .sv-wi-form .field .hint { font-size: var(--t-micro); }
 .sv-wi-idle { font-size: var(--t-small); color: var(--ink-3); padding: var(--s3) var(--s4); border-radius: var(--r-sm); border: 1px dashed var(--rule-2); }
 .sv-wi-result { container-type: inline-size; display: grid; gap: var(--s3); padding-top: var(--s4); border-top: 1px solid var(--rule); }
@@ -158,30 +175,48 @@
 .sv-wi-see a { display: inline-block; padding-block: 4px; margin-block: -4px; font-weight: 600; }
 .sv-wi > .sv-more { margin-top: auto; }
 @container (min-width: 600px) {
-  .sv-wi-form { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s6); }
+  .sv-wi .sv-wi-form { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s6); }
+  .sv-wi-form > .field:nth-child(-n+2) { grid-column: auto; }
+}
+@container (min-width: 900px) {
+  .sv-wi .sv-wi-form { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(8, auto); grid-auto-flow: column; column-gap: var(--s8); }
+  .sv-wi-says { max-width: 92ch; }
 }
 @media (max-width: 1099px) { .sv-wi-see { display: block; } }
 
 /* ------------------------------------------------------------------------------------------------ row three: kept and set aside, the most instructions could take, the floor */
-.sv-board.board { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
-.sv-board > .env { grid-column: 1; }
+/* R14: three panels on the first row's two columns (7 and 5), ending on one line: the most the instructions could take
+   over the floor on the left, what is kept and set aside beside both on the right. Whichever side is shorter is given the
+   difference inside its panels, shared between their blocks. One column below 1100 px, in the same order. */
+.sv-board { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto 1fr; gap: var(--s5); align-items: stretch; }
+.sv-board > .env { grid-column: 1; grid-row: 1; }
+.sv-board > .sv-floor { grid-column: 1; grid-row: 2; }
+.sv-board > .sv-kept { grid-column: 2; grid-row: 1 / span 2; }
+.sv-board > .panel { display: flex; flex-direction: column; min-width: 0; }
+/* the panel's last part takes the height the panel was given beyond its own (layout rule L3, .fills) */
+.sv-kept > .sv-part:last-child { flex: 1 1 auto; }
+.sv-kept > .sv-part > .sv-chain { flex: 1 1 auto; }
+.sv-kept .sv-chain { display: flex; flex-direction: column; }
+.sv-kept .sv-chain > p { flex: 1 1 auto; align-content: center; }
+.sv-floor > .sv-more-link { margin-top: auto; padding-top: var(--s2); }
+@media (max-width: 1099px) {
+  .sv-board { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .sv-board > .env, .sv-board > .sv-floor, .sv-board > .sv-kept { grid-column: auto; grid-row: auto; }
+}
 .sv-kept .panel-head { margin-bottom: var(--s2); }
 .sv-part { padding-top: var(--s5); }
 .sv-part + .sv-part { margin-top: var(--s5); border-top: 1px solid var(--rule); }
 .sv-part-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--s1) var(--s4); margin-bottom: var(--s3); }
 .sv-part-head h3 { font-size: var(--t-body); font-weight: 650; }
 .sv-part-head p { font-size: var(--t-small); color: var(--ink-3); }
-.sv-none { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s3) var(--s4); align-items: start; padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); }
-.sv-none .glyph { width: 40px; height: 40px; border-radius: var(--r-sm); display: grid; place-items: center; background: var(--pane-2); border: 1px solid var(--rim); box-shadow: var(--lift-1); color: var(--ink-2); }
-.sv-none .glyph svg { width: 19px; height: 19px; }
-.sv-none h4 { font-size: var(--t-body); font-weight: 640; }
-.sv-none p { font-size: var(--t-small); color: var(--ink-2); margin-top: 2px; max-width: 64ch; line-height: 1.5; }
-.sv-none .btn { grid-column: 2; justify-self: start; }
+/* the on-chain wallet's own line when it is not set up, or cannot be used from here (WalletInline Missing): the same
+   quiet tile as "No saving instruction yet" above it, its sentence running as one sentence */
+.sv-chain > p { display: block; padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); }
 .sv-saves { display: grid; }
 .sv-saves > li { padding: var(--s3) 0; border-top: 1px solid var(--rule); }
 .sv-saves > li:first-child { border-top: 0; padding-top: 0; }
 .sv-save-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px var(--s3); }
-.sv-save-t { color: var(--ink); font-weight: 620; text-decoration: none; padding-block: 4px; margin-block: -4px; }
+.sv-save-t { color: var(--ink); font-weight: 620; text-decoration: none; padding-block: 11px; margin-block: -11px; }
 .sv-save-t:hover { text-decoration: underline; text-underline-offset: .2em; }
 .sv-save-fig { font-size: var(--t-small); color: var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
 .sv-save-fig b { color: var(--ink); font-weight: 650; }
@@ -206,7 +241,7 @@
 .sv-floor-says b.short { color: var(--loss); }
 .sv-floor > .note { margin-top: var(--s3); }
 .sv-more-link { margin-top: var(--s2); font-size: var(--t-small); }
-.sv-more-link a { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; font-weight: 600; color: var(--ink); text-decoration: none; }
+.sv-more-link a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-weight: 600; color: var(--ink); text-decoration: none; }
 .sv-more-link a:hover { text-decoration: underline; text-underline-offset: .2em; }
 .sv-more-link svg { width: 15px; height: 15px; color: var(--ink-3); }
 
@@ -394,7 +429,7 @@
 
 /* ------------------------------------------------------------------------------------------------ disclosures: one look for every "more" on these pages */
 .rv-each > summary, .rv-not > summary, .sg-more > summary, .sv-more > summary {
-  display: inline-flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 var(--s3); margin-left: calc(-1 * var(--s3)); border-radius: var(--r-pill);
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 var(--s3); margin-left: calc(-1 * var(--s3)); border-radius: var(--r-pill);
   list-style: none; color: var(--brand); font-weight: 600; font-size: var(--t-small); cursor: pointer; transition: background-color var(--d1) var(--ease-out);
 }
 .rv-each > summary::-webkit-details-marker, .rv-not > summary::-webkit-details-marker, .sg-more > summary::-webkit-details-marker, .sv-more > summary::-webkit-details-marker { display: none; }
@@ -453,12 +488,9 @@
 }
 @media (max-width: 360px) { .pb-period .seg button { padding: 0 8px; } }
 @media (max-width: 359px) {
-  .sv-wi-pair { grid-template-columns: minmax(0, 1fr); }
+  .sv-wi .sv-wi-form { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
-  .sv-none { grid-template-columns: minmax(0, 1fr); }
-  .sv-none .glyph { display: none; }
-  .sv-none .btn { grid-column: 1; }
   .pb-table .pb-wide, .pb-table .pb-time, .pb-table .pb-bal { display: none; }
   .pb-table .pb-narrow { display: table-cell; }
   .pb-time-in { display: inline; }
@@ -491,9 +523,12 @@
 .sv-goals-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s5); margin-bottom: var(--s5); }
 .sv-goals-head h2 { font-size: var(--t-h3); font-weight: 650; letter-spacing: -.014em; }
 .sv-goals-head p { margin-top: 2px; font-size: var(--t-small); color: var(--ink-2); max-width: 72ch; line-height: 1.5; }
-.sv-goals .sv-none h3 { font-size: var(--t-body); font-weight: 640; }
 .sv-goal-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
-@container (min-width: 960px) { .sv-goal-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container (min-width: 960px) {
+  .sv-goal-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* R14 L3: a lone goal, or the last of an odd number, takes the whole row instead of leaving half of it empty (owner screenshot 15) */
+  .sv-goal-list > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
 /* cards in one row of Save's list share its height (M4); elsewhere (a goal's record) a card is as tall as it is */
 .sv-goal-list > li > .sv-goal { height: 100%; }
 .sv-goal { container-type: inline-size; display: flex; flex-direction: column; padding: var(--s5); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 62%, transparent); border: 1px solid var(--rim); scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }

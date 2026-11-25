@@ -5,11 +5,11 @@
  * purchase is kept with the quotes compared, the checks made and its receipt; one outside the mandate is refused with the
  * reason. Both services are test doubles on this computer and no real money moves.
  */
-import { Check, X } from 'lucide-react'
+import { Check, ShoppingBag, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { api, fmt, useData } from '../lib/core.ts'
 import { ApprovalSheet, type PendingApproval } from '../ui/instrument.tsx'
-import { Btn, Field, Link, Loading, MoneyInput, Note, Problem, Stamp, useAction } from '../ui/kit.tsx'
+import { Btn, EmptyState, Field, Link, Loading, MoneyInput, Note, Problem, Stamp, useAction } from '../ui/kit.tsx'
 
 interface Mandate { id: string; version: number; perPurchase: number; perMonth: number; services: string[]; expiresAt: number }
 interface Quote { serviceId: string; serviceName: string; ok: boolean; error: string | null; amount: number | null; allowed: boolean }
@@ -45,8 +45,9 @@ export function Commerce() {
   const picked = chosen ?? data?.services.map((s) => s.id) ?? []
   return (
     <section className="panel pay-commerce" aria-labelledby="cm-h">
-      <div className="pay-sec-head"><div><h2 id="cm-h">Services QED can buy for you</h2><p>Simulated: two test services on this computer, paid on the paper rail. No real money moves and no real merchant is involved. {data?.note}</p></div></div>
-      {error ? <Problem error={error} /> : !data ? <Loading what="Reading the mandate" /> : <>
+      <div className="pay-sec-head cm-head"><div><h2 id="cm-h">Services QED can buy for you</h2><p>Simulated: two test services on this computer, paid on the paper rail. No real money moves and no real merchant is involved.</p>
+        {data?.note ? <details className="disclose cm-note"><summary>What is simulated, and what is not claimed</summary><p>{data.note}</p></details> : null}</div></div>
+      {error ? <Problem error={error} /> : !data ? <Loading what="Reading the mandate" /> : <div className="cm-grid">
         <div className="cm-mandate">
           <h3>Your mandate</h3>
           {m ? <>
@@ -58,11 +59,11 @@ export function Commerce() {
             </dl>
             <div className="cm-acts"><Btn small tone="quiet" busy={revoke.busy} onClick={() => void revoke.run()}>Revoke the mandate</Btn><span className="pay-quiet">Revoking only narrows what QED may do, so it needs no passkey. Signing a new mandate replaces this one.</span></div>
             <Problem error={revoke.error} />
-          </> : <p className="pay-none">No mandate is signed, so QED buys nothing. Set one below and sign it with your passkey.</p>}
-          <details className="cm-set" open={!m}>
+          </> : <p className="cm-none">No mandate is signed, so QED buys nothing. Set one below and sign it with your passkey.</p>}
+          <details className="disclose cm-set" open={!m}>
             <summary>{m ? 'Sign a different mandate' : 'Set a mandate'}</summary>
             <form className="cm-form" onSubmit={(e) => { e.preventDefault(); void prepare.run() }}>
-              <div className="pay-add-grid">
+              <div className="form-grid cols-3 fields cm-fields">
                 <Field label="Most for one purchase" error={prepare.error?.fields?.perPurchase}>{(p) => <MoneyInput {...p} value={perPurchase} onChange={setPerPurchase} />}</Field>
                 <Field label="Most in one month" error={prepare.error?.fields?.perMonth}>{(p) => <MoneyInput {...p} value={perMonth} onChange={setPerMonth} />}</Field>
                 <Field label="Lasts (days)" error={prepare.error?.fields?.days}>{(p) => <input {...p} className="input" type="number" min={1} max={90} value={days} onChange={(e) => setDays(Number(e.target.value))} />}</Field>
@@ -71,7 +72,7 @@ export function Commerce() {
                 {data.services.map((s) => <label key={s.id}><input type="checkbox" checked={picked.includes(s.id)} onChange={(e) => setChosen(e.target.checked ? [...new Set([...picked, s.id])] : picked.filter((x) => x !== s.id))} /> {s.name} <small>({s.payTo})</small></label>)}
                 {prepare.error?.fields?.services ? <p className="pay-err">{prepare.error.fields.services}</p> : null}
               </fieldset>
-              <Btn tone="fill" type="submit" busy={prepare.busy}>Review the mandate and sign</Btn>
+              <div className="cm-go"><Btn tone="fill" type="submit" busy={prepare.busy}>Review the mandate and sign</Btn></div>
               {prepare.error && Object.keys(prepare.error.fields ?? {}).length === 0 ? <Problem error={prepare.error} /> : null}
             </form>
           </details>
@@ -79,9 +80,13 @@ export function Commerce() {
 
         <div className="cm-buy">
           <h3>Compare quotes and buy</h3>
+          <div className="cm-buy-in">
           <div className="cm-pick">
             <Field label="Product">{(p) => <select {...p} className="input" value={product} onChange={(e) => { setSku(e.target.value); setCmp(null) }}>{data.products.map((x) => <option key={x.sku} value={x.sku}>{x.title}</option>)}</select>}</Field>
             <Btn tone="fill" busy={compare.busy} onClick={() => void compare.run(product)}>Compare the two quotes</Btn>
+          </div>
+          {/* what the product is, and who decides, said before the quotes are asked for (R14: the same words, no longer only after) */}
+          <p className="pay-quiet cm-says">{data.products.find((x) => x.sku === product)?.blurb} A service the mandate does not name is refused with the reason, and nothing is paid. The price comes from the service's own quote; the mandate decides, not the quote.</p>
           </div>
           <Problem error={compare.error} />
           {cmp ? <>
@@ -94,14 +99,13 @@ export function Commerce() {
                 <td><Btn small tone={q.serviceId === cmp.cheapestAllowed ? 'fill' : 'quiet'} busy={buy.busy} disabled={!q.ok} onClick={() => void buy.run(cmp.sku, q.serviceId)}>Buy from {q.serviceName.split(' ')[0]}</Btn></td>
               </tr>)}</tbody>
             </table>
-            <p className="pay-quiet">A service the mandate does not name is refused with the reason, and nothing is paid. The price comes from the service's own quote; the mandate decides, not the quote.</p>
           </> : null}
           <Problem error={buy.error} />
         </div>
 
         <div className="cm-bought">
           <h3>What QED bought, and was refused</h3>
-          {data.purchases.length === 0 ? <p className="pay-none">Nothing yet.</p> : <ul className="cm-list">{data.purchases.map((p) => (
+          {data.purchases.length === 0 ? <EmptyState across compact as="h4" icon={<ShoppingBag />} title="Nothing yet">A purchase, or a refusal with its reason, appears here.</EmptyState> : <ul className="cm-list">{data.purchases.map((p) => (
             <li key={p.id}>
               <span className="what"><b>{p.title}</b><small>{p.serviceName ?? 'No service'}{p.amount !== null ? `, ${fmt.money(p.amount, true)}` : ''}, {fmt.dayTime(p.createdAt)}</small>
                 {p.reason ? <Note tone="void" title={p.state === 'refused' ? 'Refused, and nothing was paid' : 'What happened'}>{p.reason}</Note> : null}
@@ -111,7 +115,7 @@ export function Commerce() {
               <span className="state"><Stamp tone={TONE[p.state] ?? 'plain'}>{WORD[p.state] ?? p.state}</Stamp></span>
             </li>))}</ul>}
         </div>
-      </>}
+      </div>}
       <ApprovalSheet approval={sheet} title="Sign this mandate" action="Sign the mandate" onClose={() => setSheet(null)}
         onApproved={async (approvalId) => { await api('POST', '/api/commerce/mandate/activate', { approvalId }); setSheet(null); reload() }}>
         {sheet ? <article className="instrument"><div className="i-head"><span>Commerce mandate, simulated services</span><span>Not signed yet</span></div>

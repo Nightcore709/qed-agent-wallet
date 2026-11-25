@@ -1,0 +1,30 @@
+{
+ "inr-data-spend-720x2.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-spend-chain-720x2.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "inr-data-save-720x2.png": {
+  "errors": [],
+  "overflow": []
+ },
+ "usd-data-spend-720x2.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-spend-chain-720x2.png": {
+  "errors": [
+   "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "overflow": []
+ },
+ "usd-data-save-720x2.png": {
+  "errors": [],
+  "overflow": []
+ }
+}

@@ -19,7 +19,17 @@
 .gr-head { margin-bottom: var(--s1); }
 .gr-head h1 .dim { color: var(--ink-3); font-weight: 560; }
 .gr-head h1 { max-width: 18ch; }
+.gr-head > div { flex: 1 1 28rem; min-width: 0; }
+@media (min-width: 1100px) { .gr-head .gr-acts { display: grid; grid-template-columns: repeat(2, max-content); justify-content: end; } }
 .gr-acts { display: flex; gap: var(--s2); flex-wrap: wrap; }
+
+/* what QED may do alone, with approval, and never: the empty lead panel's rows, set as the filled one's key is */
+.gr-how { display: grid; margin-top: auto; padding-top: var(--s4); }
+.gr-how > div { display: grid; grid-template-columns: minmax(7.5rem, 9rem) minmax(0, 1fr); gap: var(--s3); padding: 10px 0; border-top: 1px solid var(--rule); }
+.gr-how dt { font-weight: 600; color: var(--ink); }
+.gr-how dd { color: var(--ink-2); }
+.gr-worth > .empty-state.compact { margin-top: var(--s4); }
+@media (max-width: 479px) { .gr-how > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
 
 /* ------------------------------------------------------------------------------------------------ the two lead panels */
 .gr-top { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: var(--s5); align-items: stretch; }
@@ -264,14 +274,16 @@
 @keyframes px-in { from { opacity: 0; } }
 
 /* ------------------------------------------------------------------------------------------------ the ticket and its fills, beside the prices */
-.gr-trade { display: grid; grid-template-columns: minmax(340px, 5fr) minmax(0, 7fr); grid-template-rows: auto 1fr; grid-template-areas: "ticket prices" "fills prices"; gap: var(--s5); align-items: stretch; }
-.gr-ticket { grid-area: ticket; min-width: 0; padding: var(--s6); scroll-margin-top: calc(var(--bar-top, 0px) + 16px); }
-.gr-fills { grid-area: fills; min-width: 0; padding: var(--s5) var(--s6); display: flex; flex-direction: column; }
+/* the ticket with its fills under it is one sticky side (R14 L2: useStickySide) beside the prices; neither card is
+   stretched to the other's height, so the fills are no longer a long empty panel */
+.gr-trade { display: grid; grid-template-columns: minmax(340px, 5fr) minmax(0, 7fr); gap: var(--s5); align-items: start; }
+.gr-trade-side { display: grid; gap: var(--s5); min-width: 0; position: sticky; }
+.gr-ticket { min-width: 0; padding: var(--s6); scroll-margin-top: calc(var(--bar-top, 0px) + 16px); }
+.gr-fills { min-width: 0; padding: var(--s5) var(--s6); display: flex; flex-direction: column; }
 .gr-fills .panel-head { margin-bottom: var(--s2); }
-/* the fills end in their own foot, so the column ends with the prices beside it by design */
 .gr-fills > :is(ul, p) { margin-bottom: var(--s4); }
 .gr-fills .panel-foot { margin-top: auto; }
-.gr-trade > .gr-market { grid-area: prices; }
+.gr-trade > .gr-market { min-width: 0; }
 .gr-skel { display: grid; gap: var(--s5); }
 
 /* the record: a panel lit from below, its light spilling around it (Peak Chart's halo, in the section's colour) */
@@ -510,7 +522,8 @@
 }
 @media (max-width: 1099px) {
   .gr-top { grid-template-columns: minmax(0, 1fr); }
-  .gr-trade { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "ticket" "fills" "prices"; }
+  .gr-trade { grid-template-columns: minmax(0, 1fr); }
+  .gr-trade-side { position: static; }
   .pc-main { grid-template-columns: minmax(0, 1fr); }
   .pc-side { padding-left: 0; border-left: 0; padding-top: var(--s4); border-top: 1px solid var(--rule); }
 }

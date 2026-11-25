@@ -14,7 +14,7 @@
  * Below the journey: the bills on record, each with who pays it and what is left of that instruction's limit, and
  * every payment so far.
  */
-import { ArrowUpRight, CalendarClock, Check, CreditCard, Landmark, PiggyBank, Plus, Search, ShieldAlert, X } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, CalendarClock, Check, CreditCard, Landmark, PiggyBank, Plus, Search, ShieldAlert, X } from 'lucide-react'
 import { lazy, type ReactNode, Suspense, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { fraction } from '../../shared/fixed.ts'
 import { lookalikeWarning } from '../../server/lookalike.ts'
@@ -23,7 +23,7 @@ import { api, type ApiError, fmt, useData, useLocation, useNow } from '../lib/co
 import { homeCurrency } from '../../shared/home-money.ts'
 import type { ActionPreview, ActionView, AuthorityEnvelope, Dispute, Home, ProgramSummary } from '../lib/types.ts'
 import { ActionDoc, ApprovalSheet, Bound, type PendingApproval } from '../ui/instrument.tsx'
-import { Btn, Field, Link, MoneyBar, MoneyInput, Note, Problem, Seal, StateStamp, needsAttention, useAction, useSession, useStepUpWhenAsked } from '../ui/kit.tsx'
+import { Btn, EmptyState, Field, Link, MoneyBar, MoneyInput, Note, Problem, Seal, StateStamp, needsAttention, useAction, useSession, useStepUpWhenAsked, useStickySide } from '../ui/kit.tsx'
 import { ReserveBasis } from '../ui/reserve.tsx'
 import { atTime, heldWords, MODE_WORD, monthLeft, nearDay, railBound } from '../lib/words.ts'
 import { awaitsRepeat, REPEAT_RULE, RepeatHeld } from '../ui/repeat.tsx'
@@ -139,15 +139,15 @@ export function PayScreen() {
         qedMay={home.data.stop ? 0 : home.data.programs.some((p) => p.state === 'active') ? liq.data?.envelope.windows.find((x) => x.days === 30)?.most ?? null : 0}
         askedBill={query.get('bill')} askedPurpose={query.get('purpose')} chosen={added}
         onAdded={(id) => { setAdded(id); payees.reload() }} onDone={() => activity.reload()} onWalletPaid={() => activity.reload()} />
+      {/* R14: under the checkout every part takes the whole width and is composed in columns inside it (a list across the
+          width, or two halves), so no part stands beside a hole however long its neighbour's list grows */}
+      <BillsOnRecord home={home.data} payees={payees.data.payees} bills={bills.data.bills} payers={payers} uncovered={uncovered} now={now} onChanged={() => { bills.reload(); home.reload() }} />
+      <Subscriptions />
       {homeCurrency() === 'INR' ? (
       <Suspense fallback={<section className="panel ab" aria-busy="true"><p className="loading-line">Reading payees abroad…</p></section>}><PayAbroad /></Suspense>
       ) : null}
-      <div className="pay-below">
-        <BillsOnRecord home={home.data} payees={payees.data.payees} bills={bills.data.bills} payers={payers} uncovered={uncovered} now={now} onChanged={() => { bills.reload(); home.reload() }} />
-        <Subscriptions />
-        <Commerce />
-        <PaymentsSoFar actions={activity.data?.actions ?? []} disputes={activity.data?.disputes ?? []} error={activity.error} loading={!activity.data && !activity.error} />
-      </div>
+      <Commerce />
+      <PaymentsSoFar actions={activity.data?.actions ?? []} disputes={activity.data?.disputes ?? []} error={activity.error} loading={!activity.data && !activity.error} />
     </div>
   )
 }
@@ -189,6 +189,8 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
   const [pv, setPv] = useState<(PendingApproval & ActionPreview) | null>(null)
   const amountRef = useRef<HTMLDivElement>(null)
   const amountId = useId(), railId = useId()
+  // R14 layout rule L2: beside the steps the summary stays in view and ends level with them (kit.tsx useStickySide)
+  const side = useStickySide<HTMLElement>()
 
   // a bill asked for in the address ("Pay this bill" on Home, "Pay it now" below) is the one the person means to pay; both
   // links land on this payment's review (#pay-review), which on a phone sits below the whole journey
@@ -246,9 +248,14 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
   const held = o.bankHeld
   const keptBy = lq.binding ? ` by ${fmt.isoDay(lq.binding.date)}` : ''
   const w = vault?.setUp && vault.state?.provisioned ? vault.state : null
+  // a bill already counted in what is kept is paid from that money; whether the subtraction is exact before the terms (StaysFree)
+  const billKept = !!bill && !!lq.binding && istDate(bill.due_at) <= lq.binding.date
+  const staysExact = purpose === 'spend' || purpose === 'card' || purpose === 'fd' || (purpose === 'bill' && !billKept)
 
   // where the journey stands, said on its rail: each step is done when its figure is settled
-  const settled = { from: true, to: from === 'wallet' || ready, amount: from === 'wallet' || leaves > 0, route: from === 'wallet' || (!route.error && (!!terms || own)) }
+  // From the on-chain wallet the next step is one form of its own (to, how much and the limit), signed there: the rail
+  // stands at "To" and claims nothing after it (R14: it showed every step ticked and Review lit, even with no wallet set up)
+  const settled = from === 'wallet' ? { from: true, to: false, amount: false, route: false } : { from: true, to: ready, amount: leaves > 0, route: !route.error && (!!terms || own) }
   const order = ['from', 'to', 'amount', 'route', 'review'] as const
   const now_ = order.find((k) => k !== 'review' && !settled[k as keyof typeof settled]) ?? 'review'
   const [sent, setSent] = useState<string | null>(null)
@@ -299,7 +306,7 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
             {kind === 'payee' ? (adding
               ? <div className="pay-add"><div className="pay-add-head"><h4>Add a payee</h4>{payees.length ? <button type="button" className="icon-btn" aria-label="Close adding a payee" onClick={() => setAdding(false)}><X aria-hidden="true" /></button> : null}</div><AddPayee focus={payees.length > 0} rule={rule} onAdded={(id) => { onAdded(id); setAdding(false); requestAnimationFrame(() => amountRef.current?.querySelector('input')?.focus()) }} /></div>
               : <div className="pay-add-row"><Btn onClick={() => setAdding(true)}><Plus aria-hidden="true" />Add a payee</Btn>
-                <details className="pay-test"><summary>Payees that test a failure</summary>
+                <details className="disclose pay-test"><summary>Payees that test a failure</summary>
                   <dl>
                     <dt>decline@paper</dt><dd>Declined at once. The money comes straight back.</dd>
                     <dt>slow@paper</dt><dd>Stays pending for 90 seconds, then settles.</dd>
@@ -319,7 +326,6 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
           <form id="pay-form" className="pay-form" onSubmit={(e) => { e.preventDefault(); if (ready && !overOwed) void preview.run() }}>
             <ol className="pay-steps" start={3}>
               <Step n={3} id="pay-amount" title={bill ? 'How much' : <label htmlFor={amountId}>How much</label>}>
-                <div className={purpose === 'spend' ? 'pay-split' : 'pay-one'}>
                   <div className="pay-amount" ref={amountRef}>
                     {bill ? <><p className="pay-fixed-fig">{fmt.money(bill.amount, true)}</p><p className="pay-quiet">A bill is paid in full or not at all.</p></> : <>
                       <MoneyInput id={amountId} value={amount} onChange={setAmount} aria-invalid={!!f.amount || overOwed || undefined} aria-describedby={f.amount || overOwed ? `${amountId}-e ${amountId}-say` : `${amountId}-say`} />
@@ -333,11 +339,9 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
                       : <><span data-reserve="free">{fmt.money(free, true)}</span> is free to use. Up to that, nothing kept for what is due is touched.</>}</p>}
                     {bill || purpose !== 'spend' ? null : <ReserveBasis l={lq} />}
                   </div>
-                  {purpose === 'spend' ? <div className="pay-memo"><Field label="Note for your records" hint="Optional. Shown in the passbook.">{(p) => <input {...p} className="input" maxLength={80} value={memo} onChange={(e) => setMemo(e.target.value)} />}</Field></div> : null}
-                </div>
+                  {purpose === 'spend' ? <div className="form-grid fields pay-memo"><Field label="Note for your records" hint="Optional. Shown in the passbook.">{(p) => <input {...p} className="input" maxLength={80} value={memo} onChange={(e) => setMemo(e.target.value)} />}</Field></div> : null}
               </Step>
               <Step n={4} id="pay-route" title={own ? 'Send by' : <label htmlFor={railId}>Send by</label>}>
-                <div className="pay-split">
                   {own ? <p className="pay-fixed-route">Inside your bank</p> : (
                     <div className="pay-rail">
                       <select id={railId} className="input" value={rail} onChange={(e) => setRail(e.target.value)} aria-invalid={!!(f.rail || route.error) || undefined} aria-describedby={`${railId}-say`}>
@@ -352,17 +356,30 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
                     {own ? <p className="pay-quiet">A payment to your own account moves between your accounts at the bank, at once.</p>
                       : <p className="pay-quiet">QED's choice: UPI up to {fmt.money(railLimits(terms).upi)}, IMPS up to {fmt.money(railLimits(terms).imps)}, RTGS above that. NEFT goes in half-hourly batches. On paper: no real payment is made.</p>}
                   </div>
-                </div>
+              </Step>
+              {/* R14: the fifth step is in the journey, at the steps' width: the bank at true scale with this payment in
+                  it, and the subtraction. In the summary it made the card taller than a laptop's window, so the card could
+                  not stay in view (layout rule L2 unpins a summary taller than the room between the bars); the summary
+                  keeps its one figure, and the button. */}
+              <Step n={5} id="pay-free" title="Review">
+                {sent ? <p className="pay-quiet">This payment is signed. Follow it under “Your payment”; what is free now is on Home and Save.</p>
+                  : <StaysFree purpose={purpose} leaves={leaves} free={free} kept={kept} held={held} short={lq.short} keptBy={keptBy} bill={bill} billKept={billKept} qedMay={qedMay} />}
               </Step>
             </ol>
           </form>
         ) : null}
       </section>
 
-      <aside id="pay-review" className="panel pay-summary" aria-labelledby="sum-h">
+      {/* R14: where the summary cannot stand beside the steps (under 960 px), the payment still travels with them: one
+          line pinned above the bottom navigation with who and how much, which leads to the summary below. It shows
+          once there is someone or an amount to show, never an empty line over the steps. It is a way to the review,
+          never an approval: the terms are asked for and signed in the summary and its sheet. */}
+      {from === 'bank' && !sent && (recipient || leaves > 0) ? <PaymentStrip to={recipient?.name ?? null} amount={leaves} /> : null}
+
+      <aside id="pay-review" ref={side} className="panel pay-summary sticky-side" aria-labelledby="sum-h">
         {sent ? <Sent id={sent} actions={actions} now={now} paused={!!session.stop} onChanged={() => onDone(sent)} onAgain={() => { setSent(null); setAmount(null); setMemo('') }} /> : <>
           <h2 id="sum-h">{from === 'wallet' ? 'From your on-chain wallet' : 'This payment'}</h2>
-          {from === 'wallet' ? <p className="pay-quiet">The wallet pays only the payee its mandate names, up to the mandate's limits; the contract refuses anything else. Choose the payee and amount on the left.</p> : <>
+          {from === 'wallet' ? <p className="pay-quiet">The wallet pays only the payee its mandate names, up to the mandate's limits; the contract refuses anything else.{w ? ' Choose the payee and amount on the left.' : ''}</p> : <>
             <div className="ps-to">{recipient ? <><span className="avatar sm" aria-hidden="true">{initials(recipient.name)}</span><span><b>{recipient.name}</b><small>{recipient.sub}</small></span></> : <span className="pay-quiet">Choose who to pay</span>}</div>
             <p className={`ps-amount ${leaves > 0 ? '' : 'none'}`} data-resolve="">{leaves > 0 ? fmt.money(leaves, true) : fmt.money(0, true)}</p>
             <dl className="ps-lines">
@@ -370,8 +387,11 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
               <div><dt>Route</dt><dd>{route.error ? <span className="pay-err">{route.error}</span> : <>{RAIL_NAME[route.rail]}{leaves > 0 || own ? `, ${ARRIVES[route.rail].toLowerCase()}${willWait ? ' once its wait is over' : ''}` : ''}</>}</dd></div>
               {willWait ? <div className="ps-wait"><dt>Sent</dt><dd>After a wait of {rule.short}: a new payee's first day, above {fmt.money(rule.above)}</dd></div> : null}
               {charge ? <div><dt>Prepayment charge</dt><dd>{fmt.money(charge, true)} <small>(modelled)</small></dd></div> : null}
+              {/* the one figure of step 5, here beside the button: what is free, and after an amount is entered what stays free */}
+              {leaves > 0 && staysExact && freeAfter(free, kept, leaves).fromKept > 0 ? <div className="ps-over"><dt>More than is free, taken from what is kept</dt><dd>{fmt.money(freeAfter(free, kept, leaves).fromKept, true)}</dd></div> : null}
+              {leaves > 0 && staysExact ? <div className="ps-free"><dt>Stays free after it</dt><dd>{fmt.money(freeAfter(free, kept, leaves).free, true)}</dd></div>
+                : <div className="ps-free"><dt>Free to use now</dt><dd>{fmt.money(free, true)}</dd></div>}
             </dl>
-            <StaysFree purpose={purpose} leaves={leaves} free={free} kept={kept} held={held} short={lq.short} keptBy={keptBy} bill={bill} billKept={!!bill && !!lq.binding && istDate(bill.due_at) <= lq.binding.date} qedMay={qedMay} />
             <div className="pay-go">
               <Btn tone="fill" className="lg block" type="submit" form="pay-form" busy={preview.busy} disabled={!ready || overOwed}>See what this would do</Btn>
               <p className="pay-quiet">QED writes these figures into the terms. Your passkey signs them and nothing else; the payment is checked again as it is sent and kept with its receipt.</p>
@@ -385,6 +405,31 @@ function Journey({ home, payees, bills, terms, termsError, vault, actions, payer
         onApproved={async (approvalId) => { const a = await api<{ id: string }>('POST', '/api/actions', { approvalId }); setPv(null); setSent(a.id); onDone(a.id) }}>
         {pv ? <ActionDoc summary={pv.summary} lines={pv.lines} warnings={pv.warnings} worst={pv.worst} document={pv.document} /> : null}
       </ApprovalSheet>
+    </div>
+  )
+}
+
+/**
+ * The payment in one line, pinned above the bottom navigation while the summary is out of view on a screen too narrow
+ * for the summary to stand beside the steps (pay.css shows it under 960 px only). It gives way once the summary itself
+ * is on the screen. A link to the summary: it moves nothing and approves nothing.
+ */
+function PaymentStrip({ to, amount }: { to: string | null; amount: number }) {
+  const [away, setAway] = useState(true)
+  useEffect(() => {
+    const el = document.getElementById('pay-review')
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined
+    const io = new IntersectionObserver(([e]) => setAway(!e?.isIntersecting), { rootMargin: '0px 0px -120px 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return (
+    <div className="pay-strip" data-away={away}>
+      <a href="#pay-review" tabIndex={away ? 0 : -1} aria-hidden={away ? undefined : true}>
+        <span className="pay-strip-who"><small>This payment</small><b>{to ?? 'Choose who to pay'}</b></span>
+        <span className="pay-strip-fig">{fmt.money(amount, true)}</span>
+        <span className="pay-strip-go">Review<ArrowDown aria-hidden="true" /></span>
+      </a>
     </div>
   )
 }
@@ -580,7 +625,7 @@ function AddPayee({ onAdded, focus, rule }: { onAdded: (id: string) => void; foc
   const fieldErrors = !!(f.name || f.handle)
   return (
     <form className="pay-add-form" onSubmit={(e) => { e.preventDefault(); void add.run() }}>
-      <div className="pay-add-grid" ref={first}>
+      <div className="form-grid cols-3 fields pay-add-fields" ref={first}>
         <Field label="Name" error={f.name}>{(p) => <input {...p} className="input" value={name} maxLength={60} onChange={(e) => edit(setName)(e.target.value)} />}</Field>
         <Field label="Payment address" hint="Such as name@bank. QED compares it with your payees for look-alikes." error={f.handle}>{(p) => <input {...p} className="input" autoCapitalize="none" spellCheck={false} value={handle} maxLength={80} onChange={(e) => edit(setHandle)(e.target.value)} />}</Field>
         <Field label="Kind">{(p) => <select {...p} className="input" value={category} onChange={(e) => setCategory(e.target.value)}>{CATEGORIES.map((c) => <option key={c} value={c}>{cap(c)}</option>)}</select>}</Field>
@@ -600,7 +645,10 @@ function AddPayee({ onAdded, focus, rule }: { onAdded: (id: string) => void; foc
         <label className="check pay-check"><input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} /> I checked this address with the payee myself, not from a message or a call</label>
       </Note> : add.error && !fieldErrors ? <Problem error={add.error} /> : null}
       <div className="pay-add-go"><Btn type="submit" tone={asked ? undefined : 'fill'} busy={add.busy} disabled={!!asked && !checked}>{asked ? (asked.outcome === 'close' ? 'Add it with the name I gave' : 'Add it anyway') : 'Add this payee'}</Btn>
-        <p className="pay-quiet">Before a payee is saved, QED checks the name you give against the paper bank's own directory on this computer, not a real bank or NPCI. A match cannot tell who controls the account, or whether someone is pressing you to pay. {rule.off ? 'Payments to a new payee do not wait: you switched that off in Safeguards.' : `In a payee's first 24 hours, a payment that takes what you send it above ${fmt.money(rule.above)} waits ${rule.wait} before it is sent.`}</p></div>
+        <p className="pay-quiet">The name is checked before the payee is saved. A match cannot tell who controls the account.</p></div>
+      <details className="disclose pay-add-more"><summary>What the name check is, and a new payee's first day</summary>
+        <p>Before a payee is saved, QED checks the name you give against the paper bank's own directory on this computer, not a real bank or NPCI. A match cannot tell who controls the account, or whether someone is pressing you to pay. {rule.off ? 'Payments to a new payee do not wait: you switched that off in Safeguards.' : `In a payee's first 24 hours, a payment that takes what you send it above ${fmt.money(rule.above)} waits ${rule.wait} before it is sent.`}</p>
+      </details>
     </form>
   )
 }
@@ -631,7 +679,7 @@ function BillsOnRecord({ home, payees, bills, payers, uncovered, now, onChanged 
           ) })}
         </ul>
       ) : null}
-      {waiting.length === 0 ? <p className="pay-none">No bill is waiting to be paid. Put one on record and an instruction can pay it when it falls due.</p> : (
+      {waiting.length === 0 ? <EmptyState across compact icon={<CalendarClock />} title="No bill is waiting to be paid">Put one on record and an instruction can pay it when it falls due.</EmptyState> : (
         <ul className="pay-bill-list">
           {waiting.map((b) => {
             const open = uncovered.has(b.id), payer = payerOf(b)
@@ -661,7 +709,7 @@ function BillsOnRecord({ home, payees, bills, payers, uncovered, now, onChanged 
       <Problem error={removeBill.error} />
       {addingBill ? <div className="pay-add-bill"><div className="pay-add-head"><h3>Put a bill on record</h3><button type="button" className="icon-btn" aria-label="Close putting a bill on record" onClick={() => setAddingBill(false)}><X aria-hidden="true" /></button></div><AddBill payees={payees} onAdded={() => { setAddingBill(false); onChanged() }} /></div> : null}
       {settled.length ? (
-        <details className="pay-settled">
+        <details className="disclose pay-settled">
           <summary>Bills already dealt with ({settled.length})</summary>
           <ul>{settled.map((b) => <li key={b.id}><span className="what"><b>{b.payee_name}</b><small>{b.state === 'paid' ? 'Paid' : cap(b.state)}, was due {fmt.day(b.due_at)}{b.action_id ? <>. <Link to={`/record/${b.action_id}`}>See the payment</Link></> : null}</small></span><span className="amt">{fmt.money(b.amount, true)}</span></li>)}</ul>
         </details>
@@ -683,13 +731,13 @@ function AddBill({ payees, onAdded }: { payees: Payee[]; onAdded: () => void }) 
   return (
     <form className="pay-add-form" onSubmit={(e) => { e.preventDefault(); void add.run() }}>
       {payees.length === 0 ? <p className="pay-quiet">Add the payee first, in the journey above; a bill is always from one of your payees.</p> : null}
-      <div className="pay-add-grid four">
+      <div className="form-grid cols-2 fields pay-bill-fields">
         <Field label="From" error={f.payeeId}>{(p) => <select {...p} className="input" value={payeeId} onChange={(e) => setPayeeId(e.target.value)}>{payees.map((y) => <option key={y.id} value={y.id}>{y.name}</option>)}</select>}</Field>
         <Field label="Amount" error={f.amount}>{(p) => <MoneyInput {...p} value={amount} onChange={setAmount} />}</Field>
         <Field label="Due on" error={f.dueAt}>{(p) => <input {...p} className="input" type="date" min={todayIst(now)} value={date} onChange={(e) => setDate(e.target.value)} />}</Field>
         <Field label="At (India time)">{(p) => <input {...p} className="input" type="time" value={time} onChange={(e) => setTime(e.target.value)} />}</Field>
       </div>
-      <Field label="What it is for" hint="Optional.">{(p) => <input {...p} className="input" maxLength={80} value={memo} onChange={(e) => setMemo(e.target.value)} />}</Field>
+      <div className="form-grid fields"><Field label="What it is for" hint="Optional.">{(p) => <input {...p} className="input" maxLength={80} value={memo} onChange={(e) => setMemo(e.target.value)} />}</Field></div>
       {add.error && Object.keys(f).length === 0 ? <Problem error={add.error} /> : null}
       <div className="pay-add-go"><Btn tone="fill" type="submit" busy={add.busy} disabled={payees.length === 0}>Put this bill on record</Btn></div>
     </form>
@@ -703,8 +751,8 @@ function PaymentsSoFar({ actions, disputes, error, loading }: { actions: ActionV
   const byAction = new Map(disputes.map((d) => [d.action_id, d]))
   return (
     <section className="panel pay-paid" aria-labelledby="sent-h">
-      <div className="pay-sec-head"><div><h2 id="sent-h">Payments so far</h2><p>By you and by QED, newest first. Each opens its record and receipt. {REPEAT_RULE}</p></div><Link className="pay-all" to="/activity">All activity</Link></div>
-      {error ? <Problem error={error} /> : loading ? <p className="loading-line" aria-busy="true">Reading payments…</p> : payments.length === 0 ? <p className="pay-none">No payment has been made yet. The first one you send appears here, with its record and receipt.</p> : (
+      <div className="pay-sec-head"><div><h2 id="sent-h">Payments so far</h2><p>By you and by QED, newest first. Each opens its record and receipt.</p></div><Link className="pay-all" to="/activity">All activity</Link></div>
+      {error ? <Problem error={error} /> : loading ? <p className="loading-line" aria-busy="true">Reading payments…</p> : payments.length === 0 ? <EmptyState across compact icon={<ArrowUpRight />} title="No payment has been made yet">The first one you send appears here, with its record and receipt.</EmptyState> : (
         <ul className="pay-paid-list">
           {payments.map((a) => {
             const d = byAction.get(a.id)
@@ -719,6 +767,7 @@ function PaymentsSoFar({ actions, disputes, error, loading }: { actions: ActionV
           })}
         </ul>
       )}
+      <details className="disclose pay-repeat"><summary>When a payment that repeats an earlier one is held</summary><p>{REPEAT_RULE}</p></details>
     </section>
   )
 }

@@ -208,7 +208,8 @@ every step before it are settled), the steps settle one figure each. On the righ
 forms as it is chosen: who, how much, from where, the route and when it arrives, what stays free after it at true
 scale, and "See what this would do", which asks the server for the exact terms. After the passkey signs, the same card
 follows the payment: signed, sent, then settled or returned, in the record's own words, with its record and receipt
-one press away. Below: bills on record beside payments so far.
+one press away. Below: bills on record beside payments so far. (R14: step 5 is in the journey and every part
+below the checkout takes the whole width; see "R14, Spend and Save".)
 
 R12 (task comparison, gaps 4 and 11): nobody is chosen on arrival; the person chooses who to pay (a bill asked for in the
 address and a payee just added are choices already made). Adding a payee shows the paper bank's name check before it is
@@ -569,6 +570,155 @@ photographs, before and after, are in `evidence/design/r13-design/`.
   wallet's signer list, Safeguards' panels and the dock's last item.
 - **Sign-in:** the agreed composition is unchanged (checked at 320 to 1440 px in both themes); its example bar takes the
   bar family's materials through the tokens.
+
+### R14 layout rules (25 November 2026): shared causes, fixed once
+
+The owner's R14 screenshots (`docs/mandate/r14-screenshots/`) showed the same few faults on every screen. Each has one
+rule here, in a shared file, and every screen applies the rule instead of its own CSS. A screen that needs something a
+rule does not give changes the rule, here, for every screen. Before and after photographs:
+`evidence/design/r14-core/` (`node scripts/r14-core-shots.ts <label>`).
+
+**L1. The bars** (`shell.css` `.app`, `tokens.css` `--bar`, `App.tsx` `usePinnedBars`, `base.css` `html`). Two bars
+are pinned to the window: the top bar and the bottom navigation. Nothing is unreadable or unreachable under either.
+- Each bar is 97% solid on its own (`--bar`). Blur is a finish; legibility never rests on it (a browser that drew no
+  backdrop blur showed the page's words inside the bars).
+- A scrim stands behind each bar (`.app::before`, `.app::after`): the page fades as it passes under, so no line is cut
+  beside a bar or shows in the strip between a bar and the window's edge.
+- The page's foot padding is the navigation's measured height (`--bar-bottom`) and a step of air: the last control can
+  always be scrolled clear. Never a fixed number of pixels for a bar's height.
+- What takes focus, and what a `#anchor` names, is scrolled clear of both bars. The bottom navigation's height is
+  counted once, on the scroller (`html { scroll-padding-bottom }`). The top bar's is counted on the target:
+  `scroll-margin-top: calc(var(--bar-top) + var(--s4))`, which `base.css` gives every part with an `id` and every
+  control that can take focus. Never both for one edge: counted on the scroller and the target, the top bar left a
+  gap of two bars above every anchor (`#goals` landed 96 px under the bar).
+- What sticks inside the page sticks under the top bar: `top: calc(var(--bar-top) + var(--s4))`.
+- A surface that floats over the page (a chart's label, a menu) uses `--bar` or `--sheet`, not a pane.
+
+**L2. The sticky side summary** (`src/ui/sticky.ts`, `kit.tsx` `useStickySide`, `components.css` `.sticky-side`). A
+summary beside a longer column stays in view, starts level with the column's top and ends level with its foot.
+- Use: `const side = useStickySide<HTMLElement>()`, then `<aside ref={side} className="sticky-side …">`. The layout's
+  own CSS says at which width it has two columns (`position: sticky` there; `.cols > .sticky-side` has it from 960 px).
+  Nothing else: no `top`, no `max-height`, no scrolling inside the summary.
+- The hook sets `--sticky-top`. `pinned`: under the top bar, as plain sticky, when the column's foot passes the summary
+  before the page ends. `lowered`: pinned lower, a fixed place, when the page ends first. `drift`: the pin moves down
+  evenly over the whole scroll, when the window is tall and the page short. `static`: not pinned, when the summary is
+  taller than the room between the bars (so all of it can be reached).
+- The summary's column is its parent element. Put the summary and the action that belongs to it (Spend's "See what
+  this would do", set-up's "Open the household") in the one sticky element.
+
+**L3. Columns, cards and fields.**
+- *The board* (`src/ui/board.ts`, `kit.tsx` `useMasonry`, `.board`): two columns that stack independently. Two cards
+  whose feet would miss by 72 px or less are made level (the shorter is lengthened); the two columns end together when
+  they differ by 168 px or less; a last card marked `data-col="auto"` goes under the shorter column, or closes the
+  board across both when they are level. A lengthened card carries `data-fill` and a least height: content at the
+  top, its `.panel-foot` at the bottom. A board's cards are never stretched to their rows (`align-self: stretch`): a
+  card's own height must stay free to change, or one that grows later (its figures arrive, a disclosure opens) runs
+  over the next unseen. If two columns still end far apart, mark one more closing card `auto` (Home's holdings by
+  currency and "Ways to do better" are); do not add a spacer.
+- *Two columns of a page* (`.cols`, `.cols.even`): the main column and a 380 px side; one column below 960 px, in the
+  document's order.
+- *Cards in a row* share one height (a grid stretches them; never `align-items: start` on a row of tiles). A card that
+  must fill a height it did not ask for is a column (`.fills`) whose last part takes the rest.
+- *Fields in a row* (`.form-grid.cols-2`, `.form-grid.cols-3`): a row is full or the fields are one column; never a
+  last field alone under a full row. Group fields by what they are (what you have: two; what you owe: three) so each
+  row is whole. A single field in `.cols-2` keeps a field's width. Each falls to one column by its own width, so it
+  holds inside any panel.
+- *A field beside its words* (set-up's `.setup-ccy`): the control keeps a field's width; what it decides is said
+  beside it, not above it across the panel.
+- A footnote under figures has air and a hairline (`.reserve-basis`); it is never set against the cards it explains.
+
+**L4. The money field** (`kit.tsx` `MoneyInput`, `src/lib/money-entry.ts`, `components.css` `.money`). One field for
+every amount a person types. Its sign, grouping and decimal places come from the currency: the household's home
+currency, or `currency="JPY"` for an amount held in another. The value is whole minor units of that currency (yen 0
+places, Bahraini dinar 3; never times a fixed 100).
+- Never type a currency sign into CSS, a placeholder or a hint. Write a figure with `fmt.money`; a field with
+  `<MoneyInput>`.
+- An amount field that is not `MoneyInput` (text kept as typed for the server to read) must still show the currency:
+  wrap it as `<div className="money" data-sign={entryFormat(code).sign} data-sign-len={…}>`. A bare
+  `<div className="money">` means test rupees on the on-chain wallet and nothing else.
+- A screen that enlarges the field sets the wrapper's font size and `--sign-left` (Spend's `.pay-amount .money`); the
+  digits then begin after the sign whatever its length. Never a fixed `padding-left`.
+- `node scripts/r14-currency-audit.ts` reads every screen of a household in each home currency for a rupee sign it
+  should not carry (in the text and in what the stylesheet writes) and for an amount field with another sign;
+  `browser/tests/r14-layout.spec.ts` holds the same for the screens with amount fields.
+
+**L5. The balance charts** (`src/ui/chart-marks.tsx`; Home's `horizon.tsx`, Save's `score.tsx`). Nothing is written
+across the line.
+- A day money moves is a numbered ring beside its step, placed clear of the line, the other rings and the lowest
+  point (`placeMarks`); the same number names the day in the list under the chart (`ChartEvents`): the day, what
+  moved, how much, with its sign. Every day is there at every width; past eight they wait behind one disclosure.
+- A figure that belongs to the key is written in the key ("Kept for what is due: ₹1,57,548.63"), not on the plot.
+- The pointer's label stands beside the reading line, inside the plot (`tipPlace`): never over the axis figures, the
+  dates along the foot, or the day being read.
+- Colour says one thing: the lowest point. Money in is told by its plus sign and a thin green ring. The line's glow is
+  a trace. The chart keeps its keyboard reading (arrow keys on the plot) and its Statement view.
+
+**L6. Empty states** (`kit.tsx` `EmptyState`, `components.css` `.empty-state.guided`). An empty part says what it
+is, why nothing is in it yet, and the one next step: `<EmptyState icon={…} title="…" action={…} fill>…</EmptyState>`.
+Never a figure of zero alone in a tall card. With `fill`, inside a card that is a column (`.fills`), it takes the
+height the card has left and sets its words in the middle of it.
+
+### R14, Spend and Save (25 November 2026): the two screens on the layout rules
+
+The owner's screenshots 7 to 19. Before and after photographs of whole pages, each part and the states a still page
+does not show: `evidence/design/r14-spend-save/` (`node scripts/r14-spend-save-fixture.ts`, then
+`node scripts/r14-spend-save-shots.ts <label>`; measured checks: `node scripts/r14-spend-save-checks.ts`, which writes
+`checks.json`). Four throwaway households: a rupee one and a US-dollar one, each with and without data.
+
+**What is added to the shared rules** (small, and each in the shared file):
+- *Fields on one baseline, hints under their controls* (`.form-grid.fields`, with L3's `.cols-2` or `.cols-3`): every
+  label on the first line (its foot, when one wraps), every control on the second, each error and hint under its own
+  control, by `subgrid`. A hint between a label and its input pushed that input a row below its neighbours' (the
+  owner's screenshots 7 and 16). In the document the hint still precedes the control it describes
+  (`aria-describedby`). Without subgrid the fields still read in that order; only the shared lines are lost. A form
+  grid without `.fields` is unchanged (hint over the control): the grids that line controls up by their feet
+  (`align-items: end` on Earn, Protect and the wallet) would otherwise lose their line; they can take `.fields` one by
+  one.
+- *A choice inside a field* (`.seg.fill`): as tall as an input beside it, its choices sharing the width, each a 44 px
+  target. No track runs on empty past the last choice (screenshot 16).
+- *A disclosure* (`details.disclose`): long detail behind a plain first line. One look, a 44 px target, every word still
+  in the page. Used for rules and regulatory text: the first line says what a person must know before acting; the
+  disclosure holds the text in full, unchanged.
+- *The empty state across a wide panel* (`EmptyState across`, `.empty-state.guided.across`): its words on the left and
+  its next step on the right of one row, where L6's stacked form would be a short column beside an empty half
+  (screenshots 15 and 17). It stacks where its panel is narrow.
+- *The chart's rail* (`score.css` `.sc`, `score.tsx`): Save's what-if follows the chart and the instructions drawn on
+  the chart's own days, across the width, at every size, and in that order in the document. Beside the chart it stood
+  far taller than the chart and left a hole under it (screenshot 18).
+
+**Spend.** The checkout keeps its two columns from 960 px: the steps, and the summary pinned beside them (L2).
+- Every step is one column as wide as the step: a control, then what it means under it. The note for your records is
+  a field of its own under the amount, never a second column beside it (screenshot 8).
+- Step 5, Review, is in the journey: the bank at true scale with this payment in it, and the subtraction. The summary
+  keeps who, how much, the route, the one figure (free now, or what stays free after it; and, in red, what it takes
+  from money kept for what is due) and the button. With the review inside it the summary was taller than a laptop's
+  window, so L2 could not pin it.
+- Under 960 px the summary follows the steps as their last one, and the payment travels with them as one line above the
+  bottom navigation (`PaymentStrip`): who, how much, and a link to the summary. It shows once there is someone or an
+  amount to show and gives way when the summary is on the screen. It is a way to the review, never an approval: the
+  terms are asked for in the summary and signed in the sheet, and the server checks the signature and the payment.
+- From the on-chain wallet the rail stands at "To" and claims nothing after it: that step is one form of its own.
+- Under the checkout every part is the whole width and composed in columns inside it, so no part stands beside a hole
+  however long a neighbour's list grows: bills on record (a bill is one line across the width from 860 px), subscriptions
+  (what they are on the left, what was found on the right), paying abroad (who and how much beside the route and the
+  year's limit; the form to add a payee takes the width while it is open), the services (three rows: the mandate's
+  limits beside the services it names, the choice of product beside what decides, what was bought and refused), and
+  payments so far.
+
+**Save.**
+- Row one is two cards of one height: the figure with what it allows for (the change in that heading's row), and what
+  it pays for with what it does not count under it. The statement folds after five dated lines, so the two stay within
+  about 75 px of each other; the difference is shared out inside the shorter card (auto margins above the figure's two
+  lower blocks; the statement's lines a little further apart), never left as one hole (screenshot 14).
+- Balances by currency, the desk and the goal in another currency are each the whole width: the total beside the rows,
+  the desk's four fields on one line from 1000 px (two rows of two below), a goal's standing beside what is left
+  (screenshots 15 to 17).
+- The cash flow: the chart, the instructions on its days, then the what-if across the width, three columns of two
+  fields, each column one thing that could go wrong.
+- The last row is three cards on row one's two columns, ending on one line (L3, cards in a row): the most the
+  instructions could take over the floor, and what is kept and set aside beside both; its last part takes the height it
+  is given (screenshot 19).
+- Every button on Save is a 44 px target, as on Spend.
 
 ## Bounds (23 November 2026, R10): rejected by the owner on 24 November 2026 (D-108); kept as the record, not to build on
 

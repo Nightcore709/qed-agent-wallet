@@ -17,6 +17,7 @@
 import { type KeyboardEvent, type PointerEvent, type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { fmt } from '../lib/core.ts'
 import { axisTicks, compactInr, dayName, type RunwayBasis, type RunwayDay, runwayDays, runwayRows, useWidth, type WhatIfResult } from './charts.tsx'
+import { ChartEvents, chartEvents, Mark, placeMarks, tipPlace, useTipSize } from './chart-marks.tsx'
 import { Link } from './kit.tsx'
 
 /** One standing authority as a row of the score. */
@@ -54,16 +55,6 @@ function evenTicks(raw: number[]): number[] {
 }
 /** A figure as a person says it at worst: a shortfall is written as one. */
 const worded = (v: number): string => (v < 0 ? `${fmt.money(-v, true)} short` : fmt.money(v, true))
-/** What moved a day, apart from everyday spending, named the way a mark on the line is named. */
-function markOf(d: RunwayDay): { label: string; amount: number; income: boolean; whatif: boolean } | null {
-  const named = d.items.filter((i) => i.kind !== 'net')
-  if (named.length === 0) return null
-  const amount = named.reduce((s, i) => s + i.amount, 0)
-  const one = named.length === 1 ? named[0]!.label.replace(/ instalment$/, '') : null
-  const label = one === 'Salary counted on' ? 'Salary, at its latest' : one ?? (amount > 0 ? 'Money in' : named.every((i) => i.kind === 'emi') ? 'Loan instalments' : `${named.length} payments due`)
-  return { label, amount, income: amount > 0, whatif: named.some((i) => i.kind === 'whatif') }
-}
-
 export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf, asOf, title, sub, rail, foot }: {
   path: { date: string; low: number }[]; start: number; free: number; short: number; lowDate: string | null
   lanes: Lane[]; basis?: RunwayBasis
@@ -139,22 +130,10 @@ export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf,
   // marks on the line: what moved a day besides everyday spending (on the what-if's line when one is drawn)
   const markDays = wRun ?? days
   const markLow = (k: number) => (wDays ? wDays[k]!.low : shown[k]!.low)
-  const marks = markDays.flatMap((day) => { const m = markOf(day); return m ? [{ k: day.k, ...m }] : [] })
-  const placed: { k: number; x: number; y: number; text: string; income: boolean; whatif: boolean }[] = []
-  if (W >= 440) {
-    const boxes: { x0: number; x1: number; y0: number; y1: number }[] = []
-    const clear = (b: { x0: number; x1: number; y0: number; y1: number }) => b.y0 > 2 && b.y1 < H - PAD_B && boxes.every((o) => b.x1 + 8 < o.x0 || b.x0 > o.x1 + 8 || b.y1 < o.y0 || b.y0 > o.y1)
-    for (const m of [...marks].filter((mm) => mm.whatif || Math.abs(mm.amount) >= (y1 - y0) * 0.02).sort((a, b) => Number(b.whatif) - Number(a.whatif) || Math.abs(b.amount) - Math.abs(a.amount))) {
-      const text = `${m.label} ${m.income ? '+' : '−'}${fmt.money(Math.abs(m.amount), true)}`
-      const tw = text.length * 6.6 + 10
-      const x0 = cx(m.k) + 6 + tw <= W ? cx(m.k) + 6 : Math.max(2, cx(m.k) - 6 - tw)
-      for (const tier of [0, 1]) {
-        const ty = y(markLow(m.k)) + (m.income ? 24 + tier * 15 : -14 - tier * 15)
-        const b = { x0, x1: x0 + tw, y0: ty - 11, y1: ty + 4 }
-        if (clear(b)) { boxes.push(b); placed.push({ k: m.k, x: x0, y: ty, text, income: m.income, whatif: m.whatif }); break }
-      }
-    }
-  }
+  const events = useMemo(() => chartEvents(markDays), [markDays])
+  // each a numbered mark beside its step, clear of the other marks and of the lowest points; named in the list under the chart (chart-marks.tsx, R14 L5)
+  const lowDots = [...(lowBeyond ? [] : [{ x: cx(lowAt), y: y(lowV), r: 12 }]), ...(wDays && wLowAt >= 0 ? [{ x: cx(wLowAt), y: y(wDays[wLowAt]!.low), r: 12 }] : [])]
+  const placed = placeMarks(events, { x, dayW: x(1), n, lineY: (k) => y(markLow(k)), startY: y(start), W, top: 2, bottom: H - PAD_B - 2, avoid: lowDots })
   const months: { k: number; text: string }[] = []
   shown.forEach((p, k) => { if (k > 0 && p.date.endsWith('-01') && x(k) > 56 && x(k) < W - 36) months.push({ k, text: dayName(p.date).replace(/^\w+ /, '') }) })
 
@@ -182,9 +161,9 @@ export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf,
     else if (e.key === 'Home') { e.preventDefault(); setAt(0) } else if (e.key === 'End') { e.preventDefault(); setAt(n - 1) } else if (e.key === 'Escape') setAt(null)
   }
   const tipValue = wAt ? wAt.low : reading?.low ?? 0
-  const tipLeft = reading ? Math.min(Math.max(cx(reading.k), 104), W - 104) : 0
-  // the label sits above the point, or under it when the point is too near the top for the label to fit above
-  const tipBelow = y(tipValue) < 132
+  // the label stands beside the reading line, inside the plot (chart-marks.tsx tipPlace)
+  const [tipRef, tipSize] = useTipSize(`${reading?.k ?? ''}:${w ? 1 : 0}`)
+  const tip = reading ? tipPlace({ cx: cx(reading.k), cy: y(tipValue), W, bottom: H - PAD_B, w: Math.min(tipSize.w, W), h: tipSize.h }) : null
   const tipItems = (wAtItems ?? reading)?.items.filter((i) => i.kind !== 'net') ?? []
   const summary = `Bank balance at worst, day by day for ${n} days, from ${fmt.money(start, true)} today to ${worded(shown[n - 1]?.low ?? start)} on ${dayName(shown[n - 1]?.date ?? path[0]!.date)}, lowest ${worded(lowV)} on ${dayName(shown[lowAt]?.date ?? path[0]!.date)}${w && wLowV !== null ? `; with the what-if drawn over it, lowest ${worded(wLowV)} on ${dayName(wDays![wLowAt]!.date)}` : ''}. Focus here and use the arrow keys to read each day.`
 
@@ -227,17 +206,15 @@ export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf,
                       <path d={line} className="sc-glow" filter={`url(#${id}-glow)`} />
                       <path d={line} className="sc-line" />
                       {wLine ? <path d={wLine} className="sc-wline" /> : null}
-                      {marks.map((m) => <line key={m.k} className={`sc-mark ${m.whatif ? 'wif' : m.income ? 'in' : ''}`} x1={cx(m.k)} x2={cx(m.k)} y1={y(markLow(m.k)) + (m.income ? 5 : -5)} y2={y(markLow(m.k)) + (m.income ? 14 : -14)} />)}
-                      {placed.map((p) => <text key={p.k} className={`sc-mark-text ${p.whatif ? 'wif' : p.income ? 'in' : ''}`} x={p.x} y={p.y}>{p.text}</text>)}
                     </g>
-                    {zeroY !== null ? <><line className="sc-zero" x1={0} x2={W} y1={zeroY} y2={zeroY} /><text className="sc-zero-text" x={W - 4} y={zeroY - 6} textAnchor="end">Empty: ₹0</text></> : null}
+                    {zeroY !== null ? <><line className="sc-zero" x1={0} x2={W} y1={zeroY} y2={zeroY} /><text className="sc-zero-text" x={W - 4} y={zeroY - 6} textAnchor="end">Empty: {fmt.money(0)}</text></> : null}
                     {lowBeyond ? null : <g className={`sc-low ${w ? 'was' : ''}`}>
                       {w ? null : <line className="sc-low-line" x1={0} x2={W} y1={y(lowV)} y2={y(lowV)} />}
                       {w ? null : <circle className="sc-low-halo" cx={cx(lowAt)} cy={y(lowV)} r={11} />}
                       <circle className="sc-low-dot" cx={cx(lowAt)} cy={y(lowV)} r={5} />
                     </g>}
                     {wDays && wLowV !== null ? <g className="sc-wlow"><circle className="sc-wlow-halo" cx={cx(wLowAt)} cy={y(wLowV)} r={11} /><circle className="sc-wlow-dot" cx={cx(wLowAt)} cy={y(wLowV)} r={5} /></g> : null}
-                    {!w && !lowBeyond && W >= 440 && keptAll > 0 ? <text className="sc-kept-text" x={10} y={Math.min(y(lowV) - 10, (y(start) + y(lowV)) / 2 + 4)}>Kept {fmt.money(keptAll, true)}</text> : null}
+                    <g className="sc-reveal">{placed.map((m, i) => <Mark key={m.k} m={m} e={events[i]!} on={at === m.k} tickX={cx(m.k)} lineY={y(markLow(m.k))} />)}</g>
                     <text className="sc-today" x={2} y={H - 8}>Today</text>
                     {months.map((m) => <text key={m.k} className="sc-month-text" x={x(m.k) + 4} y={H - 8}>{m.text}</text>)}
                     {reading ? <g className="sc-reading">
@@ -247,8 +224,8 @@ export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf,
                     </g> : null}
                   </svg>
                 ) : null}
-                {reading ? (
-                  <div className={`sc-tip ${tipBelow ? 'below' : ''}`} style={{ left: tipLeft, top: tipBelow ? y(tipValue) + 14 : y(tipValue) - 14 }} aria-hidden="true">
+                {reading && tip ? (
+                  <div className="sc-tip cv-tip" ref={tipRef} style={{ left: tip.left, top: tip.top }} aria-hidden="true">
                     <span className="sc-tip-day">{dayName(reading.date)}</span>
                     <b className={tipValue < 0 ? 'short' : ''}>{worded(tipValue)}</b>
                     <span className="sc-tip-sub">{wAt ? `at worst if this happens; ${worded(wAt.recorded)} as recorded` : reading.k === lowAt ? 'the lowest point, at worst' : 'at worst'}</span>
@@ -267,16 +244,15 @@ export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf,
                 {wLowV !== null ? <span><i className="k-wlow" /><span>{wBeyond ? 'Lowest drawn if this happens' : 'Lowest if this happens'}: <b>{worded(wLowV)}</b>, {dayName(wDays![wLowAt]!.date)}{wBeyond && w ? <>; lower later, <b>{worded(w.low.low)}</b> on {dayName(w.low.date)}</> : null}</span></span> : null}
               </> : <>
                 <span><i className="k-line" />Balance at worst</span>
-                <span><i className="k-kept" />Kept for what is due</span>
+                <span><i className="k-kept" /><span>Kept for what is due{!lowBeyond && keptAll > 0 ? <>: <b>{fmt.money(keptAll, true)}</b></> : null}</span></span>
                 <span><i className="k-low" /><span>Lowest point: <b>{fmt.money(lowV, true)}</b>, {dayName(shown[lowAt]?.date ?? path[0]!.date)}{lowBeyond ? ' (the hardest day is later)' : ''}</span></span>
               </>}
             </div>
+            <ChartEvents events={events} at={at} onPick={setAt} id={id} />
           </>
         )}
         <p className="sc-source">From your records{asOf ? `, as of ${fmt.time(asOf)} today` : ''}: what is in your bank now, each bill and instalment QED knows of, your salary and your everyday spending figure. Today is recorded; every later day is worked out at worst, not forecast.{w ? ' The dashed line is a what-if worked out in this browser.' : ''}</p>
       </div>
-
-      {rail ? <div className="sc-rail">{rail}</div> : null}
 
       {view === 'chart' ? (
         <div className="sc-lanes">
@@ -289,6 +265,9 @@ export function Score({ path, start, free, short, lowDate, lanes, basis, whatIf,
           )}
         </div>
       ) : null}
+      {/* R14: the rail (Save's what-if) follows the chart and the instructions drawn on the chart's own days, across the
+          width, at every size: beside the chart it stood far taller than the chart and left a hole under it */}
+      {rail ? <div className="sc-rail">{rail}</div> : null}
       {foot ? <div className="sc-foot">{foot}</div> : null}
     </div>
   )

@@ -32,7 +32,7 @@ import { api, fmt, navigate, sourceName, useData, useLocation, useNow, useQuote 
 import { SOURCE } from '../lib/words.ts'
 import { ActionDoc, ApprovalSheet, type PendingApproval } from '../ui/instrument.tsx'
 import { Paise } from '../ui/charts.tsx'
-import { Basis, Btn, Field, Link, MoneyInput, Note, Problem, Stamp, StateStamp, useAction, useSession } from '../ui/kit.tsx'
+import { Basis, Btn, EmptyState, Field, Link, MoneyInput, Note, Problem, Stamp, StateStamp, useAction, useSession, useStickySide } from '../ui/kit.tsx'
 import { Skel, useHashTarget } from '../ui/page.tsx'
 import { atomsText, dailyWord, deskStatus, fromOf, isoDayOf, isUnits, MINUS, pctText, placesOf, quantityText, show, tickerOf, unitsWord } from '../ui/prices.ts'
 import { useMedia } from '../ui/viewport.ts'
@@ -120,7 +120,7 @@ function Worth({ home }: { home: Home }) {
   const fall = Math.max(0, w.holdingsValue - w.holdingsWorst)
   const n = o.holdings.length
   return (
-    <section className="panel gr-worth" aria-labelledby="pos-h">
+    <section className={`panel gr-worth${n === 0 ? ' fills' : ''}`} aria-labelledby="pos-h">
       <div className="gr-lead-head">
         <h2 id="pos-h">Your investments, worth now</h2>
         <span className="gr-asof">{n === 0 ? 'Nothing held' : `${n} holding${n === 1 ? '' : 's'}`}, at the prices of {fmt.time(o.asOf, true)}</span>
@@ -128,8 +128,17 @@ function Worth({ home }: { home: Home }) {
       <p className="gr-hero" data-resolve=""><Paise paise={o.holdingsValue} /></p>
       <p className="gr-hero-sub">
         {priced.length && paid > 0 ? <span className={`gr-chg ${gain < 0 ? 'loss' : gain > 0 ? 'gain' : ''}`}>{signedInr(gain)}<span className="gr-chg-pct"> ({signedPct(gain / paid)})</span> since bought</span> : null}
-        {n === 0 ? <span>You hold nothing that moves with a market.</span> : null}
       </p>
+      {n === 0 ? <>
+        <EmptyState compact title="You hold no investments yet" action={<><Link to="/holdings#ticket" className="btn fill">Buy or sell by hand</Link><Link to="/holdings/idea" className="btn">Test an idea first</Link></>}>
+          Whatever you buy will be listed here, with what it would fetch now. This is practice money: nothing here is real.
+        </EmptyState>
+        <dl className="gr-how" aria-label="What QED may do here">
+          <div><dt>QED alone</dt><dd>Reads prices and checks every purchase against your floor. It does not buy or sell on its own.</dd></div>
+          <div><dt>With your approval</dt><dd>Every order. You see the estimate first and approve with your passkey.</dd></div>
+          <div><dt>Refused</dt><dd>A purchase that would take your worst case below your floor, however it is asked for.</dd></div>
+        </dl>
+      </> : null}
       {w.holdingsValue > 0 ? <>
         <ValueBar now={w.holdingsValue} worst={w.holdingsWorst} paid={paid} />
         <dl className="gr-legend">
@@ -178,7 +187,7 @@ function FloorBound({ worst, fall, floor }: { worst: number; fall: number; floor
         <span className="floor" style={{ left: pc(floor) }} />
       </div>
       <div className="gr-rule-foot">
-        {at(floor) > 0.3 ? <span className="gr-rule-lab start" style={{ left: '0%' }}>{lo < 0 ? fmt.inr(lo) : '₹0'}</span> : null}
+        {at(floor) > 0.3 ? <span className="gr-rule-lab start" style={{ left: '0%' }}>{lo < 0 ? fmt.money(lo) : fmt.money(0)}</span> : null}
         <span className={`gr-rule-lab ${place(at(floor))}`} style={{ left: pc(floor) }}>Your floor</span>
       </div>
     </div>
@@ -202,9 +211,9 @@ function Floor({ home }: { home: Home }) {
       <FloorBound worst={w.gHat} fall={fall} floor={w.line} />
       {/* the subtraction as rows; the operators are said as words to a screen reader */}
       <dl className="gr-eq">
-        <div><dt><i className="gr-sw keep" aria-hidden="true" />Your worst case</dt><dd>{fmt.inr(w.gHat, true)}</dd></div>
-        <div><dt><span className="gr-op" aria-hidden="true">{MINUS}</span><span className="sr">minus </span>Your floor</dt><dd>{fmt.inr(w.line, true)}</dd></div>
-        <div className="sum"><dt><span className="gr-op" aria-hidden="true">=</span><span className="sr">equals </span>{above ? 'Above your floor' : 'Below your floor'}</dt><dd className={above ? '' : 'loss'}>{above ? '' : MINUS}{fmt.inr(Math.abs(w.cushion), true)}</dd></div>
+        <div><dt><i className="gr-sw keep" aria-hidden="true" />Your worst case</dt><dd>{fmt.money(w.gHat, true)}</dd></div>
+        <div><dt><span className="gr-op" aria-hidden="true">{MINUS}</span><span className="sr">minus </span>Your floor</dt><dd>{fmt.money(w.line, true)}</dd></div>
+        <div className="sum"><dt><span className="gr-op" aria-hidden="true">=</span><span className="sr">equals </span>{above ? 'Above your floor' : 'Below your floor'}</dt><dd className={above ? '' : 'loss'}>{above ? '' : MINUS}{fmt.money(Math.abs(w.cushion), true)}</dd></div>
       </dl>
       <p className="gr-floor-what"><b>Worst case:</b> your bank, deposits and holdings at their limits, less the card and what is due in 30 days.</p>
       {!w.valid ? <Note tone="void" title="This figure cannot be relied on right now">{w.invalidReasons.join('. ')}. While that lasts QED refuses purchases that depend on it.</Note> : null}
@@ -213,8 +222,8 @@ function Floor({ home }: { home: Home }) {
         <table className="ledger fixed gr-parts-t">
           <caption className="sr">Your worst case, part by part</caption>
           <colgroup><col /><col className="c-sum" /></colgroup>
-          <tbody>{shown.map((p) => <tr key={p.label}><th scope="row">{p.label}<span className="sub">{p.note}</span></th><td className="num">{p.amount < 0 ? `${MINUS}${fmt.inr(-p.amount, true)}` : fmt.inr(p.amount, true)}</td></tr>)}</tbody>
-          <tfoot><tr><th scope="row">Your worst case</th><td className="num">{fmt.inr(w.gHat, true)}</td></tr></tfoot>
+          <tbody>{shown.map((p) => <tr key={p.label}><th scope="row">{p.label}<span className="sub">{p.note}</span></th><td className="num">{p.amount < 0 ? `${MINUS}${fmt.money(-p.amount, true)}` : fmt.money(p.amount, true)}</td></tr>)}</tbody>
+          <tfoot><tr><th scope="row">Your worst case</th><td className="num">{fmt.money(w.gHat, true)}</td></tr></tfoot>
         </table>
         <p className="gr-parts-foot"><Link to="/safeguards#floor">The worst case, line by line, and your floor<ChevronRight aria-hidden="true" /></Link></p>
       </details>
@@ -559,7 +568,7 @@ function Ticket({ market, home, onDone, preset, onPick }: { market: Market; home
         {type !== 'market' ? <Field label={type === 'limit' ? 'My price, in rupees' : 'Sell when buyers offer this or less'} error={f.limitPrice ?? f.stopPrice}>{(p) => <input {...p} className="input" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />}</Field> : null}
         {type !== 'limit' ? <Field label="Worst price to accept" hint="Away from the best price at that moment. What cannot fill inside it is cancelled.">{(p) => <select {...p} className="input" value={slip} onChange={(e) => setSlip(Number(e.target.value))}><option value={50}>0.5%</option><option value={100}>1%</option><option value={200}>2%</option><option value={500}>5%</option></select>}</Field> : null}
       </div> : null}
-      {side === 'buy' ? <p className="small muted ticket-floor"><i className={`gr-sw ${w.cushion >= 0 ? 'room' : 'short'}`} aria-hidden="true" />{w.cushion >= 0 ? <>QED refuses a purchase that would take your worst case below your floor: {fmt.inr(w.cushion, true)} of room now. The estimate shows the room after this order.</> : <>Your worst case is {fmt.inr(-w.cushion, true)} below your floor, so QED refuses a purchase that lowers it further.</>}</p> : null}
+      {side === 'buy' ? <p className="small muted ticket-floor"><i className={`gr-sw ${w.cushion >= 0 ? 'room' : 'short'}`} aria-hidden="true" />{w.cushion >= 0 ? <>QED refuses a purchase that would take your worst case below your floor: {fmt.money(w.cushion, true)} of room now. The estimate shows the room after this order.</> : <>Your worst case is {fmt.money(-w.cushion, true)} below your floor, so QED refuses a purchase that lowers it further.</>}</p> : null}
       {preview.error && Object.keys(f).length === 0 ? <Problem error={preview.error} /> : null}
       <div className="tk-go"><Btn tone="fill" type="submit" busy={preview.busy}>See what this would do</Btn><span className="small muted">An estimate at current prices. Nothing is sent until you approve it with your passkey.</span></div>
       <dl className="tk-promise">
@@ -585,7 +594,7 @@ function Fills({ market }: { market: Market }) {
   return (
     <section className="panel gr-fills" aria-labelledby="fills-h">
       <div className="panel-head"><h2 id="fills-h">Your fills</h2><p>Orders you placed by hand, newest first</p></div>
-      {!act.data ? (act.error ? <Problem error={act.error} /> : <Skel h={64} r={14} />) : orders.length === 0 ? <p className="small muted">None yet. A filled order shows its quantity, amount, time and the book it met, here and on its record.</p> : (
+      {!act.data ? (act.error ? <Problem error={act.error} /> : <Skel h={64} r={14} />) : orders.length === 0 ? <p className="small muted">No orders yet. When you place one and it fills, its quantity, amount, time and the book it met are listed here, and on its record.</p> : (
         <ul className="tk-fill-list">{orders.map((a) => {
           const unit = a.instrument ? unitsWord(a.instrument.kind, a.instrument.baseAsset) : ''
           const filled = Number(a.result.filledQty ?? 0) > 0
@@ -625,6 +634,7 @@ function QuoteAge({ q }: { q: NonNullable<ActionPreview['quote']> }) {
 export function HoldingsScreen() {
   const presentation = !!useSession().session.presentation
   const now = useNow(1000)
+  const side = useStickySide<HTMLDivElement>()
   const { query } = useLocation()
   const home = useData<Home>('/api/home', ['action', 'nav', 'profile'])
   const market = useData<Market>('/api/market', ['provider', 'nav'])
@@ -634,7 +644,7 @@ export function HoldingsScreen() {
   // the head (title, sentence, actions) is drawn before any data arrives; only the parts that show data wait for it
   const head = (
     <header className="page-head gr-head">
-      <div><h1>Grow.<span className="dim"> What you own, and how far it could fall.</span></h1><p>Valued at what a sale would fetch now. Test an idea against doing nothing before any money moves.</p></div>
+      <div><h1>Grow.<span className="dim"> What you own, and how far it could fall.</span></h1><p>Valued at what a sale would fetch now. This is practice money, and QED never buys or sells here on its own: every order needs your approval, and none is sent that would take your worst case below your floor. Test an idea against doing nothing before any money moves.</p></div>
       <nav className="gr-acts" aria-label="Do something yourself">
         <Link to="/holdings/idea" className="btn fill"><Scale aria-hidden="true" />Test an idea</Link>
         <Link to="/holdings#ticket" className="btn"><ArrowLeftRight aria-hidden="true" />Buy or sell</Link>
@@ -683,11 +693,13 @@ export function HoldingsScreen() {
       {/* the ticket with its fills under it, beside the prices of what it can buy; in reading order the ticket, the
           fills, then the prices. The two columns end together: the fills take what height the prices leave. */}
       <div className="gr-trade">
+        <div ref={side} className="sticky-side gr-trade-side">
         <section className="panel gr-ticket" aria-labelledby="h-ticket" id="ticket">
           <div className="panel-head"><h2 id="h-ticket">Buy or sell by hand</h2><p>You see the estimate before you approve</p></div>
           <Ticket key={`${query.get('buy')}-${query.get('sell')}`} market={m} home={home.data} preset={preset} onPick={setChart} onDone={(id) => navigate(`/record/${id}`)} />
         </section>
         <Fills market={m} />
+        </div>
 
         <section className="panel gr-market" aria-labelledby="h-prices">
           <div className="panel-head"><h2 id="h-prices">Prices</h2><p>Choose a name to chart it</p></div>
@@ -749,9 +761,9 @@ export function HoldingsScreen() {
       <section className="panel gr-debts" aria-labelledby="h-debts">
         <div className="panel-head"><h2 id="h-debts">Deposits and debts</h2><p>At book value</p></div>
         <ul className="gr-debt-tiles">
-          <li className="tile"><p className="k">Credit card</p><p className="v">{fmt.inr(o.card, true)}</p><p className="s">You owe this. Interest is charged on a balance carried past its due date.</p><Link className="gr-tile-go" to="/pay?purpose=card">Pay it down<ChevronRight aria-hidden="true" /></Link></li>
-          <li className="tile"><p className="k">Loans</p><p className="v">{fmt.inr(o.loans, true)}</p><p className="s">Personal and home loans. Instalments leave your bank on their day each month.</p><Link className="gr-tile-go" to="/pay?purpose=loan:personal">Prepay<ChevronRight aria-hidden="true" /></Link></li>
-          <li className="tile"><p className="k">Fixed deposit</p><p className="v">{fmt.inr(o.deposits, true)}</p><p className="s">Broken early, the broken part earns the savings rate less one point (a modelling rule).</p><Link className="gr-tile-go" to="/pay?purpose=fd">Add to it<ChevronRight aria-hidden="true" /></Link></li>
+          <li className="tile"><p className="k">Credit card</p><p className="v">{fmt.money(o.card, true)}</p><p className="s">You owe this. Interest is charged on a balance carried past its due date.</p><Link className="gr-tile-go" to="/pay?purpose=card">Pay it down<ChevronRight aria-hidden="true" /></Link></li>
+          <li className="tile"><p className="k">Loans</p><p className="v">{fmt.money(o.loans, true)}</p><p className="s">Personal and home loans. Instalments leave your bank on their day each month.</p><Link className="gr-tile-go" to="/pay?purpose=loan:personal">Prepay<ChevronRight aria-hidden="true" /></Link></li>
+          <li className="tile"><p className="k">Fixed deposit</p><p className="v">{fmt.money(o.deposits, true)}</p><p className="s">Broken early, the broken part earns the savings rate less one point (a modelling rule).</p><Link className="gr-tile-go" to="/pay?purpose=fd">Add to it<ChevronRight aria-hidden="true" /></Link></li>
         </ul>
       </section>
 

@@ -31,10 +31,18 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - uses: foundry-rs/foundry-toolchain@v1
+        with: { version: v1.7.1 }
       - run: npm ci
       - run: forge build
       - run: npx tsc -p tsconfig.json
       - run: npm run test:ts
+      - run: npm run test:demo
+      - name: Interactive browser API-to-contract real Anvil acceptance test
+        run: |
+          set -o pipefail
+          echo "::notice::$(anvil --version | head -1)"
+          npm run test:demo:e2e 2>&1 | tee e2e.log || { grep -E "not ok|rror|assert|expected|actual|did not|failed" e2e.log | head -25 | sed "s/^/::error::/"; exit 1; }
+        env: { QED_OFFLINE: "1" }
       - name: Run the whole autonomous economy locally (deterministic offline brain, dev keys)
         run: npm run local
         env: { QED_OFFLINE: "1" }
@@ -59,7 +67,18 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@v1
       - run: npm ci
       - run: forge build
-      - run: npm run verify
+      # Every claim is re-derived in full from one public RPC. A single public endpoint can answer "not found" for an
+      # old receipt from one of its pruned or lagging nodes (seen twice on 25 Nov 2026 with publicnode, which serves the
+      # same receipts at other times), so the whole verification is retried in full against other independent public
+      # endpoints. It passes only if one endpoint confirms every claim; nothing is skipped or loosened.
+      - name: npm run verify (any one independent public RPC must confirm every claim)
+        run: |
+          for rpc in https://ethereum-sepolia-rpc.publicnode.com https://sepolia.gateway.tenderly.co https://1rpc.io/sepolia; do
+            echo "::group::verify against $rpc"
+            if RPC_URL="$rpc" npm run verify; then echo "::endgroup::"; echo "::notice title=verify::every claim confirmed by $rpc"; exit 0; fi
+            echo "::endgroup::"; echo "::warning title=verify::$rpc did not confirm every claim; trying the next endpoint"
+          done
+          echo "::error title=verify::no public endpoint confirmed every claim"; exit 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -12,11 +12,12 @@
  * Every figure and every sentence about money comes from the server, which works in integer minor units; the screen
  * only places them. Paper only: no real money moves.
  */
-import { Plus } from 'lucide-react'
-import { type FormEvent, useState } from 'react'
+import { Globe, Plus, Target } from 'lucide-react'
+import { type FormEvent, type ReactNode, useState } from 'react'
 import { api, ApiError, fmt, useData } from '../lib/core.ts'
+import { entryFormat } from '../lib/money-entry.ts'
 import { ActionDoc, ApprovalSheet } from '../ui/instrument.tsx'
-import { Btn, Field, Note, Problem, StateStamp, useAction } from '../ui/kit.tsx'
+import { Btn, EmptyState, Field, Note, Problem, StateStamp, useAction } from '../ui/kit.tsx'
 
 // ------------------------------------------------------------------------------------------------ what the server sends
 
@@ -50,6 +51,14 @@ interface AbroadView { payees: Payee[]; countries: { code: string; name: string;
 
 const KIND_WORDS: Record<string, string> = { historical: 'recorded reference', synthetic: 'synthetic reference', observation: 'reference', fixture: 'test reference' }
 const kindWords = (label: string | null): string => (label ? KIND_WORDS[label] ?? `${label} reference` : '')
+/**
+ * An amount typed as text for the server to read (it works in the currency's own minor units), with the currency's sign
+ * standing in the field as it does in MoneyInput (R14 layout rule L4): never a bare field whose currency is only in its label.
+ */
+function Amount({ currency, children }: { currency: string; children: ReactNode }) {
+  const sign = entryFormat(currency).sign
+  return <div className="money" data-sign={sign} data-sign-len={sign.length > 1 ? 'code' : 'one'} data-currency={currency}>{children}</div>
+}
 const pending = (p: Preview | null) => (p ? { approvalId: p.approvalId, docHash: p.docHash, expiresAt: p.expiresAt, requiresStepUp: true } : null)
 
 // ------------------------------------------------------------------------------------------------ balances by currency
@@ -62,14 +71,17 @@ export function ByCurrency({ variant, money }: { variant: 'home' | 'save'; money
   const own = useData<MoneyView>(money === undefined ? '/api/money' : null)
   const m = money ?? own.data
   const id = `ccy-${variant}-h`
-  if (!m) return <section data-col="2" className="panel ccy" aria-labelledby={id} aria-busy={!own.error}><div className="panel-head"><h2 id={id}>{variant === 'home' ? 'Holdings by currency' : 'Balances by currency'}</h2></div>{own.error ? <Problem error={own.error} /> : <p className="loading-line">Reading your balances…</p>}</section>
+  if (!m) return <section data-col={variant === 'home' ? 'auto' : '2'} className="panel ccy" aria-labelledby={id} aria-busy={!own.error}><div className="panel-head"><h2 id={id}>{variant === 'home' ? 'Holdings by currency' : 'Balances by currency'}</h2></div>{own.error ? <Problem error={own.error} /> : <p className="loading-line">Reading your balances…</p>}</section>
   const foreign = m.balances.filter((b) => b.currency !== 'INR')
   return (
-    <section data-col="2" className="panel ccy" aria-labelledby={id} data-testid={`by-currency-${variant}`}>
+    <section data-col={variant === 'home' ? 'auto' : '2'} className="panel ccy" aria-labelledby={id} data-testid={`by-currency-${variant}`}>
       <div className="panel-head"><h2 id={id}>{variant === 'home' ? 'Holdings by currency' : 'Balances by currency'}</h2><p>At the paper bank, each in its own currency</p></div>
+      {/* R14: where the panel is wide (Save), the total leads on the left and each currency's row runs beside it */}
+      <div className="ccy-body"><div className="ccy-lead">
       {m.total.text
         ? <p className="ccy-total"><span className="ccy-total-k">{foreign.length ? 'All of it in rupees, at the reference rates below' : 'In rupees'}</span><span className="ccy-total-v" data-testid="ccy-total">{foreign.length ? `about ${m.total.text}` : m.total.text}</span></p>
         : <Note tone="wait" title="No total in rupees">{m.total.why}</Note>}
+      </div><div className="ccy-rows">
       <ul className="ccy-list">
         {m.balances.map((b) => {
           const line = m.total.lines.find((l) => l.currency === b.currency)
@@ -84,7 +96,8 @@ export function ByCurrency({ variant, money }: { variant: 'home' | 'save'; money
         })}
       </ul>
       {foreign.length ? <p className="small muted ccy-rule">{m.total.rule}</p> : <p className="small muted ccy-rule">You hold rupees only. Change some into another currency under Save, or pay someone abroad under Spend.</p>}
-      {foreign.length ? <details className="ccy-src"><summary>Where each rate comes from</summary><ul>{m.total.lines.filter((l) => l.source).map((l) => <li key={l.currency}><b>{l.currency}</b>: {l.source}</li>)}</ul></details> : null}
+      {foreign.length ? <details className="disclose ccy-src"><summary>Where each rate comes from</summary><ul>{m.total.lines.filter((l) => l.source).map((l) => <li key={l.currency}><b>{l.currency}</b>: {l.source}</li>)}</ul></details> : null}
+      </div></div>
     </section>
   )
 }
@@ -124,25 +137,30 @@ function Convert({ m, onDone }: { m: MoneyView; onDone: () => void }) {
     <section data-col="1" className="panel fx-desk" aria-labelledby="fx-h">
       <div className="panel-head"><h2 id="fx-h">Change money between currencies</h2><p>{m.desk.name}: an executable quote for {m.desk.ttlSeconds} seconds</p></div>
       <form className="fx-form" onSubmit={submit} aria-describedby="fx-rule">
+        <div className="form-grid cols-2 fields fx-fields">
         <Field label="From">{(p) => <select {...p} className="input" value={sell} onChange={(e) => { setSell(e.target.value); if (e.target.value !== 'INR') setBuy('INR'); else if (buy === 'INR') setBuy('USD') }}>
           <option value="INR">Rupees (INR)</option>{held.map((c) => <option key={c} value={c}>{m.currencies.find((x) => x.code === c)?.name} ({c})</option>)}
         </select>}</Field>
         <Field label="Into">{(p) => <select {...p} className="input" value={target} onChange={(e) => setBuy(e.target.value)}>{buyChoices.map((c) => <option key={c.code} value={c.code}>{c.name} ({c.code})</option>)}</select>}</Field>
         <div className="field"><span className="legend" id="fx-fixed-l">The amount is what you</span>
-          <div className="seg" role="group" aria-labelledby="fx-fixed-l">
+          <div className="seg fill" role="group" aria-labelledby="fx-fixed-l">
             <button type="button" aria-pressed={fixed === 'buy'} onClick={() => setFixed('buy')}>Receive</button>
             <button type="button" aria-pressed={fixed === 'sell'} onClick={() => setFixed('sell')}>Pay</button>
           </div>
         </div>
-        <Field label={`Amount in ${amountIn}`} hint={`${amountIn} has ${unit === 0 ? 'no decimal places' : `${unit} decimal places`} (ISO 4217)`} error={quote.error?.fields.amount}>{(p) => <input {...p} className="input" inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} />}</Field>
-        <Btn tone="fill" type="submit" busy={quote.busy} disabled={!amount.trim()}>Get a quote</Btn>
+        <Field label={`Amount in ${amountIn}`} hint={`${amountIn} has ${unit === 0 ? 'no decimal places' : `${unit} decimal places`} (ISO 4217)`} error={quote.error?.fields.amount}>{(p) => <Amount currency={amountIn}><input {...p} className="input" inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} /></Amount>}</Field>
+        </div>
+        <div className="fx-go"><Btn tone="fill" type="submit" busy={quote.busy} disabled={!amount.trim()}>Get a quote</Btn>
+          <p className="small muted" id="fx-rule">Spread {(m.desk.spreadBps[target === 'INR' ? sell : target] ?? 0) / 100}% over the reference, fee {m.desk.feeText}, each shown apart.{sell === 'INR' ? ' Rupees changed count towards the Liberalised Remittance Scheme at once.' : ''}</p></div>
       </form>
       {quote.error && !quote.error.fields.amount ? <Problem error={quote.error} /> : null}
-      <p className="small muted" id="fx-rule">Spread {(m.desk.spreadBps[target === 'INR' ? sell : target] ?? 0) / 100}% over the reference, fee {m.desk.feeText}, each shown apart. {m.desk.rounding}</p>
-      <p className="small faint">{m.desk.words}</p>
-      <p className="small muted" data-testid="lrs-held-note">Liberalised Remittance Scheme: {m.lrs.heldNote}</p>
       {done ? <FillCard f={done} /> : null}
-      {m.fills.length ? <details className="fx-past"><summary>Conversions so far ({m.fills.length})</summary><ul>{m.fills.map((f) => <li key={f.fillId}><span>{f.sellText} into <b>{f.buyText}</b></span><span>at ₹{f.rate}, spread {(f.spreadBps / 100).toFixed(2)}%, fee {f.feeText}</span><span className="faint">{fmt.dayTime(f.filledAt)}</span></li>)}</ul></details> : null}
+      <details className="disclose fx-more"><summary>How the rate is rounded, the desk's spread, and what counts towards the scheme</summary>
+        <p>{m.desk.rounding}</p>
+        <p>{m.desk.words}</p>
+        <p data-testid="lrs-held-note">Liberalised Remittance Scheme: {m.lrs.heldNote}</p>
+      </details>
+      {m.fills.length ? <details className="disclose fx-past"><summary>Conversions so far ({m.fills.length})</summary><ul>{m.fills.map((f) => <li key={f.fillId}><span>{f.sellText} into <b>{f.buyText}</b></span><span>at ₹{f.rate}, spread {(f.spreadBps / 100).toFixed(2)}%, fee {f.feeText}</span><span className="faint">{fmt.dayTime(f.filledAt)}</span></li>)}</ul></details> : null}
       <ApprovalSheet approval={pending(pv)} title="Approve this conversion" action="Approve and convert" onClose={() => setPv(null)}
         onApproved={async (approvalId) => { const f = await api<Fill>('POST', '/api/fx/convert', { approvalId }); setPv(null); setDone(f); setAmount(''); onDone() }}>
         {pv ? <ActionDoc summary={pv.summary} lines={pv.lines} warnings={pv.warnings ?? []} document={pv.document} /> : null}
@@ -162,17 +180,24 @@ function FxGoals({ m, onChanged }: { m: MoneyView; onChanged: () => void }) {
   const E = (k: string) => add.error?.fields[k]
   return (
     <section data-col="2" className="panel fx-goals" aria-labelledby="fxg-h">
-      <div className="panel-head"><h2 id="fxg-h">A goal in another currency</h2><p>Counted from your balance in that currency</p></div>
-      {m.goals.length === 0 ? <p className="small muted">No goal in another currency yet. A goal in rupees is set up under Saving for a goal.</p> : (
+      {/* R14: with goals listed, the way to add another is in the heading's row (as Saving for goals has it), never a
+          button alone on a row under the list */}
+      <div className="panel-head fxg-head"><div><h2 id="fxg-h">A goal in another currency</h2><p>Counted from your balance in that currency</p></div>
+        {m.goals.length && !open ? <Btn small onClick={() => setOpen(true)}><Plus aria-hidden="true" />Add a goal in another currency</Btn> : null}</div>
+      {m.goals.length === 0 && !open ? <EmptyState across compact icon={<Target />} title="No goal in another currency yet" action={<Btn onClick={() => setOpen(true)}><Plus aria-hidden="true" />Add a goal in another currency</Btn>}>A goal in rupees is set up under Saving for a goal.</EmptyState> : m.goals.length === 0 ? null : (
         <ul className="fxg-list">
           {m.goals.map((x) => (
             <li key={x.id} className="fxg" data-currency={x.currency}>
+              <div className="fxg-lead">
               <div className="fxg-top"><b>{x.name}</b><span>{x.targetText} by {x.byText}</span></div>
               <div className="fxg-bar" aria-hidden="true"><i style={{ width: `${x.progressPermille / 10}%` }} /></div>
               <p className="fxg-fig"><b>{x.heldText}</b> held of {x.targetText} ({(x.progressPermille / 10).toFixed(1)}%){x.status === 'reached' ? '. Reached.' : x.status === 'date-passed' ? '. The date has passed.' : ''}</p>
+              <Btn small onClick={() => void remove.run(x.id)} busy={remove.busy}>Stop this goal<span className="sr">: {x.name}</span></Btn>
+              </div>
+              <div className="fxg-says">
               {x.status === 'on-the-way' ? <p className="small">{x.leftText} left: {x.perMonthText} a month over {x.monthsLeft} month{x.monthsLeft === 1 ? '' : 's'}{x.leftInRupees ? <>; about {x.leftInRupees.text} in rupees{x.perMonthInRupees ? ` (about ${x.perMonthInRupees.text} a month)` : ''} at ₹{x.leftInRupees.rate} per {x.currency}, a {kindWords(x.leftInRupees.label)} observed {x.leftInRupees.observedText}</> : null}.</p> : null}
               <p className="small faint">{x.words}</p>
-              <Btn small onClick={() => void remove.run(x.id)} busy={remove.busy}>Stop this goal</Btn>
+              </div>
             </li>
           ))}
         </ul>
@@ -180,14 +205,16 @@ function FxGoals({ m, onChanged }: { m: MoneyView; onChanged: () => void }) {
       {remove.error ? <Problem error={remove.error} /> : null}
       {open ? (
         <form className="fxg-form" onSubmit={(e) => { e.preventDefault(); void add.run() }}>
+          <div className="form-grid cols-2 fields fxg-fields">
           <Field label="What it is for" error={E('name')}>{(p) => <input {...p} className="input" value={g.name} onChange={(e) => setG({ ...g, name: e.target.value })} />}</Field>
           <Field label="Currency" error={E('currency')}>{(p) => <select {...p} className="input" value={g.currency} onChange={(e) => setG({ ...g, currency: e.target.value })}>{m.currencies.filter((c) => c.code !== 'INR').map((c) => <option key={c.code} value={c.code}>{c.name} ({c.code})</option>)}</select>}</Field>
-          <Field label={`Target in ${g.currency}`} hint={`${unit === 0 ? 'No decimal places' : `${unit} decimal places`} (ISO 4217)`} error={E('target')}>{(p) => <input {...p} className="input" inputMode="decimal" value={g.target} onChange={(e) => setG({ ...g, target: e.target.value })} />}</Field>
+          <Field label={`Target in ${g.currency}`} hint={`${unit === 0 ? 'No decimal places' : `${unit} decimal places`} (ISO 4217)`} error={E('target')}>{(p) => <Amount currency={g.currency}><input {...p} className="input" inputMode="decimal" value={g.target} onChange={(e) => setG({ ...g, target: e.target.value })} /></Amount>}</Field>
           <Field label="By" error={E('by')}>{(p) => <input {...p} className="input" type="date" value={g.by} onChange={(e) => setG({ ...g, by: e.target.value })} />}</Field>
+          </div>
           <div className="fxg-acts"><Btn tone="fill" type="submit" busy={add.busy}>Add the goal</Btn><Btn onClick={() => setOpen(false)}>Not now</Btn></div>
           {add.error && !Object.keys(add.error.fields).length ? <Problem error={add.error} /> : null}
         </form>
-      ) : <Btn onClick={() => setOpen(true)}><Plus aria-hidden="true" />Add a goal in another currency</Btn>}
+      ) : null}
     </section>
   )
 }
@@ -198,6 +225,8 @@ export function SaveInCurrencies() {
   if (!m.data) return <section className="panel ccy" aria-busy={!m.error}>{m.error ? <Problem error={m.error} /> : <p className="loading-line">Reading your balances in each currency…</p>}</section>
   return (
     <div className="ccy-save">
+      {/* R14: three parts, each the whole width and composed in columns inside, so none stands beside a hole whatever
+          the household holds: the balances, the desk's form on one line, the goal in another currency */}
       <ByCurrency variant="save" money={m.data} />
       <Convert m={m.data} onDone={() => m.reload()} />
       <FxGoals m={m.data} onChanged={() => m.reload()} />
@@ -207,7 +236,7 @@ export function SaveInCurrencies() {
 
 // ------------------------------------------------------------------------------------------------ payments abroad (Spend)
 
-function AddAbroadPayee({ v, onAdded }: { v: AbroadView; onAdded: (id: string) => void }) {
+function AddAbroadPayee({ v, onAdded, onClose }: { v: AbroadView; onAdded: (id: string) => void; onClose: () => void }) {
   const [f, setF] = useState({ name: '', country: 'US', currency: 'USD', account: '', routing: '', bank: '' })
   const scheme = v.countries.find((c) => c.code === f.country)?.scheme ?? 'iban'
   const [checked, setChecked] = useState(false)
@@ -217,17 +246,20 @@ function AddAbroadPayee({ v, onAdded }: { v: AbroadView; onAdded: (id: string) =
   const E = (k: string) => add.error?.fields[k]
   return (
     <form className="ab-add" onSubmit={(e) => { e.preventDefault(); void add.run() }} aria-label="Add a payee abroad">
+      <div className="ab-add-head"><h3>Add a payee abroad</h3><Btn small tone="quiet" onClick={onClose}>Not now</Btn></div>
+      <div className="form-grid cols-2 fields ab-add-fields">
       <Field label="Payee's name" error={E('name')}>{(p) => <input {...p} className="input" autoComplete="off" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />}</Field>
       <Field label="Country" error={E('country')}>{(p) => <select {...p} className="input" value={f.country} onChange={(e) => setF({ ...f, country: e.target.value })}>{v.countries.map((c) => <option key={c.code} value={c.code}>{c.name.replace(/^the /, '').replace(/^./, (x) => x.toUpperCase())}</option>)}</select>}</Field>
       <Field label="Currency they receive" error={E('currency')}>{(p) => <select {...p} className="input" value={f.currency} onChange={(e) => setF({ ...f, currency: e.target.value })}>{['USD', 'EUR', 'GBP', 'AED', 'SGD', 'JPY', 'BHD'].map((c) => <option key={c} value={c}>{c}</option>)}</select>}</Field>
       {scheme === 'aba' ? <Field label="Routing number" hint="Nine digits; its checksum is checked" error={E('routing')}>{(p) => <input {...p} className="input" inputMode="numeric" autoComplete="off" value={f.routing} onChange={(e) => setF({ ...f, routing: e.target.value })} />}</Field> : null}
       {scheme === 'bic-account' ? <Field label="Bank's BIC" hint="8 or 11 characters; its country is checked" error={E('bank')}>{(p) => <input {...p} className="input" autoComplete="off" value={f.bank} onChange={(e) => setF({ ...f, bank: e.target.value })} />}</Field> : null}
       <Field label={scheme === 'iban' ? 'IBAN' : 'Account number'} hint={scheme === 'iban' ? `Its check digits, country, length and layout are checked. ${v.countries.find((c) => c.code === f.country)?.ibanNote ?? ''}` : undefined} error={E('account')}>{(p) => <input {...p} className="input" autoComplete="off" value={f.account} onChange={(e) => setF({ ...f, account: e.target.value })} />}</Field>
+      </div>
       {look ? <Note tone="wait" title="This payee looks like one you already have">
         <p>{look.message}</p>
         <label className="check"><input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} /> I have checked this payee's account with them directly, and no message or call asked me to add it.</label>
       </Note> : null}
-      <Btn tone="fill" type="submit" busy={add.busy} disabled={!!look && !checked}>{look ? 'Add it, I have checked' : 'Add this payee abroad'}</Btn>
+      <div className="ab-go"><Btn tone="fill" type="submit" busy={add.busy} disabled={!!look && !checked}>{look ? 'Add it, I have checked' : 'Add this payee abroad'}</Btn></div>
       {add.error && !look && !Object.keys(add.error.fields).length ? <Problem error={add.error} /> : null}
     </form>
   )
@@ -278,7 +310,7 @@ export function PayAbroad() {
   return (
     <section className="panel ab" aria-labelledby="ab-h" id="abroad">
       <div className="panel-head"><h2 id="ab-h">Pay someone abroad</h2><p>On a paper route: the payee receives nothing real</p></div>
-      <div className="ab-grid">
+      <div className={`ab-grid ${adding ? 'adding' : ''}`}>
         <div className="ab-form">
           <fieldset className="ab-payees">
             <legend className="legend">Who</legend>
@@ -287,22 +319,25 @@ export function PayAbroad() {
                 <input type="radio" name="abroad-payee" value={p.id} checked={payeeId === p.id} onChange={() => { setPayeeId(p.id); setFrom('INR'); setPv(null); setHeld(null) }} />
                 <span><b>{p.name}</b><small>{p.countryName.replace(/^the /, '')}, {p.currency}, {p.account}</small></span>
               </label>
-            )) : <p className="small muted">No payee abroad yet.</p>}
-            {adding ? <AddAbroadPayee v={d} onAdded={(id) => { setAdding(false); setPayeeId(id); v.reload() }} /> : <Btn small onClick={() => setAdding(true)}><Plus aria-hidden="true" />Add a payee abroad</Btn>}
+            )) : adding ? null : <EmptyState across compact icon={<Globe />} title="No payee abroad yet" action={<Btn onClick={() => setAdding(true)}><Plus aria-hidden="true" />Add a payee abroad</Btn>}>Add one to see its route, its fee and its value date.</EmptyState>}
+            {adding || !d.payees.length ? null : <Btn onClick={() => setAdding(true)}><Plus aria-hidden="true" />Add a payee abroad</Btn>}
           </fieldset>
+          {adding ? <AddAbroadPayee v={d} onAdded={(id) => { setAdding(false); setPayeeId(id); v.reload() }} onClose={() => setAdding(false)} /> : null}
           {payee ? <form className="ab-pay" onSubmit={(e) => { e.preventDefault(); void prepare.run() }}>
-            <Field label={`Amount they receive, in ${payee.currency}`} hint={`${payee.currency} has ${unit === 0 ? 'no decimal places' : `${unit} decimal places`} (ISO 4217)`} error={prepare.error?.fields.amount}>{(p) => <input {...p} className="input" inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} />}</Field>
+            <div className="form-grid cols-2 fields ab-pay-fields">
+            <Field label={`Amount they receive, in ${payee.currency}`} hint={`${payee.currency} has ${unit === 0 ? 'no decimal places' : `${unit} decimal places`} (ISO 4217)`} error={prepare.error?.fields.amount}>{(p) => <Amount currency={payee.currency}><input {...p} className="input" inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} /></Amount>}</Field>
             <Field label="Purpose" hint="As the RBI text lists them">{(p) => <select {...p} className="input" value={purpose} onChange={(e) => setPurpose(e.target.value)}>
               {d.purposes.map((x) => <option key={x.id} value={x.id}>{x.words}</option>)}
               <option value="margin">Margin for trading on an overseas exchange</option>
               <option value="investment">An investment abroad</option>
             </select>}</Field>
+            </div>
             {heldIn ? <div className="field"><span className="legend" id="ab-from-l">Pay from</span>
-              <div className="seg" role="group" aria-labelledby="ab-from-l">
+              <div className="seg fill" role="group" aria-labelledby="ab-from-l">
                 <button type="button" aria-pressed={from === 'INR'} onClick={() => setFrom('INR')}>Rupees, at a quote</button>
                 <button type="button" aria-pressed={from !== 'INR'} onClick={() => setFrom(payee.currency)}>My {payee.currency} balance ({heldIn.text})</button>
               </div></div> : null}
-            <Btn tone="fill" type="submit" busy={prepare.busy} disabled={!amount.trim()}>See the quote and the route</Btn>
+            <div className="ab-go"><Btn tone="fill" type="submit" busy={prepare.busy} disabled={!amount.trim()}>See the quote and the route</Btn></div>
           </form> : null}
           {prepare.error && !prepare.error.fields.amount ? <Problem error={prepare.error} /> : null}
           {held ? <Note tone="wait" title="Held for your confirmation">
@@ -311,17 +346,23 @@ export function PayAbroad() {
           </Note> : null}
           {sent ? <PaymentCard p={sent} /> : null}
         </div>
-        <aside className="ab-facts" aria-label="The route">
+        <aside className="ab-facts" aria-label="The route, and this year's limit">
           {route ? <dl className="fx-facts">
             <div><dt>Route</dt><dd>{route.name}<small>Fee {route.feeText}; credited {route.valueDays} business day{route.valueDays === 1 ? '' : 's'} after it is sent (cut-off {route.cutoff} IST), in the {route.calendar} calendar</small></dd></div>
             <div><dt>Holidays</dt><dd>{route.calendar}<small>{route.calendarWords}</small></dd></div>
           </dl> : payee ? <Note tone="void" title="No paper route for this payee">QED has no paper route that sends {payee.currency} to {payee.countryName}. Ask for a quote to see the reason in full: nothing is rerouted.</Note> : <p className="small muted">Choose who to pay to see the route, its fee and its value date.</p>}
-          {m.data ? <p className="small">Liberalised Remittance Scheme, this financial year (since {m.data.lrs.fyStartText.replace(', 00:00 IST', '')}): <b>{m.data.lrs.usedText}</b> of {m.data.lrs.ceilingText} changed out of rupees. <span className="faint">{m.data.lrs.source}. {m.data.lrs.heldNote} {m.data.lrs.label}</span></p> : null}
-          <p className="small faint">{d.tcs.why}</p>
-          <p className="small faint">A payment to the same payee for the same amount within {d.duplicateWindowHours} hours is held until you confirm it.</p>
+          {m.data ? <div className="ab-lrs" data-testid="abroad-lrs">
+            <p className="ab-lrs-k">Liberalised Remittance Scheme, this financial year (since {m.data.lrs.fyStartText.replace(', 00:00 IST', '')})</p>
+            <p className="ab-lrs-v"><b>{m.data.lrs.usedText}</b> of {m.data.lrs.ceilingText} changed out of rupees</p>
+          </div> : null}
+          <details className="disclose ab-rules"><summary>How QED counts this, tax collected at source, and a repeated payment</summary>
+            {m.data ? <p data-testid="abroad-lrs-rule">{m.data.lrs.source}. {m.data.lrs.heldNote} {m.data.lrs.label}</p> : null}
+            <p>{d.tcs.why}</p>
+            <p>A payment to the same payee for the same amount within {d.duplicateWindowHours} hours is held until you confirm it.</p>
+          </details>
         </aside>
       </div>
-      {d.payments.length ? <details className="ab-past" open={!sent}><summary>Payments abroad ({d.payments.length})</summary><ul>{d.payments.map((p) => <li key={p.id}><StateStamp state={p.state === 'credited' ? 'done' : 'working'} recon={p.reconciliation.state} /><span><b>{p.amountText}</b> to {p.payee.name}</span><span className="faint">{p.stateWords}</span></li>)}</ul></details> : null}
+      {d.payments.length ? <details className="disclose ab-past" open={!sent}><summary>Payments abroad ({d.payments.length})</summary><ul>{d.payments.map((p) => <li key={p.id}><StateStamp state={p.state === 'credited' ? 'done' : 'working'} recon={p.reconciliation.state} /><span><b>{p.amountText}</b> to {p.payee.name}</span><span className="faint">{p.stateWords}</span></li>)}</ul></details> : null}
       <ApprovalSheet approval={pending(pv)} title="Approve this payment abroad" action="Approve and send" onClose={() => setPv(null)}
         onApproved={async (approvalId) => { const p = await api<Payment>('POST', '/api/abroad/pay', { approvalId }); setPv(null); setSent(p); setAmount(''); v.reload(); m.reload() }}>
         {pv ? <ActionDoc summary={pv.summary} lines={pv.lines} warnings={pv.warnings ?? []} document={pv.document} /> : null}

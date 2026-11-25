@@ -17,28 +17,24 @@
 .hz-grid { stroke: var(--rule); stroke-dasharray: 2 6; }
 .hz-month { stroke: var(--rule-2); stroke-dasharray: 1 4; }
 .hz-zero { stroke: var(--loss); stroke-width: 1; stroke-dasharray: 4 4; }
-.hz-fill-top { stop-color: var(--c2); stop-opacity: .26; } .hz-fill-bottom { stop-color: var(--c2); stop-opacity: 0; }
+.hz-fill-top { stop-color: var(--c2); stop-opacity: .15; } .hz-fill-bottom { stop-color: var(--c2); stop-opacity: 0; }
 .hz-hatch { stroke: var(--part-kept); stroke-width: 1.2; }
-.hz-kept { opacity: .55; }
-.hz-glow { fill: none; stroke: var(--c2); stroke-width: 6; opacity: .55; }
+.hz-kept { opacity: .42; }
+/* R14: the line's light is a trace, not a second line; colour is kept for the lowest point alone */
+.hz-glow { fill: none; stroke: var(--c2); stroke-width: 5; opacity: .22; }
 .hz-line { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
-.hz-mark { stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; }
-.hz-mark.in { stroke: var(--gain); }
-.hz-svg .hz-mark-text { fill: var(--ink-2); font-weight: 600; paint-order: stroke; stroke: var(--ground); stroke-width: 5px; stroke-linejoin: round; }
-.hz-svg .hz-mark-text.in { fill: var(--gain); }
-.hz-svg .hz-kept-text { fill: var(--ink-2); font-weight: 700; paint-order: stroke; stroke: var(--ground); stroke-width: 6px; stroke-linejoin: round; }
 .hz-low-line { stroke: var(--due); stroke-width: 1; stroke-dasharray: 2 4; opacity: .8; }
 .hz-low-halo { fill: color-mix(in oklab, var(--due-mark) 26%, transparent); animation: halo 2.6s var(--ease-move) infinite; transform-box: fill-box; transform-origin: center; }
 .hz-low-dot { fill: var(--due-mark); stroke: var(--sheet); stroke-width: 2.5; }
 @keyframes halo { 50% { transform: scale(1.35); opacity: .4; } }
-.hz-svg .hz-today { fill: var(--brand); font-weight: 700; }
+.hz-svg .hz-today { fill: var(--ink-2); font-weight: 700; }
 .hz-cursor { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
 .hz-dot { fill: var(--sheet); stroke: var(--ink); stroke-width: 2.5; }
 /* the line draws from today to the right as the chart arrives; every value is there from the first frame */
 .hz-reveal { animation: hz-draw 1100ms var(--ease-out) both; }
 @keyframes hz-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.hz-tip { position: absolute; z-index: 4; pointer-events: none; transform: translate(-50%, -100%); min-width: 176px; max-width: 280px; padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
-  background: var(--pane-3); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); font-size: var(--t-small); line-height: 1.35; display: grid; gap: 2px; }
+.hz-tip { position: absolute; z-index: 4; pointer-events: none; min-width: 176px; max-width: min(280px, 100%); padding: 10px 14px; border-radius: var(--r-sm); border: 1px solid var(--rim); box-shadow: var(--lift-3);
+  background: var(--bar); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); font-size: var(--t-small); line-height: 1.35; display: grid; gap: 2px; }
 .hz-tip-day { font-size: var(--t-micro); color: var(--ink-3); font-weight: 600; }
 .hz-tip b { font-size: var(--t-lead); font-weight: 680; letter-spacing: -.02em; font-variant-numeric: tabular-nums lining-nums; }
 .hz-tip-sub { font-size: var(--t-micro); color: var(--ink-3); }
@@ -50,7 +46,7 @@
 .hz-key span { display: inline-flex; align-items: center; gap: 6px; }
 .hz-key b { color: var(--ink-2); font-weight: 650; }
 .hz-key i { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
-.hz-key .k-line { height: 2px; background: var(--ink); box-shadow: 0 0 6px var(--c2); }
+.hz-key .k-line { height: 2px; background: var(--ink); }
 .hz-key .k-kept { background: repeating-linear-gradient(135deg, var(--part-kept) 0 1.5px, transparent 1.5px 5px); box-shadow: inset 0 0 0 1px var(--part-kept); }
 .hz-key .k-low { width: 10px; border-radius: 50%; background: var(--due-mark); }
 .hz-foot { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); font-size: var(--t-small); padding-top: var(--s3); border-top: 1px solid var(--rule); }

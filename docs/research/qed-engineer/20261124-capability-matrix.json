@@ -237,5 +237,53 @@
     "Q-047"
    ]
   }
+ ],
+ "corrections_25_nov_2026": [
+  {
+   "id": "C4",
+   "supersedes": "architecture: \"L: not built. No second currency in the books, no executable FX quote, no second rail.\"; integration: none; evidence: none; execution: none",
+   "date": "2026-11-25",
+   "by": "qed-qa-reliability (R14 register reconciliation)",
+   "code_shows": "Eight currencies are held in integer minor units with reference rates (FBIL, ECB) kept apart from paper quotes; conversions are priced with their source; payments abroad run on paper routes and unsupported routes are refused (register R13-040, Met). Still not built: executable FX quotes, a second real rail, money-model stages S5 and S8 (R10-003 Partly). So 'not built' is wrong for the books and paper conversion, and right for execution.",
+   "paths": [
+    "apps/qed-demo/server/fx.ts",
+    "apps/qed-demo/server/fx-rates.ts",
+    "apps/qed-demo/server/abroad.ts",
+    "apps/qed-demo/server/fx-goals.ts",
+    "apps/qed-demo/server/home-currency.ts",
+    "apps/qed-demo/shared/currency.ts",
+    "apps/qed-demo/server/money-api.test.ts",
+    "apps/qed-demo/server/abroad.test.ts"
+   ]
+  },
+  {
+   "id": "C7",
+   "supersedes": "architecture: \"equities and ETFs not built\"; execution: \"Equities and ETFs: none\"",
+   "date": "2026-11-25",
+   "by": "qed-qa-reliability (R14 register reconciliation)",
+   "code_shows": "A paper exchange for Nifty 50 and gold ETFs and three shares, a government-securities desk, a money-market fund and SWP exist, on synthetic labelled prices with hours, lots, costs by class and T+1 (register R13-051, Met; its desk hours and 5 bp spread NOT VERIFIED). US equities are deliberately not offered, with a reason on screen. No real broker or market data is integrated.",
+   "paths": [
+    "apps/qed-demo/server/securities.ts",
+    "apps/qed-demo/server/securities-books.ts",
+    "apps/qed-demo/server/registry.ts",
+    "apps/qed-demo/server/venues.ts",
+    "apps/qed-demo/src/screens/Desk.tsx",
+    "apps/qed-demo/server/securities.test.ts",
+    "apps/qed-demo/server/swp.test.ts"
+   ]
+  },
+  {
+   "id": "C10",
+   "supersedes": "execution: \"The chain escrow has no acceptance or dispute step (audit E3).\"",
+   "date": "2026-11-25",
+   "by": "qed-qa-reliability (R14 register reconciliation)",
+   "code_shows": "An on-chain dispute escrow now sits in front of the unmodified proof escrow: terms bound by the provider's quote, a third-household decider, deadline windows, payouts that add to the price (register R13-058, Partly: not every clause is covered or run in a browser at this revision). The original proof escrow itself still has no dispute step.",
+   "paths": [
+    "apps/qed-demo/chain/disputes/test/QEDDisputeEscrow.t.sol",
+    "apps/qed-demo/server/earn-dispute.test.ts",
+    "apps/qed-demo/browser/tests/earn-dispute.spec.ts",
+    "apps/qed-demo/server/dispute-deadlines.ts"
+   ]
+  }
  ]
 }
