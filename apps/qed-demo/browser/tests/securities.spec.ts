@@ -84,7 +84,7 @@ test('an ETF and a Treasury bill bought through their sheets, a fund for a withd
   // 1. the ETF: the sheet says whose prices these are, the costs, the hours and the settlement, before anything is signed
   let sheet = await preview(page, ETF, '10000')
   await expect(sheet.getByText('a paper exchange, on paper')).toBeVisible()
-  await expect(sheet.getByText(/Synthetic prices generated on this computer, not market data/).first()).toBeVisible()
+  await expect(sheet.getByText(/Synthetic prices generated on this QED installation, not market data/).first()).toBeVisible()
   await expect(sheet.getByText('Stamp duty', { exact: true })).toBeVisible()
   await expect(sheet.getByText('Brokerage', { exact: true })).toBeVisible()
   await expect(sheet.getByText(/Settlement is T\+1/)).toBeVisible()

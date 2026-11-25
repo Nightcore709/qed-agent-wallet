@@ -374,7 +374,7 @@ export function SecurityScreen() {
                       {s.email.verified ? null : !s.email.canVerify
                         ? <p className="sy-s wait">Not verified. This build of QED cannot send email, so verifying is unavailable here; nothing was sent to this address. Your account works without it.</p>
                         : s.email.pending
-                          ? <p className="sy-s wait">Not verified yet. {s.email.simulated ? <>Its confirmation is kept in the <a href="/dev/outbox" target="_blank" rel="noopener">simulated outbox</a> on this computer; nothing was sent.</> : 'Open the link in the message QED sent to it.'}</p>
+                          ? <p className="sy-s wait">Not verified yet. {s.email.simulated ? <>Its confirmation is kept in the <a href="/dev/outbox" target="_blank" rel="noopener">simulated outbox</a> on this QED installation; nothing was sent.</> : 'Open the link in the message QED sent to it.'}</p>
                           : <p className="sy-s wait">Not verified. Its confirmation expired or was replaced.</p>}
                     </div>
                     {!s.email.verified && s.email.canVerify ? <span className="sy-acts"><Btn small busy={resend.busy} onClick={() => void resend.run()}>{s.email.pending ? 'Send it again' : 'Send a confirmation'}</Btn></span> : null}

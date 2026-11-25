@@ -43,7 +43,7 @@ export function Directory({ onChosen }: { onChosen: () => void }) {
   const close = useAction(async (l: DListing) => { await api('POST', `/api/earn/directory/listings/${l.id}/close`); v.reload() })
   const head = (
     <div className="er-kind-head">
-      <div><h2 id="dir-h">Find work, or someone to do it</h2><p>The directory of QED households on this computer. Publish an offer of work you do, or a request for work you need; compare the quotes and choose one. The job then goes through the escrow on the chain like any other: nothing moves until the provider offers it with their passkey and the client funds it.</p></div>
+      <div><h2 id="dir-h">Find work, or someone to do it</h2><p>The directory of the QED households in this installation: the same deployment you are using, not a list from elsewhere. Publish an offer of work you do, or a request for work you need; compare the quotes and choose one. The job then goes through the escrow on the chain like any other: nothing moves until the provider offers it with their passkey and the client funds it.</p></div>
       {v.data && !publishing ? <Btn onClick={() => setPublishing(true)}><Plus aria-hidden="true" />Publish an offer or a request</Btn> : null}
     </div>
   )
@@ -160,7 +160,7 @@ function PublishForm({ hasWallet, onDone }: { hasWallet: boolean; onDone: () => 
         <Field label="Delivery within, hours" error={f.deliverWithinHours}>{(p) => <input {...p} className="input" inputMode="numeric" value={hours} onChange={(e) => setHours(e.target.value)} />}</Field>
       </div>
       {publish.error && Object.keys(f).length === 0 ? <Problem error={publish.error} /> : null}
-      <div className="er-form-go"><Btn tone="fill" type="submit" busy={publish.busy}>Publish it</Btn><p className="small faint">Every household on this computer can see it, by your handle. Publishing moves no money and signs nothing.</p></div>
+      <div className="er-form-go"><Btn tone="fill" type="submit" busy={publish.busy}>Publish it</Btn><p className="small faint">Every household in this QED installation can see it, by your handle. Publishing moves no money and signs nothing.</p></div>
     </form>
   )
 }

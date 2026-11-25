@@ -76,7 +76,7 @@ test('a pound household sets up, reads pounds, saves for a goal and pays', async
   await page.getByLabel('What it is for').fill('Holiday in March')
   await page.getByLabel('How much').fill('5000')
   await page.getByLabel('By', { exact: true }).fill(by)
-  const live = page.locator('.pr-cw-step').first().locator('.pr-cw-live')
+  const live = page.locator('aside.pr-cw-live')
   await expect(live.getByText('QED works out')).toBeVisible()
   expect((await live.locator('.pr-cw-says-big').innerText()).split('\n')[0]).toMatch(/^£[\d,]+ a month$/)
   await page.getByRole('button', { name: 'Review and sign' }).click()

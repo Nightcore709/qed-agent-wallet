@@ -71,7 +71,7 @@ describe('the advice beside the two names on the add form', () => {
     expect(nameCheckAdvice('match')).toBeNull()
     for (const o of ['close', 'no_match', 'unknown', 'no_answer'] as const) {
       const a = nameCheckAdvice(o)!
-      expect(a, o).toMatch(/It is the paper bank's own directory on this computer: no real bank or NPCI was asked, and it cannot tell who controls the account or whether someone is pressing you to pay\.$/)
+      expect(a, o).toMatch(/It is the paper bank's own directory on this QED installation: no real bank or NPCI was asked, and it cannot tell who controls the account or whether someone is pressing you to pay\.$/)
       expect(a, o).not.toMatch(/Ravi|Kumar|@/)
     }
     expect(nameCheckAdvice('close')).toMatch(/^Use its name if this is who you mean to pay; to keep yours, say you checked the address with the payee yourself\./)
@@ -83,7 +83,7 @@ describe('where the answer comes from, and what it cannot tell (R13 section 4)',
   it('every answer a payee and a payment\'s terms carry names its source, says no real bank or NPCI was asked, and says what it cannot detect', () => {
     for (const o of ['match', 'close', 'no_match', 'unknown', 'no_answer'] as const) {
       const { note } = nameCheckWords(o, 'Ravi Kumar', 'Ravi Kumar')
-      expect(note, o).toMatch(/against the paper bank's own directory on this computer; no real bank or NPCI was asked\./)
+      expect(note, o).toMatch(/against the paper bank's own directory on this QED installation; no real bank or NPCI was asked\./)
       expect(note, o).toMatch(/It can say only whether a name matches the one held for the address, not who controls the account or whether someone is pressing you to pay\.$/)
     }
     // and the add form says so for every answer but a match (where the form says it under its button)

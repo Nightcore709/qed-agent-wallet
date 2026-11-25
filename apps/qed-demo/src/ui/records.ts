@@ -19,7 +19,7 @@ export const caseOutcome = (outcome: string): [string, Tone] => CASE_OUTCOME[out
  * while it runs), simulated on a paper venue, on a throwaway chain that is gone, or nothing sent at all.
  */
 export function executionOf(venue: string): { word: string; says: string } {
-  if (venue === 'local-chain') return { word: 'Local test chain', says: 'This build, on a chain on this computer; its transactions can be re-read while it runs' }
+  if (venue === 'local-chain') return { word: 'Local test chain', says: 'This build, on a chain on this QED installation; its transactions can be re-read while it runs' }
   if (venue === 'ephemeral-chain') return { word: 'Throwaway test chain', says: 'A chain made for one test and gone since; only its record remains' }
   if (venue === 'paper') return { word: 'Paper venue', says: 'Simulated by this installation with its own books; no exchange or bank was reached' }
   return { word: 'Nothing sent', says: 'No order, payment or transaction was sent anywhere' }

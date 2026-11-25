@@ -12,7 +12,7 @@ import { ChevronRight, HandCoins, PiggyBank, Receipt, Scale, ShieldCheck, Split,
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { api, ApiError, fmt, navigate, useData, useLocation } from '../lib/core.ts'
 import { ApprovalSheet, type AuthDoc, InstrumentDoc, type PendingApproval } from '../ui/instrument.tsx'
-import { Btn, Crumb, Field, Link, Loading, MoneyInput, Note, Problem, useAction } from '../ui/kit.tsx'
+import { Btn, Crumb, Field, Link, Loading, MoneyInput, Note, Problem, useAction, useStickySide } from '../ui/kit.tsx'
 import type { Analysis, Authority, Draft, GoalsView, Home, Market, MarketInstrument, ProgramDetail, Proposal } from '../lib/types.ts'
 import { Consequences } from './Instructions.tsx'
 
@@ -66,7 +66,7 @@ function ScheduleField({ value, onChange, error, only }: { value: Sched; onChang
   return (
     <fieldset className="pr-cw-group">
       <legend>When it runs</legend>
-      <div className="pr-cw-grid">
+      <div className="form-grid cols-2 fields">
         <Field label="How often">{(p) => (
           <select {...p} className="input" value={value.type} onChange={(e) => { const t = e.target.value; onChange(t === 'every' ? { type: 'every', minutes: 30 } : t === 'daily' ? { type: 'daily', at } : t === 'weekly' ? { type: 'weekly', weekday: 1, at } : { type: 'monthly', day: 5, at }) }}>
             {offer('monthly') ? <option value="monthly">Every month</option> : null}{offer('weekly') ? <option value="weekly">Every week</option> : null}{offer('daily') ? <option value="daily">Every day</option> : null}{offer('every') ? <option value="every">Every so many minutes</option> : null}
@@ -81,20 +81,20 @@ function ScheduleField({ value, onChange, error, only }: { value: Sched; onChang
   )
 }
 
-/** One step of the guided form: its number and name, the fields, and beside them what those fields would allow. */
-function Step({ n, id, title, live, children, wide }: { n: number; id: string; title: string; live?: ReactNode; children: ReactNode; wide?: boolean }) {
+/** One step of the guided form: its number and name and its fields. What each would allow is in the summary beside the steps. */
+function Step({ n, id, title, children }: { n: number; id: string; title: string; children: ReactNode }) {
   return (
-    <section className={`pr-cw-step ${wide ? 'wide' : ''}`} aria-labelledby={id}>
+    <section className="pr-cw-step" aria-labelledby={id}>
       <div className="pr-cw-main">
         <div className="pr-cw-label"><span className="pr-cw-n" aria-hidden="true">{n}</span><h2 id={id}>{title}</h2></div>
         <div className="pr-cw-fields">{children}</div>
       </div>
-      {live === undefined ? null : <div className="pr-cw-live"><p className="pr-cw-live-h">What signing would allow<span>Worked out by QED's server as you type</span></p>{live}</div>}
     </section>
   )
 }
 
 export function ComposeScreen({ amendId }: { amendId?: string }) {
+  const side = useStickySide<HTMLElement>()
   const { query } = useLocation()
   const proposalId = query.get('proposal')
   const [kind, setKind] = useState(amendId ? '' : query.get('kind') ?? '')
@@ -207,6 +207,9 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
   const goalDay = (params.schedule as { day?: number } | undefined)?.day ?? (draft?.params.schedule as { day?: number } | undefined)?.day ?? goals.data?.defaultDay ?? 1
   const salary = goals.data?.salaryDay ?? null
   const runMode = A('runMode') as Authority['runMode'] | undefined
+  const liveDoes = draft ? <div className="pr-cw-says">{kind === 'goal' && typeof draft.params.amount === 'number' ? <><p className="pr-cw-live-k">QED works out</p><p className="pr-cw-says-big">{fmt.money(draft.params.amount)} a month<small>{draft.analysis.headline}</small></p></> : null}<p className="pr-cw-live-k">It will</p>{draft.doc.may.map((m, i) => <p key={i} className="pr-cw-may">{m}</p>)}{updating ? <p className="pr-cw-quiet">Updating…</p> : null}</div> : pending
+  const liveBound = draft ? <BoundPreview draft={draft} sellOnly={sellOnly} kind={kind} /> : pending
+  const liveMode = runMode ? <div className="pr-cw-says"><p className="pr-cw-live-k">Each run</p><p>{MODE_MEANS[runMode]}</p>{draft ? <FirstRun analysis={draft.analysis} /> : null}</div> : <p className="pr-cw-quiet">Choose how it acts. Until you choose, nothing is assumed.</p>
 
   return (
     <div className="pr pr-cw">
@@ -214,20 +217,21 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
         <div>
           <Crumb to={amendId ? `/instructions/${amendId}` : '/instructions'}>{amendId ? 'The instruction' : 'Instructions'}</Crumb>
           <h1>{amendId ? 'Amend the instruction' : 'Write an instruction'}</h1>
-          <p>{amendId ? 'An amendment is a new version. The version in force keeps running until you sign this one.' : 'Four steps. Beside each, what it would allow, worked out from your records as you type. Nothing can act until you sign it.'}</p>
+          <p>{amendId ? 'An amendment is a new version. The version in force keeps running until you sign this one.' : 'Four steps. Beside them, what signing would allow, worked out from your records as you type. Nothing can act until you sign it.'}</p>
         </div>
         {!amendId && !proposalId ? <Btn tone="quiet" onClick={() => { setKind(''); setDraft(null); navigate('/instructions/new', true) }}>Choose another kind</Btn> : null}
       </header>
 
       <form id="compose-form" className="panel pr-cw-form" onSubmit={(e) => { e.preventDefault(); void sign.run() }}>
-        <Step n={1} id="does-h" title={kind === 'goal' ? 'What you are saving for' : 'What it does'} live={draft ? <div className="pr-cw-says">{kind === 'goal' && typeof draft.params.amount === 'number' ? <><p className="pr-cw-live-k">QED works out</p><p className="pr-cw-says-big">{fmt.money(draft.params.amount)} a month<small>{draft.analysis.headline}</small></p></> : null}<p className="pr-cw-live-k">It will</p>{draft.doc.may.map((m, i) => <p key={i} className="pr-cw-may">{m}</p>)}{updating ? <p className="pr-cw-quiet">Updating…</p> : null}</div> : pending}>
+        <div className="pr-cw-steps">
+        <Step n={1} id="does-h" title={kind === 'goal' ? 'What you are saving for' : 'What it does'}>
           {kind === 'goal' ? <>
             <Field label="What it is for" hint="A few words, such as a holiday in March" error={E('name')}>{(p) => <input {...p} className="input" maxLength={60} autoComplete="off" value={String(params.name ?? '')} onChange={(e) => set('name', e.target.value)} />}</Field>
-            <div className="pr-cw-grid">
+            <div className="form-grid cols-2 fields">
               {moneyField('target', 'How much')}
               <Field label="By" hint={goals.data ? `A date up to ${fmt.isoDay(goals.data.latest)}` : undefined} error={E('date')}>{(p) => <input {...p} className="input" type="date" min={istDate(Date.now() + DAY)} max={goals.data?.latest} value={String(params.date ?? '')} onChange={(e) => set('date', e.target.value)} />}</Field>
             </div>
-            <div className="pr-cw-grid">
+            <div className="form-grid cols-2 fields">
               <Field label="Set aside on day" hint={salary ? `Of each month: the ${ordinal(salary >= 28 ? 1 : salary + 1)}, the day after your salary arrives on the ${ordinal(salary)}, unless you choose another.` : 'Of each month, 1 to 28. No salary is on record, so the 1st unless you choose another.'} error={E('schedule')}>{(p) => <select {...p} className="input" value={goalDay} onChange={(e) => set('schedule', { type: 'monthly', day: Number(e.target.value), at: '10:00' })}>{Array.from({ length: 28 }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}</select>}</Field>
               <Field label="Growth to count" hint="None unless you name a rate. Money set aside here earns no interest on paper: a rate you name is your assumption, counted only in whether it is on track." error={E('growthBps')}>{(p) => <select {...p} className="input" value={Number(params.growthBps ?? 0)} onChange={(e) => set('growthBps', Number(e.target.value))}>{GROWTH.map((g) => <option key={g} value={g}>{g === 0 ? 'None' : `${g / 100}% a year, as I assume`}</option>)}</select>}</Field>
             </div></> : null}
@@ -247,19 +251,19 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
             <ScheduleField only={['monthly', 'weekly']} value={params.schedule as Sched} onChange={(s) => set('schedule', s)} error={E('schedule')} /></> : null}
           {kind === 'sweep' ? <>
             <Field label="Park spare cash in" hint="Liquid, overnight and arbitrage funds only." error={E('instrumentId')}>{(p) => <InstrumentSelect {...p} market={market.data!} only={(i) => ['liquid', 'overnight', 'arbitrage'].includes(String(i.meta.category))} value={String(params.instrumentId ?? '')} onChange={(v) => set('instrumentId', v)} />}</Field>
-            <div className="pr-cw-grid">{moneyField('keep', 'Always keep in the bank')}{moneyField('minMove', 'Only move when at least this much is spare')}</div>
+            <div className="form-grid cols-2 fields">{moneyField('keep', 'Always keep in the bank')}{moneyField('minMove', 'Only move when at least this much is spare')}</div>
             <label className="check"><input type="checkbox" checked={params.topUp !== false} onChange={(e) => set('topUp', e.target.checked)} /> Bring money back from the fund when the bank falls below the buffer</label>
             <ScheduleField value={params.schedule as Sched} onChange={(s) => set('schedule', s)} error={E('schedule')} /></> : null}
           {kind === 'paydown' ? <>
             <p className="pr-cw-quiet">Whole rupees. QED runs this only if two independent checkers find it never leaves you worse off in the scenarios it lists.</p>
-            <div className="pr-cw-grid">{[['card', 'To your credit card'], ['personal_loan', 'To your personal loan'], ['home_loan', 'To your home loan'], ['fd', 'Into a fixed deposit'], ['liquid_fund', 'Into a liquid fund']].map(([k, label]) => (
+            <div className="form-grid cols-2 fields">{[['card', 'To your credit card'], ['personal_loan', 'To your personal loan'], ['home_loan', 'To your home loan'], ['fd', 'Into a fixed deposit'], ['liquid_fund', 'Into a liquid fund']].map(([k, label]) => (
               <Field key={k} label={label!} error={E(`plan.${k}`)}>{(p) => <MoneyInput {...p} value={(plan[k!] ?? 0) * 100} onChange={(v) => set('plan', { ...plan, [k!]: Math.round((v ?? 0) / 100) })} />}</Field>))}</div>
             {E('plan') ? <span className="err">{E('plan')}</span> : null}</> : null}
           {kind === 'bills' ? <>
             <fieldset className="pr-cw-group"><legend>Pay bills from</legend>
               {!payees.data ? <Loading /> : payees.data.payees.length === 0 ? <p className="pr-cw-quiet">You have no payees yet. <Link to="/pay">Add one on the Spend page</Link>, then come back.</p> : <div className="choice pr-cw-payees">{payees.data.payees.map((y) => <label key={y.id}><input type="checkbox" checked={handles.includes(y.handle)} onChange={(e) => set('payeeHandles', e.target.checked ? [...handles, y.handle] : handles.filter((h) => h !== y.handle))} /><b>{y.name}</b><small>{y.handle}</small></label>)}</div>}
               {E('payeeHandles') ? <span className="err">{E('payeeHandles')}</span> : null}</fieldset>
-            <div className="pr-cw-grid">{moneyField('capPerBill', 'Never pay a single bill above')}
+            <div className="form-grid cols-2 fields">{moneyField('capPerBill', 'Never pay a single bill above')}
               <Field label="Pay it">{(p) => <select {...p} className="input" value={Number(params.leadMinutes ?? 0)} onChange={(e) => set('leadMinutes', Number(e.target.value))}><option value={0}>At the due time</option><option value={60}>An hour before</option><option value={1440}>A day before</option></select>}</Field></div></> : null}
           {kind === 'exit' ? <>
             <Field label="Sell" hint={held.size ? undefined : 'You hold nothing yet; it can be signed once you do.'} error={E('instrumentId')}>{(p) => <InstrumentSelect {...p} market={market.data!} only={(i) => held.size === 0 || held.has(i.id)} value={String(params.instrumentId ?? '')} onChange={(v) => set('instrumentId', v)} />}</Field>
@@ -267,7 +271,7 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
               <label><input type="radio" name="mode" checked={params.mode === 'trail'} onChange={() => setParams((s) => ({ ...s, mode: 'trail', trailPct: s.trailPct ?? 5 }))} /><b>When it falls a set percentage from its highest price</b><small>The level follows the price up and never comes down.</small></label>
               <label><input type="radio" name="mode" checked={params.mode === 'below'} onChange={() => setParams((s) => ({ ...s, mode: 'below', price: s.price ?? inst?.quotes.bid?.price ?? inst?.quotes.nav?.price ?? '' }))} /><b>When it reaches a price you name</b><small>A fixed level.</small></label>
             </div>
-            <div className="pr-cw-grid">
+            <div className="form-grid cols-2 fields">
               {params.mode === 'trail' ? <Field label="Fall from the high, in percent" error={E('trailPct')}>{(p) => <input {...p} className="input" type="number" step="0.5" min={0.1} max={80} value={Number(params.trailPct ?? 5)} onChange={(e) => set('trailPct', Number(e.target.value))} />}</Field>
                 : <Field label="Sell at or below" hint={inst?.quotes.bid ? `Buyers offer ${fmt.price(inst.quotes.bid.price)} now.` : undefined} error={E('price')}>{(p) => <input {...p} className="input" inputMode="decimal" value={String(params.price ?? '')} onChange={(e) => set('price', e.target.value.replace(/[,\s]/g, ''))} />}</Field>}
               <Field label="How much of it">{(p) => <select {...p} className="input" value={Number(params.sellBps ?? 10_000)} onChange={(e) => set('sellBps', Number(e.target.value))}><option value={10_000}>All of it</option><option value={5000}>Half</option><option value={2500}>A quarter</option></select>}</Field></div></> : null}
@@ -292,19 +296,19 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
             {moneyField('minIncome', 'Only split income of at least')}</> : null}
         </Step>
 
-        <Step n={2} id="limits-h" title="Its bound" live={draft ? <BoundPreview draft={draft} sellOnly={sellOnly} kind={kind} /> : pending}>
+        <Step n={2} id="limits-h" title="Its bound">
           {kind === 'goal' ? <p className="pr-cw-quiet">Its bound is the goal itself: {draft ? <>at most <strong>{fmt.money(draft.authority.maxPerRun)}</strong> in one run and in one month, until the end of {fmt.isoDay(String(draft.params.date))}</> : 'its monthly figure, once a month, until the end of its date'}. Each contribution goes only into the goal's set-aside, and no instruction can spend what is there; only you can release it, with your passkey.</p> : null}
-          {kind !== 'goal' && !sellOnly ? <div className="pr-cw-grid">
+          {kind !== 'goal' && !sellOnly ? <div className="form-grid cols-2 fields">
             <Field label="Most in one run" error={E('maxPerRun')}>{(p) => <MoneyInput {...p} value={A('maxPerRun') ?? null} onChange={(v) => setA({ maxPerRun: v ?? 0 })} />}</Field>
             <Field label="Most in one month" error={E('maxPerMonth')}>{(p) => <MoneyInput {...p} value={A('maxPerMonth') ?? null} onChange={(v) => setA({ maxPerMonth: v ?? 0 })} />}</Field>
           </div> : sellOnly ? <p className="pr-cw-quiet">This instruction only sells, so it has no spending limits. It can never buy or pay.</p> : null}
-          {kind !== 'goal' ? <div className="pr-cw-grid">
+          {kind !== 'goal' ? <div className="form-grid cols-2 fields">
             <Field label="Authority ends on" hint="It always ends. At most 400 days from now." error={E('expiresAt')}>{(p) => <input {...p} className="input" type="date" value={A('expiresAt') ? istDate(A('expiresAt')) : ''} min={istDate(Date.now() + DAY)} onChange={(e) => { if (e.target.value) setA({ expiresAt: endOfDayIst(e.target.value) }) }} />}</Field>
             {inst?.kind === 'crypto_spot' || kind === 'floor' ? <Field label="Worst price it may accept" hint="Away from the best price on the book at that moment.">{(p) => <select {...p} className="input" value={A('maxSlippageBps') ?? 100} onChange={(e) => setA({ maxSlippageBps: Number(e.target.value) })}><option value={50}>0.5%</option><option value={100}>1%</option><option value={200}>2%</option><option value={500}>5%</option></select>}</Field> : null}
           </div> : null}
         </Step>
 
-        <Step n={3} id="mode-h" title="How it acts" live={runMode ? <div className="pr-cw-says"><p className="pr-cw-live-k">Each run</p><p>{MODE_MEANS[runMode]}</p>{draft ? <FirstRun analysis={draft.analysis} /> : null}</div> : <p className="pr-cw-quiet">Choose how it acts. Until you choose, nothing is assumed.</p>}>
+        <Step n={3} id="mode-h" title="How it acts">
           <div className="choice pr-cw-modes" role="radiogroup" aria-labelledby="mode-h">
             <label><input type="radio" name="runMode" checked={runMode === 'approve'} onChange={() => setA({ runMode: 'approve' })} /><b>Ask me each time</b><small>It prepares each run and does nothing until you approve that run. Unanswered requests lapse after 24 hours.</small></label>
             <label><input type="radio" name="runMode" checked={runMode === 'notify'} onChange={() => setA({ runMode: 'notify', noticeSec: auth.noticeSec ?? 86_400 })} /><b>Tell me first, then run unless I object</b><small>You get notice before every run and can stop that run.</small></label>
@@ -314,9 +318,19 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
           {runMode === 'notify' ? <div className="pr-cw-notice"><Field label="Notice before each run" hint="Indian mandate rules require 24 hours. Shorter is a paper setting for trying it out.">{(p) => <select {...p} className="input" value={A('noticeSec') ?? 86_400} onChange={(e) => setA({ noticeSec: Number(e.target.value) })}><option value={86_400}>24 hours</option><option value={3600}>1 hour</option><option value={600}>10 minutes</option><option value={60}>1 minute</option></select>}</Field></div> : null}
         </Step>
 
-        <Step n={4} id="follows-h" title="What follows, and signing" wide>
+        </div>
+        <aside ref={side} className="sticky-side pr-cw-live" aria-labelledby="live-h">
+          <p className="pr-cw-live-h" id="live-h">What signing would allow<span>Worked out by QED's server as you type. Nothing here acts until you sign.</span></p>
+          <section className="pr-cw-live-part" aria-labelledby="live-1"><h3 id="live-1"><i aria-hidden="true">1</i>What it does</h3>{liveDoes}</section>
+          <section className="pr-cw-live-part" aria-labelledby="live-2"><h3 id="live-2"><i aria-hidden="true">2</i>Its bound</h3>{liveBound}</section>
+          <section className="pr-cw-live-part" aria-labelledby="live-3"><h3 id="live-3"><i aria-hidden="true">3</i>How it acts</h3>{liveMode}</section>
+          <p className="pr-cw-live-ui">What needs your approval: signing this document, with your passkey. {runMode === 'approve' ? 'Then each run, too.' : runMode === 'notify' ? 'Then you may stop any run after its notice.' : runMode === 'auto' ? 'After that, runs inside the limits need none.' : ''} This panel is only a reading of the terms; QED's server enforces them.</p>
+        </aside>
+        <div className="pr-cw-steps pr-cw-last">
+        <Step n={4} id="follows-h" title="What follows, and signing">
           {draft ? <Consequences analysis={draft.analysis} heading={false} /> : pending}
           {draft ? <details className="pr-cw-doc"><summary><span>The document you would sign</span><small>Every clause as it stands now, word for word. The same document is shown again when you sign.</small></summary><InstrumentDoc doc={draft.doc} state="draft" /></details> : null}
+          {draft ? <NextSummary draft={draft} runMode={runMode} sellOnly={sellOnly} /> : null}
           <div className="pr-cw-sign">
             {allows ? <p className="pr-cw-allows" aria-live="polite">{allows}</p> : null}
             {refused ? <p className="pr-cw-refused">It cannot be signed as it stands. The reasons are listed above.</p> : null}
@@ -333,6 +347,7 @@ export function ComposeScreen({ amendId }: { amendId?: string }) {
             <p className="pr-cw-quiet">Nothing is saved, and nothing can act, until your passkey signs the document. A draft is kept unsigned until you sign it or discard it.</p>
           </div>
         </Step>
+        </div>
       </form>
 
       <ApprovalSheet approval={approval} title="Sign this instruction" action="Sign and put in force" onClose={() => { const id = approval?.programId; setApproval(null); if (id) navigate(`/instructions/${id}`) }}
@@ -374,6 +389,28 @@ function BoundPreview({ draft, sellOnly, kind }: { draft: Draft; sellOnly: boole
   )
 }
 const MINUS = '−'
+
+/** Before "Review and sign": what happens next, from the terms the server worked out. UX only: signing itself needs your passkey. */
+function NextSummary({ draft, runMode, sellOnly }: { draft: Draft; runMode: Authority['runMode'] | undefined; sellOnly: boolean }) {
+  const a = draft.authority, all = draft.doc.ceilingPaise
+  const first = draft.analysis.figures.find((x) => /^First run|^Next run/.test(x.label))
+  const rows: [string, ReactNode][] = [
+    ['Now', 'Nothing has been saved and nothing can act. "Review and sign" shows you the exact document first.'],
+    ['You sign', 'Your passkey signs that document. Only then is the instruction in force.'],
+    ...(first ? [[first.label, first.value] as [string, ReactNode]] : []),
+    ['Each run', runMode ? MODE_MEANS[runMode] : 'You have not chosen how it acts yet (step 3).'],
+    ['Limits', sellOnly || typeof all !== 'number' ? 'It only sells. It never buys and never pays anyone.' : <>At most {fmt.money(a.maxPerRun)} in one run, {fmt.money(a.maxPerMonth)} in one month and {fmt.money(all)} in all.</>],
+    ['It ends', fmt.dayYear(a.expiresAt)],
+    ['You can', 'Pause or revoke it at any time from its page. A draft is kept unsigned until you sign or discard it.'],
+  ]
+  return (
+    <section className="pr-cw-next" aria-labelledby="next-h">
+      <h3 id="next-h">What happens next</h3>
+      <dl>{rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+      <p className="pr-cw-quiet">As QED's server worked it out just now. The confirmation here is only a reading of the terms; the server enforces them and the signature is your passkey's.</p>
+    </section>
+  )
+}
 
 /** When the first run would be, if the server's figures say. */
 function FirstRun({ analysis }: { analysis: Analysis }) {

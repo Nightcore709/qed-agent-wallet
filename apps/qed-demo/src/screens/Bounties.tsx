@@ -4,7 +4,7 @@
  *
  *   - what the two bounties state: each one's theorem, what refutes it, its limits and whom it pays, exactly as the
  *     server serves them from the release's contracts and record (server/bounties.ts), never retyped here;
- *   - what this build runs on a test chain on this computer: the same two contracts, unmodified, judge each claim
+ *   - what this build runs on a test chain on this QED installation: the same two contracts, unmodified, judge each claim
  *     behind a board that pays only the committed finder (chain/rail/bounties.ts, QEDBountyBoard); a household checks
  *     a claim with the judge (nothing recorded or sent), commits it, reveals it after the delay, waits out the
  *     contest and settles; each claim's state is said in the shared status words where they apply (M12);
@@ -28,7 +28,7 @@ import { Btn, Crumb, Field, Link, Loading, Note, Problem, Stamp, useAction } fro
 export interface Tx { step: string; title: string; by: string; from: string; hash: string; block: string; at: string; status: string; gasUsed: string; error?: { name: string; args: string[] } }
 /** One of the two original bounties as stated and recorded (server/bounties.ts `originalBounties`). */
 export interface Original { key: string; name: string; network: string; address: string; verifier?: string; token: string; theorem: string; invites: string; test: string; limits: string[]; pays: string; funded: Tx & { amount: string; amountText: string }; deployed: Tx; attempts: Tx[]; status: string }
-/** A bounty on this computer's board (chain/rail/bounties.ts `board`). */
+/** A bounty on this QED installation's board (chain/rail/bounties.ts `board`). */
 export interface LocalBounty { id: string; key: string; kind: 'optimality' | 'maximality'; role: 'original' | 'positive-control'; judge: string; title: string; phase: 'none' | 'open' | 'contest' | 'settleable' | 'settled'; pool: string; poolText: string; paid: string; winner: string | null; recipient: string | null; contestEndsAt: number | null; periods: { revealDelaySeconds: number; revealWindowSeconds: number; contestSeconds: number }; selector: string }
 export type ClaimState = 'committing' | 'committed' | 'revealable' | 'leading' | 'overtaken' | 'won' | 'lost' | 'expired' | 'too-late'
 /** One of this household's claims, its state read from the chain (chain/rail/bounties.ts `claims`). The salt is never sent. */
@@ -37,7 +37,7 @@ export interface Recipients { reserve: string; ownerAccount: string | null }
 /** The vault service's part: the board and this household's claims, or (`available: false`) why not, with its code. */
 export interface Local { available: boolean; code?: string; reason?: string | null; status?: string; auto?: boolean; board?: string | null; chainId?: number; token?: string; domain?: { name: string; version: string; chainId: number; verifyingContract: string; separator: string }; claimType?: string; deployBlock?: string; artifact?: { bytecodeSha256: string; sourceSha256: string }; bounties?: LocalBounty[]; claimant?: string | null; recipients?: Recipients; claims?: Claim[] }
 export interface View { originals: Original[]; local: Local; howItPays: string; scope: string }
-/** The judge's ruling on a claim, asked on this computer's chain; nothing recorded or sent. */
+/** The judge's ruling on a claim, asked on this QED installation's chain; nothing recorded or sent. */
 export interface CheckResult { bountyId: string; key: string; role: string; valid: boolean; claimHash: string; claimBytes: number; error?: { name: string; args: string[]; words: string }; words: string }
 type Tone = 'ok' | 'wait' | 'void' | 'plain' | 'info' | undefined
 interface Ctx { now: number; auto: boolean; recipients: Recipients | null }
@@ -116,7 +116,7 @@ export function claimWords(c: Claim, b: LocalBounty | undefined, x: Ctx): { stag
       }
     }
     case 'overtaken': return { stage: 'Overtaken', word: 'Overtaken', tone: 'plain', act: null, say: 'An older commitment was revealed during the contest and took over. This claim will not be paid.', next: 'Nothing to do: only the oldest valid commitment is paid.' }
-    case 'won': return { stage: 'Won', word: 'Completed', tone: 'ok', act: null, say: `${c.paidText ?? tusd(c.paid)} paid to ${toWhom(c)}.`, next: `Nothing to do. It is in ${toWhom(c)} on this computer's chain, in test dollars with no value.` }
+    case 'won': return { stage: 'Won', word: 'Completed', tone: 'ok', act: null, say: `${c.paidText ?? tusd(c.paid)} paid to ${toWhom(c)}.`, next: `Nothing to do. It is in ${toWhom(c)} on this QED installation's chain, in test dollars with no value.` }
     case 'lost': return { stage: 'Lost', word: 'Lost', tone: 'plain', act: null, say: 'It was revealed, but an older commitment won the contest; the pool went to its recipient.', next: 'Nothing to do: only the oldest valid commitment is paid.' }
     case 'expired': return {
       stage: 'Lapsed', word: 'Expired', tone: 'plain', act: null,
@@ -149,7 +149,7 @@ export function steps(c: Claim, b: LocalBounty | undefined, now: number): { key:
   ]
 }
 
-/** A bounty's phase on this computer's board, and whether it takes a claim now. */
+/** A bounty's phase on this QED installation's board, and whether it takes a claim now. */
 export function phaseWords(b: LocalBounty, x: Ctx): { word: string; tone: Tone; say: string; open: boolean } {
   switch (b.phase) {
     case 'open': return { word: 'Open', tone: 'ok', open: true, say: `Open for claims: ${b.poolText} in the pool.` }
@@ -195,7 +195,7 @@ export function unavailableWords(l: { code?: string; reason?: string | null }): 
     case 'bounties_unavailable': return { title: 'The bounty board is not on this chain', say: reason || 'The vault service could not set it up.', next: `${stands} Its records say why.`, retry: true }
     case 'rail_starting': return { title: 'The wallet service is starting', say: reason, next: `${stands} Try again in a moment.`, retry: true }
     case 'rail_off': case 'rail_unavailable': case 'rail_misconfigured': case 'rail_refused': return { title: 'The wallet service is not answering', say: reason, next: `${stands} Your claims are kept by the service and its chain; a claim must still be revealed before it lapses, so start the service again before then.`, retry: true }
-    default: return { title: 'The bounties on this computer cannot be shown', say: reason, next: stands, retry: true }
+    default: return { title: 'The bounties on this QED installation cannot be shown', say: reason, next: stands, retry: true }
   }
 }
 
@@ -239,7 +239,7 @@ export function parseClaim(text: string): { claim: Record<string, unknown> } | {
 }
 
 /**
- * The judge's ruling on this computer, beside the record: when a claim to an original bounty is refused with exactly
+ * The judge's ruling on this QED installation, beside the record: when a claim to an original bounty is refused with exactly
  * the error and the figures recorded on Sepolia for one of the five claims, that recorded claim is named.
  */
 export function sameAsRecorded(check: CheckResult, b: LocalBounty | undefined, originals: Original[]): Tx | null {
@@ -436,7 +436,7 @@ function MakeClaim({ v, x, pick, setPick, onChange, field }: { v: View; x: Ctx; 
                 <p>{say(shown.error?.words ?? shown.words)}</p>
                 <p><strong>What you can do:</strong> nothing was recorded or sent, and a claim the judge rejects is never committed. Check a different claim.</p>
                 {shown.error ? <p className="small">As the judge says it: <span className="code">{shown.error.name}({shown.error.args.join(', ')})</span></p> : null}
-                {recorded ? <p className="bt-same"><History aria-hidden="true" /><span>Reproduced on this computer: the judge here gives exactly the answer recorded on Sepolia for claim {recorded.step} on {utc(recorded.at)} (historical, not re-verified).</span></p> : null}
+                {recorded ? <p className="bt-same"><History aria-hidden="true" /><span>Reproduced on this QED installation: the judge here gives exactly the answer recorded on Sepolia for claim {recorded.step} on {utc(recorded.at)} (historical, not re-verified).</span></p> : null}
               </Note>
         ) : null}
         {commit.job && !made ? <JobLine job={commit.job} /> : null}
@@ -455,16 +455,16 @@ function MakeClaim({ v, x, pick, setPick, onChange, field }: { v: View; x: Ctx; 
   )
 }
 
-/** The bounties on this computer's board, each with its phase; a contest that is over can be settled by anyone. */
+/** The bounties on this QED installation's board, each with its phase; a contest that is over can be settled by anyone. */
 function Board({ v, x, onPick, onChange }: { v: View; x: Ctx; onPick: (id: string) => void; onChange: () => void }) {
   const l = v.local
   return (
     <section className="panel bt-board" aria-labelledby="bt-board-h">
       <div className="panel-head">
-        <h2 id="bt-board-h">On this computer's chain</h2>
+        <h2 id="bt-board-h">On this QED installation's chain</h2>
         <Btn tone="quiet" small onClick={onChange}><RefreshCw aria-hidden="true" />Read the chain again</Btn>
       </div>
-      <p className="bt-board-say">The same two contracts, unmodified, judge each claim; a board holds each pool and pays only the claimant who committed first. Chain {l.chainId ?? 31337} runs on this computer; tUSD are test dollars with no value.</p>
+      <p className="bt-board-say">The same two contracts, unmodified, judge each claim; a board holds each pool and pays only the claimant who committed first. Chain {l.chainId ?? 31337} runs on this QED installation; tUSD are test dollars with no value.</p>
       <ul className="bt-bounties">{(l.bounties ?? []).map((b) => <BoardRow key={b.id} b={b} x={x} onPick={onPick} onChange={onChange} />)}</ul>
       <details className="bt-fold">
         <summary>As the chain sees it</summary>
@@ -512,14 +512,14 @@ function Protection({ v }: { v: View }) {
         <li><strong>Settle</strong><span>Anyone may settle once the contest is over; the board pays only the recorded recipient, once. The judge itself holds nothing, so a claim sent straight to it pays nothing.</span></li>
       </ol>
       <div className="bt-guard-foot">
-        <p className="small"><strong>Limits.</strong> The protection holds if your reveal is mined within the delay plus the contest of being sent, and before your commitment lapses; on this computer the vault service runs the chain itself. The vault service sees your claim before it commits it, so you rely on it not to claim first; anyone may instead commit from their own key straight to the board.</p>
+        <p className="small"><strong>Limits.</strong> The protection holds if your reveal is mined within the delay plus the contest of being sent, and before your commitment lapses; on this QED installation the vault service runs the chain itself. The vault service sees your claim before it commits it, so you rely on it not to claim first; anyone may instead commit from their own key straight to the board.</p>
         {auto === undefined ? null : <p className="small">{auto ? 'This vault service reveals your claims as soon as they may be revealed and settles your winning ones, so a claim does not depend on this page being open.' : 'This vault service is set not to reveal or settle on its own: reveal each claim before it lapses, and settle it once its contest is over.'}</p>}
       </div>
     </section>
   )
 }
 
-/** One bounty's statement, exactly as served; then where it stands on this computer's chain. */
+/** One bounty's statement, exactly as served; then where it stands on this QED installation's chain. */
 function Statement({ o, here, x, onPick }: { o: Original; here: LocalBounty | undefined; x: Ctx; onPick: (id: string) => void }) {
   const p = here ? phaseWords(here, x) : null
   return (
@@ -534,7 +534,7 @@ function Statement({ o, here, x, onPick }: { o: Original; here: LocalBounty | un
       <details className="bt-fold"><summary>The exact test, in the contract's integers</summary><p className="bt-test">{o.test}</p></details>
       {here && p ? (
         <div className="bt-st-here">
-          <p><strong>On this computer's chain:</strong> bounty {here.id}, <Stamp tone={p.tone}>{p.word}</Stamp> {here.phase === 'open' ? `${here.poolText} in the pool. The same contract only judges here: the board pays the committed finder.` : p.say}</p>
+          <p><strong>On this QED installation's chain:</strong> bounty {here.id}, <Stamp tone={p.tone}>{p.word}</Stamp> {here.phase === 'open' ? `${here.poolText} in the pool. The same contract only judges here: the board pays the committed finder.` : p.say}</p>
           {p.open ? <Btn small onClick={() => onPick(here.id)}>Claim bounty {here.id}</Btn> : null}
         </div>
       ) : null}
@@ -598,7 +598,7 @@ export function BountiesScreen() {
         <h1>Refutation bounties</h1>
         <p>Two of the release's bounties pay their pool to whoever shows that one of QED's theorems is false. Here a claim is checked by the bounty's own contract and paid only to the household that committed it first.</p>
       </div>
-      <span className="stamp bt-label"><FlaskConical aria-hidden="true" />Test chain on this computer; tokens of no value</span>
+      <span className="stamp bt-label"><FlaskConical aria-hidden="true" />Test chain on this QED installation; tokens of no value</span>
     </header>
   )
   if (!view.data) return <div className="bt">{head}{view.error ? <div className="bt-load-failed"><Problem error={view.error} /><Btn small onClick={reload}>Try again</Btn></div> : <div className="page-wait"><Loading what="Reading the bounties" /></div>}</div>

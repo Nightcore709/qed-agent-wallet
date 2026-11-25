@@ -348,7 +348,7 @@ const invest: KindSpec<InvestP> = {
         const step = Number(inst.meta.qtyStep ?? '1'), least = Math.ceil(Number(input.price) * step * 100)
         if (p.amount < least) refusals.push(`At the current price one lot (${step} unit${step === 1 ? '' : 's'}) costs about ${amountText(least)}, and costs come out of the amount: each run needs more than ${amountText(p.amount)}.`)
       }
-      warnings.push(`A run on a day or at an hour the ${inst.venue === 'paper-gsec' ? 'government-securities desk' : 'exchange'} is closed (${inst.meta.hours?.open ?? '09:15'} to ${inst.meta.hours?.close ?? '15:30'} India time, weekdays) is refused, not delayed. The prices are synthetic, generated on this computer.`)
+      warnings.push(`A run on a day or at an hour the ${inst.venue === 'paper-gsec' ? 'government-securities desk' : 'exchange'} is closed (${inst.meta.hours?.open ?? '09:15'} to ${inst.meta.hours?.close ?? '15:30'} India time, weekdays) is refused, not delayed. The prices are synthetic, generated on this QED installation.`)
     }
     const first = firstDue(p.schedule, now)
     return {

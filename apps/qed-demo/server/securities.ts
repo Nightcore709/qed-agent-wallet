@@ -26,7 +26,7 @@ export const SYNTH_MARKETS = 'synthetic-markets'
 export const SECURITY_KINDS: ReadonlySet<string> = new Set(['etf', 'equity', 'tbill', 'gsec'])
 export const isSecurity = (inst: { kind: string }): boolean => SECURITY_KINDS.has(inst.kind)
 export const isDebt = (inst: { kind: string }): boolean => inst.kind === 'tbill' || inst.kind === 'gsec'
-export const DATA_LABEL = 'Synthetic prices generated on this computer, not market data'
+export const DATA_LABEL = 'Synthetic prices generated on this QED installation, not market data'
 
 // ---------------------------------------------------------------------------------------------- hours
 

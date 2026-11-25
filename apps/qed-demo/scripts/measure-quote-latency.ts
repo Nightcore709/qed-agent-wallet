@@ -3,7 +3,7 @@
  *
  *   node scripts/measure-quote-latency.ts [output.json] [rounds]
  *
- * Three legs are timed, in milliseconds, over many rounds, on this computer, in one process, with no network:
+ * Three legs are timed, in milliseconds, over many rounds, on this QED installation, in one process, with no network:
  *   receipt  a provider frame in its wire format is parsed and stored (what happens when a price arrives);
  *   display  the market view a screen reads is built (the server's part of showing it);
  *   decision a payment-sized buy order is previewed, approved, sent to the paper venue and filled.

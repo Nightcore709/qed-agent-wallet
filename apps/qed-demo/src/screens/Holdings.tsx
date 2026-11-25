@@ -718,7 +718,7 @@ export function HoldingsScreen() {
         <section className="panel gr-market" aria-labelledby="h-prices">
           <div className="panel-head"><h2 id="h-prices">Prices</h2><p>Choose a name to chart it</p></div>
 
-          <div className="gr-table-head"><h3>Digital assets, in rupees</h3><p className="small muted">{presentation ? 'A synthetic order book generated on this computer (presentation mode).' : 'Live order book from CoinDCX.'} Paper orders fill against it.</p></div>
+          <div className="gr-table-head"><h3>Digital assets, in rupees</h3><p className="small muted">{presentation ? 'A synthetic order book generated on this QED installation (presentation mode).' : 'Live order book from CoinDCX.'} Paper orders fill against it.</p></div>
           {assets.length === 0 ? <p className="small muted gr-none">No digital asset can be bought or sold here right now: the venue's list has not been read.</p> : <div className="gr-scroll" tabIndex={0} role="region" aria-label="Digital asset prices; scroll sideways on a narrow screen">
             <table className="ledger fixed market">
               <colgroup><col /><col className="c-px" /><col className="c-px c-ask" /><col className="c-age" /></colgroup>
@@ -736,10 +736,10 @@ export function HoldingsScreen() {
             </table>
           </div>}
 
-          <div className="gr-table-head"><h3>ETFs and shares, whole units</h3><p className="small muted">Synthetic prices generated on this computer, never market data. Each starts from a stated value (an ETF from a fund NAV AMFI published on a named day; a share from a round number). The exchange trades 9:15 am to 3:30 pm India time, weekdays; holidays are not modelled. A sale pays out the next business day.</p></div>
+          <div className="gr-table-head"><h3>ETFs and shares, whole units</h3><p className="small muted">Synthetic prices generated on this QED installation, never market data. Each starts from a stated value (an ETF from a fund NAV AMFI published on a named day; a share from a round number). The exchange trades 9:15 am to 3:30 pm India time, weekdays; holidays are not modelled. A sale pays out the next business day.</p></div>
           <SecurityTable list={listed} now={now} name={name} label="ETF and share prices; scroll sideways on a narrow screen" />
 
-          <div className="gr-table-head"><h3>Government bills and bonds, lots of 100 units</h3><p className="small muted">A unit is ₹100 of face value; the price is for one unit. Synthetic prices generated on this computer from a round yield, never auction or market data. The desk trades 9:00 am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a coupon twice a year.</p></div>
+          <div className="gr-table-head"><h3>Government bills and bonds, lots of 100 units</h3><p className="small muted">A unit is ₹100 of face value; the price is for one unit. Synthetic prices generated on this QED installation from a round yield, never auction or market data. The desk trades 9:00 am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a coupon twice a year.</p></div>
           <SecurityTable list={govt} now={now} name={name} label="Bill and bond prices; scroll sideways on a narrow screen" />
 
           <details className="gr-more" id="not-offered">

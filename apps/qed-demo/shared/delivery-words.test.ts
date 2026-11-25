@@ -49,8 +49,8 @@ describe('words for a message kept in the simulated outbox', () => {
   })
 
   it('says how long the kept link works, as the real message would, and names the address only as typed', () => {
-    expect(outboxWords('reset', 'asha').body).toBe('If an account with a confirmed email address matches “asha”, the message that would go to that address is kept in the simulated outbox on this computer: nothing was sent. Its link works once, for 30 minutes.')
-    expect(outboxWords('recover', 'asha').body).toBe('If an account with a confirmed email address matches “asha”, the recovery link that would go to that address is kept in the simulated outbox on this computer: nothing was sent. It works once, for an hour.')
+    expect(outboxWords('reset', 'asha').body).toBe('If an account with a confirmed email address matches “asha”, the message that would go to that address is kept in the simulated outbox on this QED installation: nothing was sent. Its link works once, for 30 minutes.')
+    expect(outboxWords('recover', 'asha').body).toBe('If an account with a confirmed email address matches “asha”, the recovery link that would go to that address is kept in the simulated outbox on this QED installation: nothing was sent. It works once, for an hour.')
     expect(outboxWords('confirm', 'asha@example.com')).toEqual({ title: 'Kept in the simulated outbox, not sent to asha@example.com', body: 'Open the link in the kept message, or type its code under Security and recovery: nothing was sent. The address receives your security notices once confirmed.' })
   })
 })

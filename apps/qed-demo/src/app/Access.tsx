@@ -388,7 +388,7 @@ function withLinks(text: string): ReactNode[] {
 
 /**
  * The local test outbox's developer page. It says first, and on every message, that nothing was sent: QED in this
- * build has no email or text-message provider. Each message is what would have been sent, for testing on this computer.
+ * build has no email or text-message provider. Each message is what would have been sent, for testing on this QED installation.
  */
 function OutboxPage() {
   const v = useData<{ notice: string; messages: OutboxMessage[] }>('/api/dev/outbox?limit=80')
@@ -403,7 +403,7 @@ function OutboxPage() {
       </header>
       <section className="outbox-intro" aria-labelledby="ob-h">
         <h1 id="ob-h">Simulated outbox</h1>
-        <p className="outbox-banner" role="note"><b>Simulated delivery: no email or text message was sent.</b> This build of QED has no email or text-message provider. Each message it would have sent is kept here instead, for testing on this computer. Sending real messages needs a provider account, its credentials and the owner's approval.</p>
+        <p className="outbox-banner" role="note"><b>Simulated delivery: no email or text message was sent.</b> This build of QED has no email or text-message provider. Each message it would have sent is kept here instead, for testing on this QED installation. Sending real messages needs a provider account, its credentials and the owner's approval.</p>
         <div className="row">
           <Field label="Filter by address">{(p) => <input {...p} className="input" type="search" autoComplete="off" value={q} onChange={(e) => setQ(e.target.value)} />}</Field>
           <Btn onClick={() => v.reload()}><RefreshCw aria-hidden="true" />Refresh</Btn>

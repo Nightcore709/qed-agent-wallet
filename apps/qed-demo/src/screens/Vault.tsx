@@ -5,7 +5,7 @@
  * forming beside them; and every rule carries one of three marks (src/ui/enforced.tsx): what the wallet's contract on
  * the chain refuses ("Contract enforces"), what QED's co-signer or vault service refuses ("QED checks", which the chain
  * does not know), and what is only read ("Observed only"). Amounts are valueless test rupees and test dollars on a chain
- * that runs on this computer, and are said to be so wherever they appear.
+ * that runs on this QED installation, and are said to be so wherever they appear.
  *
  * Plain words first: what the wallet holds, what QED may do with it (each limit a meter of what is left, in QED's tide),
  * what is set aside for whom, who must sign. Addresses, chain ids, hashes, block numbers and the contracts' names are one
@@ -285,12 +285,12 @@ function Checks({ checks }: { checks: LimitCheck[] }) {
  */
 export function whereWords(terms: Record<string, unknown> | undefined): string {
   const id = terms?.chainId
-  return `On a local test chain on this computer${typeof id === 'number' || typeof id === 'string' ? ` (chain id ${id})` : ''}: the tokens have no value.`
+  return `On a local test chain on this QED installation${typeof id === 'number' || typeof id === 'string' ? ` (chain id ${id})` : ''}: the tokens have no value.`
 }
 /** The same, for a record: the chain's id read from the record's network ("Local Anvil chain 31337, …"). */
-export const chainLine = (network: string | null | undefined): string => { const m = /\bchain (\d+)\b/i.exec(network ?? ''); return `On a local test chain on this computer${m ? ` (chain id ${m[1]})` : ''}; the tokens have no value.` }
+export const chainLine = (network: string | null | undefined): string => { const m = /\bchain (\d+)\b/i.exec(network ?? ''); return `On a local test chain on this QED installation${m ? ` (chain id ${m[1]})` : ''}; the tokens have no value.` }
 const FINAL_KINDS = new Set(['pay', 'settle'])
-export const FINAL_WORDS = 'On a real chain, once it is mined a payment cannot be reversed, by QED or by you: only whoever received it could send it back. Here the payee is a test account whose key is held on this computer.'
+export const FINAL_WORDS = 'On a real chain, once it is mined a payment cannot be reversed, by QED or by you: only whoever received it could send it back. Here the payee is a test account whose key is held on this QED installation.'
 /** The exact terms of a vault action, as the owner approves them: the action in words, its limits, then what the passkey signs. */
 function Terms({ p }: { p: Proposal }) {
   const { message, toSign, ...rest } = p.terms as Record<string, unknown> & { message?: unknown; toSign?: ToSign[] }
@@ -581,7 +581,7 @@ export function setupSteps(stage: 0 | 1 | 2 | 3, shared: boolean, threshold: num
   const state = (i: number): SetupStep['state'] => (i < stage ? 'done' : i === stage ? 'now' : 'next')
   const who = threshold === 1 ? 'any one of them' : `${threshold} different members`
   return [
-    { id: 'create', title: shared ? 'Create it, owned by your members' : 'Create it, owned by your passkey', does: shared ? `QED puts a wallet on a test chain on this computer and makes your members' passkeys its owners: ${who} must sign for anything it does as owner.` : 'QED puts a wallet on a test chain on this computer and makes your passkey its owner: nothing is done as its owner without your signature.', state: state(0) },
+    { id: 'create', title: shared ? 'Create it, owned by your members' : 'Create it, owned by your passkey', does: shared ? `QED puts a wallet on a test chain on this QED installation and makes your members' passkeys its owners: ${who} must sign for anything it does as owner.` : 'QED puts a wallet on a test chain on this QED installation and makes your passkey its owner: nothing is done as its owner without your signature.', state: state(0) },
     { id: 'accept', title: 'Accept it', does: `${!shared ? 'One signature from your passkey takes' : threshold === 1 ? 'One member\'s passkey takes' : `The passkeys of ${threshold} different members take`} ownership. Then the opening grant of ${grant} arrives; until then it can only be read.`, state: state(1) },
     { id: 'mandate', title: 'Say what QED may do', does: 'Sign a mandate: the most in one payment, in a day and in all, and until when. Until you do, QED can pay no one from it.', state: state(2) },
   ]
@@ -627,7 +627,7 @@ function Head({ sub, state, stage, nav }: { sub: string; state?: RailState | nul
       <header className="page-head vt-head">
         <div className="vt-head-text">
           <h1>On-chain wallet.<span className="dim"> Test money, owned by passkey.</span></h1><p><Src kind="chain" /></p>
-          <p>{cap(unitWords(main.symbol))} and {unitWords(reserve.symbol)} on a chain that runs on this computer; they have no value. QED may pay from it only inside the limits of a mandate you sign, and the wallet's own contract enforces them.{stage === 'owned' ? ' You can pause the wallet or revoke the mandate at any time under Stop or change it; each takes effect on the chain as soon as it is recorded.' : ''}</p>
+          <p>{cap(unitWords(main.symbol))} and {unitWords(reserve.symbol)} on a chain that runs on this QED installation; they have no value. QED may pay from it only inside the limits of a mandate you sign, and the wallet's own contract enforces them.{stage === 'owned' ? ' You can pause the wallet or revoke the mandate at any time under Stop or change it; each takes effect on the chain as soon as it is recorded.' : ''}</p>
         </div>
         <div className="vt-head-state">
           {stage === 'owned' && state ? <Stamp tone={paused ? 'wait' : 'ok'}>{paused ? 'Paused' : 'Running'} on a local test chain</Stamp>
@@ -720,7 +720,7 @@ function SetupSummary({ stage, o }: { stage: 0 | 1 | 2; o: Overview }) {
       <dl className="vt-sum">
         {rows.map((r) => <div key={r.k} className={r.done ? 'done' : ''}><dt><span className="vt-sum-mark" aria-hidden="true">{r.done ? <Check /> : null}</span>{r.k}</dt><dd>{r.v}</dd></div>)}
       </dl>
-      <p className="vt-sum-foot">A chain that runs on this computer: not a public chain, and nothing on it has any value.</p>
+      <p className="vt-sum-foot">A chain that runs on this QED installation: not a public chain, and nothing on it has any value.</p>
     </>
   )
 }
@@ -806,7 +806,7 @@ function SetUp({ o, reload }: { o: Overview; reload: () => void }) {
     <SetupFlow stage={0} shared={shared} threshold={o.plan?.threshold ?? 1} title={shared ? 'Set up this workspace\'s wallet' : 'Set up your wallet'}
       intro={`Three steps. ${shared ? 'Your members\' passkeys sign' : 'Your passkey signs'} each one over the exact terms, and the vault service holds no key that could stand in for ${shared ? 'them' : 'it'}.`}
       summary={<SetupSummary stage={0} o={o} />}>
-      {o.lost ? <Note tone="wait" title="Your earlier wallet is no longer on the vault service">The service on this computer was started with a new data folder, so the chain that held your wallet is gone. Its tokens were valueless test tokens. Setting up makes a new wallet.</Note> : null}
+      {o.lost ? <Note tone="wait" title="Your earlier wallet is no longer on the vault service">The service on this QED installation was started with a new data folder, so the chain that held your wallet is gone. Its tokens were valueless test tokens. Setting up makes a new wallet.</Note> : null}
       {ws?.status === 'failed' ? <Note tone="void" title="Setting up stopped before it finished">Nothing of yours was at stake: the wallet holds nothing until you accept it. Try again; each step that already happened is skipped.</Note> : null}
       {ws?.status === 'deploying' ? <Note tone="wait" title="Your wallet is being created">This takes a few seconds. If it does not finish, try again: each step that already happened is skipped.</Note> : null}
       {!allowed ? <Note tone="void">This page is at {here}, which QED does not accept for passkeys. Open QED at {o.origins.join(' or ')}.</Note> : null}
@@ -817,7 +817,7 @@ function SetUp({ o, reload }: { o: Overview; reload: () => void }) {
       {!shared ? (
         <details className="vt-fold">
           <summary>Test tokens: {CHAIN_TOKENS[tokens.treasury].many}, {CHAIN_TOKENS[tokens.reserve].many} and {CHAIN_TOKENS[tokens.route].many}{chosen ? ', your choice' : ', the usual ones'}</summary>
-          <p className="vt-fold-p">The wallet holds valueless test tokens on the chain on this computer: its treasury one kind, its reserve another, and conversions may pass through a third. You may choose them from the eight currencies QED&apos;s paper bank holds. Nothing chooses them for you: other tokens than the usual ones are used only once your passkey signs them, as a second prompt, and they are fixed when the wallet is created. None of them is money, and choosing them opens no way to move real money.</p>
+          <p className="vt-fold-p">The wallet holds valueless test tokens on the chain on this QED installation: its treasury one kind, its reserve another, and conversions may pass through a third. You may choose them from the eight currencies QED&apos;s paper bank holds. Nothing chooses them for you: other tokens than the usual ones are used only once your passkey signs them, as a second prompt, and they are fixed when the wallet is created. None of them is money, and choosing them opens no way to move real money.</p>
           {(['treasury', 'reserve', 'route'] as const).map((k) => (
             <Field key={k} label={k === 'treasury' ? 'The treasury holds' : k === 'reserve' ? 'The reserve holds' : 'Conversions may pass through'}>
               {(p) => <select {...p} className="input" value={tokens[k]} onChange={(e) => setTokens({ ...tokens, [k]: e.target.value as AssetSet['treasury'] })}>{CHAIN_CURRENCIES.map((c) => <option key={c} value={c}>{cap(CHAIN_TOKENS[c].many)} ({c})</option>)}</select>}
@@ -907,7 +907,7 @@ function Account({ v, name, unit, lead, bound = 0n, until = null, mandate = fals
   const mayWhy = !mandate ? 'No mandate is in force' : v.paused ? 'Until you resume the wallet' : bound > 0n ? `At most${when}, from the free part only` : BigInt(v.free) === 0n ? 'Nothing in the treasury is free' : 'Your mandate allows nothing more in all'
   return (
     <section className="vault-acct primary" aria-label={name}>
-      <div className="vt-acct-top">{head}<span className="vt-acct-note">Valueless test tokens on a chain on this computer</span></div>
+      <div className="vt-acct-top">{head}<span className="vt-acct-note">Valueless test tokens on a chain on this QED installation</span></div>
       <p className="lead" data-resolve=""><Figure text={top.text} /></p>
       {top.exact ? <p className="va-exact">Exactly {top.exact}</p> : null}
       <TreasuryBar v={v} bound={bound} when={when} />
@@ -968,7 +968,7 @@ function Holds({ st, active, col }: { st: RailState; active: MandateView | null;
       <dl className="va-lines vt-bycur" aria-labelledby="wh-cur">
         {byCurrency.map((c) => <div key={c.symbol}><dt>{cap(c.words)}</dt><dd>{c.total}<small>{c.parts.map(([w, x]) => `${w.replace(/^In /, 'in ')} ${x}`).join('; ')}</small></dd></div>)}
       </dl>
-      <p className="vt-mini-s">Valueless test tokens on a chain on this computer, one per currency, each counted in its own units; never added together and never money.</p>
+      <p className="vt-mini-s">Valueless test tokens on a chain on this QED installation, one per currency, each counted in its own units; never added together and never money.</p>
     </section>
   )
 }
@@ -1197,7 +1197,7 @@ function Technical({ o, st }: { o: Overview; st: RailState }) {
     <details className="vt-fold vt-tech"><summary>Who controls it, in technical terms</summary>
       <p className="vt-fold-p">{o.custody}</p>
       <dl className="kv small">
-        <dt>Chain</dt><dd>Local test chain {st.network.chainId}, on this computer. Latest block {st.network.block}, timed {secs(st.clock.chainSeconds)}. Not a public chain; no value.</dd>
+        <dt>Chain</dt><dd>Local test chain {st.network.chainId}, on this QED installation. Latest block {st.network.block}, timed {secs(st.clock.chainSeconds)}. Not a public chain; no value.</dd>
         <dt>Wallet contract</dt><dd className="code">{st.contracts.vault}</dd>
         <dt>Reserve contract</dt><dd className="code">{st.contracts.reserve}</dd>
         <dt>QED's paying key</dt><dd className="code">{st.roles.operator}</dd>
@@ -1402,7 +1402,7 @@ function Receive({ st }: { st: RailState }) {
   return (
     <section data-col="2" className="panel vt-receive" aria-labelledby="rc-h">
       <div className="panel-head"><h2 id="rc-h">Receive</h2></div>
-      <p className="vt-say">Test tokens sent to this address arrive in your own account on this chain; a deposit moves them into the wallet. It is on the local test chain, id {st.network.chainId}, on this computer: nothing on a public chain can reach it, and the tokens have no value.</p>
+      <p className="vt-say">Test tokens sent to this address arrive in your own account on this chain; a deposit moves them into the wallet. It is on the local test chain, id {st.network.chainId}, on this QED installation: nothing on a public chain can reach it, and the tokens have no value.</p>
       <p className="vt-rc-id code"><span className="sr">{id}</span><span aria-hidden="true">{id.split(':').slice(0, 2).join(':')}:</span>{(st.roles.owner.slice(2).match(/.{1,4}/g) ?? []).map((g, i) => <span key={i} aria-hidden="true">{i === 0 ? `0x${g}` : g}</span>)}</p>
       <div className="vt-go"><Btn busy={copy.busy} onClick={() => void copy.run()}>{copied ? 'Copied' : 'Copy the address'}</Btn></div>
       {copy.error ? <Problem error={copy.error} /> : null}
@@ -2011,7 +2011,7 @@ function TabBrief({ st, sub }: { st: RailState; sub: string }) {
   const { main, reserve } = useUnits()
   const t = st.treasury, active = st.mandate?.status === 'active' ? st.mandate : null
   const policyOn = st.policy?.status === 'active'
-  const where = `${money(t.free, main)} is free in the treasury, ${money(t.ringFenced, main)} is set aside for promises and ${money(st.reserve.balance, reserve)} is in the dollar reserve. All of it is test money on a chain that runs on this computer${t.paused ? '; the wallet is paused, so nothing can move' : ''}.`
+  const where = `${money(t.free, main)} is free in the treasury, ${money(t.ringFenced, main)} is set aside for promises and ${money(st.reserve.balance, reserve)} is in the dollar reserve. All of it is test money on a chain that runs on this QED installation${t.paused ? '; the wallet is paused, so nothing can move' : ''}.`
   const alone = sub === 'mandate' ? (active ? `Pay the payees the mandate names and convert, each only inside its limits: at most ${money(active.fields.maxPerPayment, main)} in one payment. Nothing else.` : 'Nothing. With no mandate in force, QED can pay no one.')
     : sub === 'treasury' ? 'Nothing on this page. A payment or a set-aside is prepared here and only sent after you sign its exact terms with your passkey.'
     : sub === 'convert' ? 'Only what you ask for here, and only inside the mandate. QED\'s checking service also refuses a conversion that its authority budget does not allow.'
@@ -2152,7 +2152,7 @@ export function VaultJobScreen({ id }: { id: string }) {
   if (!job.data) {
     return (
       <div className="vt vt-job">
-        <header className="page-head vt-job-head"><div><Crumb to="/vault">On-chain wallet</Crumb>{job.error ? null : <div className="skel vt-skel-h1" aria-hidden="true" />}<p className="vt-job-when">On a test chain on this computer; the tokens have no value.</p></div></header>
+        <header className="page-head vt-job-head"><div><Crumb to="/vault">On-chain wallet</Crumb>{job.error ? null : <div className="skel vt-skel-h1" aria-hidden="true" />}<p className="vt-job-when">On a test chain on this QED installation; the tokens have no value.</p></div></header>
         {job.error ? <><Problem error={job.error} /><p><Link to="/vault">Back to the wallet</Link></p></> : <Loading what="Opening the record" />}
       </div>
     )

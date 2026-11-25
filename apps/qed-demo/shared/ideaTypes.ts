@@ -30,7 +30,7 @@ export interface Outcome {
 }
 export interface Claim { vs: string; difference: Difference; says: string }
 export interface Evidence {
-  /** recorded: published prices this app recorded; synthetic: generated on this computer; none: no record of the idea */
+  /** recorded: published prices this app recorded; synthetic: generated on this QED installation; none: no record of the idea */
   basis: 'recorded' | 'synthetic' | 'none'
   source: string
   horizonDays: number; windows: number; firstStart: string | null; lastStart: string | null

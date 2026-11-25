@@ -50,7 +50,7 @@ export function OwnershipPanel({ col }: { col: string }) {
       {!transferred && open !== 'transfer' ? <div><Btn small tone="quiet" onClick={() => { setOpen('transfer'); setHandle('') }}>Transfer this wallet to another household</Btn></div> : null}
       {open === 'transfer' ? (
         <form className="vt-own-form" aria-label="Transfer this wallet" onSubmit={(e) => { e.preventDefault(); start('/api/vault/ownership/transfer', { handle }, 'Approve: offer this wallet to another household', `Both vaults, with everything in them and every owner power over them, are offered to @${handle.replace(/^@/, '')}. Nothing changes for ${delay}; any one of your passkeys can cancel it until then. After that it is an offer: the wallet changes hands only when they accept with their own passkeys, and from then on your passkeys no longer control it.`) }}>
-          <Field label="The household's handle" hint="It needs its own on-chain wallet on this computer.">{(p) => <input {...p} className="input" autoCapitalize="none" maxLength={40} value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
+          <Field label="The household's handle" hint="It needs its own on-chain wallet on this QED installation.">{(p) => <input {...p} className="input" autoCapitalize="none" maxLength={40} value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
           <div className="vt-own-go"><Btn tone="fill" type="submit" busy={va.busy}>See the terms</Btn><Btn tone="quiet" onClick={() => setOpen(null)}>Not now</Btn></div>
         </form>
       ) : null}

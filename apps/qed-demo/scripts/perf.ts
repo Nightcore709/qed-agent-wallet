@@ -2,7 +2,7 @@
  * Lab measures of the built interface on the running design fixture (scripts/design-fixture.ts), per screen: Largest
  * Contentful Paint, Cumulative Layout Shift over a watch window while live prices and events stream, the longest
  * interaction (pointer down to next paint) when a section link is pressed, and the JavaScript and CSS transferred.
- * Lab figures on this computer, not field data from people's devices (R7-019 distinguishes the two).
+ * Lab figures on this QED installation, not field data from people's devices (R7-019 distinguishes the two).
  *
  *   node scripts/perf.ts [out.json] [route ...]       defaults: evidence/design/perf.json and the main screens
  *
@@ -67,5 +67,5 @@ for (const r of routes) {
   await ctx.close()
 }
 await browser.close()
-writeFileSync(outFile, `${JSON.stringify({ measuredAt: new Date().toISOString(), base: fx.base, watchMs: WATCH_MS, note: phone ? 'Lab measures on this computer (headless Chrome, 390x844, CPU 4x slower, slow 4G); not field data.' : 'Lab measures on this computer (headless Chrome, 1440x900, no throttling); not field data.', results }, null, 1)}\n`)
+writeFileSync(outFile, `${JSON.stringify({ measuredAt: new Date().toISOString(), base: fx.base, watchMs: WATCH_MS, note: phone ? 'Lab measures on this QED installation (headless Chrome, 390x844, CPU 4x slower, slow 4G); not field data.' : 'Lab measures on this QED installation (headless Chrome, 1440x900, no throttling); not field data.', results }, null, 1)}\n`)
 console.log(`written ${outFile}`)

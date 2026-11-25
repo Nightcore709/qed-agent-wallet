@@ -172,7 +172,7 @@ function booking(db: Db, userId: string, m: Movement, asset: string, firstOut: b
     if (cp.kind === 'conversion') return { kind: 'chain-conversion-in', memo: lower(m.conversion?.tokenOut ?? '') === lower(m.token) ? `Conversion: ${w} received` : `Conversion: unspent ${w} back`, lines: [{ account: into, amount: x }, { account: acc('conversion'), amount: -x }] }
     if (cp.kind === 'escrow' && m.escrow?.event === 'settled') return { kind: 'chain-escrow-earning', memo: `Received for work: ${job}`, lines: [{ account: into, amount: x }, { account: acc('work-received'), amount: -x }] }
     if (cp.kind === 'escrow' && m.escrow?.event === 'refunded') return { kind: 'chain-escrow-refund', memo: `Refunded to you: ${job}`, lines: [{ account: into, amount: x }, { account: acc('escrow'), amount: -x }] }
-    return { kind: 'chain-receipt', memo: cp.kind === 'workspace' ? 'Received from another wallet on this computer' : 'Received from outside the wallet', lines: [{ account: into, amount: x }, { account: acc('received'), amount: -x }] }
+    return { kind: 'chain-receipt', memo: cp.kind === 'workspace' ? 'Received from another wallet on this QED installation' : 'Received from outside the wallet', lines: [{ account: into, amount: x }, { account: acc('received'), amount: -x }] }
   }
   if (cp.kind === 'conversion') {
     const costs = firstOut ? conversionCosts(db, m) : { fee: null, spread: [], note: 'This conversion\'s fee and spread are on its first leg.' }
@@ -180,7 +180,7 @@ function booking(db: Db, userId: string, m: Movement, asset: string, firstOut: b
     return { kind: 'chain-conversion-out', memo: `Conversion: ${w} paid in`, lines: [{ account: outOf!, amount: -x }, ...(fee > 0n ? [{ account: acc('fee'), amount: fee }] : []), { account: acc('conversion'), amount: x - fee }], extra: { conversion: costs } }
   }
   if (cp.kind === 'escrow' && m.escrow?.event === 'opened') return { kind: 'chain-escrow-fund', memo: `Funded ${job} for work you commissioned`, lines: [{ account: acc('escrow'), amount: x }, { account: outOf!, amount: -x }] }
-  return { kind: 'chain-payment', memo: `Paid ${cp.label ?? (cp.kind === 'workspace' ? 'another wallet on this computer' : 'an address outside the wallet')}`, lines: [{ account: acc('paid'), amount: x }, { account: outOf!, amount: -x }] }
+  return { kind: 'chain-payment', memo: `Paid ${cp.label ?? (cp.kind === 'workspace' ? 'another wallet on this QED installation' : 'an address outside the wallet')}`, lines: [{ account: acc('paid'), amount: x }, { account: outOf!, amount: -x }] }
 }
 const PLACE_WORDS: Record<Role, string> = { treasury: 'treasury vault', reserve: 'reserve vault', 'owner-account': 'own account' }
 /** The movement's effect on what the wallet's holders hold of its token. */

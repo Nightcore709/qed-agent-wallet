@@ -8,7 +8,7 @@
  *                                  holds it); never logged, never in an error message
  *   QED_MAIL_FROM                  the sender, on a domain verified at Postmark: "QED <no-reply@mail.example.com>"
  *   QED_POSTMARK_STREAM            the message stream (default "outbound", Postmark's transactional stream)
- *   QED_POSTMARK_URL               tests only: a stand-in on this computer (see postmarkBaseUrl)
+ *   QED_POSTMARK_URL               tests only: a stand-in on this QED installation (see postmarkBaseUrl)
  */
 import { readFileSync } from 'node:fs'
 
@@ -31,7 +31,7 @@ const fail = (m: string): never => { throw new Error(`Configuration: ${m}`) }
 
 /**
  * Postmark's address: the real one, unless a test stack asks for its stand-in. The stand-in is honoured only with
- * QED_TEST_STACK=1, no public origin, and an http:// origin on this computer (127.0.0.1 or localhost); in any other
+ * QED_TEST_STACK=1, no public origin, and an http:// origin on this QED installation (127.0.0.1 or localhost); in any other
  * setting QED_POSTMARK_URL stops the process, so a production configuration can never be pointed at anything else.
  */
 export function postmarkBaseUrl(env: NodeJS.ProcessEnv, publicOrigin: string | null): { baseUrl: string; standIn: boolean } {
@@ -40,7 +40,7 @@ export function postmarkBaseUrl(env: NodeJS.ProcessEnv, publicOrigin: string | n
   if (env.QED_TEST_STACK !== '1' || publicOrigin) fail('QED_POSTMARK_URL names a stand-in for tests. It is honoured only on an isolated test stack (QED_TEST_STACK=1) with no public origin; Postmark\'s own address is built in.')
   let u: URL
   try { u = new URL(asked) } catch { return fail('QED_POSTMARK_URL is not a URL.') }
-  if (u.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(u.hostname) || u.pathname !== '/' || u.search || u.hash || u.username || u.password) fail('QED_POSTMARK_URL must be an http:// origin on this computer (127.0.0.1 or localhost).')
+  if (u.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(u.hostname) || u.pathname !== '/' || u.search || u.hash || u.username || u.password) fail('QED_POSTMARK_URL must be an http:// origin on this QED installation (127.0.0.1 or localhost).')
   return { baseUrl: u.origin, standIn: true }
 }
 

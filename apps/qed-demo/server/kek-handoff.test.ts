@@ -1,7 +1,7 @@
 /**
  * R13 review fix F3 (i): QED_KEK stays in no process's initial environment (server/kek-handoff.ts), and the container's
  * isolation check reads /proc correctly (scripts/deploy/isolation-check.ts, its logic on a fake /proc here; the check
- * itself runs only inside the Linux container: NOT VERIFIED on this computer).
+ * itself runs only inside the Linux container: NOT VERIFIED on this QED installation).
  *
  * On macOS `ps -E` prints the environment the kernel recorded when a process started, like /proc/<pid>/environ on Linux.
  * The control shows the finding (deleting the variable leaves it there); the hand-off shows the fix (the re-executed

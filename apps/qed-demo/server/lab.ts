@@ -354,7 +354,7 @@ function series(db: Db, id: string): { s: Series; sources: Set<string> } | null 
   return { s: { id, name: inst.name.replace(/ \(.*\)$/, ''), dates: rows.map((r) => r.value_date), values: rows.map((r) => Number(r.value)) }, sources: new Set(rows.map((r) => r.source)) }
 }
 const sourceText = (sources: Set<string>): { text: string; synthetic: boolean } => {
-  if (sources.has('synthetic')) return { text: 'synthetic NAVs generated on this computer (presentation mode)', synthetic: true }
+  if (sources.has('synthetic')) return { text: 'synthetic NAVs generated on this QED installation (presentation mode)', synthetic: true }
   if ([...sources].some((s) => s.startsWith('mfapi') || s.startsWith('amfi'))) return { text: 'published NAVs recorded by this app (AMFI; earlier history back-filled from mfapi.in)', synthetic: false }
   return { text: `values recorded by this app (${[...sources].join(', ')})`, synthetic: !![...sources].find((s) => s === 'test') }
 }

@@ -7,7 +7,7 @@
  * evidence cases and verifies each offline and against the stack's chain while it runs; and writes one result file.
  *
  *   QED_AI_PROVIDER=claude-cli node scripts/judge-live.ts --real-model [--out evidence/<yyyymmdd>-judge-live] [--shots]
- *       A REAL MODEL answers Ask: the Claude command-line client signed in on this computer, which uses that account's
+ *       A REAL MODEL answers Ask: the Claude command-line client signed in on this QED installation, which uses that account's
  *       allowance (about five calls: the objective, 3 and 300 test rupees, the bill; about US$0.40 at the 22 Nov rate).
  *       Run it once, and only with the owner's approval (Q-051).
  *   node scripts/judge-live.ts --rehearse [--out <folder>] [--shots]
@@ -233,7 +233,7 @@ const result = {
   revision: REVISION,
   howToReproduce: real ? 'cd apps/qed-demo && QED_AI_PROVIDER=claude-cli node scripts/judge-live.ts --real-model (with the owner\'s approval: it uses the signed-in Claude account\'s allowance)' : 'cd apps/qed-demo && node scripts/judge-live.ts --rehearse',
   stack: { web: base, vaultService: `http://127.0.0.1:${stack.railPort}`, chainRpc: rpc, chainId: 31337, presentationMode: true, prices: 'synthetic: no market provider was contacted', database: 'a scratch directory, deleted with the stack' },
-  proposer: real ? { provider: 'claude-cli', note: 'A real model, through the Claude command-line client signed in on this computer.' } : { provider: 'scripted', model: 'scripted-test-double', note: 'NOT a model: fixed replies from evidence/20261122-judge-journey/scripted-double-replies.json. A rehearsal of the script.' },
+  proposer: real ? { provider: 'claude-cli', note: 'A real model, through the Claude command-line client signed in on this QED installation.' } : { provider: 'scripted', model: 'scripted-test-double', note: 'NOT a model: fixed replies from evidence/20261122-judge-journey/scripted-double-replies.json. A rehearsal of the script.' },
   passkey: 'Chrome\'s virtual authenticator (the DevTools WebAuthn domain), answering as a platform authenticator would; not a hardware or platform passkey.',
   passed: steps.length - failed.length, failed: failed.length, steps,
   decisions,

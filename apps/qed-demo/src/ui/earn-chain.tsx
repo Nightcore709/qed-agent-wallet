@@ -129,7 +129,7 @@ export function ChainWork({ v, primary }: { v: Resource<ChainView>; primary: str
   const deciding = v.data?.asDecider ?? []
   const head = (
     <div className="er-kind-head">
-      <div><h2 id="cw-h">Work paid through escrow on the chain</h2><p>In test rupees, between two QED accounts on this computer. You offer each milestone with your passkey; the client funds it from their wallet; the escrow pays you the moment the verifier on the chain accepts the certificate you deliver. Without checked work by the deadline, the client takes the money back.</p></div>
+      <div><h2 id="cw-h">Work paid through escrow on the chain</h2><p>In test rupees, between two QED accounts in this installation. You offer each milestone with your passkey; the client funds it from their wallet; the escrow pays you the moment the verifier on the chain accepts the certificate you deliver. Without checked work by the deadline, the client takes the money back.</p></div>
       {v.data && all.length && !adding ? prepare : null}
     </div>
   )
@@ -167,7 +167,7 @@ export function ChainWork({ v, primary }: { v: Resource<ChainView>; primary: str
           <p>For work a verifier on the chain can check: you offer it to another QED account, they put the money in escrow from their wallet, and the escrow pays you as soon as the certificate you deliver checks out. There is no approving or disputing: without checked work by the deadline, they take the money back. A payment from a client outside your own accounts also adds half its price to what QED may pay out on its own.</p>
         </details>
       ) : null}
-      {asProvider.length ? <EscrowSum parts={partsOf(asProvider)} role="provider" who={partsOf(asProvider).held > 0 ? 'Held by the escrow contract on the test chain on this computer, from the client\'s wallet: paid into your wallet the moment the verifier accepts your certificate, and refundable to the client once the deadline has passed.' : 'Nothing is held now. The escrow holds money only once a client funds an offer, and pays it into your wallet the moment the verifier accepts your certificate.'} /> : null}
+      {asProvider.length ? <EscrowSum parts={partsOf(asProvider)} role="provider" who={partsOf(asProvider).held > 0 ? 'Held by the escrow contract on the test chain on this QED installation, from the client\'s wallet: paid into your wallet the moment the verifier accepts your certificate, and refundable to the client once the deadline has passed.' : 'Nothing is held now. The escrow holds money only once a client funds an offer, and pays it into your wallet the moment the verifier accepts your certificate.'} /> : null}
       {all.filter((x) => x.role === 'provider').map(({ j, role }) => job(j, role))}
       {asClient.length ? <>
         <h3 className="er-sub">Work you pay for</h3>

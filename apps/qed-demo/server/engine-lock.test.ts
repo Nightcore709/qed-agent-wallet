@@ -161,7 +161,7 @@ describe('one engine per database', () => {
     await e.tick()
     expect(fenced).toHaveLength(1)
     expect(heartbeat(db).instance).toBe('another-host') // never overwritten
-    // It let go of its lock: an engine may now be started here (the other "host" has no live pid on this computer).
+    // It let go of its lock: an engine may now be started here (the other "host" has no live pid on this QED installation).
     const next = engineOn(db, { clock })
     next.start()
     expect(heartbeat(db).instance).toBe(next.instance)

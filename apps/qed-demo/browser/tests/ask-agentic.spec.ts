@@ -109,7 +109,7 @@ test('Ask proposes a goal and a payment, both approved; QED buys within a mandat
   await page.goto(`${s.base}/pay`)
   const commerce = page.getByRole('region', { name: 'Services QED can buy for you' })
   await expect(commerce.getByText('No mandate is signed, so QED buys nothing.')).toBeVisible()
-  await expect(commerce.getByText(/Simulated: two test services on this computer/)).toBeVisible()
+  await expect(commerce.getByText(/Simulated: two test services on this QED installation/)).toBeVisible()
   await commerce.getByRole('group', { name: 'Services QED may buy from' }).getByLabel(/Beta Briefs/).uncheck()
   await commerce.getByRole('button', { name: 'Review the mandate and sign' }).click()
   const mandate = page.getByRole('dialog', { name: 'Sign this mandate' })
@@ -154,8 +154,10 @@ test('Ask proposes a goal and a payment, both approved; QED buys within a mandat
   // ---- Spend lists it, and Activity shows the payment under the mandate
   await page.reload()
   await expect(page.getByRole('region', { name: 'Payments so far' }).getByText('By QED, within your mandate')).toBeVisible({ timeout: 30_000 })
-  await page.goto(`${s.base}/activity`)
+  await page.goto(`${s.base}/activity?view=list`)
   await expect(page.getByText('Alpha Digest (simulated)').first()).toBeVisible({ timeout: 30_000 })
+  const row = page.getByRole('row').filter({ hasText: 'Alpha Digest (simulated)' }).first() // R14: the day book's row, its details behind "Every detail and time"
+  await row.getByRole('button', { name: 'Every detail and time' }).click()
   await expect(page.getByText('Your commerce mandate').first()).toBeVisible()
   expect(errors).toEqual([])
 })
