@@ -349,3 +349,21 @@
 .desk .desk-acts { gap: var(--s3); flex-wrap: wrap; margin-top: var(--s3); }
 .desk .desk-report .wk-t svg, .desk .pg-sec-t h2 svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
 .desk .desk-rfq { display: grid; gap: var(--s4); margin-top: var(--s4); }
+
+/* ---- R14 rest 2: Workspace (kept with the wk- rules above, which this file owns) ---- */
+/* Workspace (R14 rest 2). The rules of the page's own parts are in security.css (wk-); this file holds what the R14 pass
+   added, and nothing else, so Security's page is not touched.
+
+   A form that holds several fields is one column. security.css gave every .wk-form a two-column grid (a 420 px field
+   and a button) for the one-field forms, so the policy form and the add-a-member form put their heading and hints in
+   one column and their fields in the other, with a void under the heading and the fields on two different lines
+   (L3: fields in a row are whole, and each hint sits under its own control). */
+.workspace .wk-form.wk-form--stack,
+.workspace .wk-policy .wk-form,
+.workspace form.wk-part.wk-form { grid-template-columns: minmax(0, 1fr); justify-content: stretch; align-items: start; }
+.workspace .wk-form > .btn, .workspace .wk-form > div > .btn { width: auto; justify-self: start; }
+.workspace .wk-hint { max-width: 72ch; }
+/* A hint that stands alone in a part (the personal workspace's note on what a business adds) is a line, not a box */
+.workspace .wk-part:has(> .wk-hint:only-child) { background: none; border: 0; border-top: 1px solid var(--rule-2); border-radius: 0; padding-inline: 0; }
+/* A member's role control is a control's width, with its two buttons beside it where the row has room */
+.workspace .wk-acts > select.input { width: auto; min-width: 9rem; }

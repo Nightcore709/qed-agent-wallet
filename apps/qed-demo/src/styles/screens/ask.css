@@ -297,3 +297,12 @@
 .ak-payee-check { display: grid; gap: var(--s3); }
 .ak-sure { display: flex; align-items: flex-start; gap: var(--s2); font-size: var(--t-small); }
 .ak-quiet { font-size: var(--t-small); color: var(--ink-3); }
+
+/* R14 rest 2: the page's foot. The composer's own floor already reserves the dock's height under it, so the sources
+   note follows it without a second gap, and its last line can be scrolled clear of the dock (the dock floated over it
+   at the foot of the page because Ask gives the shell no foot padding). A last, odd "waiting on you" card takes the row
+   instead of standing beside nothing. */
+.app.is-ask .source-note { margin-top: 0; padding-bottom: calc(var(--bar-bottom, 84px) + var(--s5)); }
+.ak-wait-list > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.ak-more { margin-top: calc(-1 * var(--s2)); max-width: 62ch; }
+.ak-more > p { margin: 0; font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }

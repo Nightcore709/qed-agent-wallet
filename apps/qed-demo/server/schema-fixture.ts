@@ -108,8 +108,23 @@ export const V8_TABLES: readonly string[] = ['dispute_pauses', 'channel_terms', 
   // R13 (part (w)): every request Ask made to the Anthropic API, with its model, tokens and cost
   'ai_attempts']
 
+/** What schema v9 added (R14, server/core.ts): part (d), Grow's watchlist, made by schema.sql at every open. */
+export const V9_TABLES: readonly string[] = ['watchlist_items']
+
+/** Take what schema v9 added out of a closed database file this build made, and set the version to 8: the shape v8 left. */
+export function toSchemaV8(path: string): void {
+  const raw = new DatabaseSync(path)
+  try {
+    raw.exec('BEGIN IMMEDIATE')
+    for (const t of V9_TABLES) raw.exec(`DROP TABLE IF EXISTS ${t}`)
+    raw.exec(`UPDATE meta SET value = '8' WHERE key = 'schema_version'`)
+    raw.exec('COMMIT')
+  } catch (e) { if (raw.isTransaction) raw.exec('ROLLBACK'); throw e } finally { raw.close() }
+}
+
 /** Take what schema v8 added out of a closed database file this build made, and set the version to 7: the shape v7 left. */
 export function toSchemaV7(path: string): void {
+  toSchemaV8(path)
   const raw = new DatabaseSync(path)
   try {
     raw.exec('BEGIN IMMEDIATE')

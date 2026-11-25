@@ -102,14 +102,15 @@ async function v7Database(alsoV8 = false): Promise<{ path: string; waiting: stri
 
 describe('schema v8: a fund purchase\'s money received is a state of its own', () => {
   it('a v7 database migrates after its copy is sealed: every fund order keeps its state and its NAV day, and each purchase gains the time its money was treated as received', async () => {
-    expect(SCHEMA_VERSION).toBe('8')
+    // v8 is this file's step; the build migrates on past it (v9, R14 watchlist), so the version it ends at is SCHEMA_VERSION
+    expect(Number(SCHEMA_VERSION)).toBeGreaterThanOrEqual(8)
     const { path } = await v7Database()
     const before = new DatabaseSync(path, { readOnly: true })
     const was = new Map((before.prepare('SELECT client_ref, state, created_at, meta_json FROM pv_orders').all() as { client_ref: string; state: string; created_at: number; meta_json: string }[]).map((r) => [r.client_ref, r]))
     try { expect(columns(before, 'pv_orders')).not.toContain('funds_at') } finally { before.close() }
     const db = openDb(path)
     try {
-      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: '8' })
+      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: SCHEMA_VERSION })
       const allotted = orderRow(db, 'mf-allotted'), waiting = orderRow(db, 'mf-waiting'), redeem = orderRow(db, 'mf-redeem'), refused = orderRow(db, 'mf-refused')
       expect(allotted).toMatchObject({ state: 'filled', funds_at: was.get('mf-allotted')!.created_at })
       expect(waiting).toMatchObject({ state: 'funded', funds_at: was.get('mf-waiting')!.created_at })
@@ -122,7 +123,7 @@ describe('schema v8: a fund purchase\'s money received is a state of its own', (
     const manifests = listManifests(join(dirname(path), 'migration-copies'))
     expect(manifests).toHaveLength(1)
     const target = join(tempFolder('qed-v8-restored-'), 'qed.db')
-    expect(restoreBackup({ manifest: manifests[0]!, keyring: openKeyring('migration-copy'), target }).manifest.migration).toEqual({ from: '7', to: '8' })
+    expect(restoreBackup({ manifest: manifests[0]!, keyring: openKeyring('migration-copy'), target }).manifest.migration).toEqual({ from: '7', to: SCHEMA_VERSION })
     const restored = new DatabaseSync(target, { readOnly: true })
     try {
       expect((restored.prepare(`SELECT value FROM meta WHERE key = 'schema_version'`).get() as { value: string }).value).toBe('7')
@@ -156,7 +157,7 @@ describe('schema v8: a fund purchase\'s money received is a state of its own', (
     openDb(path).close()
     const db = openDb(path)
     try {
-      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: '8' })
+      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: SCHEMA_VERSION })
       expect(orderRow(db, 'mf-v8')).toMatchObject({ state: 'accepted', funds_at: null })
       expect(typeof JSON.parse(orderRow(db, 'mf-v8').meta_json).fundsDueAt).toBe('number')
     } finally { db.close() }

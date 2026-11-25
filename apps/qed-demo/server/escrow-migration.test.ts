@@ -82,7 +82,8 @@ function expectTermsUnchanged(db: ReturnType<typeof openDb>): void {
 
 describe('schema v8 on books shaped like the review database: no new terms by migration', () => {
   it('the first execution seals a copy, then adds the columns and tables and gives no milestone a deadline, a default or terms; no money moves', () => {
-    expect(SCHEMA_VERSION).toBe('8')
+    // v8 is this file's step; the build migrates on past it (v9, R14 watchlist), so the version it ends at is SCHEMA_VERSION
+    expect(Number(SCHEMA_VERSION)).toBeGreaterThanOrEqual(8)
     const path = reviewShapedV7()
     const before = snapshotV7(path)
     expect(before.version).toBe('7')
@@ -93,7 +94,7 @@ describe('schema v8 on books shaped like the review database: no new terms by mi
     } finally { d0.close() }
     const db = openDb(path)
     try {
-      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: '8' })
+      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: SCHEMA_VERSION })
       for (const [t, c] of V8_COLUMNS) expect(db.all<{ name: string }>(`PRAGMA table_info(${t})`).map((x) => x.name), `${t}.${c}`).toContain(c)
       expectTermsUnchanged(db)
       expect(db.all('SELECT id, job_id, title, amount, state, evidence_hash, updated_at FROM earn_milestones ORDER BY id')).toEqual(before.milestones)
@@ -121,7 +122,7 @@ describe('schema v8 on books shaped like the review database: no new terms by mi
     for (let i = 0; i < 2; i++) {
       const db = openDb(path)
       try {
-        expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: '8' })
+        expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: SCHEMA_VERSION })
         expect({ m: money(db), schema: db.all(`SELECT type, name, sql FROM sqlite_master ORDER BY name`) }).toEqual(after)
         expectTermsUnchanged(db)
       } finally { db.close() }
@@ -143,7 +144,7 @@ describe('schema v8 on books shaped like the review database: no new terms by mi
     try { expect(columns(d0, 'earn_milestones')).not.toContain('due_at') } finally { d0.close() }
     const db = openDb(path)
     try {
-      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: '8' })
+      expect(db.get(`SELECT value FROM meta WHERE key = 'schema_version'`)).toEqual({ value: SCHEMA_VERSION })
       expectTermsUnchanged(db)
       expect(db.all('SELECT id, job_id, title, amount, state, evidence_hash, updated_at FROM earn_milestones ORDER BY id')).toEqual(before.milestones)
       expect(db.get('SELECT COUNT(*) n FROM entries')).toEqual(before.entries)
@@ -158,7 +159,7 @@ describe('schema v8 on books shaped like the review database: no new terms by mi
     expect(manifests).toHaveLength(1)
     const target = join(tempFolder('qed-v8-restored-'), 'qed.db')
     const r = restoreBackup({ manifest: manifests[0]!, keyring: openKeyring('migration-copy'), target })
-    expect(r.manifest.migration).toEqual({ from: '7', to: '8' })
+    expect(r.manifest.migration).toEqual({ from: '7', to: SCHEMA_VERSION })
     expect(snapshotV7(target)).toEqual(before)
     const d = ro(target)
     try {

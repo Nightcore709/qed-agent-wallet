@@ -19,7 +19,7 @@ FILES = sorted(p for d in ('src', 'server', 'shared') for p in (root / d).rglob(
 KEEP_RUPEES = set('''src/lib/core.ts server/earn-chain.ts server/directory.ts server/escrow.ts server/rfq.ts server/netting.ts server/institutional.ts
 server/securities-books.ts server/tax.ts server/ideas.ts server/evidence.ts src/ui/earn-chain.tsx src/ui/earn-directory.tsx
 src/ui/earn-terms.tsx src/ui/vault-ownership.tsx src/screens/WalletInline.tsx src/screens/Earn.tsx src/screens/Idea.tsx src/screens/Lab.tsx
-src/screens/Desk.tsx src/screens/Holdings.tsx src/screens/GrowCompare.tsx src/screens/Tax.tsx'''.split())
+src/screens/Desk.tsx src/screens/Holdings.tsx src/screens/Watching.tsx src/screens/GrowCompare.tsx src/screens/Tax.tsx'''.split())
 EXACT = {'workspaces.ts', 'netting.ts', 'institutional.ts', 'liquidity.ts', 'goals.ts'}
 MINOR = {'commerce-mandate.ts', 'ask-kinds.ts', 'policy.ts', 'commerce.ts'}
 VIA_PROGRAMS = {'ai.ts', 'owner.ts', 'conversation.ts', 'runner.ts'}

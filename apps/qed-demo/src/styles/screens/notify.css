@@ -31,11 +31,9 @@
 .pr-nt-ico[data-u="action"] { color: var(--due); border-color: color-mix(in oklab, var(--due) 35%, transparent); background: var(--due-bg); }
 .pr-nt-dedupe { display: flex; align-items: flex-start; gap: var(--s2); margin-top: var(--s2); padding-top: var(--s3); border-top: 1px solid var(--rule-2); font-size: var(--t-small); line-height: 1.45; color: var(--ink-2); }
 .pr-nt-dedupe svg { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--ink-3); }
-.pr-nt-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4); align-items: end; }
-.pr-nt-save, .pr-nt-hint { grid-column: 1 / -1; }
+.pr-nt-form { display: grid; gap: var(--s4); }
 @media (max-width: 759px) {
   .pr-nt-grid > .panel { padding: var(--s4); }
   .pr-nt-list > li { grid-template-columns: minmax(0, 1fr) auto; }
   .pr-nt-when { grid-column: 1 / -1; }
-  .pr-nt-form { grid-template-columns: minmax(0, 1fr); }
 }

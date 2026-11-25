@@ -12,7 +12,7 @@ import { migrateToV6 } from './migrate-v6.ts'
 import { closeAsFound, MigrationRefused, sealMigrationCopy } from './migration-copy.ts'
 import { MICROS, PRICES } from './model-prices.ts'
 
-export const SCHEMA_VERSION = '8'
+export const SCHEMA_VERSION = '9'
 const HERE = dirname(fileURLToPath(import.meta.url))
 export const APP_ROOT = join(HERE, '..')
 
@@ -391,6 +391,15 @@ const MIGRATIONS: Record<string, { to: string; alter: (db: Db) => void; fill: (d
       // (r) the saved codes made before v3, put under scrypt
       layerLegacyCodes(db)
     },
+  },
+  // The v8 to v9 step is one step with lettered parts, shared by the R14 work (each part is its own block):
+  // (d) 25 Nov 2026, R14 Grow (server/watchlist.ts): one new table made by schema.sql, watchlist_items, a household's list of the
+  // names it watches. No column is added and no row is written: nobody watches anything, and nothing is bought, sold, limited or
+  // approved for anyone by this step. Every existing household, its books and its records keep their meaning.
+  '8': {
+    to: '9',
+    alter: () => { /* (d) nothing to alter: the table is made by schema.sql */ },
+    fill: () => { /* (d) nothing to fill: the list starts empty for every household */ },
   },
 }
 

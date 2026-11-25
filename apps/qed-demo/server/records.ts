@@ -192,6 +192,8 @@ export const TABLES: Record<string, Rule> = {
   xb_payments: { scope: 'person', where: OWN_WS, onDelete: 'keep', keep: FIN('Payments abroad as sent on paper, with their route and value date') },
   xb_payees: { scope: 'person', where: OWN_WS, onDelete: 'scrub', scrub: { name: `'[erased]'`, account: `'[erased-' || id || ']'`, bank: 'NULL' }, note: 'The payee row stays for the payments abroad that point to it; its name and account are overwritten' },
   fx_goals: { scope: 'person', where: OWN_WS, onDelete: 'delete' },
+  // R14 (schema v9 part d): the household's watchlist (server/watchlist.ts); it holds no money and is removed with the account
+  watchlist_items: { scope: 'person', where: OWN_WS, onDelete: 'delete' },
   actions: { scope: 'person', where: OWN_WS, onDelete: 'keep', keep: FIN('Orders and payments, with what checked them') },
   runs: { scope: 'person', where: OWN_WS, onDelete: 'keep', keep: FIN('Runs of the person\'s instructions') },
   pv_orders: { scope: 'person', where: OWN_WS, onDelete: 'keep', keep: FIN('The paper venue\'s orders') },

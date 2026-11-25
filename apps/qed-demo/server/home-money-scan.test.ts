@@ -22,7 +22,7 @@ const RUPEE_ONLY: Record<string, string> = {
   'server/tax.ts': 'Indian tax, in rupees', 'server/ideas.ts': 'ideas tested on rupee-quoted instruments', 'server/evidence.ts': 'rupee evidence cases',
   'src/ui/earn-chain.tsx': 'test rupees', 'src/ui/earn-directory.tsx': 'test rupees', 'src/ui/earn-terms.tsx': 'test rupees', 'src/ui/vault-ownership.tsx': 'test rupees', 'src/screens/WalletInline.tsx': 'test rupees',
   'src/screens/Earn.tsx': 'test rupees and paper escrow', 'src/screens/Idea.tsx': 'rupee-quoted instruments', 'src/screens/Lab.tsx': 'rupee-quoted instruments', 'src/screens/Desk.tsx': 'the rupee desk',
-  'src/screens/Holdings.tsx': 'rupee-quoted holdings', 'src/screens/GrowCompare.tsx': 'rupee-quoted funds', 'src/screens/Tax.tsx': 'Indian tax, in rupees',
+  'src/screens/Holdings.tsx': 'rupee-quoted holdings', 'src/screens/Watching.tsx': 'the watchlist writes a rupee-quoted instrument\'s price in rupees (a price, not a household balance)', 'src/screens/GrowCompare.tsx': 'rupee-quoted funds', 'src/screens/Tax.tsx': 'Indian tax, in rupees',
 }
 const RUPEE_CALL = /(?<![\w.$])(?:inr|inrExact|inrCompact)\s*\(|\bfmt\.inr\b/
 

@@ -1575,3 +1575,19 @@ CREATE TABLE IF NOT EXISTS institution_setups (
   created_at INTEGER NOT NULL,
   UNIQUE (user_id, institution)
 ) STRICT;
+
+-- R14 (schema v9 part d): a household's watchlist (server/watchlist.ts). One row for each instrument a household watches,
+-- with the price, its type, source and times at the moment it was added, which a row's change since added is counted from.
+-- It moves no money and places no order. At most 50 a household (checked in the code, under the write lock).
+CREATE TABLE IF NOT EXISTS watchlist_items (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  instrument_id TEXT NOT NULL REFERENCES instruments(id),
+  added_at INTEGER NOT NULL,
+  added_role TEXT NOT NULL,
+  price_type TEXT NOT NULL,
+  added_price TEXT,             -- NULL when no price was on record at the moment it was added
+  added_provider TEXT,
+  added_source_ts INTEGER,
+  added_recv_ts INTEGER,
+  PRIMARY KEY (user_id, instrument_id)
+) STRICT;
