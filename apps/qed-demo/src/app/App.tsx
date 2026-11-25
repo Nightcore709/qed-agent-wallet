@@ -4,14 +4,17 @@
  * sections (five on a phone, Ask in the middle). Design system "Meridian" (DESIGN.md).
  */
 import {
-  ArrowLeft, ArrowRight, Bell, Building2, ChartLine, Check, ChevronDown, ChevronRight, Copy, Download, Fingerprint, HandCoins, House, KeyRound, ListChecks, LogOut, Menu,
+  ArrowLeft, ArrowRight, Bell, Building2, ChartLine, Check, ChevronDown, ChevronRight, Fingerprint, HandCoins, House, KeyRound, ListChecks, LogOut, Menu,
   Monitor, Moon, PiggyBank, ReceiptText, Route, ShieldCheck, Sparkles, Sun, Users, Wallet, ArrowUpRight, FileText, Settings2, X,
 } from 'lucide-react'
 import { type ComponentType, lazy, type ReactNode, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { type Id, t, useT } from '../lib/i18n.ts'
 import { api, ApiError, beginSignOut, endSignOut, fmt, handAsk, match, navigate, onSignedOut, setCsrf, setDisplayZone, setHomeCurrency, startLive, stopLive, useData, useLocation, useNow } from '../lib/core.ts'
-import { addPasskey, confirmWithPasskey, deviceWords, passkeyAutofillAvailable, passkeysAvailable, signIn, signInWithAutofill, signInWithPassword, signUp, signUpWithPassword, stopAutofill } from '../lib/passkey.ts'
+import { addPasskey, beginGoogle, confirmWithPasskey, holdCodes, takeCodes, type DeviceCheck, deviceCheck, deviceWords, passkeyAutofillAvailable, passkeysAvailable, signIn, signInWithAutofill, signInWithPassword, signUp, signUpWithEmail, stopAutofill } from '../lib/passkey.ts'
+import { DEVICE_SIGN_IN, NO_DEVICE_CHECK, NO_PASSKEYS_AT_ALL, ORDINARY_SIGN_IN_LIMIT } from '../../shared/access-operations.ts'
+import { outboxWords } from '../../shared/delivery-words.ts'
 import { Btn, Crumb, Field, Link, Loading, Logo, MoneyInput, Note, Orb, PasswordField, Problem, Seal, SectionNav, type SessionInfo, SessionCtx, Sheet, SourceNote, useAction, useSession, useStickySide } from '../ui/kit.tsx'
+import { SavedCodes } from '../ui/SavedCodes.tsx'
 import { applyFx, type Fx, readFx, setFx, useArrival, useDockIndicator, useSection } from '../ui/motion.ts'
 import { HomeScreen } from '../screens/Home.tsx'
 
@@ -35,9 +38,8 @@ const RecoveredStep = lazy(async () => ({ default: (await accessMod()).Recovered
 const AccessPage = lazy(async () => ({ default: (await accessMod()).AccessPage }))
 // the pause sheet's "Also pause the on-chain wallet": the wallet page's code, fetched only when asked for
 const WalletPauseNow = lazy(async () => ({ default: (await import('../ui/wallet-pause.tsx')).WalletPauseNow }))
-const EmailSetup = lazy(async () => ({ default: (await accessMod()).EmailSetup }))
 /** The pages a message's link opens, and the developer outbox: drawn on their own, signed in or out. */
-const ACCESS_PATHS = ['/reset-password', '/recover', '/verify-email', '/dev/outbox']
+const ACCESS_PATHS = ['/reset-password', '/recover', '/verify-email', '/dev/outbox', '/auth/google/callback']
 const EvidenceCaseScreen = screen(() => import('../screens/Evidence.tsx'), 'EvidenceCaseScreen')
 const EvidenceListScreen = screen(() => import('../screens/Evidence.tsx'), 'EvidenceListScreen')
 // the judge's walk-through (Topic F, R11-018): on demand only, not fetched ahead with the everyday screens
@@ -239,24 +241,38 @@ function useTheme(): void { useEffect(() => { applyTheme(readTheme()); applyFx()
 
 // ------------------------------------------------------------------------------------------------ sign-in and account creation
 
+/**
+ * Signing in and opening an account (R14, Priority 1): one screen, with the ordinary ways first.
+ *
+ *   Sign in            email (or handle) and password; or the device ("your fingerprint, Face ID or device PIN", a passkey);
+ *                      or Google, rendered only where this installation has it configured. Phone sign-in has no provider
+ *                      here, so nothing is shown for it.
+ *   Create an account  name, email and password; or Google; or, for someone who wants no password, a passkey.
+ *
+ * Signing in is one of five separate operations (shared/access-operations.ts): it lets a person look and prepare. The
+ * page says so, and says where money is approved: on the device.
+ */
 function Welcome() {
-  const { reload } = useSession()
+  const { session, reload } = useSession()
   const { query } = useLocation()
   // "?help=recover" or "?help=forgot" (a message's "ask for a new link") opens that journey at once
-  const [mode, setMode] = useState<'in' | 'new' | 'forgot' | 'recover'>(() => (query.get('help') === 'recover' ? 'recover' : query.get('help') === 'forgot' ? 'forgot' : 'in'))
-  const [handle, setHandle] = useState(''), [name, setName] = useState(''), [password, setPassword] = useState('')
-  const [method, setMethod] = useState<'passkey' | 'password'>('passkey')
+  const [mode, setMode] = useState<'in' | 'new' | 'new-passkey' | 'forgot' | 'recover'>(() => (query.get('help') === 'recover' ? 'recover' : query.get('help') === 'forgot' ? 'forgot' : 'in'))
+  const [id, setId] = useState(''), [email, setEmail] = useState(''), [handle, setHandle] = useState(''), [name, setName] = useState(''), [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
-  const [codes, setCodes] = useState<string[] | null>(null)
   // after a recovery: the step that says the new passkey signs in only, and how approving comes back (R12)
   const [recovered, setRecovered] = useState<string[] | null>(null)
   const supported = passkeysAvailable()
+  const check = useDeviceCheck()
+  const google = session.signIn?.google ?? false
   const signin = useAction(async () => { await signIn(); await reload() })
-  const signup = useAction(async () => { setCodes(method === 'passkey' ? await signUp(handle, name) : await signUpWithPassword(handle, name, password)) })
-  const byPassword = useAction(async () => { await signInWithPassword(handle, password); await reload() })
-  const f = { ...(signup.error?.fields ?? {}), ...(byPassword.error?.fields ?? {}) }
-  const go = (m: typeof mode) => { setMode(m); signin.clear(); signup.clear(); byPassword.clear(); if (query.get('help')) navigate('/', true) }
-  // On the sign-in form the handle field also offers this device's passkeys for QED (the browser's own suggestions):
+  const byPassword = useAction(async () => { await signInWithPassword(id, password); await reload() })
+  const signup = useAction(async () => { await signUpWithEmail(email, name, password, handle); await reload() })
+  // an account opened with a passkey has its device from the start: the next screen says so, and offers a way back in
+  const signupPasskey = useAction(async () => { await signUp(handle, name); justEnrolled(true); await reload() })
+  const withGoogle = useAction(async () => { await beginGoogle('signin') })
+  const f = { ...(signup.error?.fields ?? {}), ...(signupPasskey.error?.fields ?? {}), ...(byPassword.error?.fields ?? {}) }
+  const go = (m: typeof mode) => { setMode(m); signin.clear(); signup.clear(); signupPasskey.clear(); byPassword.clear(); withGoogle.clear(); if (query.get('help')) navigate('/', true) }
+  // On the sign-in form the first field also offers this device's passkeys for QED (the browser's own suggestions):
   // choosing one signs in with no further step. Pressing the button instead replaces this request; leaving the form ends it.
   useEffect(() => {
     // The browser suite's virtual authenticators answer this request with no person present, which would sign a journey
@@ -269,9 +285,13 @@ function Welcome() {
     return () => { live = false; stopAutofill() }
   }, [mode, supported, reload])
 
-  if (codes) return <CodesStep codes={codes} onDone={() => void reload()} />
   if (recovered) return <Suspense fallback={<main className="solo"><Loading what="Opening" /></main>}><RecoveredStep codes={recovered} onDone={() => void reload()} /></Suspense>
 
+  // rendered only where this installation has Google configured; inside .access-act so a wrapped label keeps its mark beside it
+  const googleButton = google ? (
+    <div className="access-act"><Btn className="lg block" busy={withGoogle.busy} onClick={() => void withGoogle.run()}><GoogleMark />Continue with Google{google === 'stand-in' ? ' (test stand-in)' : ''}</Btn></div>
+  ) : null
+  const creating = mode === 'new' || mode === 'new-passkey'
   return (
     <>
       <PresentationBanner />
@@ -288,49 +308,73 @@ function Welcome() {
 
         <main className="welcome-access" id="content">
           <div className="access">
-            {mode === 'in' || mode === 'new' ? <>
+            {mode === 'in' || creating ? <>
               <div className="seg access-seg" role="group" aria-label="Sign in or create an account">
                 <button type="button" aria-pressed={mode === 'in'} onClick={() => go('in')}>Sign in</button>
-                <button type="button" aria-pressed={mode === 'new'} onClick={() => go('new')}>Create an account</button>
+                <button type="button" aria-pressed={creating} onClick={() => go('new')}>Create an account</button>
               </div>
-              <h2 className="access-title">{mode === 'new' ? 'Create your account' : 'Sign in to QED'}</h2>
-              {!supported ? <Note tone="wait" title="This browser cannot use passkeys">Use your handle and password, or open QED in a current Safari, Chrome, Edge or Firefox to use a passkey.</Note> : null}
+              <h2 className="access-title">{mode === 'in' ? 'Sign in to QED' : mode === 'new' ? 'Create your account' : 'Create your account with a passkey'}</h2>
             </> : null}
 
             {mode === 'in' ? <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-              {/* the button and what the device will ask for, read as one group: centred under the button, with room */}
-              <div className="access-act">
-                <Btn tone="fill" className="lg block" busy={signin.busy} disabled={!supported} onClick={() => void signin.run()}><Fingerprint aria-hidden="true" />Sign in with a passkey</Btn>
-                {supported ? <p className="access-explain">Your device asks for {deviceWords()}. QED never receives it, only a signature.</p> : null}
-              </div>
-              <Problem error={signin.error} />
-              <div className="or"><span>or with your handle and password</span></div>
               <form className="stack" style={{ ['--gap' as string]: '12px' }} onSubmit={(e) => { e.preventDefault(); void byPassword.run() }}>
-                <Field label="Handle" hint={supported ? 'Your passkeys for QED may also be offered here.' : undefined} error={f.handle}>{(p) => <input {...p} className="input" autoComplete="username webauthn" autoCapitalize="none" spellCheck={false} value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
+                <Field label="Email or handle" error={f.handle}>{(p) => <input {...p} className="input" autoComplete="username webauthn" autoCapitalize="none" spellCheck={false} inputMode="email" value={id} onChange={(e) => setId(e.target.value)} />}</Field>
                 <PasswordField value={password} onChange={setPassword} show={show} onShow={setShow} autoComplete="current-password" error={f.password} />
                 {byPassword.error && !f.handle && !f.password ? <Problem error={byPassword.error} /> : null}
-                <Btn type="submit" className="block" busy={byPassword.busy}>Sign in with your password</Btn>
+                <Btn tone="fill" type="submit" className="lg block" busy={byPassword.busy}>Sign in with your password</Btn>
               </form>
+              <div className="or"><span>or</span></div>
+              {/* the device, first-class beside the password: the button and what the device will ask for, read as one group */}
+              <div className="access-act">
+                <Btn className="lg block" busy={signin.busy} disabled={!supported} onClick={() => void signin.run()}><Fingerprint aria-hidden="true" />{DEVICE_SIGN_IN}</Btn>
+                {!supported ? <p className="access-explain">{NO_PASSKEYS_AT_ALL}</p>
+                  : check === 'other-device' ? <p className="access-explain">{NO_DEVICE_CHECK}</p>
+                    : <p className="access-explain">For a device you have set up. It asks for {deviceWords()}; QED never receives it, only a signature.</p>}
+              </div>
+              <Problem error={signin.error} />
+              {googleButton}
+              <Problem error={withGoogle.error} />
               <div className="access-foot access-help">
                 <p className="small muted">Forgotten your password? <button type="button" className="linkish" onClick={() => go('forgot')}>Reset your password</button></p>
-                <p className="small muted">Lost your passkey or your device? <button type="button" className="linkish" onClick={() => go('recover')}>Recover your account</button></p>
+                <p className="small muted">Lost your device? <button type="button" className="linkish" onClick={() => go('recover')}>Recover your account</button></p>
               </div>
-              <p className="small faint">A session opened with a password can look at everything and set things up. Anything that moves money is approved with a passkey.</p>
+              <p className="small faint">{ORDINARY_SIGN_IN_LIMIT}</p>
             </div> : null}
 
-            {mode === 'new' ? <form className="stack" style={{ ['--gap' as string]: '14px' }} onSubmit={(e) => { e.preventDefault(); void signup.run() }}>
+            {mode === 'new' ? <div className="stack" style={{ ['--gap' as string]: '14px' }}>
+              <form className="stack" style={{ ['--gap' as string]: '12px' }} onSubmit={(e) => { e.preventDefault(); void signup.run() }}>
+                <Field label="Name to sign with" hint="Shown as your signature on what you approve.">{(p) => <input {...p} className="input" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />}</Field>
+                <Field label="Email" hint="You sign in with it. Others never see it." error={f.email}>{(p) => <input {...p} className="input" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} />}</Field>
+                <PasswordField value={password} onChange={setPassword} show={show} onShow={setShow} autoComplete="new-password" error={f.password} hint="At least 10 characters. A phrase of a few words works well." />
+                <details className="access-more" open={!!f.handle || undefined}>
+                  <summary>Choose your handle (optional)</summary>
+                  <Field label="Handle" hint="The name others pay you with: 3 to 32 letters, digits, dots, dashes or underscores. Left empty, QED makes one from your name." error={f.handle}>{(p) => <input {...p} className="input" autoComplete="off" autoCapitalize="none" spellCheck={false} value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
+                </details>
+                {signup.error && !f.handle && !f.password && !f.email ? <Problem error={signup.error} /> : null}
+                <div className="access-act">
+                  <Btn tone="fill" className="lg block" type="submit" busy={signup.busy}>Create account</Btn>
+                  <p className="access-explain">Next, you can set up your fingerprint, Face ID or device PIN for faster, more secure access. QED keeps your password in a form it cannot read back.</p>
+                </div>
+              </form>
+              <div className="or"><span>or</span></div>
+              {googleButton}
+              <Problem error={withGoogle.error} />
+              <div className="access-act">
+                <Btn className="block" disabled={!supported} onClick={() => go('new-passkey')}><Fingerprint aria-hidden="true" />Use a passkey instead</Btn>
+                <p className="access-explain">{supported ? 'No password: a passkey is your device\'s own fingerprint, Face ID or PIN check, kept for QED.' : NO_PASSKEYS_AT_ALL}</p>
+              </div>
+              <p className="small faint">{ORDINARY_SIGN_IN_LIMIT}</p>
+            </div> : null}
+
+            {mode === 'new-passkey' ? <form className="stack" style={{ ['--gap' as string]: '14px' }} onSubmit={(e) => { e.preventDefault(); void signupPasskey.run() }}>
+              <button type="button" className="back-link" onClick={() => go('new')}><ArrowLeft size={16} aria-hidden="true" />Use an email and a password</button>
               <Field label="Handle" hint="3 to 32 letters, digits, dots, dashes or underscores. Others pay you with it." error={f.handle}>{(p) => <input {...p} className="input" autoComplete="username" autoCapitalize="none" spellCheck={false} value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
               <Field label="Name to sign with" hint="Shown as your signature on what you approve.">{(p) => <input {...p} className="input" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />}</Field>
-              <fieldset className="choice method">
-                <legend className="legend">How you will sign in</legend>
-                <label><input type="radio" name="method" checked={method === 'passkey'} onChange={() => setMethod('passkey')} disabled={!supported} /><b>With a passkey</b><small>Unlocked with {deviceWords()}. Nothing to remember, and the same passkey approves payments.</small></label>
-                <label><input type="radio" name="method" checked={method === 'password'} onChange={() => setMethod('password')} /><b>With a password</b><small>You can look around and set up at once. Approving anything needs a passkey, which the next step offers to add.</small></label>
-              </fieldset>
-              {method === 'password' ? <PasswordField value={password} onChange={setPassword} show={show} onShow={setShow} autoComplete="new-password" error={f.password} hint="At least 10 characters. A phrase of a few words works well." /> : null}
-              {signup.error && !f.handle && !f.password ? <Problem error={signup.error} /> : null}
+              {check === 'other-device' ? <Note tone="wait" title="No fingerprint, face or PIN check on this device">{NO_DEVICE_CHECK}</Note> : null}
+              {signupPasskey.error && !f.handle ? <Problem error={signupPasskey.error} /> : null}
               <div className="access-act">
-                <Btn tone="fill" className="lg block" type="submit" busy={signup.busy} disabled={method === 'passkey' && !supported}>{method === 'passkey' ? <><Fingerprint aria-hidden="true" />Create account with a passkey</> : 'Create account with a password'}</Btn>
-                <p className="access-explain">{method === 'passkey' ? `Your device makes a passkey for QED and asks for ${deviceWords()}. QED never receives your face, fingerprint or PIN, only the passkey's public key.` : 'Your password is stored only as a slow, salted hash. QED cannot read it back.'}</p>
+                <Btn tone="fill" className="lg block" type="submit" busy={signupPasskey.busy} disabled={!supported}><Fingerprint aria-hidden="true" />Create account with a passkey</Btn>
+                <p className="access-explain">Your device makes a passkey for QED and asks for {deviceWords()}. QED never receives your face, fingerprint or PIN, only the passkey's public key. This account has no password.</p>
               </div>
             </form> : null}
 
@@ -344,6 +388,34 @@ function Welcome() {
       </div>
     </>
   )
+}
+
+/**
+ * A plain letter for Google's button. Before sign-in with Google is switched on with a real client, this button is to be
+ * replaced by Google's own branded button, as its sign-in branding guidelines ask (design note, open items).
+ */
+function GoogleMark() {
+  return <span className="g-mark" aria-hidden="true">G</span>
+}
+
+/** What this device can offer for "your fingerprint, Face ID or device PIN"; null until the browser has answered. */
+function useDeviceCheck(): DeviceCheck | null {
+  const [c, setC] = useState<DeviceCheck | null>(null)
+  useEffect(() => { let live = true; void deviceCheck().then((v) => { if (live) setC(v) }); return () => { live = false } }, [])
+  return c
+}
+
+/**
+ * Whether a device was set up a moment ago in this tab (at sign-up with a passkey, or in the step after it): the next
+ * screen then says it worked and offers a way back in, once. Kept for the tab, so a reload does not lose it.
+ */
+const ENROLLED_KEY = 'qed.enrolled'
+function justEnrolled(set?: boolean): boolean {
+  try {
+    if (set === true) sessionStorage.setItem(ENROLLED_KEY, '1')
+    if (set === false) sessionStorage.removeItem(ENROLLED_KEY)
+    return sessionStorage.getItem(ENROLLED_KEY) === '1'
+  } catch { return false }
 }
 
 /**
@@ -370,59 +442,32 @@ function Vignette() {
 }
 
 /**
- * Right after an account is created: a way back in. An email address first (R12: the familiar way, confirmed by a link
- * or a code), then the saved recovery codes as the backup, shown once. Continuing needs one of the two: a confirmation
- * sent, or the codes kept somewhere other than this device.
+ * The address the account was opened with, and whether it is confirmed, said plainly (R14). Where this installation cannot
+ * send email, it says that confirming is unavailable here and that the account works without it; it never says a message
+ * was sent. With the local test outbox it says the message is kept there, not sent.
  */
-function CodesStep({ codes, onDone }: { codes: string[]; onDone: () => void }) {
+function EmailLine() {
   const { session } = useSession()
-  // With no way to send email on this installation (review M4), the codes are the way back in: no email is offered.
-  const noEmail = session.delivery === 'none'
-  const [saved, setSaved] = useState(false), [copied, setCopied] = useState(false), [emailed, setEmailed] = useState(false)
-  const download = () => {
-    const blob = new Blob([`QED recovery codes, made ${new Date().toISOString().slice(0, 10)}. Each works once.\n\n${codes.join('\n')}\n`], { type: 'text/plain' })
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'qed-recovery-codes.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000)
-  }
-  return (
-    <div className="onboard">
-      <OnboardTop step="account" />
-      <main className="onboard-main" id="content">
-        <section className="onboard-card stack" style={{ ['--gap' as string]: '18px' }}>
-          <div className="onboard-icon"><KeyRound aria-hidden="true" /></div>
-          <div className="stack" style={{ ['--gap' as string]: '8px' }}>
-            <h1>Keep a way back in</h1>
-            <p className="muted">{noEmail ? 'Your account is open. If you ever lose every device that holds your passkey, QED gets you back in with one of these codes and a code from a recovery contact you name later, after a wait that you, your devices and your recovery contacts can stop.' : 'Your account is open. If you ever lose every device that holds your passkey, QED gets you back in with your email and one more proof, after a wait that you, your devices and your recovery contacts can stop. Set up at least one of these now.'}</p>
-          </div>
-          <Suspense fallback={<Loading what="Opening" />}><EmailSetup onSent={() => setEmailed(true)} /></Suspense>
-          <section className="stack ax-codes" style={{ ['--gap' as string]: '10px' }} aria-labelledby="codes-h">
-            <h2 id="codes-h" className="ax-h2">{noEmail ? 'Save your recovery codes' : 'Save your recovery codes as a backup'}</h2>
-            <p className="small muted">{noEmail ? 'One of these, beside a code from a recovery contact you name later, starts a recovery.' : 'One of these is the second proof beside your email, or, without email, beside a code from a recovery contact you name later.'} Each works once, they are shown only now, and no code can recover the account on its own.</p>
-            <ol className="codes" aria-label="Recovery codes">{codes.map((c) => <li key={c} className="code">{c}</li>)}</ol>
-            <div className="row">
-              <Btn onClick={() => void navigator.clipboard?.writeText(codes.join('\n')).then(() => setCopied(true)).catch(() => {})}>{copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}{copied ? 'Copied' : 'Copy them'}</Btn>
-              <Btn onClick={download}><Download aria-hidden="true" />Download as a text file</Btn>
-            </div>
-            <label className="check confirm"><input type="checkbox" checked={saved} onChange={(e) => setSaved(e.target.checked)} /> I have stored these codes somewhere other than this device</label>
-          </section>
-          <div className="row"><Btn tone="fill" className="lg" disabled={!saved && !(emailed && !noEmail)} onClick={onDone}>Continue</Btn>{!saved && !(emailed && !noEmail) ? <span className="small faint">{noEmail ? 'Keep the codes first.' : 'Add an email address or keep the codes first.'}</span> : null}</div>
-        </section>
-      </main>
-    </div>
-  )
+  const e = session.email
+  if (!e?.address || e.verified) return null
+  if (!e.canVerify) return <div role="status"><Note tone="wait" title={`${e.address} is not verified`}>This build of QED cannot send email, so it cannot verify your address here. Your account works without it: you sign in with this address and your password. Nothing was sent to it.</Note></div>
+  if (!e.pending) return <div role="status"><Note tone="wait" title={`${e.address} is not verified`}>Send its confirmation again under Security.</Note></div>
+  const w = e.simulated ? outboxWords('confirm', e.address) : { title: `Confirm ${e.address}`, body: 'A message with a link is on its way to it. Until you open it, the address is not verified.' }
+  return <div role="status"><Note tone="qed" title={w.title}>{w.body}{e.simulated ? <> <a href="/dev/outbox" target="_blank" rel="noopener">Open the simulated outbox</a>.</> : null}</Note></div>
 }
 
 /** The steps of opening an account, with where this person is. */
-function OnboardTop({ step, skippedPasskey }: { step: 'account' | 'passkey' | 'household' | null; skippedPasskey?: boolean }) {
+function OnboardTop({ step, skippedDevice }: { step: 'account' | 'device' | 'household' | null; skippedDevice?: boolean }) {
   const { session, reload } = useSession()
   const out = useAction(async () => { beginSignOut(); try { await api('POST', '/api/auth/logout') } catch (e) { endSignOut(); throw e } await reload(); navigate('/', true) })
-  const order = ['account', 'passkey', 'household'] as const
+  const order = ['account', 'device', 'household'] as const
   const at = step ? order.indexOf(step) : -1
-  const label = { account: 'Your account', passkey: 'Your passkey', household: 'Your household' }
+  const label = { account: 'Your account', device: 'Your device', household: 'Your household' }
   return (
     <header className="onboard-top">
       <Brand />
       {step ? <ol className="steps" aria-label="Setting up">{order.map((s, i) => {
-        const skipped = s === 'passkey' && skippedPasskey && i < at
+        const skipped = s === 'device' && skippedDevice && i < at
         return <li key={s} className={skipped ? 'skipped' : i < at ? 'done' : i === at ? 'now' : ''} aria-current={i === at ? 'step' : undefined}><i aria-hidden="true">{skipped ? '–' : i < at ? <Check size={12} strokeWidth={3} /> : i + 1}</i><span className="step-name">{label[s]}{skipped ? ', later' : ''}</span></li>
       })}</ol> : <span />}
       {session.authenticated ? <span className="row onboard-who"><span className="small muted">Signed in as {session.user?.displayName}</span><Btn small tone="quiet" busy={out.busy} onClick={() => void out.run()}>Sign out</Btn></span> : <span />}
@@ -433,56 +478,117 @@ function OnboardTop({ step, skippedPasskey }: { step: 'account' | 'passkey' | 'h
 /**
  * Before the household is opened, the account still has its security screen, a way to sign out, and the warning about
  * a recovery somebody started: an account with nothing set up is still an account someone may be trying to take.
+ *
+ * After an account is opened (R14): one optional step offers the device, "Use your fingerprint, Face ID or device PIN
+ * for faster, more secure access"; when a device has just been set up, one screen says so and offers a way back in
+ * (saved recovery codes, made only if asked for). Nothing here is a wall: each can be left for later.
  */
 function BeforeSetup() {
   const { session } = useSession()
   const { path } = useLocation()
   const [later, setLater] = useState(false)
-  const needsPasskey = !session.hasPasskey && !later
+  const [enrolled, setEnrolled] = useState(() => justEnrolled())
+  const needsDevice = !session.hasPasskey && !later
+  const showEnrolled = !!session.hasPasskey && enrolled
   return (
     <div className="onboard">
       <PresentationBanner />
       <RecoveryBanner />
       <AuthorityBanner />
-      <OnboardTop step={needsPasskey ? 'passkey' : 'household'} skippedPasskey={!session.hasPasskey} />
+      <OnboardTop step={needsDevice || showEnrolled ? 'device' : 'household'} skippedDevice={!session.hasPasskey} />
       {path === '/security'
         ? <main className="main" id="content"><Crumb to="/">Back to setting up</Crumb><Suspense fallback={<Loading what="Opening security" />}><SecurityScreen /></Suspense></main>
-        : needsPasskey ? <PasskeyStep onLater={() => setLater(true)} /> : <Setup />}
+        : needsDevice ? <DeviceStep onLater={() => setLater(true)} onDone={() => { justEnrolled(true); setEnrolled(true) }} />
+          : showEnrolled ? <DeviceReady onDone={() => { justEnrolled(false); setEnrolled(false) }} />
+            : <Setup />}
     </div>
   )
 }
 
-/** A password account adds the passkey that approves payments, or chooses to do it later. */
-function PasskeyStep({ onLater }: { onLater: () => void }) {
+/**
+ * The step after an ordinary sign-up: set up device sign-in for faster, more secure access, or leave it for later. (The
+ * button does not say "this device": the browser also offers a phone nearby or a security key, and QED does not tie a passkey to one.) Enrolling
+ * a device is its own operation: the server takes the password typed in the last five minutes (the sign-up's own counts),
+ * or Google confirmed again, for the account's first device only.
+ */
+function DeviceStep({ onLater, onDone }: { onLater: () => void; onDone: () => void }) {
   const { t } = useT()
-  const { reload } = useSession()
+  const { session, reload } = useSession()
+  const check = useDeviceCheck()
   // The password typed at sign-up unlocks this for five minutes; after that, or after signing in again with the
-  // password, the server asks for it once more (the review of D-094, M4).
-  const [askPw, setAskPw] = useState(false), [pw, setPw] = useState(''), [show, setShow] = useState(false)
+  // password, the server asks for it once more (the review of D-094, M4). An account Google signs in to confirms with Google.
+  const [askPw, setAskPw] = useState(false), [askGoogle, setAskGoogle] = useState(false), [pw, setPw] = useState(''), [show, setShow] = useState(false)
   const add = useAction(async () => {
     if (askPw) await api('POST', '/api/auth/stepup', { password: pw })
-    try { await addPasskey() }
-    catch (e) { if (e instanceof ApiError && e.code === 'stepup_required') { setAskPw(true); throw new ApiError(401, 'stepup_required', t('passkey.stepup')) } throw e }
-    setPw(''); await reload()
+    try { const made = await addPasskey(); holdCodes(made.recoveryCodes, made.replacedEarlier === true) }
+    catch (e) {
+      if (e instanceof ApiError && e.code === 'stepup_required') {
+        if (session.hasPassword === false) { setAskGoogle(true); throw new ApiError(401, 'stepup_required', 'Confirm with Google again, then set up your device: a device is set up only right after you have signed in.') }
+        setAskPw(true); throw new ApiError(401, 'stepup_required', t('passkey.stepup'))
+      }
+      throw e
+    }
+    setPw(''); onDone(); await reload()
   })
+  const again = useAction(async () => { await beginGoogle('confirm', '/') })
+  const none = check === 'none'
   return (
     <main className="onboard-main" id="content">
       <section className="onboard-card stack" style={{ ['--gap' as string]: '18px' }}>
         <div className="onboard-icon"><Fingerprint aria-hidden="true" /></div>
         <div className="stack" style={{ ['--gap' as string]: '8px' }}>
           <h1>{t('passkey.title')}</h1>
-          <p className="muted">{t('passkey.lead')}</p>
+          <p className="onboard-lead">{t('passkey.lead')}</p>
         </div>
         <ul className="ticks">
           <li><Check aria-hidden="true" />{t('passkey.tick1')}</li>
           <li><Check aria-hidden="true" />{t('passkey.tick2')}</li>
           <li><Check aria-hidden="true" />{t('passkey.tick3')}</li>
         </ul>
-        {!passkeysAvailable() ? <Note tone="wait">{t('passkey.unavailable')}</Note> : null}
+        {none ? <Note tone="wait" title="This browser cannot set up a device">{NO_PASSKEYS_AT_ALL}</Note>
+          : check === 'other-device' ? <Note tone="wait" title="No fingerprint, face or PIN check on this device">{NO_DEVICE_CHECK} Press the button and your browser offers them.</Note> : null}
         {askPw ? <PasswordField value={pw} onChange={setPw} show={show} onShow={setShow} autoComplete="current-password" hint={t('passkey.again')} /> : null}
         <Problem error={add.error} />
-        <div className="row"><Btn tone="fill" className="lg" busy={add.busy} disabled={!passkeysAvailable()} onClick={() => void add.run()}><Fingerprint aria-hidden="true" />{t('passkey.add')}</Btn><Btn className="lg" onClick={onLater}>{t('passkey.later')}</Btn></div>
-        <p className="small faint">{t('passkey.without')}</p>
+        {askGoogle ? <div><Btn busy={again.busy} onClick={() => void again.run()}>Confirm with Google again</Btn><Problem error={again.error} /></div> : null}
+        <div className="row"><Btn tone="fill" className="lg" busy={add.busy} disabled={none} onClick={() => void add.run()}><Fingerprint aria-hidden="true" />{check === 'other-device' ? t('passkey.addOther') : t('passkey.add')}</Btn><Btn className="lg" onClick={onLater}>{t('passkey.later')}</Btn></div>
+        <p className="small faint">{session.hasPassword === false ? t('passkey.withoutGoogle') : t('passkey.without')}</p>
+        <EmailLine />
+      </section>
+    </main>
+  )
+}
+
+/**
+ * Right after a device is set up: it worked, what it now does, and, once, the saved recovery codes that came with it (R14,
+ * review F1: they are made with the first device so that nobody can hold two without them; no confirmation box and no
+ * forced step: Copy, Download or just Continue). After a password reset the device signs in only, and the page says so.
+ */
+function DeviceReady({ onDone }: { onDone: () => void }) {
+  const { session } = useSession()
+  const [held] = useState(() => takeCodes())
+  const codes = held?.codes ?? null
+  const has = (session.recoveryCodesLeft ?? 0) > 0
+  const signinOnly = session.authority === 'restricted'
+  return (
+    <main className="onboard-main" id="content">
+      <section className="onboard-card stack" style={{ ['--gap' as string]: '18px' }}>
+        <div className="onboard-icon"><ShieldCheck aria-hidden="true" /></div>
+        <div className="stack" style={{ ['--gap' as string]: '8px' }}>
+          <h1>Device sign-in is set up</h1>
+          {signinOnly
+            ? <p className="muted">Your device now signs you in. It cannot approve payments yet: it was added after a password reset or a recovery, so approving waits until you ask for it under Security and recovery, after a wait that your other devices and contacts can stop. QED never receives your fingerprint, face or PIN.</p>
+            : <p className="muted">Your device now signs you in, and it approves what you pay: each approval is the device signing that payment's exact amount, payee and terms. QED never receives your fingerprint, face or PIN.</p>}
+        </div>
+        <section className="stack ax-codes" style={{ ['--gap' as string]: '10px' }} aria-labelledby="back-h">
+          <h2 id="back-h" className="ax-h2">Keep a way back in</h2>
+          {codes ? <>
+            {session.email?.canVerify === false ? <p className="small muted">This installation cannot send email, so the codes are the way back if you lose your device.</p> : null}
+            <SavedCodes codes={codes} replaced={held?.replaced} onContinue={onDone} />
+          </>
+            : has ? <p className="small muted">You have saved recovery codes. Under Security you can add a second device and name a recovery contact.</p>
+              : <p className="small muted">This account holds no saved recovery codes. Under Security and recovery you can make them once your device can confirm it.</p>}
+        </section>
+        {codes ? null : <div className="row"><Btn tone="fill" className="lg" onClick={onDone}>Continue</Btn></div>}
       </section>
     </main>
   )

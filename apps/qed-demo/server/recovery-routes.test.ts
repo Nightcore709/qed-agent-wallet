@@ -57,7 +57,8 @@ describe('reset and recovery over HTTP', () => {
 
   it('a recovery by email, read from the outbox, ends signed in with a passkey that approves nothing', async () => {
     const owner = client(PORT), key = authenticatorFor(PORT)
-    const made = await signUp(owner.ok, key, 'routerec', 'Route Rec')
+    // R14 (F1): the sign-up makes the saved codes with the first device and returns them once
+    const made = { recoveryCodes: (await signUp(owner.ok, key, 'routerec', 'Route Rec')).recoveryCodes }
     // the sign-up's own confirmation (five minutes) adds the address; its link confirms it
     await owner.ok('POST', '/api/security/addresses', { kind: 'email', address: 'routerec@gmail.com' })
     const confirm = (await outbox('routerec@gmail.com')).find((m) => m.purpose === 'verify-email')!

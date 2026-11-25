@@ -350,6 +350,12 @@
 .desk .desk-report .wk-t svg, .desk .pg-sec-t h2 svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
 .desk .desk-rfq { display: grid; gap: var(--s4); margin-top: var(--s4); }
 
+/* R14: the five separate operations of account access, as a numbered list (shared/access-operations.ts) */
+.sy-ops { display: grid; gap: var(--s3); margin: 0; padding: 0; list-style: none; }
+.sy-ops > li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.sy-ops .n { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--brand-bg); color: var(--brand); font-size: var(--t-micro); font-weight: 680; font-variant-numeric: tabular-nums; }
+.sy-ops .sy-d { max-width: 78ch; }
+
 /* ---- R14 rest 2: Workspace (kept with the wk- rules above, which this file owns) ---- */
 /* Workspace (R14 rest 2). The rules of the page's own parts are in security.css (wk-); this file holds what the R14 pass
    added, and nothing else, so Security's page is not touched.

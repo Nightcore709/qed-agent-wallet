@@ -55,7 +55,7 @@ test('keyboard only: Security and recovery, naming a second passkey, new recover
   await expect.poll(() => query<{ n: number }>('SELECT COUNT(*) n FROM webauthn_credentials WHERE person_id = ? AND removed_at IS NOT NULL', userId)[0]!.n, { timeout: 30_000 }).toBe(1)
   // the removed passkey opened this session, so its removal ends the session: sign in again with the one that remains, by keyboard
   await page.goto('/')
-  await press(page, page.getByRole('button', { name: 'Sign in with a passkey' }))
+  await press(page, page.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' }))
   await expect(page.getByRole('button', { name: /account menu$/ })).toBeVisible()
   await page.goto('/security')
   await expect(page.getByText(/^Removed /).first()).toBeVisible()

@@ -10,10 +10,10 @@ const unique = (p: string) => `${p}${Date.now().toString(36)}${Math.floor(Math.r
 async function newOwner(page: Page): Promise<void> {
   await page.goto('/')
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(unique('adr'))
   await page.getByLabel('Name to sign with').fill('Draft Reader')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)

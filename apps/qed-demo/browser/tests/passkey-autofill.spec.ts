@@ -14,14 +14,14 @@ test('a passkey offered in the handle field signs in with a passkey session, and
   const handle = unique('af')
   await page.goto('/')
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill(`Test ${handle}`)
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await expect(page.getByRole('heading', { name: 'Save your recovery codes' })).toBeVisible()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
+  await expect(page.getByRole('heading', { name: 'Device sign-in is set up' })).toBeVisible()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Sign out' }).click()
-  await expect(page.getByRole('button', { name: 'Sign in with a passkey' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Sign in with your fingerprint, Face ID or device PIN' })).toBeVisible()
 
   // the sign-in form's handle field is marked for passkey suggestions
   await expect(page.getByLabel('Handle')).toHaveAttribute('autocomplete', 'username webauthn')

@@ -32,7 +32,7 @@ conversion (TLS, origins, sessions, keys, monitoring, residency) is `docs/PRODUC
    before anyone signs up.
 4. Make the key-encryption key on your computer, escrow it offline, and enter it into Railway yourself (step 2.2). It is
    never in the repository, the image, a log or chat.
-5. Sign up as the first owner in a browser with a real passkey at the domain (step 2.7), and keep the recovery codes.
+5. Sign up as the first owner in a browser with a real passkey at the domain (step 2.7), and save recovery codes when the next screen offers them (since R14 they are offered, not forced; this installation cannot send email, so they are the way back in).
 6. Decide backup retention, any off-host copy and the restore-drill schedule (sections 8 and 17). Retention is off until you
    set `QED_BACKUP_RETENTION=on` (it then deletes backups beyond 7 daily, 4 weekly and 3 monthly); off-host copy is off until
    you make a bucket and set `QED_OFFSITE=on`; deleting damaged copies stays yours.
@@ -137,7 +137,7 @@ afterwards (section 9).
 ### 2.7 The first owner account
 
 Open the domain in a browser on a device with a passkey (phone or computer), "Create an account", let the device make
-the passkey, save the ten recovery codes, open the paper household. There is no administrator account: every account
+the passkey, save the ten recovery codes when they are offered (R14), open the paper household. There is no administrator account: every account
 is an owner of its own workspace. The local rehearsal signed up through the API with a software authenticator
 (`scripts/deploy/smoke.ts`); do not run that script against the public deployment (it leaves an account whose passkey
 existed only in the script's memory). Since R14 the script also creates an on-chain wallet, accepts it, signs a mandate and

@@ -21,6 +21,7 @@ import { Check, Fingerprint, FlaskConical, KeyRound, ShieldAlert } from 'lucide-
 import type { AttackInfo, DecisionRecord, HistoricalEvidence, HistoryEntry, Job, LiabilityView, LimitCheck, LimitsResult, MandateView, PaymentLimits, PolicyView, Proposal, ProposalKind, QuotaView, QuoteResult, RailState, ScenarioInfo, TickRecord, ToSign, VaultView } from '../../chain/types.ts'
 import { api, fmt, navigate, useData, useNow } from '../lib/core.ts'
 import { CHAIN_CURRENCIES, CHAIN_TOKENS, DEFAULT_ASSET_SET, TEST_TOKEN_SYMBOLS, tokenBySymbol, type AssetSet } from '../../shared/chain-assets.ts'
+import { SavedCodes } from '../ui/SavedCodes.tsx'
 import { addFirstPasskey, confirmWithPasskey, deviceWords, passkeysAvailable, platformPasskeyAvailable, setUpVaultWithTokens, signForVault } from '../lib/passkey.ts'
 import { EnforcedBy, EnforcementKey, type Enforcer } from '../ui/enforced.tsx'
 import { ApprovalSheet, type PendingApproval } from '../ui/instrument.tsx'
@@ -739,7 +740,10 @@ function OwnerGate({ owner, reload }: { owner: OwnerReadiness | undefined; reloa
   // whether this device can hold a passkey itself; null until the browser has answered (and where it cannot say)
   const [builtIn, setBuiltIn] = useState<boolean | null>(null)
   useEffect(() => { let on = true; void platformPasskeyAvailable().then((v) => { if (on) setBuiltIn(v) }); return () => { on = false } }, [])
-  const add = useAction(async () => { await addFirstPasskey(pw); setPw(''); await session.reload(); reload() })
+  // the saved codes that came with this first passkey (review F1), shown once, here, before anything else on the page
+  const [codes, setCodes] = useState<string[] | null>(null), [replaced, setReplaced] = useState(false)
+  const add = useAction(async () => { const made = await addFirstPasskey(pw); setPw(''); if (made.recoveryCodes) { setCodes(made.recoveryCodes); setReplaced(made.replacedEarlier === true) }; await session.reload(); reload() })
+  if (codes) return <Note tone="ok" title="Your passkey is ready, and so are your saved recovery codes"><SavedCodes codes={codes} replaced={replaced} onContinue={() => setCodes(null)} /></Note>
   if (!owner || owner.state === 'ready') return null
   if (owner.state === 'signin-only') return (
     <Note tone="wait" title="Your passkey signs you in, but cannot own a wallet yet">

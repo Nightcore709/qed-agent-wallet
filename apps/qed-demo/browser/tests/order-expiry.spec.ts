@@ -33,10 +33,11 @@ test('a limit order placed to stand a few minutes expires, its money is freed on
   const handle = `exp${Date.now().toString(36)}`
   await page.goto(`${s.base}/`)
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Expiry Owner')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
+  await expect(page.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10) // R14: made with the first device, shown once, no box to tick
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)
@@ -101,10 +102,11 @@ test('a limit order that part-filled and then expired is a partly done order: th
   const handle = `exq${Date.now().toString(36)}`
   await page.goto(`${s.base}/`)
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Part Fill Owner')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
+  await expect(page.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10) // R14: made with the first device, shown once, no box to tick
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)

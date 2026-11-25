@@ -5,7 +5,7 @@
  * promise, runs a dollar-liability hedge through the checker, and proposes the mix. The proposal becomes a draft
  * instruction; nothing trades; the owner signs it with a passkey, and it asks before every run. What the screen says is
  * compared with the stack's database at each step. Photographs of the populated lab are written outside the repository
- * (QED_LAB_SHOTS, default /private/tmp/claude-501/r12-quant-shots).
+ * (QED_LAB_SHOTS; unset, the test's own output folder, which exists on every machine).
  */
 import { mkdirSync } from 'node:fs'
 import { expect, type Page, test } from '../support/test.ts'
@@ -13,7 +13,6 @@ import { addAuthenticator } from '../support/passkey.ts'
 import { extraPort, startExtraStack } from '../support/stack.ts'
 
 const PORT = Number(process.env.QED_LAB_PORT ?? extraPort(26))
-const SHOTS = process.env.QED_LAB_SHOTS ?? '/private/tmp/claude-501/r12-quant-shots'
 let s: Awaited<ReturnType<typeof startExtraStack>>
 test.beforeAll(async () => { s = await startExtraStack(PORT, { QED_PRESENTATION: '1' }) })
 test.afterAll(async () => { await s?.stop() })
@@ -36,10 +35,10 @@ test('the lab: the mix and its tax, what can be promised, a dollar hedge, and a 
   await page.goto(`${s.base}/`)
   const handle = `lab${Date.now().toString(36)}`
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Lab Owner')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
   await page.getByRole('button', { name: 'Continue' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)
@@ -115,6 +114,7 @@ test('the lab: the mix and its tax, what can be promised, a dollar hedge, and a 
   await expect(hedge.getByText(/This app cannot buy Treasury bills or hold dollars at a custodian/)).toBeVisible()
 
   // photographs of the populated lab, both themes, computer and phone (outside the repository)
+  const SHOTS = process.env.QED_LAB_SHOTS ?? test.info().outputPath('lab-shots')
   mkdirSync(SHOTS, { recursive: true })
   for (const [w, h, scheme] of [[1440, 900, 'dark'], [1440, 900, 'light'], [390, 844, 'dark'], [390, 844, 'light']] as const) {
     await page.setViewportSize({ width: w, height: h })

@@ -72,6 +72,8 @@ describe('a session opened with a password', () => {
   it('H1: a recovery is finished only with the reference its starter was given, never with the id a session can see', async () => {
     const owner = client(), PW = 'a long enough pass phrase'
     const made = await owner.ok('POST', '/api/auth/signup', { handle: 'rec-h1', password: PW, displayName: 'Recovering Person' })
+    // R14: sign-up makes no saved codes; the person makes them, here with the password just typed
+    made.recoveryCodes = (await owner.ok('POST', '/api/security/recovery-codes', {})).codes
     // someone holding the password signs in elsewhere, as a phished password would let them
     const thief = client()
     await thief.ok('POST', '/api/auth/login', { handle: 'rec-h1', password: PW })
@@ -98,9 +100,10 @@ describe('a session opened with a password', () => {
   it('M1: on an account with a passkey, a password session cannot cancel a recovery or take the new codes; a passkey can', async () => {
     const owner = client(), key = authenticatorFor(PORT), PW = 'another long pass phrase'
     const made = await owner.ok('POST', '/api/auth/signup', { handle: 'rec-m1', password: PW, displayName: 'Careful Person' })
-    // the sign-up session is fresh from the password: it adds the account's first passkey
+    // the sign-up session is fresh from the password: it adds the account's first passkey, which brings the saved codes (R14, F1/R1)
     const b = await owner.ok('POST', '/api/security/passkeys/begin')
-    await owner.ok('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response: key.create(b.options) })
+    const first = await owner.ok('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response: key.create(b.options) })
+    made.recoveryCodes = first.recoveryCodes
     const started = await client().ok('POST', '/api/auth/recovery/start', { handle: 'rec-m1', code: made.recoveryCodes[0], password: PW })
     const thief = client()
     await thief.ok('POST', '/api/auth/login', { handle: 'rec-m1', password: PW })
@@ -119,6 +122,8 @@ describe('a session opened with a password', () => {
   it('M1: on an account with no passkey, cancelling needs the password typed again (the password is its only credential)', async () => {
     const owner = client(), PW = 'a third long pass phrase'
     const made = await owner.ok('POST', '/api/auth/signup', { handle: 'rec-m1b', password: PW, displayName: 'Password Only' })
+    // R14: sign-up makes no saved codes; the person makes them, here with the password just typed
+    made.recoveryCodes = (await owner.ok('POST', '/api/security/recovery-codes', {})).codes
     const started = await client().ok('POST', '/api/auth/recovery/start', { handle: 'rec-m1b', code: made.recoveryCodes[0], password: PW })
     const later = client()
     await later.ok('POST', '/api/auth/login', { handle: 'rec-m1b', password: PW })

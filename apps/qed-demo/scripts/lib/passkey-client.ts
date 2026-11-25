@@ -12,11 +12,16 @@ export function authenticatorFor(port: number): SoftAuthenticator {
   return new SoftAuthenticator({ origin: `http://localhost:${port}` })
 }
 
-/** Create an account with a passkey. Returns the CSRF token for the new session and the recovery codes. */
+/**
+ * Create an account with a passkey. Returns the CSRF token for the new session. Since R14 no saved recovery codes are made
+ * at sign-up (the forced codes step is gone): a journey that needs them asks for them (POST /api/security/recovery-codes),
+ * as a person does under Security.
+ */
 export async function signUp(ok: Call, auth: SoftAuthenticator, handle: string, displayName: string): Promise<{ csrf: string; userId: string; recoveryCodes: string[] }> {
   const b = await ok('POST', '/api/auth/passkey/signup/begin', { handle, displayName })
   const r = await ok('POST', '/api/auth/passkey/signup/finish', { challengeId: b.challengeId, response: auth.create(b.options) })
-  return { csrf: String(r.csrf), userId: String(r.userId), recoveryCodes: r.recoveryCodes as string[] }
+  // the account's saved codes, made with its first device and shown once (R14, F1)
+  return { csrf: String(r.csrf), userId: String(r.userId), recoveryCodes: (r.recoveryCodes ?? []) as string[] }
 }
 
 export async function signIn(ok: Call, auth: SoftAuthenticator): Promise<{ csrf: string }> {

@@ -20,6 +20,8 @@ import { addAuthenticator } from '../support/passkey.ts'
 import { extraPort, startExtraStack } from '../support/stack.ts'
 
 const PORT = Number(process.env.QED_R14_LAYOUT_PORT ?? extraPort(86))
+// one stack for the file, so one worker runs all of it: under fullyParallel two workers would each start a stack on this port
+test.describe.configure({ mode: 'serial' })
 let s: Awaited<ReturnType<typeof startExtraStack>>
 test.beforeAll(async () => { s = await startExtraStack(PORT, { QED_PRESENTATION: '1' }) })
 test.afterAll(async () => { await s?.stop() })
@@ -27,10 +29,11 @@ test.afterAll(async () => { await s?.stop() })
 async function signUp(page: Page, handle: string): Promise<void> {
   await page.goto(`${s.base}/`)
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByRole('button', { name: 'Use a passkey instead' }).click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Meera Iyer')
   await page.getByRole('button', { name: 'Create account with a passkey' }).click()
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
+  await expect(page.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10) // R14: made with the first device, shown once, no box to tick
   await page.getByRole('button', { name: 'Continue' }).click()
   await expect(page.getByRole('heading', { name: 'Open your paper household' })).toBeVisible()
 }

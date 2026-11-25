@@ -25,19 +25,18 @@ async function passwordAccount(page: Page): Promise<string> {
   const handle = unique('xb'), password = `${randomBytes(9).toString('base64url')} phrase`
   await page.goto('/')
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByText('Choose your handle (optional)').click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Meera Test')
-  await page.getByRole('radio', { name: /With a password/ }).check()
+  // R14: the ordinary sign-up is an email address and a password
+  await page.getByLabel('Email', { exact: true }).fill(`${handle}@example.in`)
   await page.getByLabel('Password', { exact: true }).fill(password)
   // the server checks the password with scrypt, slowly on purpose: the next step is awaited with the test's own limit
-  await page.getByRole('button', { name: 'Create account with a password' }).click()
-  await expect(page.getByRole('list', { name: 'Recovery codes' }).getByRole('listitem')).toHaveCount(10, { timeout: 60_000 })
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
-  await page.getByRole('button', { name: 'Continue' }).click()
-  await expect(page.getByRole('heading', { name: 'Add the passkey that approves payments' })).toBeVisible()
-  // the passkey step reads like Security's "Add a passkey": the server does not tie a passkey to this device
-  await expect(page.getByRole('button', { name: 'Add a passkey', exact: true })).toBeVisible()
-  await expect(page.getByText('on this device', { exact: false }).filter({ hasText: /Add a passkey on this device/ })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Create account', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Faster, more secure access' })).toBeVisible()
+  // the step's button does not say "this device": the server does not tie a passkey to one (a phone or a key works too)
+  await expect(page.getByRole('button', { name: /^(Set up device sign-in|Use a phone or a security key)$/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /on this device/ })).toHaveCount(0)
   const r = await new AxeBuilder({ page: page as never }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
   expect(r.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([])
   await page.getByRole('button', { name: 'Not now' }).click()

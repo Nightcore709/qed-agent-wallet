@@ -19,7 +19,7 @@
 import { ArrowLeft, Check, Copy, Download, Fingerprint, KeyRound, LifeBuoy, Mail, RefreshCw, ShieldCheck } from 'lucide-react'
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from 'react'
 import { api, ApiError, fmt, navigate, useData, useNow } from '../lib/core.ts'
-import { deviceWords, finishRecovery, finishRecoveryWithLink, passkeysAvailable, requestAuthority, startRecovery } from '../lib/passkey.ts'
+import { deviceWords, finishGoogle, finishRecovery, finishRecoveryWithLink, passkeysAvailable, requestAuthority, startRecovery } from '../lib/passkey.ts'
 import { Btn, Field, Logo, Note, PasswordField, Problem, useAction, useSession } from '../ui/kit.tsx'
 import { noDeliveryWords, type OutboxCase, outboxWords } from '../../shared/delivery-words.ts'
 
@@ -65,12 +65,10 @@ function useLinkToken(): string {
  * sent, so none is said to be on its way or sent (R13: simulated delivery is never presented as a real message); with a
  * provider (not in this build) the message is on its way.
  */
-function Sent({ what, typed }: { what: OutboxCase; typed: string }) {
+function Sent({ what, typed }: { what: Exclude<OutboxCase, 'confirm'>; typed: string }) {
   const { session } = useSession()
   if (session.delivery === 'outbox') { const w = outboxWords(what, typed); return <Note tone="ok" title={w.title}>{w.body}</Note> }
-  return what === 'confirm'
-    ? <Note tone="ok" title={`Confirmation sent to ${typed}`}>Open the link in it, or type its code under Security and recovery. It receives your security notices once confirmed.</Note>
-    : <Note tone="ok" title="Check your email">If an account with a confirmed email address matches “{typed}”, {what === 'reset' ? 'a message is on its way to that address. Its link works once, for 30 minutes.' : 'a recovery link is on its way to that address. It works once, for an hour.'}</Note>
+  return <Note tone="ok" title="Check your email">If an account with a confirmed email address matches “{typed}”, {what === 'reset' ? 'a message is on its way to that address. Its link works once, for 30 minutes.' : 'a recovery link is on its way to that address. It works once, for an hour.'}</Note>
 }
 
 function OutboxPointer() {
@@ -123,9 +121,47 @@ export function AccessPage({ path }: { path: string }) {
   if (path === '/recover') return <RecoverPage />
   if (path === '/verify-email') return <VerifyEmailPage />
   if (path === '/dev/outbox') return <OutboxPage />
+  if (path === '/auth/google/callback') return <GoogleCallbackPage />
   return null
 }
-export const ACCESS_PATHS = ['/reset-password', '/recover', '/verify-email', '/dev/outbox']
+export const ACCESS_PATHS = ['/reset-password', '/recover', '/verify-email', '/dev/outbox', '/auth/google/callback']
+
+/**
+ * Where Google sends the browser back (R14): this page takes the code and the state from its address, removes them from
+ * the address bar and its history at once, and hands them to the server, which checks them against the sign-in this
+ * browser began (server/google.ts). It then goes on to the page the sign-in was started from. A refusal says what
+ * happened in plain words and offers the sign-in page; nothing is retried by itself.
+ */
+let googleTaken: Promise<{ purpose: 'signin' | 'link' | 'confirm'; back: string; created: boolean }> | null = null
+function GoogleCallbackPage() {
+  const { reload } = useSession()
+  const [error, setError] = useState<ApiError | null>(null)
+  useEffect(() => {
+    // taken once per page load, however often the component is mounted: a code works once
+    if (!googleTaken) {
+      const q = new URLSearchParams(location.search)
+      history.replaceState(null, '', location.pathname)
+      const refused = q.get('error')
+      googleTaken = refused
+        ? Promise.reject(new ApiError(0, 'google_refused', refused === 'access_denied' ? 'The Google sign-in was cancelled. Nothing was changed.' : 'Google did not complete the sign-in. Nothing was changed.'))
+        : finishGoogle({ code: q.get('code') ?? '', state: q.get('state') ?? '', iss: q.get('iss') })
+    }
+    let live = true
+    googleTaken.then(async (r) => { await reload(); if (live) navigate(r.back, true) }, (e: unknown) => { if (live) setError(e instanceof ApiError ? e : new ApiError(0, 'error', String(e))) })
+    return () => { live = false }
+  }, [reload])
+  const h = useFocusHeading(error)
+  if (!error) return <Solo><div aria-busy="true" className="stack" style={{ ['--gap' as string]: '10px' }}><h1 className="access-title" ref={h} tabIndex={-1}>Finishing the sign-in</h1><p className="muted">Checking what Google sent back.</p></div></Solo>
+  return (
+    <Solo>
+      <div className="stack" style={{ ['--gap' as string]: '14px' }}>
+        <h1 className="access-title" ref={h} tabIndex={-1}>That sign-in did not finish</h1>
+        <div role="alert"><Note tone="void">{error.message}</Note></div>
+        <div><Btn tone="fill" onClick={() => navigate('/', true)}>Go to QED</Btn></div>
+      </div>
+    </Solo>
+  )
+}
 
 function ResetPasswordPage() {
   const { reload } = useSession()
@@ -285,7 +321,7 @@ function RecoverPage() {
     )
   }
   const proofs = st.proofs
-  const options = ([['savedCode', 'One of your saved recovery codes', 'One of the codes you kept when the account was made, or after its last recovery.'], ['contact', 'A code from your recovery contact', 'Ask them on a call you make. They issue it from their own account, and it lasts a day.'], ['password', 'The account\'s password', 'If the account signs in with a password too.']] as const).filter(([k]) => proofs[k])
+  const options = ([['savedCode', 'One of your saved recovery codes', 'One of the codes you saved: under Security, when you added a second device, or after your last recovery.'], ['contact', 'A code from your recovery contact', 'Ask them on a call you make. They issue it from their own account, and it lasts a day.'], ['password', 'The account\'s password', 'If the account signs in with a password too.']] as const).filter(([k]) => proofs[k])
   const label = proof === 'savedCode' ? 'Saved recovery code' : proof === 'contact' ? 'Code from your recovery contact' : 'The account\'s password'
   const fieldError = start.error?.fields.code ?? start.error?.fields.contactCode ?? start.error?.fields.password
   return (
@@ -326,7 +362,7 @@ function VerifyEmailPage() {
   if (done) return (
     <Solo>
       <h1 className="access-title" ref={h} tabIndex={-1}>Email address confirmed</h1>
-      <div role="status"><Note tone="ok" title={done.address}>It receives your security notices from now on.{done.usableFrom ? ` It can start a password reset or a recovery from ${fmt.full(done.usableFrom)}: a new address waits, so that someone who adds theirs cannot use it at once.` : ''}</Note></div>
+      <div role="status"><Note tone="ok" title={done.address}>It receives your security notices from now on.{done.usableFrom ? ` It can start a password reset or a recovery from ${fmt.full(done.usableFrom)}: an address waits after it is confirmed, so that someone who has only a mailbox cannot use it at once.` : ''}</Note></div>
       <div><Btn tone="fill" onClick={() => navigate(session.authenticated ? '/security' : '/', true)}>{session.authenticated ? 'Back to Security and recovery' : 'Go to sign in'}</Btn></div>
     </Solo>
   )
@@ -517,8 +553,9 @@ export function LostPasskey({ onBack, onRecovered }: { onBack: () => void; onRec
       </> : (
         <form className="stack" style={{ ['--gap' as string]: '14px' }} onSubmit={(e) => { e.preventDefault(); void begin.run() }}>
           <p className="muted">{noEmail ? 'Two codes obtained differently' : 'The backup way, without email: two codes obtained differently'}. One of your saved recovery codes, and a code from your recovery contact or, for an account with a password, that password.</p>
+          {noEmail ? <p className="small muted">An account that never saved recovery codes cannot be recovered on this installation, because it cannot send email. If you still know your password, sign in with it; your account opens, and another device you set up still approves.</p> : null}
           <Field label="Handle">{(p) => <input {...p} className="input" autoComplete="username" autoCapitalize="none" spellCheck={false} value={handle} onChange={(e) => setHandle(e.target.value)} />}</Field>
-          <Field label="Saved recovery code" hint="One of the codes shown when the account was made, or after its last recovery.">{(p) => <input {...p} className="input code" autoComplete="off" value={code} onChange={(e) => setCode(e.target.value)} />}</Field>
+          <Field label="Saved recovery code" hint="One of the codes you saved: under Security, when you added a second device, or after your last recovery.">{(p) => <input {...p} className="input code" autoComplete="off" value={code} onChange={(e) => setCode(e.target.value)} />}</Field>
           {withPassword
             ? <PasswordField label="The account's password" value={password} onChange={setPassword} show={show} onShow={setShow} autoComplete="current-password" />
             : <Field label="Code from your recovery contact" hint="Ask them in person or on a call you make. They issue it after confirming with their own passkey; it lasts 24 hours.">{(p) => <input {...p} className="input code" autoComplete="off" value={contactCode} onChange={(e) => setContactCode(e.target.value)} />}</Field>}
@@ -586,7 +623,7 @@ export function RecoveredStep({ codes, onDone }: { codes: string[]; onDone: () =
           <Problem error={ask.error} />
           {codes.length ? (
             <div className="stack" style={{ ['--gap' as string]: '10px' }}>
-              <p className="small"><b>Your saved recovery codes were replaced.</b> The recovery spent one, so every earlier code stopped working. These are kept only now.</p>
+              <p className="small"><b>Your saved recovery codes are new.</b> The recovery made this set, so any earlier code has stopped working. They are shown only now.</p>
               {showCodes ? <>
                 <ol className="codes" aria-label="Recovery codes">{codes.map((c) => <li key={c} className="code">{c}</li>)}</ol>
                 <div className="row">
@@ -607,28 +644,3 @@ export function RecoveredStep({ codes, onDone }: { codes: string[]; onDone: () =
 }
 
 // ------------------------------------------------------------------------------------------------ at sign-up
-
-/**
- * The first way back in, offered at sign-up before the saved codes: an email address, confirmed by a link or a code.
- * Sending the confirmation is enough to continue; the address is used once it is confirmed.
- */
-export function EmailSetup({ onSent }: { onSent: (address: string) => void }) {
-  const { session } = useSession()
-  const [address, setAddress] = useState(''), [sent, setSent] = useState<string | null>(null)
-  const add = useAction(async () => { await api('POST', '/api/security/addresses', { kind: 'email', address }); setSent(address.trim()); onSent(address.trim()) })
-  // With no way to send messages here (review M4), no address is offered: it could not be confirmed.
-  if (session.delivery === 'none') return <NoDelivery what="address" />
-  return (
-    <section className="stack ax-email" style={{ ['--gap' as string]: '10px' }} aria-labelledby="ax-email-h">
-      <h2 id="ax-email-h" className="ax-h2">Add an email address <span className="ax-rec">Recommended</span></h2>
-      <p className="small muted">If you lose your devices, a link to this address starts getting you back in, with one more proof and a wait. Any ordinary address works, Gmail included.</p>
-      {sent ? <div role="status"><Sent what="confirm" typed={sent} /><OutboxPointer /></div> : (
-        <form className="ax-email-row" onSubmit={(e) => { e.preventDefault(); void add.run() }}>
-          <Field label="Email address" error={add.error?.fields.address}>{(p) => <input {...p} className="input" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={address} onChange={(e) => setAddress(e.target.value)} />}</Field>
-          <Btn type="submit" busy={add.busy} disabled={!address.trim()}>Send a confirmation</Btn>
-        </form>
-      )}
-      {add.error && !add.error.fields.address ? <Problem error={add.error} /> : null}
-    </section>
-  )
-}

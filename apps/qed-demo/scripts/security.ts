@@ -152,6 +152,7 @@ interface Signed { cookie: string; csrf: string; userId: string }
 interface Person extends Signed { handle: string; auth: SoftAuthenticator; codes: string[]; signupFinish: unknown }
 const as = (p: { cookie: string; csrf: string }, extra: Opts = {}): Opts => ({ cookie: p.cookie, csrf: p.csrf, ...extra })
 let signupBegins = 0 // every sign-up begin that reached the handler counts against the per-address limit
+const signupCodesAtSignup: number[] = [] // how many saved codes each sign-up's own answer carried (R14: none)
 
 async function signUp(handle: string, household = true): Promise<Person> {
   const auth = authenticator()
@@ -160,7 +161,11 @@ async function signUp(handle: string, household = true): Promise<Person> {
   const signupFinish = { challengeId: b.challengeId, response: auth.create(b.options) }
   const f = await http('POST', '/api/auth/passkey/signup/finish', { body: signupFinish })
   const j = must(f, `sign-up finish for ${handle}`)
-  const p: Person = { handle, auth, cookie: cookieOf(f), csrf: String(j.csrf), userId: String(j.userId), codes: j.recoveryCodes as string[], signupFinish }
+  const p: Person = { handle, auth, cookie: cookieOf(f), csrf: String(j.csrf), userId: String(j.userId), codes: [], signupFinish }
+  // R14: sign-up makes no saved recovery codes (the forced codes step is gone). These checks are about what the codes do,
+  // so each person makes their set right after, as under Security: one passkey, none yet, a fresh confirmation.
+  signupCodesAtSignup.push(Array.isArray(j.recoveryCodes) ? (j.recoveryCodes as unknown[]).length : 0)
+  p.codes = must(await http('POST', '/api/security/recovery-codes', as(p, { body: {} })), `saved codes for ${handle}`).codes as string[]
   if (household) must(await http('POST', '/api/household', as(p, { body: {} })), `household for ${handle}`)
   return p
 }
@@ -389,7 +394,7 @@ try {
     const storedAs = stored.length && stored.every((r) => algo(r) === 'scrypt') ? 'scrypt (V6.5.2 met)' : stored.every((r) => algo(r) === 'sha256') ? 'salted SHA-256 (V6.5.2 not met: a code of under 112 bits needs a password-hashing algorithm)' : `mixed or unrecognised (${[...new Set(stored.map(algo))].join(', ')})`
     const saltBits = Math.min(...stored.map((r) => Buffer.from(String(r.salt ?? ''), 'hex').length * 8))
     const salts = new Set(stored.map((r) => String(r.salt ?? '')))
-    check('N02', 'account', 'recovery codes: ten, each 16 symbols of a 32-symbol alphabet (80 bits), all different, salted, and none stored in clear', 'V6.5.4 entropy; V6.5.3 random generation; V6.5.2 (see observed)', 'ten distinct codes of the form; ten stored rows, each with a salt of at least 32 bits; no code in any stored row', `${victim.codes.length} codes, ${victim.codes.filter((c) => form.test(c)).length} of the form, ${new Set(victim.codes).size} distinct; ${stored.length} rows, salts of at least ${saltBits} bits (${salts.size} distinct: ${salts.size === 1 ? 'one per batch' : 'one per code'}); ${inClear} found in clear; stored as ${storedAs}`, victim.codes.length === 10 && victim.codes.every((c) => form.test(c)) && new Set(victim.codes).size === 10 && stored.length === 10 && saltBits >= 32 && inClear === 0)
+    check('N02', 'account', 'recovery codes: none is made by the sign-up itself (R14); made on request they are ten, each 16 symbols of a 32-symbol alphabet (80 bits), all different, salted, and none stored in clear', 'V6.5.4 entropy; V6.5.3 random generation; V6.5.2 (see observed)', 'no code in any sign-up\'s answer; ten distinct codes of the form; ten stored rows, each with a salt of at least 32 bits; no code in any stored row', `sign-up answers carried ${signupCodesAtSignup.reduce((a, b) => a + b, 0)} codes; `+`${victim.codes.length} codes, ${victim.codes.filter((c) => form.test(c)).length} of the form, ${new Set(victim.codes).size} distinct; ${stored.length} rows, salts of at least ${saltBits} bits (${salts.size} distinct: ${salts.size === 1 ? 'one per batch' : 'one per code'}); ${inClear} found in clear; stored as ${storedAs}`, victim.codes.length === 10 && victim.codes.every((c) => form.test(c)) && new Set(victim.codes).size === 10 && stored.length === 10 && saltBits >= 32 && inClear === 0 && signupCodesAtSignup.every((n) => n === 0))
 
     let accepted = signupBegins, limited: Res | null = null
     for (let i = 0; i < 25 && !limited; i++) { const x = await http('POST', '/api/auth/passkey/signup/begin', { body: { handle: `limit-${i}`, displayName: 'x' } }); if (x.status === 200) accepted++; else limited = x }

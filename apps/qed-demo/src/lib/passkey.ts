@@ -23,6 +23,20 @@ export async function platformPasskeyAvailable(): Promise<boolean | null> {
 }
 
 /**
+ * What this device can offer for the step "use your fingerprint, Face ID or device PIN" (R14):
+ *   'this-device'   it has a built-in check that verifies the person (Touch ID, Face ID, Windows Hello, a screen lock):
+ *                   PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable() answered true;
+ *   'other-device'  the browser can use passkeys, but this device has no such check: a phone nearby or a security key works;
+ *   'none'          the browser cannot use passkeys at all.
+ * Asked of the browser, never guessed from its name; an error asking is read as 'other-device', the careful answer.
+ */
+export type DeviceCheck = 'this-device' | 'other-device' | 'none'
+export async function deviceCheck(): Promise<DeviceCheck> {
+  if (!browserSupportsWebAuthn()) return 'none'
+  try { return (await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) ? 'this-device' : 'other-device' } catch { return 'other-device' }
+}
+
+/**
  * What this device will ask for, so the button says what will happen. A passkey is unlocked by the device in whatever
  * way it is set up (R12: no promise of a particular biometric method): the platform's usual checks are named only as
  * examples, always with the one that is not a biometric (a passcode, a PIN, a password), because the device may have no
@@ -87,23 +101,61 @@ async function use(begin: Options): Promise<unknown> {
   try { return await startAuthentication({ optionsJSON: begin.options as never }) } catch (e) { explain(e) }
 }
 
-/** Create an account: the handle is reserved only when the passkey verifies. Returns the recovery codes, shown once. */
-export async function signUp(handle: string, displayName: string, passkeyName?: string): Promise<string[]> {
+/**
+ * Create an account with a passkey and no password: the handle is reserved only when the passkey verifies. Its saved
+ * recovery codes are made with it (R14, F1) and shown once on the next screen (takeCodes).
+ */
+export async function signUp(handle: string, displayName: string, passkeyName?: string): Promise<void> {
   const b = await api<Options>('POST', '/api/auth/passkey/signup/begin', { handle, displayName })
   const response = await create(b)
-  const r = await api<{ csrf: string; recoveryCodes: string[] }>('POST', '/api/auth/passkey/signup/finish', { challengeId: b.challengeId, response, passkeyName })
+  const r = await api<{ csrf: string; recoveryCodes?: string[] }>('POST', '/api/auth/passkey/signup/finish', { challengeId: b.challengeId, response, passkeyName })
   setCsrf(r.csrf)
-  return r.recoveryCodes
+  holdCodes(r.recoveryCodes)
 }
 
 /**
- * Create an account with a handle and a password (D-094). It can read and set up everything; approving anything needs a
- * passkey, which the next screen offers to add. Returns the recovery codes, shown once.
+ * The saved codes made with an account's first device, kept in this page's memory only (never in storage) until the screen
+ * that follows shows them once (review F1). A reload before they are saved loses them here, but not for good: for 30 minutes
+ * the session that was shown them may ask Security for a fresh set (server/passkeys.ts regenerateJustMadeCodes, R3).
+ * `replaced`: codes made earlier, before any device, stopped working (R1).
  */
-export async function signUpWithPassword(handle: string, displayName: string, password: string): Promise<string[]> {
-  const r = await api<{ csrf: string; recoveryCodes: string[] }>('POST', '/api/auth/signup', { handle, displayName, password })
+let held: { codes: string[]; replaced: boolean } | null = null
+export function holdCodes(codes: string[] | undefined, replaced = false): void { held = codes?.length ? { codes, replaced } : null }
+export function takeCodes(): { codes: string[]; replaced: boolean } | null { const c = held; held = null; return c }
+
+/**
+ * Create an account with an email address and a password (R14; D-094 for the password). It can read and set up
+ * everything; approving anything needs a device, which the next screen offers to set up. The answer is the same whether or
+ * not another account uses the address. `handle` is optional: left empty, QED makes one from the name.
+ */
+export async function signUpWithEmail(email: string, displayName: string, password: string, handle?: string): Promise<void> {
+  const r = await api<{ csrf: string }>('POST', '/api/auth/signup', { email, displayName, password, ...(handle?.trim() ? { handle: handle.trim() } : {}) })
   setCsrf(r.csrf)
-  return r.recoveryCodes
+}
+
+// ------------------------------------------------------------------------------------------------ Google (only where it is configured)
+
+const GOOGLE_KEY = 'qed.google'
+/**
+ * Start a round trip to Google: 'signin' from the sign-in page; 'link' (add Google to this account) and 'confirm' (confirm
+ * with Google again) from a signed-in page. What it is for, and the page to come back to, wait in this tab's session
+ * storage; the browser leaves for Google and comes back at /auth/google/callback (finishGoogle).
+ */
+export async function beginGoogle(purpose: 'signin' | 'link' | 'confirm', back = '/'): Promise<never> {
+  const r = await api<{ url: string }>('POST', purpose === 'signin' ? '/api/auth/google/begin' : '/api/security/google/begin', purpose === 'signin' ? {} : { purpose })
+  try { sessionStorage.setItem(GOOGLE_KEY, JSON.stringify({ purpose, back })) } catch { /* private mode: the callback then reads it as a sign-in */ }
+  location.assign(r.url)
+  return new Promise<never>(() => { /* the page is leaving */ })
+}
+/** Finish it with what Google put on the callback's address. Returns where to go next. */
+export async function finishGoogle(q: { code: string; state: string; iss: string | null }): Promise<{ purpose: 'signin' | 'link' | 'confirm'; back: string; created: boolean }> {
+  let kept: { purpose?: string; back?: string } = {}
+  try { kept = JSON.parse(sessionStorage.getItem(GOOGLE_KEY) ?? '{}') as typeof kept; sessionStorage.removeItem(GOOGLE_KEY) } catch { /* none kept */ }
+  const purpose = kept.purpose === 'link' || kept.purpose === 'confirm' ? kept.purpose : 'signin'
+  const back = typeof kept.back === 'string' && kept.back.startsWith('/') && !kept.back.startsWith('//') ? kept.back : '/'
+  const r = await api<{ csrf?: string; created?: boolean }>('POST', purpose === 'signin' ? '/api/auth/google/finish' : '/api/security/google/finish', { code: q.code, state: q.state, iss: q.iss ?? undefined })
+  if (r.csrf) setCsrf(r.csrf)
+  return { purpose, back, created: r.created === true }
 }
 
 export async function signInWithPassword(handle: string, password: string): Promise<void> {
@@ -167,18 +219,24 @@ export async function setUpVaultWithTokens(origin: string, currencies: { treasur
 }
 
 /**
+/**
  * A password account's first passkey (D-094): the password typed again, which unlocks exactly this, then the device
  * makes the passkey. The server refuses it if the account has a passkey by then.
  */
-export async function addFirstPasskey(password: string, passkeyName?: string): Promise<{ id: string; name: string }> {
+export async function addFirstPasskey(password: string, passkeyName?: string): Promise<{ id: string; name: string; recoveryCodes?: string[]; replacedEarlier?: boolean }> {
   await api('POST', '/api/auth/stepup', { password })
   return addPasskey(passkeyName)
 }
 
-export async function addPasskey(passkeyName?: string): Promise<{ id: string; name: string }> {
+/**
+ * Set up a device (add a passkey). `recoveryCodes`: the saved codes, made with the account's first device when it held
+ * none, to be shown once (R14, F1): they exist before anyone can hold two devices, which is what H2 relies on.
+ */
+export async function addPasskey(passkeyName?: string): Promise<{ id: string; name: string; recoveryCodes?: string[]; replacedEarlier?: boolean }> {
   const b = await api<Options>('POST', '/api/security/passkeys/begin')
   const response = await create(b)
-  return (await api<{ passkey: { id: string; name: string } }>('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response, passkeyName })).passkey
+  const r = await api<{ passkey: { id: string; name: string }; recoveryCodes?: string[]; replacedEarlier?: boolean }>('POST', '/api/security/passkeys/finish', { challengeId: b.challengeId, response, passkeyName })
+  return { ...r.passkey, ...(r.recoveryCodes ? { recoveryCodes: r.recoveryCodes } : {}), ...(r.replacedEarlier ? { replacedEarlier: true } : {}) }
 }
 
 /** Two codes from different methods: a saved code, and one a recovery contact issued (or a legacy account's password). */

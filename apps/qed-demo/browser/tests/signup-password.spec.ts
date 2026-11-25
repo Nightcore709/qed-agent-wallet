@@ -20,17 +20,16 @@ test('a password account sets up, signs in again, and can approve nothing until 
   const handle = unique('pw'), password = `${randomBytes(9).toString('base64url')} phrase`
   await page.goto('/')
   await page.getByRole('button', { name: 'Create an account' }).click()
+  await page.getByText('Choose your handle (optional)').click()
   await page.getByLabel('Handle').fill(handle)
   await page.getByLabel('Name to sign with').fill('Meera Test')
-  await page.getByRole('radio', { name: /With a password/ }).check()
+  // R14: the ordinary sign-up is an email address and a password
+  await page.getByLabel('Email', { exact: true }).fill(`${handle}@example.in`)
   await page.getByLabel('Password', { exact: true }).fill(password)
-  await page.getByRole('button', { name: 'Create account with a password' }).click()
-  await expect(page.getByRole('list', { name: 'Recovery codes' }).getByRole('listitem')).toHaveCount(10)
-  await page.getByLabel('I have stored these codes somewhere other than this device').check()
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('button', { name: 'Create account', exact: true }).click()
 
   // the first-run step offers the passkey that approves payments; "Not now" is allowed and says what it leaves out
-  await expect(page.getByRole('heading', { name: 'Add the passkey that approves payments' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Faster, more secure access' })).toBeVisible()
   await page.getByRole('button', { name: 'Not now' }).click()
   await page.getByRole('button', { name: 'Open the household' }).click()
   await expect(page.getByRole('button', { name: 'Open the household' })).toHaveCount(0)

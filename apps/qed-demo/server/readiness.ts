@@ -158,6 +158,8 @@ const PLAIN: Record<string, [Area, string]> = {
   'RISK-114': ['build', 'Inside the service, the co-signer\'s account can reach the test chain, which asks for no credential, and the check that the services are kept apart takes one of its inputs from the wallet service it checks. The chain holds only valueless test tokens.'],
   'RISK-115': ['signing', 'Your saved recovery codes decide disputes between your passkeys: without one you cannot remove a stolen passkey, and one stolen passkey can remove your recovery contact, your password and an email address at once. The Security screen warns when two or fewer codes are left.'],
   'RISK-116': ['signing', 'Some screens can show an out-of-date time or an option that will be refused: after a recovery restarts, the wallet shows its earlier time until an attempt to finish it is refused; "Stop this recovery" is offered for recoveries your guardian did not co-sign, which the service refuses; and bounty boards and wallets set up under earlier versions keep their earlier code. The chain refuses a wrong action in each case.'],
+  'RISK-123': ['signing', 'If email sending is switched on later, a password reset followed by a new device could let whoever first uses that device make the recovery codes. Email sending is off, so this cannot happen in this build.'],
+  'RISK-124': ['signing', 'Without email recovery, an account that never saved its recovery codes, or one that signs in only with Google, cannot be recovered if its only device is lost.'],
   'RISK-117': ['build', 'In Safari\'s engine the page\'s security policy blocks some inline styles, which can change how a few details look; the check in that engine fails on these reports.'],
 }
 /**

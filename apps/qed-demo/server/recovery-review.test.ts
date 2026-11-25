@@ -17,13 +17,16 @@ import { type Db, openDb } from './core.ts'
 import { configureDelivery } from './delivery.ts'
 import {
   acceptContact, applyDueChanges, beginAddPasskey, beginLogin, beginReauth, beginRecoveryPasskey, beginSignup, cancelRecovery, finishAddPasskey, finishLogin, finishReauth, finishSignup,
-  nominateContact, PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, RECOVERY_FINISH_WINDOW_MS, regenerateRecoveryCodes, type RelyingParty, signUpWithPassword, startRecovery,
+  nominateContact, PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, RECOVERY_FINISH_WINDOW_MS, regenerateRecoveryCodes, type RelyingParty, signUpWithPassword as openWithPassword, startRecovery, makeRecoveryCodes,
 } from './passkeys.ts'
 import {
   addAddress, beginAuthorityRequest, beginRecoveryFromLink, confirmAddressByLink, contactCancel, finishAuthorityRequest, finishRecoveryFromLink, recoveryLinkState, recoveryTick,
   removeAddress, requestPasswordReset, requestRecoveryLink, resetPassword, startRecoveryFromLink,
 } from './recovery.ts'
 import { SoftAuthenticator } from './softauthn.ts'
+
+// R14: sign-up makes no saved recovery codes any more. These tests are about what the codes do, so each account makes its set right after it opens.
+const signUpWithPassword = async (db: Db, input: Parameters<typeof openWithPassword>[1], meta: Parameters<typeof openWithPassword>[2], now: number) => { const r = await openWithPassword(db, input, meta, now); return { ...r, recoveryCodes: makeRecoveryCodes(db, r.personId, now) } }
 
 // a saved code the person has not used (H2: suspending down to one passkey and new codes spend one)
 const unusedCodeId = (db: import('./core.ts').Db, personId: string): string | undefined => db.get<{ id: string }>('SELECT id FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL LIMIT 1', personId)?.id
@@ -47,7 +50,7 @@ async function passkeyAccount(db: Db, handle: string, now = T0) {
   const auth = new SoftAuthenticator({ origin: RP.origins[0]! })
   const b = await beginSignup(db, RP, { handle, displayName: handle }, `10.1.0.${handle.length}`, now)
   const r = await finishSignup(db, RP, { challengeId: b.challengeId, response: auth.create(b.options as never) }, META, now)
-  return { auth, ...r, s: (t = now + 1000) => sessionFor(db, r.session.token, t)! }
+  return { auth, ...r, recoveryCodes: makeRecoveryCodes(db, r.personId, now), s: (t = now + 1000) => sessionFor(db, r.session.token, t)! }
 }
 function confirmedEmail(db: Db, s: ReturnType<typeof sessionFor>, address: string, now: number) {
   addAddress(db, s!, 'email', address, now)
