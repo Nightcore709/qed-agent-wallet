@@ -99,7 +99,9 @@ test('a subscription is found and reviewed; a repeat is held and confirmed; a di
   await expect(subs.getByText(/QED cannot cancel a subscription with the merchant/).first()).toBeVisible()
   expect(s.query('SELECT state FROM subscription_reviews WHERE user_id = ? AND payee_handle = ?', person!.id, 'ravi.kumar@upi')).toEqual([{ state: 'cancel-myself' }])
 
-  // 3. a second, separately approved payment of the same amount to the same payee: the rule is on the sheet, and it is held
+  // 3. a second, separately approved payment of the same amount to the same payee: the rule is on the page (R14: behind the
+  // disclosure under Payments so far, every word kept) and on the sheet, and it is held
+  await page.getByRole('region', { name: 'Payments so far' }).getByText('When a payment that repeats an earlier one is held').click()
   await expect(page.getByText(/the same bill, or the same payee and the same amount within 24 hours/).first()).toBeVisible()
   await payFromSpend(page, '500')
   sheet = page.getByRole('dialog')

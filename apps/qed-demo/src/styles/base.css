@@ -3,8 +3,11 @@
 html, body { overflow-x: clip; }
 html {
   -webkit-text-size-adjust: 100%;
-  /* A control that takes focus is scrolled clear of the bars pinned to the window (WCAG 2.2, 2.4.11). */
-  scroll-padding-top: calc(var(--bar-top, 0px) + 16px); scroll-padding-bottom: calc(var(--bar-bottom, 0px) + var(--composer-h, 0px) + 16px);
+  /* Whatever is scrolled to is scrolled clear of the bars pinned to the window (WCAG 2.2, 2.4.11; R14 layout rule L1).
+     The bottom navigation's height is counted here, once, for everything. The top bar's is counted on the target: a
+     part an address names (#anchor) and a control that takes focus each carry it as their own scroll-margin-top, below.
+     Counted in both places it left a gap of two bars above every anchor (measured: #goals landed 96 px under the bar). */
+  scroll-padding-top: var(--s2); scroll-padding-bottom: calc(var(--bar-bottom, 0px) + var(--composer-h, 0px) + 16px);
   scrollbar-color: var(--ink-4) transparent;
   background: var(--ground);
   /* the lights travel between sections instead of switching (tokens.css registers them) */
@@ -73,7 +76,9 @@ table { font-variant-numeric: tabular-nums lining-nums; }
 @media (max-width: 560px) { .desk { display: none; } .narrow-only { display: inline; } }
 
 /* a section reached by a #link stops below any bar pinned to the top of the window */
-:where(section, article, div, fieldset)[id] { scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+:where(section, article, aside, div, fieldset)[id] { scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
+/* a control that takes focus is scrolled clear of the top bar, as an anchor is (the scroller no longer counts the bar) */
+:where(a, button, input, select, textarea, summary, [tabindex]) { scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4)); }
 
 /* ------------------------------------------------------------------------------------------------ the atmosphere
  * Three lights and the meridian (a thin arc of light on the horizon) behind every screen, on the compositor only:

@@ -16,7 +16,7 @@ import { ApprovalSheet, type PendingApproval } from '../ui/instrument.tsx'
 import { dayName, runwayOf, scoreLanes } from '../ui/charts.tsx'
 import { Horizon } from '../ui/horizon.tsx'
 import type { Lane } from '../ui/score.tsx'
-import { Btn, Link, Loading, MoneyBar, Problem, Seal, Swatch, useAction, useMasonry, useSession } from '../ui/kit.tsx'
+import { Btn, EmptyState, Link, Loading, MoneyBar, Problem, Seal, Swatch, useAction, useMasonry, useSession } from '../ui/kit.tsx'
 import { withPasskeyIfAsked } from '../lib/stepup.ts'
 import { haveTotal, oweTotal } from '../lib/sheet.ts'
 import { ReserveBasis } from '../ui/reserve.tsx'
@@ -191,7 +191,8 @@ export function HomeScreen() {
 
         <section data-col="2" className="panel hm-authority" aria-labelledby="auth-h">
           <div className="panel-head"><h2 id="auth-h">What QED may do</h2><Link to="/protect" className="small">Review all</Link></div>
-          {lanes.length === 0 ? <p className="small muted">Nothing. QED does nothing on its own until you sign an instruction.</p> : (
+          {/* R14 L6: what this is, why it is empty, the one next step */}
+          {lanes.length === 0 ? <EmptyState compact icon={<FilePlus2 />} title="Nothing yet" action={<Link to="/instructions/new" className="btn">Write an instruction</Link>}>QED does nothing on its own until you sign an instruction. Each one you sign appears here with its limit and what is left of it.</EmptyState> : (
             <ul className="hm-lanes">{lanes.slice(0, 6).map((l) => {
               const next = l.runs[0]
               return (

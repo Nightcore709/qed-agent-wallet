@@ -7,7 +7,7 @@
 import { Repeat } from 'lucide-react'
 import { useState } from 'react'
 import { api, fmt, useData } from '../lib/core.ts'
-import { Btn, Link, Loading, Note, Problem, useAction } from '../ui/kit.tsx'
+import { Btn, EmptyState, Link, Loading, Note, Problem, useAction } from '../ui/kit.tsx'
 import { ChannelList, type RevocationRecord } from '../ui/revocation.tsx'
 
 interface Sub {
@@ -26,9 +26,11 @@ export function Subscriptions() {
   const mine = useAction(async (handle: string) => { await api('POST', '/api/subscriptions/cancel-myself', { payeeHandle: handle }); reload() })
   return (
     <section className="panel pay-subs" aria-labelledby="subs-h">
-      <div className="pay-sec-head"><div><h2 id="subs-h">Subscriptions</h2><p>Payments that repeat on a schedule, found in what you have paid. {data?.cannotCancel}</p></div></div>
+      <div className="pay-subs-in">
+      <div className="pay-sec-head"><div><h2 id="subs-h">Subscriptions</h2><p>Payments that repeat on a schedule, found in what you have paid.{data?.subscriptions.length ? ` ${data.cannotCancel}` : ''}</p></div></div>
+      <div className="pay-subs-body">
       {error ? <Problem error={error} /> : !data ? <Loading what="Reading your payments" /> : data.subscriptions.length === 0 ? (
-        <p className="pay-none">No subscription found in your payments yet.</p>
+        <EmptyState across compact icon={<Repeat />} title="No subscription found in your payments yet" />
       ) : (
         <ul className="subs-list">
           {data.subscriptions.map((s) => (
@@ -38,7 +40,7 @@ export function Subscriptions() {
                 <span className="sub-cost gr-n"><b>{fmt.money(s.perMonth, true)}</b> a month<small>{fmt.money(s.perYear, true)} a year</small></span>
               </div>
               <p className="sub-next">Next payment expected {fmt.day(s.nextExpected)}. Last paid {fmt.day(s.lastPaid)}.</p>
-              <details className="sub-evidence">
+              <details className="disclose sub-evidence">
                 <summary>The {s.evidence.length} payments this rests on</summary>
                 <ul>{s.evidence.map((e) => <li key={e.actionId}><Link to={`/record/${e.actionId}`}>{fmt.day(e.at)}</Link> <span>{fmt.money(e.amount, true)}</span>{e.programId ? <small> by an instruction</small> : null}</li>)}</ul>
               </details>
@@ -57,7 +59,9 @@ export function Subscriptions() {
         </ul>
       )}
       <Problem error={stop.error ?? mine.error} />
-      {data ? <details className="sub-rule"><summary>How a subscription is found</summary><p>{data.rule}</p></details> : null}
+      {data ? <details className="disclose sub-rule"><summary>How a subscription is found</summary><p>{data.rule}</p>{data.subscriptions.length ? null : <p>{data.cannotCancel}</p>}</details> : null}
+      </div>
+      </div>
     </section>
   )
 }

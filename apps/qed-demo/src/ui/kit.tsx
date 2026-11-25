@@ -1,10 +1,13 @@
 /** Interface primitives. Small on purpose: every screen is built from these and from plain HTML. */
 import { ArrowLeft, Check, Clock, Eye, EyeOff, Minus, X } from 'lucide-react'
 import { type ButtonHTMLAttributes, createContext, type ReactNode, useCallback, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { api, ApiError, fmt, navigate, paiseToRupees, rupeesToPaise } from '../lib/core.ts'
+import { api, ApiError, fmt, navigate } from '../lib/core.ts'
+import { entryFormat, entryText, parseEntry } from '../lib/money-entry.ts'
 import { homeCurrency } from '../../shared/home-money.ts'
 import { confirmWithPasskey } from '../lib/passkey.ts'
 import { SOURCES, type SourceKind, sourcesOfPath } from '../lib/sources.ts'
+import { boardPlan } from './board.ts'
+import { type StickyPlan, stickyPlan, stickyTopAt } from './sticky.ts'
 
 export interface SessionInfo {
   authenticated: boolean; presentation?: boolean; csrf?: string; stepUpFresh?: boolean; setup?: boolean; authMethod?: string; hasPasskey?: boolean; openRecoveries?: number
@@ -81,6 +84,10 @@ export function Btn({ tone, small, busy, className, children, disabled, onClick,
  * whatever the heights, so no row leaves a hole beside a short neighbour. The document order stays the order of
  * importance (on Home: position, what needs you, what QED may do, what is coming, where the money is, what happened), and on a
  * narrow screen it is the reading order too.
+ *
+ * R14 layout rule L3 (board.ts): two cards whose feet nearly meet are made to meet, the two columns end together, and
+ * a last card marked data-col="auto" closes the board across both columns when they are already level. A lengthened
+ * card carries data-fill; its content stays at the top and its foot (.panel-foot) at the bottom (components.css).
  */
 export function useMasonry() {
   const board = useRef<HTMLDivElement>(null)
@@ -90,26 +97,103 @@ export function useMasonry() {
     const UNIT = 4
     const apply = () => {
       const on = getComputedStyle(el).display === 'grid'
-      // how far down each column already reaches; a section marked data-col="auto" goes under the shorter one, so the
-      // last section evens the two columns' feet instead of lengthening the longer one (R12, Home's "Ways to do better")
-      const reach = [0, 0]
-      for (const c of Array.from(el.children) as HTMLElement[]) {
-        if (!on) { c.style.gridRowEnd = ''; if (c.dataset.col === 'auto') c.style.gridColumn = ''; continue }
-        const h = c.getBoundingClientRect().height + parseFloat(getComputedStyle(c).marginBottom || '0')
-        const span = Math.max(1, Math.ceil(h / UNIT))
-        c.style.gridRowEnd = `span ${span}`
-        const col = c.dataset.col === 'auto' ? (reach[0]! <= reach[1]! ? 0 : 1) : c.dataset.col === '2' ? 1 : c.dataset.col === '1' ? 0 : -1
-        if (c.dataset.col === 'auto') c.style.gridColumn = String(col + 1)
-        if (col >= 0) reach[col]! += span
-      }
+      const cards = Array.from(el.children) as HTMLElement[]
+      // back to each card's own height first: a card lengthened on the last pass must not be measured at that length.
+      // An auto card keeps the column it was last given while it is measured (its height depends on the column's
+      // width); if this pass moves it, its size changes and the observer lays the board out once more.
+      for (const c of cards) { c.style.gridRowEnd = ''; c.style.minHeight = ''; c.removeAttribute('data-fill'); if (!on && c.dataset.col === 'auto') c.style.gridColumn = '' }
+      if (!on) return
+      const gaps = cards.map((c) => parseFloat(getComputedStyle(c).marginBottom || '0'))
+      const plan = boardPlan(cards.map((c, k) => ({
+        col: c.dataset.col === 'auto' ? 'auto' : c.dataset.col === '2' ? 2 : c.dataset.col === '1' ? 1 : null,
+        span: Math.max(1, Math.ceil((c.getBoundingClientRect().height + gaps[k]!) / UNIT)),
+      })), { snap: 72 / UNIT, level: 168 / UNIT })
+      cards.forEach((c, k) => {
+        const p = plan[k]!
+        c.style.gridRowEnd = `span ${p.span}`
+        if (c.dataset.col === 'auto') c.style.gridColumn = p.col === 'both' ? '1 / -1' : String(p.col ?? 1)
+        // A lengthened card, and one that ends level with it, is given its length as a least height. Every card keeps
+        // its own height otherwise (never stretched to its rows): a card that grows later, when its figures arrive or
+        // a disclosure in it opens, then changes size, is seen by the observer below and the board is laid out again.
+        if (p.filled || p.level) c.style.minHeight = `${p.span * UNIT - gaps[k]!}px`
+        if (p.filled) c.setAttribute('data-fill', '')
+      })
     }
     const ro = new ResizeObserver(apply)
-    for (const c of Array.from(el.children)) ro.observe(c)
+    const watch = () => { for (const c of Array.from(el.children)) ro.observe(c) }
+    watch()
     ro.observe(el)
+    // a card that arrives later without this screen drawing again (a part loaded on its own, such as Home's holdings by
+    // currency) is watched from then on: unwatched, it grew once its figures arrived and ran over what follows the board
+    const mo = new MutationObserver(() => { watch(); apply() })
+    mo.observe(el, { childList: true })
+    // a disclosure closing inside a lengthened card does not change the card's size, so it is listened for
+    el.addEventListener('toggle', apply, true)
     apply()
-    return () => ro.disconnect()
+    return () => { ro.disconnect(); mo.disconnect(); el.removeEventListener('toggle', apply, true) }
   })
   return board
+}
+
+/**
+ * The sticky side summary (R14 layout rule L2, sticky.ts): put the returned ref on the summary beside a longer column
+ * and give it the class "sticky-side". It stays in view under the top bar while the column scrolls, starts level with
+ * the column's top and ends level with its foot, whatever the window's height and wherever the page ends. A summary
+ * taller than the room between the bars is not pinned. The stylesheet decides when the layout has two columns
+ * (position: sticky); this only sets where the summary is pinned (--sticky-top). With scripts off it is a plain sticky
+ * summary under the top bar.
+ */
+export function useStickySide<T extends HTMLElement = HTMLElement>() {
+  const ref = useRef<T>(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    const col = el?.parentElement
+    if (!el || !col) return undefined
+    const root = document.documentElement
+    let plan: StickyPlan = { mode: 'static' }
+    let frame = 0
+    const place = () => { frame = 0; const t = stickyTopAt(plan, window.scrollY); if (t !== null) el.style.setProperty('--sticky-top', `${t}px`) }
+    const onScroll = () => { if (plan.mode === 'drift' && !frame) frame = requestAnimationFrame(place) }
+    const measure = () => {
+      el.removeAttribute('data-sticky')
+      el.style.removeProperty('--sticky-top')
+      if (getComputedStyle(el).position !== 'sticky') { plan = { mode: 'static' }; return }
+      const px = (name: string) => parseFloat(getComputedStyle(root).getPropertyValue(name)) || 0
+      const cs = getComputedStyle(col)
+      const box = col.getBoundingClientRect()
+      const padTop = parseFloat(cs.paddingTop) || 0, padBottom = parseFloat(cs.paddingBottom) || 0
+      plan = stickyPlan({
+        colTop: box.top + window.scrollY + padTop, colHeight: box.height - padTop - padBottom, height: el.getBoundingClientRect().height,
+        viewport: window.innerHeight, scrollMax: Math.max(0, root.scrollHeight - window.innerHeight),
+        top: (px('--bar-top') || 8) + 16, bottom: px('--bar-bottom') ? px('--bar-bottom') + 16 : 24,
+      })
+      el.setAttribute('data-sticky', plan.mode)
+      place()
+    }
+    const ro = new ResizeObserver(measure)
+    ro.observe(el); ro.observe(col); ro.observe(document.body)
+    window.addEventListener('resize', measure)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    measure()
+    return () => { ro.disconnect(); window.removeEventListener('resize', measure); window.removeEventListener('scroll', onScroll); if (frame) cancelAnimationFrame(frame) }
+  }, [])
+  return ref
+}
+
+/**
+ * An empty state that fills its card honestly (R14 layout rule L6): what this is, why there is nothing in it yet, and
+ * the one next step. `fill` makes it take the height its card has left (the card must be a column: class "fills"), so a
+ * card that is level with a taller neighbour is not a void with one line at its top. Never a figure of zero alone.
+ */
+export function EmptyState({ icon, title, children, action, fill, compact, across, as: H = 'h3' }: { icon?: ReactNode; title: string; children?: ReactNode; action?: ReactNode; fill?: boolean; compact?: boolean
+  /** In a panel as wide as the page: the words on the left and the next step on the right of one row (R14, Spend and Save); it stacks where the panel is narrow. */ across?: boolean; as?: 'h2' | 'h3' | 'h4' }) {
+  return (
+    <div className={['empty-state', 'guided', fill ? 'fill' : '', compact ? 'compact' : '', across ? 'across' : ''].filter(Boolean).join(' ')}>
+      {icon ? <span className="glyph" aria-hidden="true">{icon}</span> : null}
+      <div className="es-words"><H className="es-title">{title}</H>{children ? <p>{children}</p> : null}</div>
+      {action ? <div className="es-act">{action}</div> : null}
+    </div>
+  )
 }
 
 /** Run an async action with busy and error state. The error is shown where the action was taken. */
@@ -269,27 +353,31 @@ export function PasswordField({ label = 'Password', value, onChange, show, onSho
   )
 }
 
-/** Rupee amount entry. The value is paise or null; the text the person typed is kept until it parses. */
-export function MoneyInput({ value, onChange, ...p }: { value: number | null; onChange: (paise: number | null) => void; id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string; placeholder?: string }) {
-  // Shown grouped the Indian way (8,00,000) when it is not being typed; typing keeps exactly what the person types.
-  const [text, setText] = useState(value === null ? '' : grouped(value))
+/**
+ * Amount entry, the one money field of every screen (R14 layout rule L4, DESIGN.md). The value is a whole number of the
+ * currency's own minor unit, or null; the text the person typed is kept until it parses.
+ *
+ * The sign before the digits, the grouping and the decimal places come from the currency (src/lib/money-entry.ts): the
+ * household's home currency, or the one named in `currency` for an amount held in another (yen has no decimal places,
+ * the Bahraini dinar three). Nothing here assumes the rupee: a dollar household's fields read "USD", never "₹".
+ */
+export function MoneyInput({ value, onChange, currency, ...p }: { value: number | null; onChange: (minor: number | null) => void; currency?: string; id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string; 'aria-label'?: string; placeholder?: string }) {
+  // the home currency is read from the session's context on each draw, so a household that changes it at set-up sees every field follow
+  const f = entryFormat(currency ?? homeCurrency())
+  // Shown grouped (8,00,000 in rupees; 800,000 otherwise) when it is not being typed; typing keeps exactly what the person types.
+  const [text, setText] = useState(value === null ? '' : entryText(value, f.currency))
   const last = useRef(value)
-  useEffect(() => { if (value !== last.current) { last.current = value; setText(value === null ? '' : grouped(value)) } }, [value])
+  const shownIn = useRef(f.currency)
+  useEffect(() => {
+    if (value !== last.current || shownIn.current !== f.currency) { last.current = value; shownIn.current = f.currency; setText(value === null ? '' : entryText(value, f.currency)) }
+  }, [value, f.currency])
   return (
-    <div className="money">
-      <input className="input" inputMode="decimal" autoComplete="off" {...p} value={text}
-        onChange={(e) => { setText(e.target.value); const v = e.target.value.trim() === '' ? null : rupeesToPaise(e.target.value); last.current = v; onChange(v) }}
-        onBlur={() => { if (last.current !== null) setText(grouped(last.current)) }} />
+    <div className="money" data-sign={f.sign} data-sign-len={f.sign.length > 1 ? 'code' : 'one'} data-currency={f.currency}>
+      <input className="input" inputMode={f.places === 0 ? 'numeric' : 'decimal'} autoComplete="off" {...p} value={text}
+        onChange={(e) => { setText(e.target.value); const v = e.target.value.trim() === '' ? null : parseEntry(e.target.value, f.currency); last.current = v; onChange(v) }}
+        onBlur={() => { if (last.current !== null) setText(entryText(last.current, f.currency)) }} />
     </div>
   )
-}
-/** Rupees from paise with Indian grouping and no rupee sign, for a field the person may edit: 8,00,000 or 2,450.50. */
-function grouped(paise: number): string {
-  const r = paiseToRupees(paise)
-  const [whole, frac] = r.split('.')
-  // the lakh grouping is the rupee's alone: every other home currency groups in threes
-  const w = homeCurrency() !== 'INR' ? whole!.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : whole!.length > 3 ? `${whole!.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',')},${whole!.slice(-3)}` : whole!
-  return frac ? `${w}.${frac}` : w
 }
 
 export function Sheet({ open, title, onClose, children, foot }: { open: boolean; title: string; onClose: () => void; children: ReactNode; foot?: ReactNode }) {

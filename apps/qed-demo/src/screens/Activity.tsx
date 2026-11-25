@@ -990,7 +990,7 @@ export function ActivityScreen() {
   })
   const shelf = <FolderShelf title="Your records, filed" intro="Each kind of record QED keeps, with the check it carries. Open a folder for the latest; its corner leads to all of them." folders={folders} />
   const records = <Link to="/vault/records">The on-chain wallet's own records</Link>
-  const sentence = 'Everything done in your name, by you and by QED under what you signed, in your bank account and on your on-chain wallet. Each row opens its record, with every check and its receipt.'
+  const sentence = 'Everything done in your name, by you and by QED under what you signed, in your bank account and on your on-chain wallet. Each row opens its record, with every check and its receipt. This is a record of what has happened: reading it moves no money.'
 
   const receiptsButton = <Btn busy={receiptFile.busy} disabled={!receipts.data?.chain.count} onClick={() => void receiptFile.run()}><Download aria-hidden="true" />Every receipt (JSON)</Btn>
   if (!data.data) {

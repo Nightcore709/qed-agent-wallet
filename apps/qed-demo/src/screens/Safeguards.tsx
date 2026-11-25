@@ -211,7 +211,7 @@ function NewPayeeForm({ profile, onSaved }: { profile: Home['profile']; onSaved:
   return (
     <form className="stack pr-sg-form" onSubmit={(e) => { e.preventDefault(); void save.run() }}>
       <div className="form-grid">
-        <Field label="Payments wait above" hint="What you send a new payee in its first 24 hours, counted together. ₹0 makes every payment to it wait." error={save.error?.fields.newPayeeHoldAbove}>{(p) => <MoneyInput {...p} value={above} onChange={setAbove} />}</Field>
+        <Field label="Payments wait above" hint={`What you send a new payee in its first 24 hours, counted together. ${fmt.money(0)} makes every payment to it wait.`} error={save.error?.fields.newPayeeHoldAbove}>{(p) => <MoneyInput {...p} value={above} onChange={setAbove} />}</Field>
         <Field label="For how long" hint="From when you ask for the payment. 24 hours is suggested." error={save.error?.fields.newPayeeHoldHours}>{(p) => <select {...p} className="input" value={hours} onChange={(e) => setHours(e.target.value)}>{HOLD_CHOICES.map((h) => <option key={h} value={h}>{hoursWord(h)}</option>)}<option value={HOLD_OFF}>No wait (off)</option></select>}</Field>
       </div>
       {looser ? <p className="small wait">A higher amount, a shorter wait or no wait lets more money reach a new payee sooner, so it takes effect only after {protectionDelayWords(session.delays?.protectionMs ?? DELAY_MS)}; until then any of your passkeys can cancel it, and you, and any recovery contacts you have, are told in QED. If someone is telling you to change this so that a payment goes faster, stop: that is how this kind of fraud works.</p> : null}
@@ -367,12 +367,16 @@ export function ReserveWhy({ l, brief = false }: { l: Liquidity; /** On Safeguar
 }
 
 /** What the figure allows for, how to change it, and what it does not count. */
-export function ReserveAllows({ l, profile, onSaved, here = false }: { l: Liquidity; profile: Home['profile']; onSaved: () => void; /** Shown on Safeguards, where the household figures are further down the same page. */ here?: boolean }) {
+export function ReserveAllows({ l, profile, onSaved, here = false, notCounted = true }: { l: Liquidity; profile: Home['profile']; onSaved: () => void; /** Shown on Safeguards, where the household figures are further down the same page. */ here?: boolean
+  /** Save draws what the figure does not count beside what it pays for (NotCounted below), so it is not repeated here. */ notCounted?: boolean }) {
   const [editing, setEditing] = useState(false)
   const a = l.assumptions
   return (
     <section className="rv-allow" aria-labelledby="allow-h">
-      <div className="rv-sub-head"><h3 id="allow-h">What it allows for</h3><p>The worst you told QED to expect</p></div>
+      {/* R14: the heading with its line on the left and the change on the right of the same row, so the button never
+          stands alone on a row with nothing beside it */}
+      <div className="rv-sub-head rv-allow-head"><div><h3 id="allow-h">What it allows for</h3><p>The worst you told QED to expect</p></div>
+        {editing ? null : <Btn small onClick={() => setEditing(true)}>Change what it allows for</Btn>}</div>
       <ul className="rv-allows">
         <li><b>{a.lateDays > 0 ? `Income up to ${a.lateDays} day${a.lateDays === 1 ? '' : 's'} late` : 'Income on its day'}</b><span>{a.lateDays > 0 ? 'A salary is counted on only once the latest day it may arrive has passed.' : 'A salary is counted on from the day it is due.'}</span></li>
         <li><b>{a.lostSalaries === 0 ? 'No salary lost' : `${a.lostSalaries === 1 ? 'One salary' : `${a.lostSalaries} salaries`} not arriving`}</b><span>{a.lostSalaries === 0 ? 'Every salary due is counted on.' : a.allowanceLeft > 0 ? `The next ${a.allowanceLeft === 1 ? 'salary due is' : `${a.allowanceLeft} salaries due are`} treated as lost, the hardest case. Lost so far: ${a.lostSoFar}.` : `${a.lostSalaries === 1 ? 'The one' : `All ${a.lostSalaries}`} allowed for ${a.lostSalaries === 1 ? 'has' : 'have'} been lost already, so every salary due is counted on now.`}</span></li>
@@ -380,12 +384,14 @@ export function ReserveAllows({ l, profile, onSaved, here = false }: { l: Liquid
       </ul>
       {a.late ? <LateSalary a={a} /> : null}
       {here ? <WaitingLine keys={['lateDays', 'lostSalaries']} /> : null}
-      <div className="rv-change">{editing
-        ? <><ReserveForm profile={profile} lostSoFar={a.lostSoFar} onSaved={() => { setEditing(false); onSaved() }} /><p><Btn small tone="quiet" onClick={() => setEditing(false)}>Close</Btn></p></>
-        : <Btn small onClick={() => setEditing(true)}>Change what it allows for</Btn>}</div>
-      <details className="rv-not"><summary>What it does not count</summary><ul className="small muted">{l.notCounted.map((t) => <li key={t}>{t}</li>)}</ul></details>
+      {editing ? <div className="rv-change"><ReserveForm profile={profile} lostSoFar={a.lostSoFar} onSaved={() => { setEditing(false); onSaved() }} /><p><Btn small tone="quiet" onClick={() => setEditing(false)}>Close</Btn></p></div> : null}
+      {notCounted ? <NotCounted l={l} /> : null}
     </section>
   )
+}
+/** What the reserve figure does not count, behind its disclosure: under what it allows for on Safeguards, beside what it pays for on Save. */
+export function NotCounted({ l }: { l: Liquidity }) {
+  return <details className="rv-not"><summary>What it does not count</summary><ul className="small muted">{l.notCounted.map((t) => <li key={t}>{t}</li>)}</ul></details>
 }
 
 /** The most the signed instructions could take, by their limits, over three windows: the bracket's figure, line by line. */

@@ -87,7 +87,11 @@ test('converts and pays across zero, two and three decimal places; refuses a rou
     await expect(fill).toContainText('Spread')
     await expect(fill).toContainText('₹50.00')
   }
-  // a conversion into a held balance counts toward the Liberalised Remittance Scheme, and the screen says so
+  // a conversion into a held balance counts toward the Liberalised Remittance Scheme, and the screen says so: in one line
+  // beside the button, and in full behind the disclosure under it (R14: the long rules are one press away, every word kept)
+  await expect(desk.getByText('Rupees changed count towards the Liberalised Remittance Scheme at once.')).toBeVisible()
+  await desk.getByText('How the rate is rounded, the desk\'s spread, and what counts towards the scheme').click()
+  await expect(page.getByTestId('lrs-held-note')).toBeVisible()
   await expect(page.getByTestId('lrs-held-note')).toContainText('even when the money stays in your account here')
   const balances = page.getByTestId('by-currency-save')
   await expect(balances.locator('[data-currency="JPY"] .ccy-bal')).toHaveText('JPY 50,000')
@@ -190,7 +194,12 @@ test('converts and pays across zero, two and three decimal places; refuses a rou
   await twin.getByRole('button', { name: 'Add it, I have checked' }).click()
   await expect(ab.getByRole('radio', { name: /^Anita Rao.*6788/ })).toBeChecked()
   // the Spend side says how far the IBAN's length and layout are checked, and that the Liberalised Remittance Scheme counts rupees changed
-  await expect(ab.getByText(/Liberalised Remittance Scheme, this financial year/)).toContainText('count now, even when the money stays in your account here')
+  // (R14: the year's figure is a tile of its own; how it is counted is behind the disclosure under it, every word kept)
+  await expect(ab.getByTestId('abroad-lrs')).toContainText(/Liberalised Remittance Scheme, this financial year \(since \d+ \w+ \d{4}\)/)
+  await expect(ab.getByTestId('abroad-lrs')).toContainText('changed out of rupees')
+  await ab.getByText('How QED counts this, tax collected at source, and a repeated payment').click()
+  await expect(ab.getByTestId('abroad-lrs-rule')).toBeVisible()
+  await expect(ab.getByTestId('abroad-lrs-rule')).toContainText('count now, even when the money stays in your account here')
 
   // ---- the database: what was filled, paid and booked; every currency balances on its own
   const fills = s.query<{ buy_ccy: string; buy_text: string; purpose: string; spread_bps: number; fee_text: string }>('SELECT buy_ccy, buy_text, purpose, spread_bps, fee_text FROM fx_fills WHERE user_id = ? ORDER BY filled_at', me!.id)

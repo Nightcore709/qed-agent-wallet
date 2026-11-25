@@ -92,12 +92,29 @@
 textarea.input { min-height: 96px; resize: vertical; line-height: 1.5; }
 select.input { appearance: none; padding-right: 40px; background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%), linear-gradient(135deg, var(--ink-2) 50%, transparent 50%); background-position: calc(100% - 20px) 52%, calc(100% - 15px) 52%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; cursor: pointer; }
 select.input option { background: var(--sheet); color: var(--ink); }
-.money { position: relative; }
-.money .input { padding-left: 34px; font-variant-numeric: tabular-nums lining-nums; font-weight: 600; letter-spacing: -.01em; }
-.money::before { content: "₹"; position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-weight: 560; pointer-events: none; }
-/* an amount of another test token than test rupees (the on-chain wallet, money-model S5): its own sign, or none */
-.money[data-sign]::before { content: attr(data-sign); }
+/* the money field (kit.tsx MoneyInput, R14 layout rule L4): the currency's sign stands before the digits, and the digits
+   begin after it whatever it is: one sign ("₹", "£", "€") or an ISO code ("USD", "AED", "JPY"). The sign is never typed
+   into this file: MoneyInput writes the household's (or the field's) currency in data-sign. Widths are the measured
+   advance of the widest sign and the widest code in Inter Tight 560, counted in the sign's own size (--sign-em: the
+   wrapper's font size as a length, so the field inside reads it whatever its own size is). A screen that enlarges the
+   field (Spend's amount) sets the wrapper's font size and --sign-left, and nothing else. */
+@property --sign-em { syntax: "<length>"; inherits: true; initial-value: 15px; }
+.money { position: relative; font-size: var(--t-body); --sign-em: 1em; --sign-left: 15px; --sign-gap: 9px; --sign-n: .64; }
+.money[data-sign-len="code"] { --sign-n: 2.1; }
+.money[data-sign=""] { --sign-n: 0; --sign-gap: 1px; }
+.money .input { padding-left: calc(var(--sign-left) + var(--sign-n) * var(--sign-em) + var(--sign-gap)); font-variant-numeric: tabular-nums lining-nums; font-weight: 600; letter-spacing: -.01em; }
+.money::before { content: attr(data-sign); position: absolute; left: var(--sign-left); top: 50%; transform: translateY(-50%); line-height: 1; color: var(--ink-3); font-weight: 560; letter-spacing: var(--track-body); white-space: nowrap; pointer-events: none; }
+/* a bare wrapper is an amount of test rupees on the on-chain wallet (WalletInline, Vault), the one place the rupee's
+   sign is a fixture and not the household's currency; another test token names its own sign in data-sign, or none */
+.money:not([data-sign])::before { content: "₹"; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s4) var(--s5); }
+/* A set number of fields to a row (R14 layout rule L3): the row is full or it is one column, never a last field left
+   alone under a full row. .cols-2 for an even number of fields, .cols-3 for three. Each falls to one column when its
+   own width (not the window's) is under --min, so it holds inside any panel: below that width the least track is the
+   whole row, above it an exact share. A single field in .cols-2 keeps a field's width instead of stretching. */
+.form-grid.cols-2 { --cols: 2; --min: 420px; }
+.form-grid.cols-3 { --cols: 3; --min: 560px; }
+.form-grid.cols-2, .form-grid.cols-3 { --gap: var(--s5); column-gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, max((var(--min) - 100%) * 999, (100% - (var(--cols) - 1) * var(--gap)) / var(--cols))), 1fr)); }
 input[type="checkbox"], input[type="radio"] { accent-color: var(--act); width: 18px; height: 18px; margin: 0; flex: none; }
 label.check { display: flex; gap: var(--s3); align-items: flex-start; cursor: pointer; line-height: 1.45; }
 label.check input { margin-top: 2px; }
@@ -161,9 +178,17 @@ button.basis { font-family: inherit; line-height: 16px; background: none; border
 button.basis:hover, button.basis[aria-expanded="true"] { color: var(--ink); }
 .src { display: inline-block; font-size: var(--t-micro); font-weight: 600; letter-spacing: .02em; color: var(--ink-2); border: 1px solid var(--edge-lo); border-radius: var(--r-sm); padding: 1px 6px; white-space: nowrap; }
 .src[data-source="chain"] { border-style: dashed; }
-.source-note { margin: 28px 0 8px; padding-top: 14px; border-top: 1px solid var(--edge-lo); color: var(--ink); font-size: var(--t-small); }
-.source-note-h { font-size: var(--t-small); font-weight: 600; color: var(--ink-2); margin: 0 0 6px; }
-.source-note ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+/* the page's footnote: each kind of figure on the page and what it comes from, as a table of two columns (the kind's
+   label, then its words), so the words start on one line whatever the label's length; two such columns on a wide page */
+.source-note { margin: var(--s10) 0 0; padding-top: var(--s5); border-top: 1px solid var(--rule-2); color: var(--ink-2); font-size: var(--t-small); line-height: 1.45; }
+.source-note-h { font-size: var(--t-small); font-weight: 650; color: var(--ink-2); letter-spacing: .01em; margin: 0 0 var(--s3); }
+.source-note ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: var(--s2) var(--s8); }
+.source-note li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: var(--s3); align-items: baseline; }
+.source-note li .src { justify-self: start; }
+@media (max-width: 479px) { .source-note li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+/* the statement of what the reserve counts, under a screen's own figures (reserve.tsx): a footnote with air above it and
+   a hairline, never set against the cards it explains (R14: it sat jammed under Home's three figures) */
+.reserve-basis { margin-top: var(--s4); padding-top: var(--s3); border-top: 1px solid var(--rule); line-height: 1.5; }
 .basis-wrap { position: relative; display: inline-block; }
 .basis-pop { position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; width: max-content; max-width: min(280px, 80vw); padding: 10px 14px; border-radius: var(--r-sm); background: var(--pane-3); backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); -webkit-backdrop-filter: blur(var(--blur-2)) saturate(var(--sat)); border: 1px solid var(--rim); box-shadow: var(--lift-3); font-size: var(--t-small); font-weight: 430; line-height: 1.45; color: var(--ink-2); white-space: normal; text-align: left; animation: pop-in var(--d2) var(--ease-out); }
 .count { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: var(--r-pill); background: var(--due-bg); color: var(--due); border: 1px solid color-mix(in oklab, var(--due) 30%, transparent); font-size: var(--t-micro); font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -217,7 +242,14 @@ button.basis:hover, button.basis[aria-expanded="true"] { color: var(--ink); }
 .section-head h2 + .small, .section-head > .small { color: var(--ink-3); }
 .cols { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s6); align-items: start; }
 .cols.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-@media (min-width: 960px) { .cols > aside.sticky { position: sticky; top: calc(var(--bar-top, 0px) + 24px); align-self: start; max-height: calc(100vh - var(--bar-top, 0px) - 48px); overflow-y: auto; } }
+/* The sticky side summary (R14 layout rule L2; kit.tsx useStickySide, sticky.ts). A summary beside a longer column
+   carries .sticky-side: it stays in view under the top bar, starts level with the column's top and ends level with its
+   foot. The layout says when it has two columns (position: sticky at that width); the hook sets --sticky-top where the
+   page would otherwise end with the summary still pinned at the top and a hole under it. A summary taller than the room
+   between the bars is not pinned (data-sticky="static"), so every part of it can be reached; it never scrolls inside. */
+.sticky-side { align-self: start; top: var(--sticky-top, calc(var(--bar-top, 8px) + var(--s4))); }
+.sticky-side[data-sticky="static"] { position: static !important; }
+@media (min-width: 960px) { .cols > .sticky-side, .cols > aside.sticky { position: sticky; } .cols > aside.sticky { align-self: start; top: var(--sticky-top, calc(var(--bar-top, 8px) + var(--s4))); } }
 @media (max-width: 959px) { .cols, .cols.even { grid-template-columns: minmax(0, 1fr); gap: var(--s5); } }
 
 /* ------------------------------------------------------------------------------------------------ notes and banners */
@@ -403,6 +435,30 @@ dialog.sheet::backdrop { background: var(--backdrop); backdrop-filter: blur(6px)
 .legend-row span { display: inline-flex; align-items: center; gap: 6px; }
 .legend-row i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
+/* The balance charts' marks, list and label (chart-marks.tsx; R14 layout rule L5), shared by Home's and Save's chart.
+   A day money moves is a numbered ring beside its step; the same number names it in the list under the chart. */
+.cv-mark circle { fill: var(--sheet); stroke: var(--ink-3); stroke-width: 1.25; }
+.cv-mark text { fill: var(--ink); font: 700 var(--t-micro)/1 var(--font); font-variant-numeric: tabular-nums lining-nums; }
+.cv-mark.in circle { stroke: var(--gain); } .cv-mark.wif circle { stroke: var(--c6); stroke-dasharray: 3 2; }
+.cv-mark.on circle { fill: var(--ink); stroke: var(--ink); } .cv-mark.on text { fill: var(--sheet); }
+line.cv-mark { stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; } line.cv-mark.in { stroke: var(--gain); } line.cv-mark.wif { stroke: var(--c6); }
+.cv-events { display: grid; gap: var(--s2); min-width: 0; }
+.cv-events-h { font-size: var(--t-micro); font-weight: 650; color: var(--ink-3); letter-spacing: .02em; }
+.cv-events ol { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 236px), 1fr)); gap: 0 var(--s6); }
+.cv-events li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: var(--s2) var(--s3); align-items: center; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--rule); font-size: var(--t-small); }
+.cv-events li.on { background: linear-gradient(90deg, transparent, var(--brand-bg) 12% 88%, transparent); }
+.cv-n { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-size: var(--t-micro); font-weight: 700; line-height: 1; color: var(--ink); background: var(--sheet); border: 1.25px solid var(--ink-3); font-variant-numeric: tabular-nums lining-nums; }
+.cv-n.in { border-color: var(--gain); } .cv-n.wif { border-color: var(--c6); border-style: dashed; }
+.cv-what { display: grid; min-width: 0; font-weight: 600; color: var(--ink); line-height: 1.3; overflow-wrap: anywhere; }
+.cv-what small { font-size: var(--t-micro); font-weight: 450; color: var(--ink-3); }
+.cv-tag { font-size: var(--t-micro); font-weight: 600; color: var(--c6); }
+.cv-amt { font-weight: 650; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; color: var(--ink); }
+.cv-amt.in { color: var(--gain); }
+.cv-events details { min-width: 0; }
+.cv-events summary { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--t-small); font-weight: 600; color: var(--brand); cursor: pointer; }
+/* the label that follows the pointer is placed by its left and top (tipPlace), inside the plot */
+.cv-tip { transform: none; }
+
 /* ------------------------------------------------------------------------------------------------ loading */
 .skel { display: block; border-radius: var(--r-md); background: linear-gradient(100deg, color-mix(in oklab, var(--pane-2) 60%, transparent) 30%, color-mix(in oklab, var(--ink) 8%, var(--pane-2)) 50%, color-mix(in oklab, var(--pane-2) 60%, transparent) 70%) 0 0 / 300% 100%; animation: skel 1.6s var(--ease-move) infinite; }
 @keyframes skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
@@ -443,9 +499,27 @@ dialog.sheet::backdrop { background: var(--backdrop); backdrop-filter: blur(6px)
 .board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--s5); grid-auto-rows: 4px; grid-auto-flow: row dense; align-items: start; }
 .board > [data-col="1"] { grid-column: 1; } .board > [data-col="2"] { grid-column: 2; }
 .board > * { margin-bottom: var(--s5); min-width: 0; }
+/* R14 layout rule L3 (board.ts): a card lengthened to end level with its neighbour, or with the other column, is given
+   a least height by useMasonry and keeps its content at the top; one that closes with a foot keeps the foot at its
+   bottom edge. No card is stretched to its rows: its own height must stay free to change, or a card that grows later
+   would run over the next one unseen. */
+.board > [data-fill]:has(> .panel-foot:last-child) { display: flex; flex-direction: column; }
+.board > [data-fill] > .panel-foot:last-child { margin-top: auto; }
 @media (max-width: 1099px) { .board { display: flex; flex-direction: column; align-items: stretch; gap: var(--s5); } .board > * { margin-bottom: 0; } }
 .empty-state.compact { padding: var(--s5); grid-template-columns: auto 1fr; align-items: center; }
 .empty-state.compact p { color: var(--ink-2); }
+/* The guided empty state (R14 layout rule L6; kit.tsx EmptyState): what this is, why nothing is in it yet, the one next
+   step. Inside a card that is a column (.fills) it takes the height the card has left and sets its words in the middle
+   of it, so a card level with a taller neighbour is never a void with one line at its top. */
+.fills { display: flex; flex-direction: column; }
+.fills > .empty-state.fill { flex: 1 1 auto; }
+.empty-state.guided { grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: start; gap: var(--s4); padding: var(--s6); }
+.empty-state.guided .es-words { display: grid; gap: var(--s1); min-width: 0; }
+.empty-state.guided .es-title { font-size: var(--t-body); font-weight: 650; letter-spacing: -.012em; color: var(--ink); }
+.empty-state.guided p { color: var(--ink-2); font-size: var(--t-small); line-height: 1.5; max-width: 52ch; }
+.empty-state.guided .es-act { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.empty-state.guided.compact { grid-template-columns: auto minmax(0, 1fr); align-items: center; padding: var(--s4) var(--s5); }
+.empty-state.guided.compact .es-act { grid-column: 1 / -1; }
 .avatar.sm { width: 34px; height: 34px; font-size: var(--t-micro); }
 .avatar.lg { width: 52px; height: 52px; font-size: var(--t-h3); }
 .avatar.own { background: var(--pane-2); color: var(--ink-2); border: 1px solid var(--rim); }
@@ -486,7 +560,7 @@ aside.margin > section > h2:first-child { font-size: var(--t-h3); }
   .subnav a { flex: none; }
 }
 /* phones: 17 px text in fields (a phone zooms the page when a field under 16 px takes focus) */
-@media (max-width: 560px) { .input, select.input, textarea.input { font-size: var(--t-lead); } }
+@media (max-width: 560px) { .input, select.input, textarea.input { font-size: var(--t-lead); } .money { font-size: var(--t-lead); } }
 
 /* ------------------------------------------------------------------------------------------------ approving (instrument.tsx)
    the three steps said as they happen; the hold, and the one-step way beside it */
@@ -516,3 +590,37 @@ aside.margin > section > h2:first-child { font-size: var(--t-h3); }
   .seg button, .seg a { min-width: 0; padding-inline: 10px; }
   .field { grid-template-columns: minmax(0, 1fr); max-width: 100%; }
 }
+
+/* ------------------------------------------------------------------------------------------------ R14 layout rules (Spend and Save; DESIGN.md "R14 layout rules, Spend and Save") */
+/* Fields in a row on one baseline, added to the form grid that sets how many stand in a row (.form-grid.cols-2 or
+   .cols-3, layout rule L3; `form-grid cols-3 fields`): every label on the first line (its foot, when one wraps), every
+   control on the second, each error and hint under its own control. A hint between a label and its input pushed that
+   input a row below its neighbours'. The order is the screen's only: in the document the hint still comes before the
+   control it describes (aria-describedby). A form grid that is not .fields is as it was (hint over the control), so a
+   grid that lines its controls up by their feet (align-items: end) is untouched. */
+.form-grid.fields { row-gap: 0; align-items: start; align-content: start; margin-bottom: calc(-1 * var(--s3)); }
+.form-grid.fields > .field { grid-row: span 4; grid-template-rows: subgrid; row-gap: 0; padding-bottom: var(--s3); }
+.form-grid.fields > .field > * { grid-row: 2; }
+.form-grid.fields > .field > :is(label, .legend):first-child { grid-row: 1; align-self: end; margin-bottom: 6px; }
+.form-grid.fields > .field > .err { grid-row: 3; margin-top: 6px; }
+.form-grid.fields > .field > .hint { grid-row: 4; margin-top: 6px; }
+/* A choice of two or three in a field: as tall as an input beside it, its choices sharing the width, so no track runs
+   on empty past the last one. */
+.seg.fill { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; min-height: 46px; padding: 1px; border-radius: var(--r-sm); }
+.seg.fill button { justify-content: center; min-height: 44px; border-radius: calc(var(--r-sm) - 1px); text-align: center; line-height: 1.2; }
+/* Long detail behind a plain first line: one look for a disclosure, a 44 px target, every word still in the page. */
+.disclose > summary { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 var(--s3); margin-left: calc(-1 * var(--s3)); border-radius: var(--r-pill); list-style: none; color: var(--brand); font-weight: 600; font-size: var(--t-small); line-height: 1.3; cursor: pointer; transition: background-color var(--d1) var(--ease-out); }
+.disclose > summary::-webkit-details-marker { display: none; }
+.disclose > summary::before { content: ""; width: 6px; height: 6px; flex: none; border-right: 1.75px solid currentColor; border-bottom: 1.75px solid currentColor; transform: rotate(-45deg); transition: transform var(--d1) var(--ease-out); }
+.disclose[open] > summary::before { transform: rotate(45deg); }
+.disclose > summary:hover { background: var(--brand-bg); }
+.disclose > :is(p, ul, ol, dl) { font-size: var(--t-small); color: var(--ink-2); line-height: 1.55; max-width: 92ch; }
+.disclose > :is(p, ul, ol, dl) + :is(p, ul, ol, dl) { margin-top: var(--s2); }
+@media (max-width: 1099px) { .pair, .pair.even { grid-template-columns: minmax(0, 1fr); } }
+/* The guided empty state (layout rule L6) in a panel as wide as the page: its words on the left and its next step on the
+   right of one row, so a wide panel is not a short column of words beside an empty half. It stacks, as the plain one
+   does, wherever its own panel is under 640 px. */
+.empty-state.guided.across { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s5); padding: var(--s4) var(--s5); }
+.empty-state.guided.across .es-words { flex: 1 1 36ch; }
+.empty-state.guided.across p { max-width: 84ch; }
+.empty-state.guided.across .es-act { flex: none; }

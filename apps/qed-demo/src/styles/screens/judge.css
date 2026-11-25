@@ -152,3 +152,4 @@ html[data-fx="plain"] .jg-st.is-current .jg-node::after { display: none; }
   .jg-node, .jg-tag { border: 1px solid CanvasText; }
   .jg-st::before { background: CanvasText; }
 }
+.jg-sub { font-size: var(--t-body); font-weight: 600; color: var(--ink); }

@@ -8,7 +8,7 @@
 .pay-head .btn { align-self: flex-end; }
 
 .pay-checkout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: var(--s5); align-items: start; }
-.pay-journey { padding: 0; overflow: visible; }
+.pay-journey { padding: 0; overflow: visible; container-type: inline-size; }
 .pay-jhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3) var(--s5); padding: var(--s5) var(--s6); border-bottom: 1px solid var(--rule); }
 .pay-jhead h2 { font-size: var(--t-h2); font-weight: 650; letter-spacing: -.02em; }
 
@@ -37,7 +37,7 @@
 .pay-none { grid-column: 1 / -1; padding: var(--s2) 0; font-size: var(--t-small); color: var(--ink-2); }
 
 /* 1, where from: two sources as glass tiles */
-.pay-from { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); max-width: 640px; }
+.pay-from { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
 .pay-from button { display: flex; align-items: flex-start; gap: var(--s3); min-height: 68px; padding: var(--s3) var(--s4); border: 1px solid var(--rim); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 70%, transparent); color: var(--ink); text-align: left; cursor: pointer; transition: border-color var(--d1) var(--ease-out), background-color var(--d2) var(--ease-out), box-shadow var(--d2) var(--ease-out), transform var(--d-spring) var(--ease-spring); }
 .pay-from button:hover { border-color: var(--edge); transform: translateY(-1px); }
 .pay-from button[aria-pressed="true"] { border-color: var(--brand-line); background: linear-gradient(160deg, var(--brand-bg), transparent 70%), var(--pane-2); box-shadow: inset 0 0 0 1px var(--brand), var(--lift-1); }
@@ -47,10 +47,13 @@
 .pay-from b { font-weight: 650; }
 .pay-from small { font-size: var(--t-small); color: var(--ink-3); line-height: 1.4; font-variant-numeric: tabular-nums; }
 .pay-wallet .tablet { padding: 0; background: none; box-shadow: none; border: 0; border-radius: 0; }
+/* the on-chain wallet's own line when it is not set up, or cannot be used from here (WalletInline Missing), composed as
+   the step's one tile: the sentence runs as one sentence, with its way forward inside it (R14, the owner's screenshot 13) */
+.pay-wallet > p { display: block; padding: var(--s4) var(--s5); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 55%, transparent); border: 1px solid var(--rim); color: var(--ink); }
 
 /* 2, to whom: the kind, a search, then the choices as one radio group of glass cards */
 .pay-to-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
-.pay-seg button { min-height: 38px; }
+.pay-seg button { min-height: 44px; }
 .pay-search { position: relative; flex: 1 1 260px; }
 .pay-search svg { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; color: var(--ink-3); transform: translateY(-50%); pointer-events: none; }
 .pay-search .input { padding-left: 40px; border-radius: var(--r-pill); }
@@ -84,14 +87,16 @@
 .pay-add-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); }
 .pay-add-head h3, .pay-add-head h4 { font-size: var(--t-body); font-weight: 650; }
 .pay-add-head .icon-btn { width: 44px; height: 44px; }
-.pay-add-form { display: grid; gap: var(--s3); }
-.pay-add-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3) var(--s4); align-items: start; }
-.pay-add-grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.pay-add-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s5); }
-.pay-add-go .pay-quiet { flex: 1 1 260px; }
+/* R14: the fields on one baseline (the form grid with .fields: labels, then controls, then each hint under its own
+   control), three across or one column, never two and one (layout rule L3); the action on its own row with one plain
+   line beside it; the rest of the note behind a disclosure under it */
+.pay-add-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+.form-grid.pay-add-fields { --min: 480px; --gap: var(--s4); }
+.pay-add-go { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); }
+.pay-add-go .pay-quiet { flex: 1 1 24ch; }
+.pay-add-more { margin-top: calc(-1 * var(--s2)); }
 .pay-check { margin-top: var(--s2); }
 .pay-test { font-size: var(--t-small); color: var(--ink-2); }
-.pay-test summary { display: inline-flex; align-items: center; min-height: 44px; font-weight: 580; }
 .pay-test dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--s1) var(--s4); max-width: 84ch; margin-top: var(--s1); line-height: 1.45; }
 .pay-test dt { font-weight: 650; color: var(--ink); }
 .pay-test > p { margin-top: var(--s2); max-width: 84ch; line-height: 1.45; }
@@ -113,21 +118,22 @@
 .pay-names dt { color: var(--ink-2); }
 .pay-names dd { font-weight: 650; color: var(--ink); overflow-wrap: anywhere; }
 
-/* 3 and 4, how much and the route */
-.pay-split { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: var(--s3) var(--s6); align-items: start; }
-.pay-one { display: grid; max-width: 640px; }
+/* 3 and 4, how much and the route (R14): one column as wide as the step, as steps 1 and 2 are. Each control has what it
+   means under it; the note for your records is a field of its own under the amount, never a second column beside it. */
 .pay-amount { display: grid; gap: var(--s2); }
-.pay-amount .money .input { min-height: 68px; padding-left: 48px; font-size: var(--t-fig-m); font-weight: 650; letter-spacing: var(--track-fig); border-radius: var(--r-md); }
-.pay-amount .money::before { left: 18px; font-size: var(--t-fig-s); }
+.form-grid.pay-memo { grid-template-columns: minmax(0, 1fr); }
+/* the large amount: the sign's size and place are set, and the digits begin after it whatever the currency (components.css, R14 L4) */
+.pay-amount .money { font-size: var(--t-fig-s); --sign-left: 18px; --sign-gap: 10px; }
+.pay-amount .money .input { min-height: 68px; font-size: var(--t-fig-m); font-weight: 650; letter-spacing: var(--track-fig); border-radius: var(--r-md); }
 .pay-fixed-fig { font-size: var(--t-fig-m); font-weight: 660; line-height: 1.1; letter-spacing: var(--track-fig); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
-.pay-say { padding-top: 6px; max-width: 60ch; font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; font-variant-numeric: tabular-nums; }
-.pay-memo { max-width: 380px; }
+.pay-say { padding-top: 6px; max-width: 72ch; font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; font-variant-numeric: tabular-nums; }
 .pay-fixed-route { padding-top: 10px; font-weight: 650; }
 .pay-route { display: grid; gap: var(--s1); padding-top: 6px; font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
 .pay-route b { font-size: var(--t-body); font-weight: 650; color: var(--ink); }
 
 /* ------------------------------------------------------------------------------------------------ the summary */
-.pay-summary { position: sticky; top: calc(var(--bar-top, 0px) + var(--s4)); display: grid; gap: var(--s4); padding: var(--s6);
+/* beside the steps it stays in view and ends level with them: layout rule L2 (.sticky-side, kit.tsx useStickySide) says where it is pinned */
+.pay-summary { position: sticky; display: grid; gap: var(--s4); padding: var(--s6); scroll-margin-top: calc(var(--bar-top, 0px) + var(--s4));
   background: linear-gradient(152deg, var(--gloss), transparent 40%), var(--pane); }
 .pay-summary > h2, .ps-sent > h2 { font-size: var(--t-body); font-weight: 600; color: var(--ink-2); }
 .ps-to { display: flex; align-items: center; gap: var(--s3); min-height: 44px; }
@@ -141,11 +147,14 @@
 .ps-lines > div { display: flex; justify-content: space-between; gap: var(--s4); padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: var(--t-small); }
 .ps-lines dt { color: var(--ink-3); } .ps-lines dd { font-weight: 620; text-align: right; }
 .ps-lines > .ps-wait dd { color: var(--ink); }
+.ps-lines > .ps-free dd { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+/* the caution of step 5, said again beside the button that asks for the terms: this payment takes money kept for what is due */
+.ps-lines > .ps-over dt, .ps-lines > .ps-over dd { color: var(--loss); font-weight: 620; } .ps-lines > .ps-over dd { white-space: nowrap; }
 .pay-go { display: grid; gap: var(--s2); }
 
 /* what stays free: the bank at true scale with this payment in it, and the subtraction written as one */
 .pay-free { display: grid; gap: var(--s3); min-width: 0; }
-.pay-bar { margin-top: var(--s2); }
+.pay-bar { margin-top: 0; }
 .pay-sum { display: grid; font-variant-numeric: tabular-nums lining-nums; }
 .pay-sum > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--s4); padding: 6px 0; font-size: var(--t-small); }
 .pay-sum dt { color: var(--ink-2); }
@@ -171,8 +180,11 @@
 .ps-acts { display: flex; flex-wrap: wrap; gap: var(--s2); }
 
 /* ------------------------------------------------------------------------------------------------ below: bills, and payments so far */
-/* the same two columns as the checkout above: bills under the steps, payments so far under the payment's card */
-.pay-below { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: var(--s5); align-items: start; }
+/* R14: bills on record, subscriptions, paying abroad, the services and payments so far, each the whole width and
+   composed inside: a bill is one line across the width; subscriptions say what they are on the left and list what was
+   found on the right */
+.pay-repeat { margin-top: var(--s3); }
+.pay-subs-body { display: grid; gap: var(--s2); min-width: 0; }
 .pay-sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--s3) var(--s6); margin-bottom: var(--s4); }
 .pay-sec-head h2 { font-size: var(--t-h3); font-weight: 650; }
 .pay-sec-head p { max-width: 70ch; margin-top: 3px; font-size: var(--t-small); color: var(--ink-3); }
@@ -200,7 +212,6 @@
 .pay-bill-list .acts { grid-area: acts; display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
 .pay-stepup { margin-top: var(--s3); }
 .pay-settled { margin-top: var(--s4); font-size: var(--t-small); }
-.pay-settled summary { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; color: var(--ink-2); }
 .pay-settled ul { display: grid; }
 .pay-settled li { display: flex; justify-content: space-between; gap: var(--s4); padding: 8px 0; border-top: 1px solid var(--rule); }
 .pay-settled .what { display: grid; } .pay-settled .what small { color: var(--ink-3); }
@@ -211,7 +222,7 @@
 .pay-paid-list .when { display: grid; font-size: var(--t-small); color: var(--ink-2); font-weight: 580; }
 .pay-paid-list .when small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 430; }
 .pay-paid-list .what { display: grid; gap: 2px; min-width: 0; }
-.pay-paid-list .what a { color: var(--ink); font-weight: 620; text-decoration: none; }
+.pay-paid-list .what a { justify-self: start; padding-block: 11px; margin-block: -11px; color: var(--ink); font-weight: 620; text-decoration: none; }
 .pay-paid-list .what a:hover { text-decoration: underline; }
 .pay-paid-list .what small { font-size: var(--t-micro); color: var(--ink-3); line-height: 1.4; }
 .pay-paid-list .state { justify-self: end; }
@@ -219,18 +230,38 @@
 .pay-skel-row { display: grid; grid-template-columns: 150px 1fr; gap: var(--s6); }
 .pay-skel-row .skel { height: 56px; }
 
-@media (max-width: 1099px) {
-  .pay-checkout, .pay-below { grid-template-columns: minmax(0, 1fr); }
+/* R14, the summary at every width. From 960 px it stands beside the steps and stays in view (a narrower column up to
+   1100 px); under 960 px it follows the steps as their last one, and the payment travels with the steps as one line
+   above the bottom navigation (PaymentStrip) until the summary itself is on the screen. */
+@media (max-width: 1099px) { .pay-checkout { grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); } .pay-summary { padding: var(--s5); } }
+/* in a narrow column a step's name stands over its controls, so the controls keep the column's width */
+@container (max-width: 640px) {
+  .pay-step { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+}
+.pay-strip { display: none; }
+@media (max-width: 959px) {
+  .pay-checkout { grid-template-columns: minmax(0, 1fr); }
   .pay-summary { position: static; }
+  /* a line of no height in the page's flow, so nothing moves when it shows or goes; its link hangs above it */
+  .pay-strip { display: block; position: sticky; bottom: calc(var(--bar-bottom, 84px) + var(--s2)); z-index: 5; height: 0; margin-top: calc(-1 * var(--s5)); }
+  .pay-strip > a { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--s3); min-height: 56px; padding: var(--s2) var(--s3) var(--s2) var(--s4); border-radius: var(--r-md); border: 1px solid var(--edge); background: var(--sheet-2); box-shadow: var(--lift-2); color: var(--ink); text-decoration: none; transition: opacity var(--d2) var(--ease-out), visibility var(--d2); }
+  .pay-strip[data-away="false"] > a { opacity: 0; visibility: hidden; pointer-events: none; }
+  .pay-strip-who { display: grid; min-width: 0; line-height: 1.25; }
+  .pay-strip-who small { font-size: var(--t-micro); color: var(--ink-3); font-weight: 600; }
+  .pay-strip-who b { font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pay-strip-fig { font-weight: 680; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+  .pay-strip-go { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 var(--s3); border-radius: var(--r-pill); background: linear-gradient(180deg, var(--act), var(--act-2)); color: var(--on-act); font-size: var(--t-small); font-weight: 650; }
+  .pay-strip-go svg { width: 15px; height: 15px; }
+  /* what takes focus under it is scrolled clear of the line as well as the navigation */
+  html:has(.pay-strip) { scroll-padding-bottom: calc(var(--bar-bottom, 84px) + 56px + var(--s2) + var(--s4)); }
 }
 @media (max-width: 759px) {
   .pay-page { gap: var(--s5); }
   .pay-page > .page-head { margin-bottom: 0; }
   .pay-head .btn { align-self: stretch; }
   .pay-jhead { padding: var(--s4); }
-  .pay-step { grid-template-columns: minmax(0, 1fr); padding: var(--s4); gap: var(--s3); }
-  .pay-from, .pay-split { grid-template-columns: minmax(0, 1fr); }
-  .pay-add-grid, .pay-add-grid.four { grid-template-columns: minmax(0, 1fr); }
+  .pay-step { padding: var(--s4); }
+  .pay-from { grid-template-columns: minmax(0, 1fr); }
   .pay-names > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .pay-summary { padding: var(--s5) var(--s4); }
   .pay-payers > li { grid-template-columns: minmax(0, 1fr); }
@@ -258,7 +289,6 @@
 }
 
 /* Subscriptions, a payment held as a repeat, and the revocation channels (R13 Spend) */
-.pay-subs { grid-column: 1 / -1; }
 .subs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4, 16px); }
 .sub { display: grid; gap: 8px; padding-block: 12px; border-top: 1px solid var(--rule, currentColor); }
 .sub:first-child { border-top: 0; }
@@ -271,7 +301,7 @@
 .sub-evidence ul { margin: 6px 0 0; padding-inline-start: 1.2em; }
 .sub-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .sub-none { color: var(--ink-3, inherit); }
-.sub-rule { margin-block-start: 12px; }
+.sub-rule { margin: 0; }
 .repeat-held { display: grid; gap: 10px; margin-block: 8px; }
 .repeat-why { margin: 0; }
 .repeat-acts { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -295,18 +325,33 @@
 @media (max-width: 640px) { .dp-timeline li { grid-template-columns: 1fr; } }
 @media print { .dp-acts, .dp .btn { display: none !important; } .dp .panel { break-inside: avoid; } }
 
-/* Services QED can buy (R13, S2): the mandate, the two quotes side by side, what was bought and refused */
-.pay-commerce { grid-column: 1 / -1; display: grid; gap: var(--s5); }
+/* Services QED can buy (R13, S2; recomposed in R14): three parts down the panel, each across its width and two-sided
+   inside: the mandate (its limits beside the services it names), the quotes (the choice beside what decides), and
+   what was bought and refused. No part is a column beside a shorter one. */
+.pay-commerce { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); container-type: inline-size; }
+.pay-commerce .pay-sec-head { margin-bottom: 0; }
 .pay-commerce h3 { font-size: var(--t-body); font-weight: 650; margin-bottom: var(--s2); }
+.cm-note { margin-top: var(--s1); }
+.cm-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.cm-grid > div { min-width: 0; padding-block: var(--s5); border-top: 1px solid var(--rule); }
+.cm-grid > div:last-child { padding-bottom: 0; }
+.cm-none { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; }
+.form-grid.cm-fields { --min: 340px; --gap: var(--s4); }
+.cm-go { display: flex; }
+.cm-pick > .field { flex: 1 1 220px; }
+.cm-says { max-width: 72ch; }
 .cm-terms { display: grid; gap: var(--s2); }
 .cm-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); margin-top: var(--s3); }
 .cm-set { margin-top: var(--s3); }
-.cm-set summary { cursor: pointer; font-weight: 600; min-height: 36px; display: flex; align-items: center; }
-.cm-form { display: grid; gap: var(--s4); margin-top: var(--s3); }
-.cm-services { display: grid; gap: var(--s2); border: 0; padding: 0; }
+.cm-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); margin-top: var(--s3); }
+.cm-buy-in { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+.cm-services { display: flex; flex-wrap: wrap; gap: 0 var(--s6); border: 0; padding: 0; min-width: 0; }
+.cm-services > .pay-err { flex-basis: 100%; }
 .cm-services legend { font-weight: 600; margin-bottom: var(--s2); }
-.cm-services label { display: flex; align-items: center; gap: var(--s2); }
+.cm-services label { display: flex; align-items: center; flex-wrap: wrap; gap: 2px var(--s2); min-height: 44px; cursor: pointer; }
+.cm-services small { color: var(--ink-3); font-size: var(--t-small); overflow-wrap: anywhere; }
 .cm-pick { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s3); }
+.cm-pick > .btn { --h: 46px; }
 .cm-quotes { width: 100%; border-collapse: collapse; margin-top: var(--s3); }
 .cm-quotes th, .cm-quotes td { text-align: left; padding: var(--s3) var(--s2); border-bottom: 1px solid var(--rim); vertical-align: middle; }
 .cm-quotes small { display: block; color: var(--ink-3); font-weight: 400; }
@@ -316,4 +361,24 @@
 .cm-list { display: grid; gap: var(--s3); }
 .cm-list li { display: flex; justify-content: space-between; gap: var(--s4); align-items: flex-start; padding-bottom: var(--s3); border-bottom: 1px solid var(--rim); }
 .cm-list .what { display: grid; gap: var(--s1); min-width: 0; }
+.cm-list .what > a { justify-self: start; padding-block: 11px; margin-block: -7px -11px; }
 .cm-list small { color: var(--ink-3); overflow-wrap: anywhere; }
+
+/* ------------------------------------------------------------------------------------------------ R14: each part across the width, by the room it has */
+.pay-bills, .pay-subs { container-type: inline-size; }
+@container (min-width: 860px) {
+  /* a bill is one line: when, what, who pays it, how much, what you can do */
+  .pay-bill-list > li { grid-template-columns: 96px minmax(0, 1fr) minmax(0, 1.4fr) minmax(96px, auto) auto; grid-template-areas: "when what who amt acts"; align-items: center; column-gap: var(--s5); padding-block: var(--s3); }
+  .pay-bill-list .acts { margin-top: 0; justify-content: flex-end; }
+  /* subscriptions: what they are on the left, what was found on the right */
+  .pay-subs-in { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--s8); align-items: start; }
+  .pay-subs-in > .pay-sec-head { margin-bottom: 0; }
+  .subs-list { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); column-gap: var(--s6); }
+  /* the mandate's limits beside the services it names; the choice of product beside what decides */
+  .cm-form { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s8); }
+  .cm-form > :is(.cm-go, .problem, .note) { grid-column: 1 / -1; }
+  .cm-buy-in { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s8); align-items: end; }
+  .cm-terms { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s4); }
+  /* a bill's four fields on one line */
+  .form-grid.pay-bill-fields { --cols: 4; }
+}

@@ -1,0 +1,1528 @@
+{
+ "at": "2026-11-25T15:11:51.906Z",
+ "base": "http://localhost:13670",
+ "currencies": [
+  "USD",
+  "EUR",
+  "GBP",
+  "AED",
+  "SGD",
+  "INR"
+ ],
+ "findings": 305,
+ "report": {
+  "USD": {
+   "(set-up)": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 10,
+    "overlap": []
+   },
+   "/": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/pay": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/save": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/holdings": {
+    "text": [
+     "₹0",
+     "₹6,980.00",
+     "₹5,400.00",
+     "₹1,580.00",
+     "Worth ₹0.00 now",
+     "₹61,60,716.0",
+     "₹ per BTC",
+     "₹60,80,000",
+     "₹61,00,000",
+     "₹61,20,000",
+     "₹61,40,000",
+     "₹61,80,000",
+     "₹ per BTC",
+     "₹61,60,716.0",
+     "From ₹61,00,001.0 (25 Nov, 20:11) to ₹61,60,716.0 (25 Nov, 20:37), up",
+     "1.00%. Lowest ₹60,80,000.0 (25 Nov, 20:15), hig",
+     "hest ₹61,90,000.0 (25 Nov, 20:34). Rec",
+     "What sellers ask: ₹61,62,524.6, 0.03% above what bu",
+     "₹178.5983",
+     "at would take your worst case below your floor: ₹1,580.00 of room now. The estima",
+     "₹61,60,716.0",
+     "₹61,62,524.6",
+     "₹1,74,143.0",
+     "₹1,74,484.8",
+     "₹104.82",
+     "₹105.32",
+     "₹4,128.3971",
+     "₹67.2585",
+     "₹43.7548",
+     "₹31.0463",
+     "₹7,041.4542",
+     "₹4,596.2408",
+     "₹94.9255",
+     "₹37.9269",
+     "₹178.5983",
+     "₹1,499.55",
+     "₹1,500.45",
+     "₹999.70",
+     "₹1,000.30",
+     "₹2,999.10",
+     "₹3,000.90",
+     "₹102.68",
+     "₹102.70",
+     "₹289.30",
+     "₹289.36",
+     "A unit is ₹100 of face value; the price is",
+     "am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a c",
+     "₹100.4571",
+     "₹100.5576",
+     "₹98.7190",
+     "₹98.7683",
+     "₹1,300.00",
+     "₹24,200.00",
+     "₹0.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/earn": {
+    "text": [
+     "ilts (5% a year), certified on the chain. Price ₹300.00 (test tINR), delivery wit",
+     "tive Helix model, certified on the chain. Price ₹450.00 (test tINR), delivery wit",
+     "ld (15% a year), certified on the chain. Budget ₹250.00 (test tINR), delivery wit",
+     "+₹1,300.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/protect": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/safeguards": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/activity": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/passbook": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new?kind=goal": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/instructions/new?kind=bills": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/security": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/workspace": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/ask": {
+    "text": [
+     "“Invest ₹2,000 every month and park my id",
+     "“₹2,000 a week, but never more than ₹5,000 a month.” The card says wh"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/notifications": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/readiness": {
+    "text": [
+     "your approval each time, apart from bills up to ₹5,000 through UPI Circle."
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/more": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/evidence": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/tax": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/subscriptions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/commerce": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/desk": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/lab": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/vault": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/data": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   }
+  },
+  "EUR": {
+   "(set-up)": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 10,
+    "overlap": []
+   },
+   "/": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/pay": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/save": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/holdings": {
+    "text": [
+     "₹0",
+     "₹6,302.00",
+     "₹4,900.00",
+     "₹1,402.00",
+     "Worth ₹0.00 now",
+     "₹61,47,583.0",
+     "₹ per BTC",
+     "₹60,80,000",
+     "₹61,00,000",
+     "₹61,20,000",
+     "₹61,60,000",
+     "₹61,80,000",
+     "₹ per BTC",
+     "₹61,47,583.0",
+     "From ₹61,00,001.0 (25 Nov, 20:11) to ₹61,47,583.0 (25 Nov, 20:38), up",
+     "0.78%. Lowest ₹60,80,000.0 (25 Nov, 20:15), hig",
+     "hest ₹61,90,000.0 (25 Nov, 20:34). Rec",
+     "What sellers ask: ₹61,50,646.1, 0.05% above what bu",
+     "₹178.5983",
+     "at would take your worst case below your floor: ₹1,402.00 of room now. The estima",
+     "₹61,47,583.0",
+     "₹61,50,646.1",
+     "₹1,73,800.0",
+     "₹1,73,981.0",
+     "₹105.32",
+     "₹105.36",
+     "₹4,128.3971",
+     "₹67.2585",
+     "₹43.7548",
+     "₹31.0463",
+     "₹7,041.4542",
+     "₹4,596.2408",
+     "₹94.9255",
+     "₹37.9269",
+     "₹178.5983",
+     "₹1,499.55",
+     "₹1,500.45",
+     "₹999.70",
+     "₹1,000.30",
+     "₹2,999.10",
+     "₹3,000.90",
+     "₹102.68",
+     "₹102.70",
+     "₹289.30",
+     "₹289.36",
+     "A unit is ₹100 of face value; the price is",
+     "am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a c",
+     "₹100.4571",
+     "₹100.5576",
+     "₹98.7190",
+     "₹98.7683",
+     "₹1,200.00",
+     "₹22,900.00",
+     "₹0.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/earn": {
+    "text": [
+     "ilts (5% a year), certified on the chain. Price ₹300.00 (test tINR), delivery wit",
+     "tive Helix model, certified on the chain. Price ₹450.00 (test tINR), delivery wit",
+     "ld (15% a year), certified on the chain. Budget ₹250.00 (test tINR), delivery wit",
+     "+₹1,200.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/protect": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/safeguards": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/activity": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/passbook": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new?kind=goal": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/instructions/new?kind=bills": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/security": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/workspace": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/ask": {
+    "text": [
+     "“Invest ₹2,000 every month and park my id",
+     "“₹2,000 a week, but never more than ₹5,000 a month.” The card says wh"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/notifications": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/readiness": {
+    "text": [
+     "your approval each time, apart from bills up to ₹5,000 through UPI Circle."
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/more": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/evidence": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/tax": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/subscriptions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/commerce": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/desk": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/lab": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/vault": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/data": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   }
+  },
+  "GBP": {
+   "(set-up)": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 10,
+    "overlap": []
+   },
+   "/": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/pay": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/save": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/holdings": {
+    "text": [
+     "₹0",
+     "₹5,289.00",
+     "₹4,100.00",
+     "₹1,189.00",
+     "Worth ₹0.00 now",
+     "₹61,15,595.6",
+     "₹ per BTC",
+     "₹60,80,000",
+     "₹61,00,000",
+     "₹61,40,000",
+     "₹61,60,000",
+     "₹61,80,000",
+     "₹ per BTC",
+     "₹61,15,595.6",
+     "From ₹61,00,001.0 (25 Nov, 20:11) to ₹61,15,595.6 (25 Nov, 20:39), up",
+     "0.26%. Lowest ₹60,80,000.0 (25 Nov, 20:15), hig",
+     "hest ₹61,90,000.0 (25 Nov, 20:34). Rec",
+     "What sellers ask: ₹61,41,469.7, 0.42% above what bu",
+     "₹178.5983",
+     "at would take your worst case below your floor: ₹1,189.00 of room now. The estima",
+     "₹61,15,595.6",
+     "₹61,41,469.7",
+     "₹1,72,811.2",
+     "₹1,73,458.5",
+     "₹105.38",
+     "₹105.39",
+     "₹4,128.3971",
+     "₹67.2585",
+     "₹43.7548",
+     "₹31.0463",
+     "₹7,041.4542",
+     "₹4,596.2408",
+     "₹94.9255",
+     "₹37.9269",
+     "₹178.5983",
+     "₹1,499.55",
+     "₹1,500.45",
+     "₹999.70",
+     "₹1,000.30",
+     "₹2,999.10",
+     "₹3,000.90",
+     "₹102.68",
+     "₹102.70",
+     "₹289.30",
+     "₹289.36",
+     "A unit is ₹100 of face value; the price is",
+     "am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a c",
+     "₹100.4571",
+     "₹100.5576",
+     "₹98.7190",
+     "₹98.7683",
+     "₹970.00",
+     "₹18,400.00",
+     "₹0.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/earn": {
+    "text": [
+     "ilts (5% a year), certified on the chain. Price ₹300.00 (test tINR), delivery wit",
+     "tive Helix model, certified on the chain. Price ₹450.00 (test tINR), delivery wit",
+     "ld (15% a year), certified on the chain. Budget ₹250.00 (test tINR), delivery wit",
+     "+₹970.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/protect": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/safeguards": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/activity": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/passbook": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new?kind=goal": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/instructions/new?kind=bills": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/security": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/workspace": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/ask": {
+    "text": [
+     "“Invest ₹2,000 every month and park my id",
+     "“₹2,000 a week, but never more than ₹5,000 a month.” The card says wh"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/notifications": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/readiness": {
+    "text": [
+     "your approval each time, apart from bills up to ₹5,000 through UPI Circle."
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/more": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/evidence": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/tax": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/subscriptions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/commerce": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/desk": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/lab": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/vault": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/data": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   }
+  },
+  "AED": {
+   "(set-up)": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 10,
+    "overlap": []
+   },
+   "/": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/pay": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/save": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/holdings": {
+    "text": [
+     "₹0",
+     "₹25,120.00",
+     "₹20,000.00",
+     "₹5,120.00",
+     "Worth ₹0.00 now",
+     "₹61,45,202.2",
+     "₹ per BTC",
+     "₹60,80,000",
+     "₹61,00,000",
+     "₹61,20,000",
+     "₹61,60,000",
+     "₹61,80,000",
+     "₹ per BTC",
+     "₹61,45,202.2",
+     "From ₹61,00,001.0 (25 Nov, 20:11) to ₹61,45,202.2 (25 Nov, 20:39), up",
+     "0.74%. Lowest ₹60,80,000.0 (25 Nov, 20:15), hig",
+     "hest ₹61,90,000.0 (25 Nov, 20:34). Rec",
+     "What sellers ask: ₹61,48,031.6, 0.05% above what bu",
+     "₹178.5983",
+     "at would take your worst case below your floor: ₹5,120.00 of room now. The estima",
+     "₹61,45,202.2",
+     "₹61,48,031.6",
+     "₹1,72,770.9",
+     "₹1,73,667.5",
+     "₹105.32",
+     "₹105.40",
+     "₹4,128.3971",
+     "₹67.2585",
+     "₹43.7548",
+     "₹31.0463",
+     "₹7,041.4542",
+     "₹4,596.2408",
+     "₹94.9255",
+     "₹37.9269",
+     "₹178.5983",
+     "₹1,499.55",
+     "₹1,500.45",
+     "₹999.70",
+     "₹1,000.30",
+     "₹2,999.10",
+     "₹3,000.90",
+     "₹102.68",
+     "₹102.70",
+     "₹289.30",
+     "₹289.36",
+     "A unit is ₹100 of face value; the price is",
+     "am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a c",
+     "₹100.4571",
+     "₹100.5576",
+     "₹98.7190",
+     "₹98.7683",
+     "₹4,700.00",
+     "₹91,000.00",
+     "₹0.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/earn": {
+    "text": [
+     "ilts (5% a year), certified on the chain. Price ₹300.00 (test tINR), delivery wit",
+     "tive Helix model, certified on the chain. Price ₹450.00 (test tINR), delivery wit",
+     "ld (15% a year), certified on the chain. Budget ₹250.00 (test tINR), delivery wit",
+     "+₹4,700.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/protect": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/safeguards": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/activity": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/passbook": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new?kind=goal": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/instructions/new?kind=bills": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/security": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/workspace": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/ask": {
+    "text": [
+     "“Invest ₹2,000 every month and park my id",
+     "“₹2,000 a week, but never more than ₹5,000 a month.” The card says wh"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/notifications": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/readiness": {
+    "text": [
+     "your approval each time, apart from bills up to ₹5,000 through UPI Circle."
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/more": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/evidence": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/tax": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/subscriptions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/commerce": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/desk": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/lab": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/vault": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/data": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   }
+  },
+  "SGD": {
+   "(set-up)": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 10,
+    "overlap": []
+   },
+   "/": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/pay": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/save": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/holdings": {
+    "text": [
+     "₹0",
+     "₹8,880.00",
+     "₹7,000.00",
+     "₹1,880.00",
+     "Worth ₹0.00 now",
+     "₹61,10,929.8",
+     "₹ per BTC",
+     "₹60,80,000",
+     "₹61,00,000",
+     "₹61,40,000",
+     "₹61,60,000",
+     "₹61,80,000",
+     "₹ per BTC",
+     "₹61,10,929.8",
+     "From ₹61,00,001.0 (25 Nov, 20:11) to ₹61,10,929.8 (25 Nov, 20:40), up",
+     "0.18%. Lowest ₹60,80,000.0 (25 Nov, 20:15), hig",
+     "hest ₹61,90,000.0 (25 Nov, 20:34). Rec",
+     "What sellers ask: ₹61,45,596.1, 0.56% above what bu",
+     "₹178.5983",
+     "at would take your worst case below your floor: ₹1,880.00 of room now. The estima",
+     "₹61,11,540.8",
+     "₹61,45,596.1",
+     "₹1,72,665.8",
+     "₹1,73,590.9",
+     "₹105.32",
+     "₹105.40",
+     "₹4,128.3971",
+     "₹67.2585",
+     "₹43.7548",
+     "₹31.0463",
+     "₹7,041.4542",
+     "₹4,596.2408",
+     "₹94.9255",
+     "₹37.9269",
+     "₹178.5983",
+     "₹1,499.55",
+     "₹1,500.45",
+     "₹999.70",
+     "₹1,000.30",
+     "₹2,999.10",
+     "₹3,000.90",
+     "₹102.68",
+     "₹102.70",
+     "₹289.30",
+     "₹289.36",
+     "A unit is ₹100 of face value; the price is",
+     "am to 5:00 pm India time, weekdays. A bill pays ₹100 at maturity; a bond pays a c",
+     "₹100.4571",
+     "₹100.5576",
+     "₹98.7190",
+     "₹98.7683",
+     "₹1,700.00",
+     "₹32,200.00",
+     "₹0.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/earn": {
+    "text": [
+     "ilts (5% a year), certified on the chain. Price ₹300.00 (test tINR), delivery wit",
+     "tive Helix model, certified on the chain. Price ₹450.00 (test tINR), delivery wit",
+     "ld (15% a year), certified on the chain. Budget ₹250.00 (test tINR), delivery wit",
+     "+₹1,700.00"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/protect": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/safeguards": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/activity": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/passbook": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new?kind=goal": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/instructions/new?kind=bills": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/security": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/workspace": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/ask": {
+    "text": [
+     "“Invest ₹2,000 every month and park my id",
+     "“₹2,000 a week, but never more than ₹5,000 a month.” The card says wh"
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/notifications": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/readiness": {
+    "text": [
+     "your approval each time, apart from bills up to ₹5,000 through UPI Circle."
+    ],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/more": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/evidence": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/tax": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/subscriptions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/commerce": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/desk": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/lab": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/vault": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/data": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   }
+  },
+  "INR": {
+   "(set-up)": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 10,
+    "overlap": []
+   },
+   "/": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/pay": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/save": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/holdings": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/earn": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/protect": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/safeguards": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/activity": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/passbook": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/instructions/new?kind=goal": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 1,
+    "overlap": []
+   },
+   "/instructions/new?kind=bills": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 3,
+    "overlap": []
+   },
+   "/security": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/workspace": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/ask": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/notifications": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/readiness": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/more": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/evidence": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/tax": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/subscriptions": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/commerce": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/desk": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/lab": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/vault": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   },
+   "/data": {
+    "text": [],
+    "pseudo": [],
+    "wrongFields": [],
+    "fields": 0,
+    "overlap": []
+   }
+  }
+ }
+}
