@@ -56,7 +56,8 @@ git checkout main && git merge --ff-only claude/r13-deploy    # or merge it the 
 git push origin main                                          # your remote; nothing in this package pushes
 ```
 
-The workflow `.github/workflows/qed-demo.yml` runs on that push (section 10). It was never run on GitHub.
+The workflow `.github/workflows/qed-demo.yml` runs on that push (section 10). Its first run on GitHub (25 Nov 2026) failed on
+portability; section 10 says what changed.
 
 ### 2.2 The key-encryption key (owner, on your computer)
 
@@ -282,8 +283,16 @@ backup failed`, `wallet service did not become ready`, and the engine's `stopped
 
 ## 10. Continuous integration
 
-`.github/workflows/qed-demo.yml` (never run on GitHub; the first push is its first run, so **nothing here is claimed to
-pass**). It runs on pushes and pull requests that touch the app, and by hand.
+`.github/workflows/qed-demo.yml`. It runs on pushes and pull requests that touch the app, and by hand. Its first run on
+GitHub (25 Nov 2026, ubuntu-24.04, the R13 release) failed on portability, not on the product: unit tests that assumed
+macOS's case-insensitive volume (`server/path-identity.test.ts`, `server/dev-server-files.test.ts`), the keys in the
+owner's `~/.qed/keys` (`server/incidents.test.ts`, `server/session-hardening.test.ts`), or a CPU fast enough to stay inside
+the API's thread-time budget (`server/password-change-routes.test.ts`); and forge's own download of solc 0.8.38. The tests
+now hold on a case-sensitive volume (the letter-case tests are skipped there by name; the same guards are tested through
+links), a fresh home folder (scratch keys) and a slow CPU (that file's budget set above what a minute can hold), and the
+compilers come from pinned binaries. Checked in Linux containers on 25 Nov 2026 (the unit suite on linux/arm64, natively: under
+amd64 emulation on an Apple-silicon Mac, Node hangs inside SQLite even at the release's revision; the compilers and the hash
+check on linux/amd64); **not yet re-run on GitHub, so nothing here is claimed to pass there**.
 
 - **Pinned**: every action is a full 40-character commit SHA with its version in a comment (`actions/checkout` v7.0.1,
   `actions/setup-node` v7.1.0, `actions/upload-artifact` v7.0.2, `foundry-rs/foundry-toolchain` v1.9.2). The SHAs were read on
@@ -296,12 +305,17 @@ pass**). It runs on pushes and pull requests that touch the app, and by hand.
   are repository variables passed through `env:`, never interpolated into the shell text. Logs: nothing prints a variable;
   the one input that could carry text (`vars.QED_RELEASE_DIR`) is an existing-directory test only. Concurrency: one run per
   branch or pull request, older ones cancelled, except on `main`.
+- **Compilers**: both jobs install solc 0.8.38 and 0.8.26 with `scripts/deploy/install-solc.sh`: the official linux-amd64
+  binaries from binaries.soliditylang.org, each checked against the SHA-256 the Dockerfile pins (`server/solc-pins.test.ts`
+  holds the two equal), at `~/.svm/<version>/`, where forge looks; every forge step then runs offline (`forge test --offline`,
+  `FORGE_OFFLINE=1` for the hash check). forge's own download failed on the runner ("No solc version exists that matches
+  =0.8.38"), as it had in the image build. The script refuses to run on anything but Linux x86-64.
 - **Job `checks`** (Node from `.nvmrc`, Foundry v1.7.1), in order: `npm ci` (+ the chain's, production dependencies,
   no install scripts) , typecheck, the unit suite, build, **`npm run sbom`** (CycloneDX SBOMs of the app and the chain from the
   lockfiles, and `npm audit` records; uploaded), **`npm run release:check`** only where the release folder exists (the
   repository variable `QED_RELEASE_DIR` names it, for a self-hosted runner; on GitHub's runners it logs a notice that it was
   skipped: the approved release lives on the owner's Mac), **`node scripts/security.ts`**, **the chain's Forge gate**
-  (`forge test` in `chain/accounts` with `SOLC_VERSION=0.8.38`), and **the owner-account hash check**
+  (`forge test --offline` in `chain/accounts` with `SOLC_VERSION=0.8.38`), and **the owner-account hash check**
   (`scripts/deploy/build-owner-account.sh` rebuilds the artifact the declared way and stops unless its SHA-256 equals
   `chain/accounts/READY.json`; it runs after `forge test` because a whole-project build can change the artifact's bytes; on this Mac it still matched after `forge test`).
 - **Job `browser`**: Chromium, the build, the same hash check, the browser suite; results uploaded.
@@ -441,7 +455,8 @@ deliberate mutations each caught: the engine's stop check removed, the API's wai
 - Backups share the volume until the owner turns on the off-host copy (section 17); the S3 client was tested against a fake
   store on loopback and against AWS's published signing examples, never against a real bucket (H-14). The outside monitor,
   the log drain and the region wait for the owner (sections 21 and 22).
-- The hardened container, the health check inside it, the Railway IaC file and the workflow were never run (H-13, H-16, H-9).
+- The hardened container, the health check inside it and the Railway IaC file were never run (H-13, H-16). The workflow ran
+  once on GitHub and failed on portability; its fix is not yet re-run there (H-9, section 10).
 - The browser suite and the chain's own suite were not re-run for this package (it changes no screen and no chain code).
 
 ## 16. Railway configuration after 1 December 2026

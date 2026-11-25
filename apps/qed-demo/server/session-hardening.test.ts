@@ -11,12 +11,13 @@
 import { createHash } from 'node:crypto'
 import { copyFileSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { startApi } from './api.ts'
 import { capSessions, contextual, login, MAX_SESSIONS, register, sessionFor, validateCredentials } from './auth.ts'
 import { layerLegacyCodes, loadConfig, openDb } from './core.ts'
+import { testKeys } from './key-fixture.ts'
 import { matchCode, matchCodeAsync } from './passkeys.ts'
 import { toSchemaV7 } from './schema-fixture.ts'
 
@@ -58,6 +59,12 @@ describe('sessions (V7.1.2)', () => {
 })
 
 describe('saved codes made before v3 are put under scrypt (V6.5.2; part r of the v8 step)', () => {
+  // Opening the v7 file migrates it, after sealing a copy under the migration-copy key: scratch keys in a folder of their
+  // own, as the other migration suites have (without them the test used ~/.qed/keys, and a fresh GitHub runner has none).
+  const keys = testKeys(mkdtempSync(join(tmpdir(), 'qed-layer-keys-')))
+  const keyDirBefore = process.env.QED_KEY_DIR
+  beforeAll(() => { process.env.QED_KEY_DIR = keys.dir })
+  afterAll(() => { if (keyDirBefore === undefined) delete process.env.QED_KEY_DIR; else process.env.QED_KEY_DIR = keyDirBefore; rmSync(dirname(keys.dir), { recursive: true, force: true }) })
   const sha = (salt: string, code: string) => createHash('sha256').update(`${salt}:${code.replace(/[^A-Z0-9]/gi, '').toUpperCase()}`).digest('hex')
 
   it('layers every bare SHA-256 code when a v7 database is opened, and the same code still matches, sync and async', async () => {

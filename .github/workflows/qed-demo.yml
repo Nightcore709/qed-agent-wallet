@@ -1,6 +1,9 @@
 # QED demo (apps/qed-demo): typecheck, unit suite, build, SBOM, the release-folder check where that folder exists, the
 # security script, the chain's Forge tests and the owner-account hash check; the browser suite as a separate job.
-# Prepared locally and NEVER RUN on GitHub (apps/qed-demo/docs/DEPLOY.md, section 10): the first push is its first run.
+# Prepared locally (apps/qed-demo/docs/DEPLOY.md, section 10). Its first run on GitHub (25 Nov 2026, ubuntu-24.04) failed
+# on portability, not on the product: unit tests that assumed macOS's case-insensitive volume, keys in the owner's home
+# folder, or a CPU fast enough to stay inside the API's thread-time budget, and forge's own download of solc 0.8.38. The
+# tests now hold on either kind of volume and machine, and solc comes from pinned binaries (scripts/deploy/install-solc.sh).
 #
 # Supply chain: every action is pinned to a full commit SHA, with its version beside it (read from each project's GitHub
 # release page on 24 Nov 2026; verify a pin with `git ls-remote https://github.com/<owner>/<repo> <tag>`). Dependabot
@@ -49,6 +52,11 @@ jobs:
       - name: Foundry v1.7.1 (the version the owner-account artifact was built with)
         uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
         with: { version: v1.7.1 }
+      # forge's own download of solc 0.8.38 fails on this runner ("No solc version exists that matches =0.8.38"), as it did
+      # in the image build: the compilers come from the official binaries, pinned by the Dockerfile's SHA-256
+      # (server/solc-pins.test.ts holds the two equal), and every forge step below runs offline.
+      - name: solc 0.8.38 and 0.8.26 (official binaries, SHA-256 pinned as in the Dockerfile)
+        run: scripts/deploy/install-solc.sh
       - name: Install (lockfiles only, no install scripts)
         run: |
           node --version
@@ -77,8 +85,10 @@ jobs:
         working-directory: apps/qed-demo/chain/accounts
         env:
           SOLC_VERSION: "0.8.38"
-        run: forge test
+        run: forge test --offline
       - name: Owner-account hash check (artifact SHA-256 equals READY.json)
+        env:
+          FORGE_OFFLINE: "1"
         run: scripts/deploy/build-owner-account.sh
       - name: Upload SBOMs, audit records and the security report
         if: always()
@@ -111,6 +121,8 @@ jobs:
       - name: Foundry v1.7.1
         uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf # v1.9.2
         with: { version: v1.7.1 }
+      - name: solc 0.8.38 and 0.8.26 (official binaries, SHA-256 pinned as in the Dockerfile)
+        run: scripts/deploy/install-solc.sh
       - name: Install (lockfiles only, no install scripts)
         run: |
           npm ci
@@ -118,6 +130,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - name: Owner-account hash check (artifact SHA-256 equals READY.json)
+        env:
+          FORGE_OFFLINE: "1"
         run: scripts/deploy/build-owner-account.sh
       - run: npx playwright test -c browser/playwright.config.ts
       - name: Upload the browser results
