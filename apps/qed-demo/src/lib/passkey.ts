@@ -274,7 +274,8 @@ export async function finishRecoveryWithLink(token: string, finishKey: string, p
  * Ask for approval authority with the passkey a recovery registered (R12): the device proves that passkey is here; the
  * authority is given when the wait ends, unless another passkey of the account or a recovery contact stops it.
  */
-export async function requestAuthority(): Promise<{ changeId: string; effectiveAt: number; passkey: string }> {
+/** recoveryCodes (R2): a passkey added after a password reset gets its saved codes with the request, shown once; they work from effectiveAt. */
+export async function requestAuthority(): Promise<{ changeId: string; effectiveAt: number; passkey: string; recoveryCodes?: string[] }> {
   const b = await api<Options>('POST', '/api/security/authority/begin')
   const response = await use(b)
   return api('POST', '/api/security/authority/finish', { challengeId: b.challengeId, response })

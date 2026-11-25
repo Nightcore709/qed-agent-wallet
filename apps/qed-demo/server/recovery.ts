@@ -39,7 +39,7 @@ import {
   activeContacts, completeRecovery, confirmNeeded, type CodeRow, type Credential, DUMMY_SALT, ES256, fail, handleOf, hasApprovingPasskey, hasPasskey, issueChallenge, isActiveLink,
   type ContactLink, matchCode, matchCodeAsync, passwordHeldUntil, PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, RECOVERY_FINISH_WINDOW_MS, type RelyingParty, scryptCode, scryptCodeAsync, securityEvent, strongConfirm,
   takeChallenge, usableCredentials, utf8, verifyAssertion,
-  endLinks, refuseCoolingOff,
+  activatePendingCodes, endAddress, keepPendingCodes, newCodeSet, refuseCoolingOff, scheduleFallbackRemoval, type ScheduledFallback,
 } from './passkeys.ts'
 import { sha256hex } from './receipts.ts'
 import { setStop } from './runner.ts'
@@ -220,11 +220,19 @@ function confirmed(db: Db, p: Point, now: number): { kind: Kind; address: string
   const usableFrom = p.kind === 'email' ? now + PROTECTION_DELAY_MS : null
   db.run('UPDATE contact_points SET verified_at = ?, usable_from = ? WHERE id = ?', now, usableFrom, p.id)
   const old = p.replaces_id ? db.get<Point>('SELECT * FROM contact_points WHERE id = ? AND person_id = ? AND removed_at IS NULL', p.replaces_id, p.person_id) : undefined
-  if (old) db.run(`UPDATE contact_points SET removed_at = ?, removed_reason = 'replaced' WHERE id = ?`, now, old.id)
-  if (old?.kind === 'email') endLinks(db, p.person_id, now) // as when it is removed (R13 review, R05)
+  // R14 (SECURITY.md 8j (c)): a change of a confirmed email address adds the new one now, as adding always has, and removes
+  // the old one only when the protection delay has passed, as a removal does (passkeys.ts endAddress tells it then what the
+  // address is now); otherwise asking to "change" an address would remove a way back in at once. A phone number (notices
+  // only) is changed at once, as before.
+  const waits = old?.kind === 'email' && old.verified_at !== null
+  if (old && !waits) db.run(`UPDATE contact_points SET removed_at = ?, removed_reason = 'replaced' WHERE id = ?`, now, old.id)
   securityEvent(db, p.person_id, p.kind === 'email' ? (own ? 'email-confirmed' : 'email-added') : 'phone-added', { address: maskAddress(p.kind, p.address), ...(old ? { replaced: maskAddress(old.kind, old.address) } : {}) }, now)
-  // The address that was replaced hears of it once more, although it receives nothing else from now on.
-  if (old) notifyChannels(db, p.person_id, { kind: `${p.kind}-changed`, title: p.kind === 'email' ? 'The email address of your QED account was changed' : 'The phone number of your QED account was changed', body: `It is now ${maskAddress(p.kind, p.address)}. This address will receive nothing more from QED.` }, now, [{ kind: old.kind, address: old.address }], true)
+  // The number that was replaced hears of it once more, although it receives nothing else from now on.
+  if (old && !waits) notifyChannels(db, p.person_id, { kind: `${p.kind}-changed`, title: p.kind === 'email' ? 'The email address of your QED account was changed' : 'The phone number of your QED account was changed', body: `It is now ${maskAddress(p.kind, p.address)}. This address will receive nothing more from QED.` }, now, [{ kind: old.kind, address: old.address }], true)
+  // the old address is told now, with every other channel, that it is to be removed and when (unless its removal already waits)
+  if (old && waits && !db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = 'remove-address' AND subject = ? AND cancelled_at IS NULL AND applied_at IS NULL`, p.person_id, old.id)) {
+    scheduleFallbackRemoval(db, { personId: p.person_id, requestedBy: null }, { kind: 'remove-address', subject: old.id, detail: { address: maskAddress('email', old.address), replacedBy: p.id }, event: 'email-removal-scheduled', already: 'Removing this email address is already scheduled.' }, now)
+  }
   audit(db, now, p.person_id, 'owner', `${p.kind}.confirm`, p.id, { replaced: old?.id ?? null })
   return { kind: p.kind, address: p.address, usableFrom }
 }
@@ -267,24 +275,25 @@ export function confirmAddressByCode(db: Db, s: Session, id: string, code: unkno
   })
 }
 
-/** Remove an address, with the account's strongest confirmation. The address removed is told, once more. */
-export function removeAddress(db: Db, s: Session, id: string, now: number): void {
+/**
+ * Remove an address, with the account's strongest confirmation. A confirmed email address is a way back in (it can start
+ * a reset or a recovery), so its removal is scheduled (SECURITY.md 8j (c), R14): it stays, and keeps receiving notices,
+ * for PROTECTION_DELAY_MS; every channel, this address included, is told now; any passkey of the person, one of their
+ * saved codes, or on an account with no passkey the password typed again, cancels it (passkeys.ts
+ * cancelScheduledChangeWithCode). When it applies (passkeys.ts endAddress) the reset and recovery links already sent stop
+ * working too (R13 review, R05). An address never confirmed, and a phone number (notices only, never a way back in), go at once.
+ */
+export function removeAddress(db: Db, s: Session, id: string, now: number): { removed: true } | ScheduledFallback {
   const p = db.get<Point>('SELECT * FROM contact_points WHERE id = ? AND person_id = ? AND removed_at IS NULL', id, s.userId)
   if (!p) throw new AppError(404, 'not_found', 'That address was not found, or it was already removed.')
   if (p.verified_at !== null && !strongConfirm(db, s, now)) throw confirmNeeded(db, s, p.kind === 'email' ? 'remove an email address' : 'remove a phone number', now)
   // removing an address stops its notices: a passkey in its cool-off removes none (RISK-068, Q-062)
   if (p.verified_at !== null) refuseCoolingOff(db, s, p.kind === 'email' ? 'remove an email address' : 'remove a phone number', now)
-  db.tx(() => {
-    db.run(`UPDATE contact_points SET removed_at = ?, removed_reason = 'removed by the owner' WHERE id = ?`, now, id)
-    if (db.run(`UPDATE one_time_tokens SET replaced_at = ? WHERE subject = ? AND used_at IS NULL AND replaced_at IS NULL`, now, id).changes) redactSpent(db, now)
-    if (p.verified_at === null) return
-    // A reset or recovery link already sent went to every usable address, this one included: it stops working with the
-    // address, or whoever holds the removed mailbox could still reset the password with it (R13 review, R05).
-    if (p.kind === 'email') endLinks(db, s.userId, now)
-    securityEvent(db, s.userId, p.kind === 'email' ? 'email-removed' : 'phone-removed', { address: maskAddress(p.kind, p.address) }, now)
-    notifyChannels(db, s.userId, { kind: `${p.kind}-removed`, title: p.kind === 'email' ? 'This email address was removed from a QED account' : 'This number was removed from a QED account', body: 'It will receive nothing more from QED.' }, now, [{ kind: p.kind, address: p.address }], true)
-    audit(db, now, s.userId, 'owner', `${p.kind}.remove`, id, {})
-  })
+  if (p.verified_at !== null && p.kind === 'email') {
+    return scheduleFallbackRemoval(db, { personId: s.userId, requestedBy: s.confirmedBy ?? s.credentialId ?? null }, { kind: 'remove-address', subject: id, detail: { address: maskAddress('email', p.address) }, event: 'email-removal-scheduled', already: 'Removing this email address is already scheduled.' }, now)
+  }
+  db.tx(() => endAddress(db, s.userId, p, now, 'owner'))
+  return { removed: true }
 }
 
 // ---------------------------------------------------------------------------------------------- who an identifier names
@@ -602,18 +611,22 @@ export async function beginAuthorityRequest(db: Db, rp: RelyingParty, s: Session
  * Ask for approval authority for the passkey that just signed (one that signs in only). It is given when the protection
  * delay has passed, unless cancelled: every device, address and recovery contact is told now.
  */
-export async function finishAuthorityRequest(db: Db, rp: RelyingParty, s: Session, input: { challengeId: unknown; response: unknown }, now: number): Promise<{ changeId: string; effectiveAt: number; passkey: string }> {
+export async function finishAuthorityRequest(db: Db, rp: RelyingParty, s: Session, input: { challengeId: unknown; response: unknown }, now: number): Promise<{ changeId: string; effectiveAt: number; passkey: string; recoveryCodes?: string[] }> {
   const ch = takeChallenge(db, input.challengeId, ['authority'], s.userId, now)
   const cred: Credential = await verifyAssertion(db, rp, ch, input.response, s.userId, now, 'signin-only')
   const changeId = newId('chg', now), effectiveAt = now + PROTECTION_DELAY_MS
+  // R2 (second review of the F1 fix): a passkey added after a password reset brought no codes. Its codes are made with this
+  // request, shown once to this session, and kept apart until its authority is restored (passkeys.ts keepPendingCodes).
+  const set = cred.authority_reason === 'after-password-reset' ? newCodeSet() : null
   db.tx(() => {
     if (db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = 'restore-authority' AND subject = ? AND cancelled_at IS NULL AND applied_at IS NULL`, s.userId, cred.id)) throw new AppError(409, 'already_scheduled', 'This passkey has already asked for approval authority. It is given when the wait ends.')
     db.run(`INSERT INTO scheduled_changes (id, person_id, kind, subject, detail_json, requested_at, requested_by, effective_at) VALUES (?, ?, 'restore-authority', ?, ?, ?, ?, ?)`, changeId, s.userId, cred.id, j({ name: cred.name, reason: cred.authority_reason }), now, cred.id, effectiveAt)
-    securityEvent(db, s.userId, 'authority-restore-requested', { passkey: cred.name, effectiveAt }, now)
+    if (set) keepPendingCodes(db, s.userId, changeId, set.kept)
+    securityEvent(db, s.userId, 'authority-restore-requested', { passkey: cred.name, effectiveAt, ...(set ? { codesWithIt: true } : {}) }, now)
     for (const c of activeContacts(db, s.userId, now)) securityEvent(db, c, 'contact-authority-requested', { for: handleOf(db, s.userId), effectiveAt }, now)
-    audit(db, now, s.userId, 'owner', 'authority.request', cred.id, { changeId, effectiveAt })
+    audit(db, now, s.userId, 'owner', 'authority.request', cred.id, { changeId, effectiveAt, codesWithIt: !!set })
   })
-  return { changeId, effectiveAt, passkey: cred.name }
+  return { changeId, effectiveAt, passkey: cred.name, ...(set ? { recoveryCodes: set.codes } : {}) }
 }
 
 /**
@@ -648,6 +661,8 @@ export function grantAuthorityNow(db: Db, s: Session, changeId: string, now: num
     db.run('UPDATE scheduled_changes SET applied_at = ?, cancelled_by = ? WHERE id = ?', now, `granted-by:${s.credentialId ?? 'session'}`, c.id)
     db.run('UPDATE users SET authority_hold_at = NULL WHERE id = ?', s.userId)
     securityEvent(db, s.userId, 'authority-restored', { passkey: cred.name, by: 'another of your passkeys' }, now)
+    // R2: authority given early brings the codes made with the request into force, as the end of the wait would
+    activatePendingCodes(db, s.userId, c.id, now)
     audit(db, now, s.userId, 'owner', 'authority.grant', c.subject, { changeId })
   })
 }

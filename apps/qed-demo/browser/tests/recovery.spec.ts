@@ -224,6 +224,33 @@ test('forgot password: a link from the outbox sets a new password, ends every se
   await again.bringToFront()
   await again.goto(link)
   await expect(again.getByRole('heading', { name: 'This link was already used' })).toBeVisible()
+  await again.close()
+
+  // R2 (SECURITY.md 8k): the first passkey added after the reset signs in only and brings no codes; its codes come with its
+  // request for approval authority, shown once there, and are the account's only from the end of that wait
+  await page.bringToFront()
+  await page.goto('/security')
+  const none = page.locator('.note').filter({ hasText: 'This account has no passkey' })
+  await none.getByLabel('Password').fill(next)
+  await none.getByRole('button', { name: 'Create a passkey' }).click()
+  await expect(page.getByText('This account has no passkey')).toHaveCount(0)
+  await expect(page.locator('.note').filter({ hasText: 'Save these recovery codes now' })).toHaveCount(0)
+  const unused = () => query<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', u!.id)[0]!.n
+  expect(unused()).toBe(0)
+  const authority = page.getByRole('region', { name: 'Approving payments again' })
+  await authority.getByRole('button', { name: 'Ask for approval authority' }).click()
+  const shown = page.locator('.note').filter({ hasText: 'Save these recovery codes now' })
+  await expect(shown.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10)
+  await expect(shown.getByText(/They were made with your request for approval authority\. They work from .*, when the passkey can approve/)).toBeVisible()
+  await expect(shown.getByRole('button', { name: 'Download as a text file' })).toBeVisible()
+  await shots(page, 'reset-authority-codes')
+  expect(unused()).toBe(0) // kept apart: nothing accepts them until the authority is given
+  await shown.getByRole('button', { name: 'Continue' }).click()
+  await expect(shown).toHaveCount(0)
+  // the wait ends (6 s on this stack): the passkey can approve, and the codes it brought are the account's
+  await expect.poll(unused, { timeout: 30_000 }).toBe(10)
+  await page.reload()
+  await expect(page.getByRole('region', { name: 'What happened' }).getByText('The saved recovery codes made with the request for approval authority now work')).toBeVisible()
 })
 
 test('an expired link says so plainly and leads to a new one', async ({ browser }) => {
@@ -433,6 +460,92 @@ test('a recovery is cancelled from a signed-in device, and again by a recovery c
   await owner.goto('/security')
   await expect(owner.getByRole('region', { name: 'What happened' }).getByText('Recovery stopped').first()).toBeVisible()
   expect(query('SELECT COUNT(*) n FROM webauthn_credentials WHERE person_id = ?', u!.id)).toEqual([{ n: 1 }])
+})
+
+test('ending a recovery contact waits (8j (c)): shown pending with its time, cancelled with the passkey, then with a saved code; a third request applies after the delay', async ({ browser }) => {
+  test.setTimeout(LIMIT)
+  const owner = await (await browser.newContext()).newPage()
+  await addAuthenticator(owner)
+  const handle = unique('ec')
+  await owner.goto('/')
+  await owner.getByRole('button', { name: 'Create an account' }).click()
+  await owner.getByRole('button', { name: 'Use a passkey instead' }).click()
+  await owner.getByLabel('Handle').fill(handle)
+  await owner.getByLabel('Name to sign with').fill(`Test ${handle}`)
+  await owner.getByRole('button', { name: 'Create account with a passkey' }).click()
+  await expect(owner.getByRole('list', { name: 'Recovery codes' }).locator('li')).toHaveCount(10)
+  const codes = await owner.getByRole('list', { name: 'Recovery codes' }).locator('li').allInnerTexts()
+  await owner.getByRole('button', { name: 'Continue' }).click()
+  const [u] = query<{ id: string }>('SELECT id FROM users WHERE handle = ?', handle)
+  // a recovery contact, accepted and active after the protection delay
+  const helper = await (await browser.newContext()).newPage()
+  await addAuthenticator(helper)
+  const helperHandle = unique('eh')
+  await helper.goto('/')
+  await helper.getByRole('button', { name: 'Create an account' }).click()
+  await helper.getByRole('button', { name: 'Use a passkey instead' }).click()
+  await helper.getByLabel('Handle').fill(helperHandle)
+  await helper.getByLabel('Name to sign with').fill(`Test ${helperHandle}`)
+  await helper.getByRole('button', { name: 'Create account with a passkey' }).click()
+  await helper.getByRole('button', { name: 'Continue' }).click()
+  await owner.goto('/security')
+  await owner.getByLabel('Their handle').fill(helperHandle)
+  await owner.getByRole('button', { name: 'Name as recovery contact' }).click()
+  await expect(owner.getByText(/waiting for them to accept/)).toBeVisible()
+  await helper.goto('/security')
+  await helper.getByRole('button', { name: 'Accept' }).click()
+  await expect(helper.getByRole('button', { name: 'Accept' })).toHaveCount(0)
+  await owner.waitForTimeout(WAIT)
+  await owner.goto('/security')
+  const contacts = owner.locator('.sy-sub').filter({ has: owner.getByRole('heading', { name: 'Recovery contacts' }) })
+  await expect(contacts.getByText(/^Active since/)).toBeVisible()
+  const ending = () => query<{ id: string }>(`SELECT id FROM scheduled_changes WHERE person_id = ? AND kind = 'remove-contact' AND cancelled_at IS NULL AND applied_at IS NULL`, u!.id)
+  // The test stack's delay is 6 s. Where this journey reads and acts on the waiting removal, it is given five minutes
+  // (a labelled harness write); the third request below is left to the stack's own delay and its engine.
+  const give = async (): Promise<void> => { await expect.poll(() => ending().length).toBe(1); force('UPDATE scheduled_changes SET effective_at = ? WHERE id = ?', Date.now() + 300_000, ending()[0]!.id); await owner.reload() }
+  const end = contacts.getByRole('button', { name: `End @${helperHandle}` })
+  const needs = owner.getByRole('region', { name: 'Needs you' })
+  const item = needs.getByRole('listitem').filter({ hasText: `End @${helperHandle} as your recovery contact` })
+
+  // 1. ending the contact is scheduled, not done: the page says it waits, until when, and how to cancel it; both are told
+  await end.click()
+  await give()
+  await expect(item.getByText(/takes effect .*Until then they stay your recovery contact and can still issue you a code\. To keep it, cancel this with any of your passkeys, or with one of your saved recovery codes\./)).toBeVisible()
+  await expect(contacts.getByText(/^Ends .*Until then they stay your recovery contact\./)).toBeVisible()
+  await expect(end).toHaveCount(0)
+  expect(query('SELECT COUNT(*) n FROM recovery_contacts WHERE person_id = ? AND removed_at IS NULL', u!.id)).toEqual([{ n: 1 }])
+  await expect(owner.getByRole('region', { name: 'What happened' }).getByText('Ending a recovery contact was asked for; it waits before it takes effect')).toBeVisible()
+  await helper.goto('/security')
+  await expect(helper.getByText(/they asked to end you as their recovery contact, which takes effect .*: if they did not tell you, call them/)).toBeVisible()
+  await owner.bringToFront()
+  await shots(owner, 'contact-ending-pending')
+  expect((await new AxeBuilder({ page: owner as never }).include('.sy-needs').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()).violations.map((v) => v.id)).toEqual([])
+
+  // 2. cancelled with the passkey
+  await item.getByRole('button', { name: 'Cancel it' }).click()
+  await expect(item).toHaveCount(0)
+  expect(ending()).toEqual([])
+  await expect(end).toBeVisible()
+
+  // 3. asked again, and cancelled with a saved code, which is not used up
+  await end.click()
+  await give()
+  await item.getByRole('button', { name: 'Use a saved code instead' }).click()
+  await item.getByLabel('One of your saved recovery codes').fill(codes[0]!)
+  await shots(owner, 'contact-ending-code')
+  await item.getByRole('button', { name: 'Cancel with this code' }).click()
+  await expect(item).toHaveCount(0)
+  expect(ending()).toEqual([])
+  expect(query('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', u!.id)).toEqual([{ n: 10 }])
+  await expect(owner.getByRole('region', { name: 'What happened' }).getByText('A scheduled change was cancelled with a saved recovery code')).toBeVisible()
+
+  // 4. asked a third time and left alone: it takes effect when the delay ends, once, and the contact is gone
+  await end.click()
+  await expect.poll(() => ending().length).toBe(1)
+  await expect.poll(() => query<{ n: number }>('SELECT COUNT(*) n FROM recovery_contacts WHERE person_id = ? AND removed_at IS NOT NULL', u!.id)[0]!.n, { timeout: 30_000 }).toBe(1)
+  await owner.reload()
+  await expect(contacts.getByText('None yet.')).toBeVisible()
+  await expect(owner.getByRole('region', { name: 'What happened' }).getByText('Recovery contact ended')).toBeVisible()
 })
 
 test('suspected compromise: every session ends from "If something is wrong", and a stolen passkey is suspended', async ({ browser }) => {

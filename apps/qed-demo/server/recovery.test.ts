@@ -133,7 +133,7 @@ describe('addresses: email confirmed by a link or a code; a phone for notices on
     expect(() => confirmAddressByCode(db, sessionFor(db, a.session.token, T0 + 2 * H + 11 * 60_000)!, later.id, code3, T0 + 2 * H + 11 * 60_000)).toThrow(expect.objectContaining({ code: 'link_expired' }))
   })
 
-  it('a change keeps the old address until the new one is confirmed, then tells the old one; a removal tells the removed one', async () => {
+  it('a change keeps the old address until the new one is confirmed and then for the protection delay, telling it at once and again when it goes; a removal waits too, and tells the removed one', async () => {
     const db = openDb(':memory:')
     const a = await passkeyAccount(db, 'mira')
     confirmedEmail(db, a.s(), 'mira@example.in', T0 + 1000)
@@ -141,12 +141,20 @@ describe('addresses: email confirmed by a link or a code; a phone for notices on
     addAddress(db, sessionFor(db, a.session.token, T0 + 2000)!, 'email', 'mira.new@gmail.com', T0 + 2000, old)
     expect(db.get(`SELECT removed_at FROM contact_points WHERE id = ?`, old)).toEqual({ removed_at: null })
     confirmAddressByLink(db, linkIn(db, 'mira.new@gmail.com', '/verify-email'), META.ip, T0 + 3000)
+    // R14 (SECURITY.md 8j (c)): a confirmed address is a way back in, so the old one goes only after the protection delay;
+    // it is told now that it is to go, and again, with what the address is now, when it does
+    expect(db.get(`SELECT removed_at FROM contact_points WHERE id = ?`, old)).toEqual({ removed_at: null })
+    expect(lastTo(db, 'mira@example.in')).toMatchObject({ purpose: 'notice:email-removal-scheduled' })
+    applyDueChanges(db, T0 + 3000 + PROTECTION_DELAY_MS)
     expect(db.get<{ removed_reason: string }>(`SELECT removed_reason FROM contact_points WHERE id = ?`, old)!.removed_reason).toBe('replaced')
     expect(lastTo(db, 'mira@example.in')).toMatchObject({ purpose: 'notice:email-changed', subject: 'QED: The email address of your QED account was changed' })
     expect(lastTo(db, 'mira@example.in')!.body).toContain('m•••@gmail.com')
     const nw = db.get<{ id: string }>(`SELECT id FROM contact_points WHERE address = 'mira.new@gmail.com'`)!.id
-    expect(() => removeAddress(db, sessionFor(db, a.session.token, T0 + 20 * 60_000)!, nw, T0 + 20 * 60_000)).toThrow(expect.objectContaining({ code: 'stepup_required' }))
-    removeAddress(db, await fresh(db, a.auth, a.session.token, T0 + 21 * 60_000), nw, T0 + 21 * 60_000)
+    const at = T0 + 3000 + PROTECTION_DELAY_MS + 60_000, tok = await signinAt(db, a.auth, at)
+    expect(() => removeAddress(db, sessionFor(db, tok, at + 6 * 60_000)!, nw, at + 6 * 60_000)).toThrow(expect.objectContaining({ code: 'stepup_required' }))
+    expect(removeAddress(db, await fresh(db, a.auth, tok, at + 7 * 60_000), nw, at + 7 * 60_000)).toMatchObject({ scheduled: true })
+    expect(lastTo(db, 'mira.new@gmail.com')).toMatchObject({ purpose: 'notice:email-removal-scheduled' })
+    applyDueChanges(db, at + 7 * 60_000 + PROTECTION_DELAY_MS)
     expect(lastTo(db, 'mira.new@gmail.com')).toMatchObject({ purpose: 'notice:email-removed' })
   })
 

@@ -33,7 +33,7 @@ import { IDLE_MS, login, logout, logoutEverywhere, rateLimit, type Session, sess
 import { emailState, resendEmailConfirmation, signUpWithEmail } from './access.ts'
 import { beginGoogle, finishGoogle, googleIdentities, unlinkGoogle } from './google.ts'
 import {
-  acceptContact, approvalChallenge, authorityOf, beginAddPasskey, beginLogin, beginReauth, beginRecoveryPasskey, beginSignup, cancelRecovery, cancelScheduledChange, changePassword,
+  acceptContact, approvalChallenge, authorityOf, beginAddPasskey, beginLogin, beginReauth, beginRecoveryPasskey, beginSignup, cancelRecovery, cancelScheduledChangeWithCode, changePassword,
   finishAddPasskey, finishLogin, regenerateJustMadeCodes, finishReauth, finishRecoveryPasskey, finishSignup, hasApprovingPasskey, hasPasskey, issueContactCode, nominateContact, regenerateRecoveryCodesWithCode,
   PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, refuseCoolingOff, relyingParty, hasPassword, removeContact, removePassword, restrictedError, revokeSession, signOutOtherSessions, scheduleRemovePasskey, scheduleUnsuspend, securityView, signUpWithPassword, startRecovery, suspendPasskeyWithCode, removePasskeyWithCode,
 } from './passkeys.ts'
@@ -376,19 +376,24 @@ route('POST', '/api/security/passkeys/:id/suspend', async (r) => { await suspend
 route('POST', '/api/security/passkeys/:id/unsuspend', (r) => scheduleUnsuspend(r.db, r.session, r.params[0]!, r.now))
 route('POST', '/api/security/contacts', (r) => nominateContact(r.db, r.session, r.body.handle, r.now))
 route('POST', '/api/security/contacts/:id/accept', (r) => { acceptContact(r.db, r.session, r.params[0]!, r.now); return { ok: true } })
-route('POST', '/api/security/contacts/:id/remove', (r) => { removeContact(r.db, r.session, r.params[0]!, r.now); return { ok: true } })
+// Ending a contact who has accepted is scheduled (SECURITY.md 8j (c)): { scheduled, changeId, effectiveAt }; withdrawing an
+// unanswered request, or stepping down, is at once: { removed: true }.
+route('POST', '/api/security/contacts/:id/remove', (r) => ({ ok: true, ...removeContact(r.db, r.session, r.params[0]!, r.now) }))
 route('POST', '/api/security/contacts/:id/code', (r) => issueContactCode(r.db, r.session, r.params[0]!, r.now))
-route('POST', '/api/security/changes/:id/cancel', (r) => { cancelScheduledChange(r.db, r.session, r.params[0]!, r.now); return { ok: true } })
+// A fresh passkey confirmation cancels any waiting change of the person's; a removal of a way back in (8j (c)) is also
+// cancelled by one of their saved codes ({ code }), from any of their sessions, and the code is not used up.
+route('POST', '/api/security/changes/:id/cancel', async (r) => ({ ok: true, ...(await cancelScheduledChangeWithCode(r.db, r.session, r.params[0]!, (r.body as { code?: unknown } | undefined)?.code, r.now)) }))
 route('POST', '/api/security/recovery-codes', async (r) => ({ codes: await regenerateRecoveryCodesWithCode(r.db, r.session, (r.body as { code?: unknown } | undefined)?.code, r.now) }))
 // The cancelled recovery spent a saved code: the answer carries the new set, shown once.
 route('POST', '/api/security/recoveries/:id/cancel', (r) => cancelRecovery(r.db, r.session, r.params[0]!, r.now))
 route('POST', '/api/security/sessions/end-others', (r) => ({ ended: signOutOtherSessions(r.db, r.session, r.now) }))
 route('POST', '/api/security/sessions/:id/revoke', (r) => { revokeSession(r.db, r.session, r.params[0]!, r.now); return { ok: true } })
 // Addresses outside QED (R12): email (notices now; a reset or a recovery after the protection delay) and a phone number
-// (short security notices only). Adding or removing one takes the account's strongest confirmation.
+// (short security notices only). Adding or removing one takes the account's strongest confirmation; removing a confirmed
+// email address is scheduled (8j (c)): { scheduled, changeId, effectiveAt }; anything else goes at once: { removed: true }.
 route('POST', '/api/security/addresses', (r) => addAddress(r.db, r.session, r.body.kind === 'phone' ? 'phone' : 'email', r.body.address, r.now, r.body.replaces ?? undefined))
 route('POST', '/api/security/addresses/:id/confirm', (r) => confirmAddressByCode(r.db, r.session, r.params[0]!, r.body.code, r.now))
-route('POST', '/api/security/addresses/:id/remove', (r) => { removeAddress(r.db, r.session, r.params[0]!, r.now); return { ok: true } })
+route('POST', '/api/security/addresses/:id/remove', (r) => ({ ok: true, ...removeAddress(r.db, r.session, r.params[0]!, r.now) }))
 // Approval authority for a passkey that signs in only: asked with that passkey, given after the protection delay unless
 // stopped; stopped by that passkey's own session or any passkey with authority; granted at once only by such a passkey.
 route('POST', '/api/security/authority/begin', (r) => beginAuthorityRequest(r.db, rp(r), r.session, r.now))
@@ -401,8 +406,8 @@ route('POST', '/api/security/contacts/:id/cancel-loosening', (r) => contactCance
 // a recovery contact pauses QED for the person who trusts them (all but protective selling); only that person resumes it
 route('POST', '/api/security/contacts/:id/pause', (r) => contactPause(r.ctx, r.session, r.params[0]!))
 // The password (RISK-076): changing it takes the account's strongest confirmation (a passkey when it has one, otherwise
-// the current password in the same request); removing it takes a passkey and leaves a way back in. Either ends every
-// other session, and the answer says how many.
+// the current password in the same request), takes effect at once and ends every other session (the answer says how
+// many); removing it takes a passkey and leaves a way back in, and is scheduled (8j (c)): { scheduled, changeId, effectiveAt }.
 route('POST', '/api/security/password', async (r) => ({ ok: true, ...(await changePassword(r.db, r.session, { current: r.body.current, password: r.body.password }, r.ip, r.now)) }))
 route('POST', '/api/security/password/remove', (r) => ({ ok: true, ...removePassword(r.db, r.session, r.ip, r.now) }))
 route('POST', '/api/auth/login', async (r) => {
