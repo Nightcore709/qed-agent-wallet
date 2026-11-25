@@ -930,3 +930,119 @@ means every listed model answered in the schema.
 is listed for this key; the real latency at high effort (the timeout allows 180 s a request); that the token estimate
 stays above the real counts; that an HTTP error is never billed (the API rejects 4xx, 429 and 529 before a model runs;
 other 5xx, timeouts and lost connections are counted at their reservation in case they were).
+
+
+## 25. Switching on email and Google sign-in (R14, 26 Nov 2026, `claude/r14-email`)
+
+What this build adds: email through Postmark (`QED_DELIVERY=postmark`; `server/postmark.ts`, fetch only, no new
+dependency) and a sign-in with Google that is ready for Google's real answers. Both are off until you set their
+variables. With none set, nothing changes: no email is sent, and no Google button is drawn.
+
+**NOT VERIFIED here, and cannot be:** a real message through Postmark, a real sign-in through Google. Every test runs against
+a local stand-in for each (`server/postmark-standin.ts`, `server/oidc-standin.ts`). Where a console is described below, it
+is as the product named it when this was written; Postmark and Google rename things, so each setting is given by its name
+"as the console names it", and the step is to find the setting that does that job.
+
+> **Do not set `QED_DELIVERY=postmark` until the release that fixes RISK-123 is live.** RISK-123 is the password-reset
+> path: with email on, a reset followed by a new device can leave one passkey without saved codes once its authority is
+> restored. It is unreachable while `QED_DELIVERY=none`, because no reset can be sent. Switching email on earlier opens it.
+> The Google variables carry no such condition and can be set on their own. Ask for the go-ahead (the next release's note
+> says when RISK-123 is closed) before the Postmark steps 3 and 4.
+
+### 25.1 Postmark (email)
+
+1. **An account and a server.** Create a Postmark account. Create a server (as the console names it, "Servers", then
+   "Create Server"); its default message streams include a transactional one, whose id is `outbound` (as the console
+   shows it under the stream's settings). QED sends transactional mail only: sign-up confirmations, password resets and
+   security notices. Postmark reviews a new account before it may send to addresses outside your own domain (its error
+   413, "not approved to send"; error 412 while pending: every recipient must share the sender's domain). Ask Postmark to
+   approve the account, and say what QED sends.
+2. **A sending domain.** Use a subdomain so the root domain's mail is untouched, for example `mail.<your domain>`. In the
+   console, find where a domain is added as a sender (as the console names it, "Sender Signatures", then "Add Domain or
+   Signature", "Add Domain"). Postmark then shows the exact records to publish at your DNS host. Publish them exactly as
+   shown; the names and kinds are:
+
+   | Record | Where | Value |
+   |---|---|---|
+   | DKIM | a TXT record at the host name Postmark shows (it ends `._domainkey.mail.<your domain>`) | the long `k=rsa; p=...` value Postmark shows |
+   | Return-Path | a CNAME at `pm-bounces.mail.<your domain>` | `pm.mtasv.net` |
+   | DMARC | a TXT record at `_dmarc.mail.<your domain>` (or `_dmarc.<your domain>` to cover the whole domain) | start with `v=DMARC1; p=none; rua=mailto:<an address you read>`; tighten to `p=quarantine` once the reports are clean |
+   | SPF | only if you also send from the root domain: add `include:spf.mtasv.net` to the root domain's one SPF TXT record | not needed for a subdomain that sends through the Return-Path above |
+
+   Then use the console's "Verify" for DKIM and for the Return-Path. DNS changes can take minutes to hours.
+   Do not guess the DKIM value: copy it from the console.
+3. **The sender and the three variables.** The token is a Server API token (as the console names it, the server's "API
+   Tokens" tab). Enter it yourself in Railway; do not paste it into a chat, a file in the repository or this runbook. In
+   the Railway dashboard, service `qed-judges-preview`, "Variables":
+
+   | Variable | Value |
+   |---|---|
+   | `QED_POSTMARK_TOKEN` | the Server API token (a Railway secret; QED never logs it, and refuses to start if it is missing or malformed) |
+   | `QED_MAIL_FROM` | for example `QED <no-reply@mail.<your domain>>`: an address on the verified domain |
+   | `QED_POSTMARK_STREAM` | `outbound`, or the id of your transactional stream; unset means `outbound` |
+   | `QED_DELIVERY` | `postmark` (set this one last, only after the RISK-123 release is live) |
+
+   Set the first three, check the service starts, then set `QED_DELIVERY=postmark`; Railway redeploys. A wrong or missing
+   value stops the service at start with a plain reason in its log, not with a message that looks sent.
+4. **Test with one real inbox.** Sign up for a new account with an address you own (or add it under Security). Within
+   seconds a message "Confirm your email address for QED" should arrive; open its link, and the address shows as
+   verified. The address is used for getting back in only after the protection delay (the Security page says how long).
+   Then ask to reset the password from the sign-in page, after that delay, and check the message and its link arrive and
+   work. In Postmark's "Activity" for the server (as the console names it) the message shows as delivered; QED keeps
+   Postmark's MessageID with it. If nothing arrives, look at the message's row on the Security page ("Send it again"), the
+   service log (it records counts and error codes only, never an address or a link) and Postmark's Activity.
+   QED keeps no text of a message once sent. A message Postmark cannot take for a short while (rate limit, an error of its
+   own, no answer in 10 seconds) is tried again for ten minutes; any other refusal is final and recorded with Postmark's
+   error code.
+
+What it does not do: send text messages (no phone number can be confirmed while Postmark is the only provider; the form is
+not shown), and track opens or links (both are off, so a link reaches the page as written).
+
+### 25.2 Google sign-in
+
+Setting `QED_GOOGLE_CLIENT_ID` and `QED_GOOGLE_CLIENT_SECRET` together draws the button and turns the routes on; one
+without the other stops the service at start.
+
+1. **A Cloud Console project.** In Google Cloud Console (console.cloud.google.com), create a project for QED, for example
+   "QED judges preview".
+2. **The consent screen.** Find the OAuth consent screen (as the console names it, "APIs & Services", then "OAuth consent
+   screen"; newer consoles call the area "Google Auth Platform"). Choose the user type **External**. Name the app, give a
+   support email and a developer contact. Scopes: only `openid`, `email` and `profile`, which need no Google review.
+   Leave the publishing status on **Testing** and, under the test users (as the console names them), add the Google accounts
+   you will try it with, your own first. In Testing mode only those accounts can sign in, and Google may show a warning
+   that the app is not verified. Publishing it for everyone ("In production") may need a verified domain and Google's
+   brand verification; this is Google's decision, not QED's, and is NOT VERIFIED here. Decide that after the test
+   accounts work.
+3. **A Web application client.** Create credentials (as the console names it, "Credentials", then "Create credentials",
+   "OAuth client ID") of the type **Web application**. Under **Authorized redirect URIs** add exactly:
+
+   `https://qed-judges-preview-production.up.railway.app/auth/google/callback`
+
+   No trailing slash, https, the same host as the public URL. Leave "Authorized JavaScript origins" empty: QED uses the
+   redirect flow only. Google shows the client ID and the client secret; copy them straight into Railway.
+4. **The two variables** (Railway dashboard, service `qed-judges-preview`, "Variables"; the owner enters them, nobody else
+   sees the secret):
+
+   | Variable | Value |
+   |---|---|
+   | `QED_GOOGLE_CLIENT_ID` | the client ID (ends `.apps.googleusercontent.com`) |
+   | `QED_GOOGLE_CLIENT_SECRET` | the client secret |
+
+   Railway redeploys; a change of the redirect URI at Google can take a few minutes to apply.
+5. **What the person sees.** On the sign-in page a button "Continue with Google" (no "stand-in" label: that appears only on
+   a test stack). It opens Google's own account chooser; after the choice Google sends the browser back to
+   `/auth/google/callback` and QED opens the account. A first-time Google account gets a new QED account of its own (its
+   address is marked confirmed because Google states it is). A Google account is never merged into an existing QED
+   account because the addresses match: to use Google with an account that exists, sign in to it first and add Google
+   under Security. A person whose Google account has an unconfirmed address is refused in plain words. Google-only
+   accounts have no saved codes until a device is set up (RISK-124).
+6. **Test.** With one of your test users, press the button, choose the account, and check you land signed in; sign out and
+   do it again, and check you reach the same account. Then try an account that is not a test user: Google should refuse it
+   before QED sees anything.
+
+What QED checks (all by code, tested against a local stand-in): the `state`, a nonce, PKCE (S256), a cookie tying the
+callback to the browser that began, the ID token's signature against Google's published keys (RS256 only), its issuer,
+audience, expiry and nonce, and `email_verified`. The authorization response's `iss` (RFC 9207) is checked whenever Google
+sends it; Google's authorization response may not carry one, and QED then accepts it only because the one issuer it is
+configured with is `https://accounts.google.com` (RFC 9207 allows this for a client of a single authorization server).
+Whether Google's real responses send `iss` today is NOT VERIFIED here.

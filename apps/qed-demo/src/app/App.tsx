@@ -13,6 +13,8 @@ import { api, ApiError, beginSignOut, endSignOut, fmt, handAsk, match, navigate,
 import { addPasskey, beginGoogle, confirmWithPasskey, holdCodes, takeCodes, type DeviceCheck, deviceCheck, deviceWords, passkeyAutofillAvailable, passkeysAvailable, signIn, signInWithAutofill, signInWithPassword, signUp, signUpWithEmail, stopAutofill } from '../lib/passkey.ts'
 import { DEVICE_SIGN_IN, NO_DEVICE_CHECK, NO_PASSKEYS_AT_ALL, ORDINARY_SIGN_IN_LIMIT } from '../../shared/access-operations.ts'
 import { outboxWords } from '../../shared/delivery-words.ts'
+import { homeCurrency } from '../../shared/home-money.ts'
+import { entryFormat } from '../lib/money-entry.ts'
 import { Btn, Crumb, Field, Link, Loading, Logo, MoneyInput, Note, Orb, PasswordField, Problem, Seal, SectionNav, type SessionInfo, SessionCtx, Sheet, SourceNote, useAction, useSession, useStickySide } from '../ui/kit.tsx'
 import { SavedCodes } from '../ui/SavedCodes.tsx'
 import { applyFx, type Fx, readFx, setFx, useArrival, useDockIndicator, useSection } from '../ui/motion.ts'
@@ -983,7 +985,7 @@ function Dock({ path }: { path: string }) {
 
 /** What a person on each page is likely to ask. None names a payee: Ask sends a question exactly as written. */
 const DOCK_SUGGEST: [string, string[]][] = [
-  ['/pay', ['Can I afford a payment of ₹50,000 today?', 'Which of my bills does no instruction pay?']],
+  ['/pay', ['Can I afford a payment of {AMOUNT} today?', 'Which of my bills does no instruction pay?']],
   ['/save', ['How long would my money last if my salary stopped?', 'How much could I set aside each month?']],
   ['/holdings', ['How much could my investments lose in a bad month?', 'What happens if Bitcoin falls 20%?']],
   ['/earn', ['Which client payments are still held in escrow?', 'What is left to deliver this month?']],
@@ -1011,7 +1013,9 @@ function AskField({ path }: { path: string }) {
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
   }, [])
-  const chips = (DOCK_SUGGEST.find(([p]) => (p === '/' ? path === '/' : path.startsWith(p))) ?? DOCK_SUGGEST[DOCK_SUGGEST.length - 1]!)[1]
+  // a round sum in the household's own currency (₹50,000, $500, ¥50,000), written as the screens write money
+  const round = fmt.money((entryFormat().places === 0 || homeCurrency() === 'INR' ? 50_000 : 500) * entryFormat().unit)
+  const chips = (DOCK_SUGGEST.find(([p]) => (p === '/' ? path === '/' : path.startsWith(p))) ?? DOCK_SUGGEST[DOCK_SUGGEST.length - 1]!)[1].map((c) => c.replace('{AMOUNT}', round))
   const send = (t: string) => { setQ(''); setOpen(false); input.current?.blur(); handAsk(t) }
   return (
     <form className="ask-field" role="search" aria-label="Ask QED" onSubmit={(e) => { e.preventDefault(); if (q.trim()) send(q.trim()) }}

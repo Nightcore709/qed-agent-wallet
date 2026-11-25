@@ -626,7 +626,7 @@ function AddressesPanel({ addresses, legacyPw, onChanged }: { addresses: Address
         <Field label={replacing?.kind === 'email' ? 'New email address' : 'Add an email address'} hint="Any ordinary address, Gmail included. A link and a code are sent to confirm it." error={add.error?.fields.address && (email || !phone) ? add.error.fields.address : undefined}>{(p) => <input {...p} className="input" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} />}</Field>
         <Btn type="submit" busy={add.busy} disabled={!email.trim()}>Send a confirmation</Btn>
       </form> : null}
-      {session.delivery !== 'none' && (!confirmedPhone || replacing?.kind === 'phone') ? <form className="sy-contact" onSubmit={(e) => { e.preventDefault(); void add.run('phone') }}>
+      {session.delivery !== 'none' && session.delivery !== 'postmark' && (!confirmedPhone || replacing?.kind === 'phone') ? <form className="sy-contact" onSubmit={(e) => { e.preventDefault(); void add.run('phone') }}>
         <Field label={replacing?.kind === 'phone' ? 'New phone number' : 'Add a phone number for security notices'} hint="With its country code, such as +91 98765 43210. It receives short notices only: a text message is easier to intercept than email, so it is never a way back in." error={add.error?.fields.address && phone && !email ? add.error.fields.address : undefined}>{(p) => <input {...p} className="input" type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />}</Field>
         <Btn type="submit" busy={add.busy} disabled={!phone.trim()}>Send a code</Btn>
       </form> : null}

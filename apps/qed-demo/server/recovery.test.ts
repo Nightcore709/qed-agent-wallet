@@ -618,8 +618,8 @@ describe('delivery: the local test outbox sends nothing and says so; a provider 
     for (const id of ['q1', 'q2']) db.run(`INSERT INTO outbound_messages (id, channel, to_address, purpose, subject, body, created_at, status, adapter) VALUES (?, 'email', 'a@b.in', 'p', 's', 'link http://x/#token=abc', 1, 'queued', 'none')`, id)
     let calls = 0
     const fake = { name: 'fake', simulated: false, send: async (m: { id: string }) => { calls++; if (m.id === 'q2') throw new Error('refused by the fake'); return { providerRef: `ref-${m.id}` } } }
-    expect(await dispatchQueued(db, fake, 5)).toEqual({ sent: 1, failed: 1 })
-    expect(await dispatchQueued(db, fake, 6)).toEqual({ sent: 0, failed: 0 })
+    expect(await dispatchQueued(db, fake, 5)).toEqual({ sent: 1, failed: 1, retrying: 0 })
+    expect(await dispatchQueued(db, fake, 6)).toEqual({ sent: 0, failed: 0, retrying: 0 })
     expect(calls).toBe(2)
     expect(db.get(`SELECT status, provider_ref, body FROM outbound_messages WHERE id = 'q1'`)).toEqual({ status: 'sent', provider_ref: 'ref-q1', body: '(sent; the text is not kept)' })
     expect(db.get(`SELECT status, error FROM outbound_messages WHERE id = 'q2'`)).toEqual({ status: 'failed', error: 'refused by the fake' })

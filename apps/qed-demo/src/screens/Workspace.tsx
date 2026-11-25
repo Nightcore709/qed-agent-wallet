@@ -13,7 +13,7 @@ import { ApprovalSheet } from '../ui/instrument.tsx'
 import { Btn, Field, Loading, MoneyInput, Note, Problem, useAction, useSession } from '../ui/kit.tsx'
 import { listed } from './Protect.tsx'
 import { policyLowering } from './Security.tsx'
-import { VaultRequest } from './Vault.tsx'
+import { plain, VaultRequest } from './Vault.tsx'
 
 type Role = 'owner' | 'admin' | 'approver' | 'operator' | 'viewer'
 interface Policy { signers: number; makerChecker: boolean; largePaise: number | null; largeSigners: number | null; bands: { fromPaise: number; signers: number }[]; limits: Record<string, number> }
@@ -78,11 +78,12 @@ export function WorkspaceScreen() {
       {business ? (
         <section className="pg-sec" aria-labelledby="queue-h">
           <div className="pg-sec-head"><div className="pg-sec-t"><h2 id="queue-h">Requests waiting for signatures</h2>{open.data?.approvals.length ? <span className="pg-aside">{open.data.approvals.length} waiting</span> : null}</div></div>
+          <p className="wk-lede">A request is prepared by QED or a member. Nothing moves until {ws.policy.signers === 1 ? 'a member who may sign has signed' : `${ws.policy.signers} different members have signed`} with a passkey; one that is not signed in time simply expires and moves nothing. Review and sign opens the exact text before you sign. This page does not approve anything: the vault\'s contract and QED\'s co-signer check each signature.</p>
           {!open.data ? (open.error ? <Problem error={open.error} /> : <Loading what="Reading the requests" />)
             : open.data.approvals.length ? <ul className="pg-sheet wk-rows">{open.data.approvals.map((o) => (
               <li key={o.id} className="wk-need">
                 <span className="wk-count" aria-hidden="true">{o.signed}<small>/{o.required}</small></span>
-                <div className="wk-main"><p className="wk-t">{summary(o)}</p><p className="wk-d">{o.signed} of {o.required} signatures; prepared {fmt.dayTime(o.createdAt)}; expires {fmt.rel(o.expiresAt, now)}</p>{o.why ? <p className="wk-d">{o.why}</p> : null}</div>
+                <div className="wk-main"><p className="wk-t">{plain(summary(o))}</p><p className="wk-d">{o.signed} of {o.required} signatures; prepared {fmt.dayTime(o.createdAt)}; expires {fmt.rel(o.expiresAt, now)}</p>{o.why ? <p className="wk-d">{o.why}</p> : null}</div>
                 {o.canSign ? <span className="wk-acts"><Btn small tone="fill" onClick={() => setSigning(o)}>Review and sign</Btn></span> : null}
               </li>
             ))}</ul>

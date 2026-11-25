@@ -25,7 +25,7 @@ import { SavedCodes } from '../ui/SavedCodes.tsx'
 import { addFirstPasskey, confirmWithPasskey, deviceWords, passkeysAvailable, platformPasskeyAvailable, setUpVaultWithTokens, signForVault } from '../lib/passkey.ts'
 import { EnforcedBy, EnforcementKey, type Enforcer } from '../ui/enforced.tsx'
 import { ApprovalSheet, type PendingApproval } from '../ui/instrument.tsx'
-import { Btn, Crumb, Field, Link, Loading, Mark, MoneyBar, Note, Problem, Src, Stamp, Swatch, useAction, useMasonry, useSession } from '../ui/kit.tsx'
+import { Btn, Crumb, Field, Link, Loading, Mark, MoneyBar, Note, Problem, Src, Stamp, Swatch, useAction, useMasonry, useSession, useStickySide } from '../ui/kit.tsx'
 
 
 interface Asset { symbol: string; decimals: number }
@@ -1334,6 +1334,7 @@ function MandateDoc({ m }: { m: MandateView }) {
 
 /** The mandate's own page: the signed document beside revoking it, a new mandate and the earlier versions. */
 function MandatePage({ st }: { st: RailState }) {
+  const side = useStickySide<HTMLDivElement>()
   const va = useVaultAction()
   const { main } = useUnits()
   const mandates = useData<{ mandates: MandateView[] }>('/api/vault/mandates', ['vault'])
@@ -1344,7 +1345,7 @@ function MandatePage({ st }: { st: RailState }) {
       <div className="vt-col">
         {st.mandate ? <MandateDoc m={st.mandate} /> : <Note tone="wait" title="No mandate is in force">QED can pay no one from the wallet until you sign one beside this.</Note>}
       </div>
-      <div className="vt-col">
+      <div className="vt-col sticky-side" ref={side}>
         {active ? (
           <section className="panel" aria-labelledby="mr-h">
             <div className="panel-head"><h2 id="mr-h">Revoke it</h2><EnforcedBy by="contract" /></div>
@@ -1693,7 +1694,7 @@ function Convert({ st }: { st: RailState }) {
           </section>
         ) : null}
 
-        <section data-col="2" className="panel" aria-labelledby="lt-h">
+        <section data-col="1" className="panel" aria-labelledby="lt-h">
           <div className="panel-head"><h2 id="lt-h">The last conversion</h2>{t ? <Link to={`/vault/job/${t.jobId}`}>Its record</Link> : null}</div>
           {t ? <>
             {/* finish review F4: the plain result here; block numbers and parts per million one step down */}
@@ -1792,6 +1793,7 @@ function TickLog({ ticks }: { ticks: Tick[] }) {
 }
 
 function Policy({ st }: { st: RailState }) {
+  const side = useStickySide<HTMLDivElement>()
   const va = useVaultAction()
   const { main, reserve } = useUnits()
   // the Overview's way of writing money: ₹ and $ on the figure, the unit in words; dollar figures to the cent
@@ -1846,7 +1848,7 @@ function Policy({ st }: { st: RailState }) {
           ) : <Note tone="wait" title="No standing policy is in force">Sign one and the reserve is kept topped up without you, inside the mandate's limits.</Note>}
           <Problem error={run.error ?? va.error} />
         </div>
-        <div className="vt-col">
+        <div className="vt-col sticky-side" ref={side}>
           {active ? (
             <details className="panel vt-more"><summary>Sign a different policy <span>It replaces the one in force; the old one is refused from then on</span></summary>{form}</details>
           ) : (
@@ -2000,7 +2002,42 @@ function JobList({ jobs }: { jobs: Job[] }) {
   )
 }
 
+/**
+ * R14: the first lines of each wallet tab, in plain words: where the money is and in what state, what QED may do alone,
+ * what needs your passkey, and how to stop or inspect it. It describes; it approves and enforces nothing. The wallet's
+ * contract and QED's co-signer do the enforcing, and each action is still signed with your passkey over its exact terms.
+ */
+function TabBrief({ st, sub }: { st: RailState; sub: string }) {
+  const { main, reserve } = useUnits()
+  const t = st.treasury, active = st.mandate?.status === 'active' ? st.mandate : null
+  const policyOn = st.policy?.status === 'active'
+  const where = `${money(t.free, main)} is free in the treasury, ${money(t.ringFenced, main)} is set aside for promises and ${money(st.reserve.balance, reserve)} is in the dollar reserve. All of it is test money on a chain that runs on this computer${t.paused ? '; the wallet is paused, so nothing can move' : ''}.`
+  const alone = sub === 'mandate' ? (active ? `Pay the payees the mandate names and convert, each only inside its limits: at most ${money(active.fields.maxPerPayment, main)} in one payment. Nothing else.` : 'Nothing. With no mandate in force, QED can pay no one.')
+    : sub === 'treasury' ? 'Nothing on this page. A payment or a set-aside is prepared here and only sent after you sign its exact terms with your passkey.'
+    : sub === 'convert' ? 'Only what you ask for here, and only inside the mandate. QED\'s checking service also refuses a conversion that its authority budget does not allow.'
+    : sub === 'policy' ? (policyOn ? 'Convert one tranche at a time to keep the dollar reserve topped up, every five minutes, without asking each time. Each tranche stays inside the mandate and the policy\'s own limits.' : 'Nothing. No standing policy is in force, so QED converts only what you approve one by one.')
+    : 'Nothing. This page only reads what has been recorded.'
+  const needs = sub === 'mandate' ? 'Signing a mandate, replacing it or revoking it: each is signed with your passkey.'
+    : sub === 'treasury' ? 'Every payment, every set-aside, every grant of more authority and every deposit or withdrawal: each is signed with your passkey.'
+    : sub === 'convert' ? 'Each conversion: you read the limits and a price, then sign.'
+    : sub === 'policy' ? 'Signing a policy, replacing it or ending it. The ticks that follow are QED\'s, inside what you signed.'
+    : 'Nothing here. A record cannot be approved, changed or repeated from this page.'
+  const stop = sub === 'records' ? 'Each row opens its record: the checks, the result and the evidence. Decision records are chained, so a changed record shows.'
+    : 'Pause the wallet or revoke the mandate under "Stop or change it" on the Overview; either takes effect on the chain as soon as it is recorded. Every action has a record under Records.'
+  return (
+    <section className="panel vt-brief" aria-label="In plain words">
+      <dl className="kv">
+        <dt>Where the money is</dt><dd>{where}</dd>
+        <dt>QED may do alone</dt><dd>{alone}</dd>
+        <dt>Needs your passkey</dt><dd>{needs}</dd>
+        <dt>To stop or inspect</dt><dd>{stop}</dd>
+      </dl>
+    </section>
+  )
+}
+
 function Records() {
+  const side = useStickySide<HTMLElement>()
   const dec = useData<{ decisions: DecisionRecord[] }>('/api/vault/decisions?limit=40')
   const ver = useData<{ ok: boolean; records: number; brokenAt: number | null; head: string }>('/api/vault/decisions-verify')
   const jobs = useData<{ jobs: Job[] }>('/api/vault/jobs?limit=30')
@@ -2030,7 +2067,7 @@ function Records() {
           <div className="panel-head"><h2 id="rj-h">Everything the wallet was asked to do</h2><p>Newest first; repeats folded</p></div>
           {jobs.data?.jobs.length ? <JobList jobs={jobs.data.jobs} /> : jobs.error ? <Problem error={jobs.error} /> : jobs.data ? <p className="vt-empty">Nothing yet. Each action you approve appears here, with its record.</p> : <Loading />}
         </section>
-        <section className="panel" aria-labelledby="re-h">
+        <section className="panel sticky-side" ref={side} aria-labelledby="re-h">
           <div className="panel-head"><h2 id="re-h">Historical evidence from the public test network</h2><Stamp tone="plain">Historical</Stamp></div>
           {ev.data ? <>
             <p className="vt-panel-say">{ev.data.note} These are records of what the approved release did on {ev.data.network.replace(/\s*\(chain \d+\)/, '')} in the past: {ev.data.counts.transactions} transactions, of which {ev.data.counts.reverted} reverted as intended, and {ev.data.counts.contracts} contracts. They are shown from the saved files. Nothing here was checked against that network today.</p>
@@ -2082,6 +2119,7 @@ export function VaultScreen({ sub }: { sub: string }) {
     <Ws.Provider value={d ?? null}><Units.Provider value={ws ? { main: ws.asset, reserve: ws.reserveAsset } : UNITS}>
       <div className="vt">
         <Head sub={sub} state={stage === 'owned' || stage === 'offered' ? st : null} stage={stage} nav={stage === null || stage === 'owned'} />
+        {stage === 'owned' && st?.provisioned && ['mandate', 'treasury', 'convert', 'policy', 'records'].includes(sub) ? <TabBrief st={st} sub={sub} /> : null}
         {body}
       </div>
     </Units.Provider></Ws.Provider>
@@ -2132,7 +2170,7 @@ export function VaultJobScreen({ id }: { id: string }) {
   return (
     <div className="vt vt-job">
       <header className="page-head vt-job-head">
-        <div><Crumb to="/vault">On-chain wallet</Crumb><div className="vt-job-state">{j.status === 'confirming' ? <Stamp big>Confirming</Stamp> : j.status === 'reorged' ? <Stamp big tone="void">Not done</Stamp> : out ? <Stamp big tone={out[1]}>{out[0]}</Stamp> : <Stamp big tone={j.status === 'failed' || j.status === 'interrupted' ? 'void' : live ? undefined : 'plain'}>{live ? 'Running' : cap(j.status)}</Stamp>}</div><h1>{title}</h1><p><Src kind="chain" /></p>{more ? <p className="wrap-any">{more}</p> : null}{!live && !j.error && out?.[1] === 'ok' ? <p className="wrap-any">A finished action on the test wallet. Its checks, its result and its evidence are below; nothing on this page can change or repeat it.</p> : live ? <p className="wrap-any">Still running. This page updates by itself, and nothing here needs you.</p> : null}<p className="vt-job-when">Asked {iso(j.createdAt)}{j.finishedAt ? `, finished ${iso(j.finishedAt)}` : ''}. {chainLine(j.network)}</p></div>
+        <div><Crumb to="/vault">On-chain wallet</Crumb><div className="vt-job-state">{j.status === 'confirming' ? <Stamp big>Confirming</Stamp> : j.status === 'reorged' ? <Stamp big tone="void">Not done</Stamp> : out ? <Stamp big tone={out[1]}>{out[0]}</Stamp> : <Stamp big tone={j.status === 'failed' || j.status === 'interrupted' ? 'void' : live ? undefined : 'plain'}>{live ? 'Running' : cap(j.status)}</Stamp>}</div><h1>{title}</h1><p><Src kind="chain" /></p>{more ? <p className="wrap-any">{more}</p> : null}{!live && !j.error && out?.[1] === 'ok' ? <p className="wrap-any">A finished action on the test wallet. Its checks, its result and its evidence are below; nothing on this page can change or repeat it.</p> : live ? <p className="wrap-any">Still running. Money moves only when its last step passes. This page updates by itself and nothing here needs you; to stop the wallet, pause it under Stop or change it on the Overview.</p> : !j.error && out?.[0] && r?.outcome === 'refused' ? <p className="wrap-any">Nothing moved. {refusedBy(r) === 'contract' ? 'The wallet\'s contract refused it on the chain' : 'QED\'s checks refused it before anything was sent'}, so no money left the wallet. You can ask again with different terms; nothing here needs you.</p> : !j.error && r?.outcome === 'reverted' ? <p className="wrap-any">Nothing moved. The chain mined it as a revert, so the wallet\'s balances are as they were. The record is kept below; sending it again is your choice, and it needs your passkey again.</p> : !j.error && r?.outcome === 'scheduled' ? <p className="wrap-any">Not done yet. It waits out the wallet\'s delay, and until then any of your passkeys can cancel it under Changes waiting out the delay on the Overview.</p> : null}<p className="vt-job-when">Asked {iso(j.createdAt)}{j.finishedAt ? `, finished ${iso(j.finishedAt)}` : ''}. {chainLine(j.network)}</p></div>
       </header>
       {j.status === 'confirming' ? <Note tone="wait" title="Mined, waiting for its confirmations">Its transaction is in block {j.confirmations?.block ?? 'not read yet'}, with {j.confirmations?.have ?? 0} of the {j.confirmations?.need ?? 2} confirmations an operation needs before QED reports it done (the block itself counts as one). If a reorganisation of the chain replaces that block first, it is reported as not done, never as done.</Note> : null}
       {j.error ? <Note tone="void" title={j.status === 'interrupted' ? 'The service stopped while this was running' : j.status === 'reorged' ? 'A reorganisation of the chain undid it' : 'It stopped with an error'}>{plain(j.error)}{j.guidance ? <span className="vt-block">{plain(j.guidance)}</span> : null}</Note> : null}
