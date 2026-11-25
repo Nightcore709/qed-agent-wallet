@@ -16,6 +16,7 @@ import { dayText, istDay } from '../../shared/day-text.ts'
 import { decisionWords } from '../../shared/latency.ts'
 import { canonical, sha256 } from '../../shared/sha256.ts'
 import { api, fmt, sourceName, useData, useNow } from '../lib/core.ts'
+import { expiredLine, standsUntilLine } from '../lib/order-expiry.ts'
 import { fundStages } from '../lib/fund-stages.ts'
 import type { ActionView, Check, Receipt, RecordView } from '../lib/types.ts'
 import { Btn, Crumb, Field, Link, Note, Problem, Seal, Stamp, StateStamp, stateWord, useAction, useSession, needsAttention } from '../ui/kit.tsx'
@@ -70,13 +71,14 @@ function outcome(a: ActionView, now = Date.now(), paused = false): string {
   }
   if (!i) return stateWord(a.state)
   const fund = i.kind === 'mutual_fund', buy = a.params.side === 'buy', filled = n(r.filledQty) > 0
-  if (!TERMINAL.has(a.state)) return filled ? `${qtyText(r.filledQty, i.baseScale)} ${fund ? 'units' : i.baseAsset} done so far. ${inProgressLine(a)}` : inProgressLine(a)
+  if (!TERMINAL.has(a.state)) { const stands = standsUntilLine(a); return `${filled ? `${qtyText(r.filledQty, i.baseScale)} ${fund ? 'units' : i.baseAsset} done so far. ` : ''}${inProgressLine(a)}${stands ? ` ${stands}.` : ''}` }
   const back = fund && buy ? ' The money was returned to your bank account.' : ''
+  if (!filled && a.state === 'expired') return `${expiredLine(a) ?? 'It expired'}. Nothing was ${buy ? 'bought' : 'sold'}.${back}`
   if (!filled) return a.state === 'cancelled' ? `Cancelled with nothing done.${a.error ? ` ${a.error}` : ''}${back}` : `Nothing was ${buy ? 'bought' : 'sold'}: ${a.error ?? stateWord(a.state).toLowerCase()}${back}`
   const avg = n(r.filledAmount) / 100 / (n(r.filledQty) / 10 ** i.baseScale)
   const what = `${qtyText(r.filledQty, i.baseScale)} ${fund ? `units of ${i.name}` : i.baseAsset}`
   const costs = [n(r.fees) ? `${fund ? 'an exit load of' : 'a venue fee of'} ${fmt.money(n(r.fees), true)}` : '', n(r.taxes) ? `${fund ? 'stamp duty of' : 'tax deducted at source of'} ${fmt.money(n(r.taxes), true)}` : ''].filter(Boolean).join(' and ')
-  const part = a.state === 'done' ? '' : ` Only part was done; the rest was ${a.state === 'expired' ? 'left to lapse' : 'cancelled'}${a.error ? ` (${a.error.replace(/\.$/, '')})` : ''}.`
+  const part = a.state === 'done' ? '' : a.result.expired === true ? ` ${expiredLine(a) ?? ''}.` : ` Only part was done; the rest was ${a.state === 'expired' ? 'left to lapse' : 'cancelled'}${a.error ? ` (${a.error.replace(/\.$/, '')})` : ''}.`
   const at = `at ${fund ? 'a NAV' : 'an average'} of ${rupee(String(avg), fund ? 4 : 2)}${costs ? `, with ${costs}` : ''}`
   return buy ? `Bought ${what} ${at}. ${moved} left your bank account.${part}`
     : `${fund ? 'Redeemed' : 'Sold'} ${what} ${at}. ${moved} ${fund && r.payoutAt ? `reaches your bank account ${fmt.dayTime(n(r.payoutAt))}` : 'reached your bank account'}.${part}`

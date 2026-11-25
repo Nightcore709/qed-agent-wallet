@@ -38,6 +38,7 @@ import { FUND_PAY_IN_MS, fundEntitlement, matchBook, navEntitlement, payoutInsta
 import { dayText, istDay } from '../shared/day-text.ts'
 import { floorToStep, fraction, mulDiv, notional, parseDec, parsePrice, pow10, quantityFor } from '../shared/fixed.ts'
 import { canonical } from '../shared/sha256.ts'
+import { resolveValidity, standsUntilText } from './validity.ts'
 import { closedText, DATA_LABEL, isSecurity, securityCosts, sessionOf } from './securities.ts'
 
 /** At or above this size, or when an action takes the worst case below the floor or dips into the bank reserve, the password is asked again. */
@@ -110,6 +111,8 @@ async function buildOrder(ctx: Ctx, userId: string, raw: Raw, now: number): Prom
   // R7-057: refused where it is not offered, with the reason (server/eligibility.ts)
   assertOffered(instrumentOffer({ id: inst.id, kind: inst.kind, venue: inst.venue, name: inst.name, tradable: inst.tradable === 1 }), jurisdictionOf(getProfile(db, userId)))
   const side: Side = raw.side === 'sell' ? 'sell' : 'buy'
+  // a fund, a share, an ETF, a bill or a bond cannot rest: a time to stand until is refused here, as it is on a coin market order
+  if (inst.kind === 'mutual_fund' || isSecurity(inst)) resolveValidity(raw, 'market', now)
   const lines: Built['lines'] = [], warnings: string[] = [], basis: string[] = []
   const lim = limitFor(db, inst)
   const free = available(db, userId, `pos:${inst.id}`)
@@ -157,6 +160,8 @@ async function buildOrder(ctx: Ctx, userId: string, raw: Raw, now: number): Prom
   const best = parsePrice(levels[0]!.price)
   const priceText = (v: unknown, field: string): string => { if (typeof v !== 'string' || !/^\d+(\.\d+)?$/.test(v) || Number(v) <= 0) throw bad('Enter a price.', { [field]: 'Enter a price.' }); return v }
   const limitPrice = type === 'limit' ? priceText(raw.limitPrice, 'limitPrice') : undefined
+  // how long a resting order stands: a term of the order, so it is inside the document that is signed (validity.ts)
+  const validity = type === 'limit' ? resolveValidity(raw, type, now) : (resolveValidity(raw, type, now), undefined)
   const stopPrice = type === 'stop' ? priceText(raw.stopPrice, 'stopPrice') : undefined
   if (type === 'stop' && side !== 'sell') throw bad('A stop order here can only sell.', { type: 'A stop order here can only sell.' })
   const bound = limitPrice ? parsePrice(limitPrice) : side === 'buy' ? best + mulDiv(best, BigInt(slip), 10_000n, 'down') : best - mulDiv(best, BigInt(slip), 10_000n, 'down')
@@ -173,7 +178,7 @@ async function buildOrder(ctx: Ctx, userId: string, raw: Raw, now: number): Prom
       if (BigInt(raw.amount) < rules.minNotional) throw bad(`The venue's minimum is ₹${inst.meta.minNotional ?? '100'}.`, { amount: `The venue's minimum is ₹${inst.meta.minNotional ?? '100'}.` })
       const budget = mulDiv(BigInt(raw.amount), pow10(12), pow10(12) + parseDec(rules.feeRate, 12), 'down')
       want = { amount: budget }
-      params = { instrumentId: inst.id, side, type, amount: String(raw.amount), maxSlippageBps: slip, purpose: 'manual', ...(limitPrice ? { limitPrice } : {}) }
+      params = { instrumentId: inst.id, side, type, amount: String(raw.amount), maxSlippageBps: slip, purpose: 'manual', ...(limitPrice ? { limitPrice } : {}), ...(validity ? { validity } : {}) }
     } else throw bad('Enter the amount in rupees.', { amount: 'Enter the amount in rupees.' })
   } else {
     const sellAll = raw.sellAll === true
@@ -182,7 +187,7 @@ async function buildOrder(ctx: Ctx, userId: string, raw: Raw, now: number): Prom
     if (qty <= 0n) throw bad('Enter how much to sell.', { qty: `Enter how much to sell, in steps of ${inst.meta.qtyStep ?? '0.00001'}.` })
     if (qty > free) throw refused('insufficient_holding', `You have ${Number(free) / 10 ** inst.baseScale} ${inst.base_asset} free to sell.`)
     want = { qty }
-    params = { instrumentId: inst.id, side, type, qty: qty.toString(), maxSlippageBps: slip, purpose: 'manual', ...(limitPrice ? { limitPrice } : {}), ...(stopPrice ? { stopPrice } : {}) }
+    params = { instrumentId: inst.id, side, type, qty: qty.toString(), maxSlippageBps: slip, purpose: 'manual', ...(limitPrice ? { limitPrice } : {}), ...(stopPrice ? { stopPrice } : {}), ...(validity ? { validity } : {}) }
   }
   const m = matchBook(side, levels, want, type === 'stop' ? null : bound, inst.baseScale, inst.quoteScale, rules.step)
   // A purchase the venue would reject for being under its minimum is refused here, before the owner is asked to approve it.
@@ -207,6 +212,7 @@ async function buildOrder(ctx: Ctx, userId: string, raw: Raw, now: number): Prom
     if (!m.complete) warnings.push(m.stoppedBy === 'price_limit' ? `Only part of this would fill inside your ${(slip / 100).toFixed(2)}% price tolerance right now.` : 'The book does not show enough size for all of this right now; it would fill in part.')
   } else if (type === 'limit') {
     lines.push({ label: 'Limit price', value: Number(limitPrice).toLocaleString('en-IN'), basis: 'exact', note: m.filledQty > 0n ? 'Part or all of it would fill immediately at current prices' : 'It rests until the market reaches it, or you cancel' })
+    lines.push({ label: 'Stands until', value: standsUntilText(validity), basis: 'exact', note: validity && validity.kind !== 'gtc' ? 'When that time comes, what has not filled is cancelled and the money or holding set aside for it is free again. What filled stays.' : 'It stays on the book until it fills or you cancel it.' })
   } else {
     lines.push({ label: 'Sells when buyers offer', value: `${Number(stopPrice).toLocaleString('en-IN')} or less`, basis: 'exact', note: 'Then it sells at what buyers offer, which can be lower. It is not evaluated while price data is stale.' })
   }
