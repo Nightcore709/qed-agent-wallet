@@ -112,6 +112,45 @@ What the image does (`Dockerfile`, `scripts/deploy/entrypoint.sh`, `scripts/depl
 - Locally (macOS, the review build) everything still runs as one user; the co-signer's empty `HOME` and the hand-off of
   `QED_KEK` apply there too.
 
+## R14: what the co-signer's own user still needs (25 November 2026)
+
+F3 above and F-14 (the chain reached only over a socket in a folder of the wallet service's user) were each checked on
+their own. Together, on the deployed image, they left the co-signer unable to do its work, and no on-chain wallet could be
+set up in production (found on 25 Nov 2026 with a labelled test account, reproduced in a local container of the released
+image). Three faults, each fixed without giving the co-signer's user anything of the wallet service's:
+
+1. **Its decision records.** The wallet service pointed them into its own data folder (`/data/app/rail/workspaces/<id>/records`),
+   which the co-signer's user cannot enter: configuring the co-signer for a new workspace failed (`EACCES`), so every set-up
+   answered 503. They are now kept in the co-signer's own folder, `/data/cosigner/records/<workspace>`
+   (`chain/rail/cosigner-env.ts` `cosignerRecordsDir`). The wallet service never read those files: each verdict comes back
+   with its record's text, which it keeps in the workspace's own store.
+2. **The chain.** The co-signer certifies from what it reads on the chain, and could not open the chain's socket. Giving it
+   that socket would give it Anvil's own controls (balances, clocks, impersonation, state). It gets a second socket instead,
+   the chain's read-only door (`chain/rail/chain-socket.ts` `startReadOnlyDoor`), which forwards a fixed list of read calls
+   and refuses every other by name before it reaches the chain. The entrypoint makes `/run/qed-chain-door` on each start:
+   owner `node`, group `qedcosign`, mode 2750, so the socket made in it (0660) is the co-signer's group's and no other
+   user's. This is less than the co-signer had before F3, when it shared the chain's own socket, and it is the only path
+   the co-signer is given and uses. It is not a confinement: Anvil's loopback TCP listener has no credential and still
+   answers any local user, the co-signer's included (RISK-114), so a compromised co-signer could drive the test chain
+   directly. `isolation-check.ts` prints this as a LIMIT line. Closing it needs a chain with no TCP listener or one in its
+   own network namespace. A co-signer that runs as another user and has no door stops the wallet service at start, with
+   that reason.
+3. **A set-up that stopped part-way.** The registry recorded a workspace's contracts before the chain was saved, so after a
+   failed set-up the next start read contracts the saved chain did not hold, and the wallet service did not start for
+   anyone. An unfinished workspace is now completed at start, from where it stopped, and never keeps the others from
+   starting (`chain/rail/host.ts` `start`).
+
+Checked: `chain/test/cosigner-own-folder.test.ts`, `chain/test/chain-door.test.ts`, `chain/test/workspaces-http.test.ts`
+(the kill after the contracts were recorded); in a container of the image, `scripts/deploy/smoke.ts` (now an on-chain
+wallet created, accepted, given a mandate and paid from) and `isolation-check.ts`, its last three checks (as the co-signer's user:
+the chain's own socket refused, a read answered at the door, `anvil_setBalance` refused there).
+Rehearsed on 25 Nov 2026 with the image built from `988a11e`: the released image's volume (one wallet left unfinished by the
+fault) upgraded in place, the smoke's wallet created, accepted and paid from, `isolation-check.ts` 13 of 13, and a restart.
+Residual: the door's group is the co-signer's primary group, so any process of that user reaches it (reads only); the chain
+is a local Anvil chain whose own socket remains full control for the wallet service's user, and whose loopback TCP listener
+answers any local user (RISK-114, above; SECURITY.md section 8). The door keeps at most 256 calls waiting on the chain and
+the last 256 refused names.
+
 ## Independent review of the fixes (25 November 2026)
 
 A reviewer other than the fixes' author read the merged revision (`1cb35ad`). The final image was then built for

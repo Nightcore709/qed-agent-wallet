@@ -9,7 +9,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { openDb } from './core.ts'
-import { checkKeyFile, cosignerCommand, cosignerEnv, KEYS_FD } from '../chain/rail/cosigner-env.ts'
+import { checkKeyFile, cosignerCommand, cosignerEnv, cosignerRecordsDir, KEYS_FD } from '../chain/rail/cosigner-env.ts'
 import { withoutCaps } from '../chain/rail/caps.ts'
 
 const here = new URL('.', import.meta.url).pathname
@@ -75,6 +75,42 @@ describe('least privilege, per process', () => {
     expect(ep).toMatch(/refuse_link "\$data" "\$secrets" "\$secrets\/qed\.kek" "\$cosigner_dir"/)
     expect(ep).not.toMatch(/chown node:node "\$secrets/)
     expect(readFileSync(join(here, '../Dockerfile'), 'utf8')).toMatch(/TSX_DISABLE_CACHE=1/)
+  })
+
+  it('R14: a co-signer with a folder of its own keeps its decision records there, never in the wallet service\'s data folder, which its user cannot enter', () => {
+    // the container (scripts/deploy/entrypoint.sh): /data/cosigner is the co-signer user's, /data/app (mode 700) the service's
+    expect(cosignerRecordsDir('/data/cosigner', 'qed-be6628307fc62b0df071f7ce', '/data/app/rail/workspaces/qed-be6628307fc62b0df071f7ce/records')).toBe('/data/cosigner/records/qed-be6628307fc62b0df071f7ce')
+    expect(cosignerRecordsDir('/data/cosigner/', 'baseline', '/data/app/rail/records')).toBe('/data/cosigner/records/baseline')
+    // no folder of its own (a development machine, one user): the workspace's own records folder, as before
+    for (const none of [null, undefined, '']) expect(cosignerRecordsDir(none, 'alice-home', '/r/workspaces/alice-home/records')).toBe('/r/workspaces/alice-home/records')
+    // a scope is a single path component: nothing else is ever joined to the co-signer's folder
+    for (const bad of ['../app', 'a/b', '', '.', 'A_b', 'x'.repeat(64)]) expect(() => cosignerRecordsDir('/data/cosigner', bad, '/r')).toThrow(/scope/)
+    // the wallet service asks this rule for every workspace's co-signer configuration, the baseline's included
+    const host = readFileSync(join(here, '../chain/rail/host.ts'), 'utf8')
+    expect(host.match(/recordsDir: this\.cosignerRecords\(/g)?.length).toBe(2)
+    expect(host).not.toMatch(/configure\(\{[^\n]*recordsDir: ws\.recordsDir/)
+    // and the container's entrypoint gives the co-signer's user that folder, records included (chown -R; mode 700)
+    const entry = readFileSync(join(here, '../scripts/deploy/entrypoint.sh'), 'utf8')
+    expect(entry).toMatch(/chown -R qedcosign:qedcosign "\$cosigner_dir"/)
+    expect(entry).toMatch(/QED_COSIGNER_STATE_DIR="\$cosigner_dir"/)
+  })
+
+  it('R14: the co-signer is never handed the chain\'s own socket when it has a door: the wallet service gives it the read-only door, in a folder of the service\'s user and the co-signer\'s group', () => {
+    const host = readFileSync(join(here, '../chain/rail/host.ts'), 'utf8')
+    // every co-signer configuration takes its socket from one place, which prefers the door
+    expect(host).not.toMatch(/chainSocket: this\.anvil\.socketPath/)
+    expect(host.match(/chainSocket: this\.cosignerChainSocket/g)?.length).toBe(2)
+    expect(host).toMatch(/private get cosignerChainSocket\(\): string \{ return this\.chainDoor\?\.path \?\? this\.anvil\.socketPath; \}/)
+    // a co-signer that runs as another user and has no door stops the start, in words
+    expect(host).toMatch(/process\.env\.QED_COSIGNER_UID\) throw new Error\("The co-signer runs as its own user and has no way to read the chain/)
+    // the door is opened before the co-signer exists
+    expect(host.indexOf('await this.openChainDoor();')).toBeGreaterThan(0)
+    expect(host.indexOf('await this.openChainDoor();')).toBeLessThan(host.indexOf('this.cosigner = await this.makeCosigner();'))
+    const entry = readFileSync(join(here, '../scripts/deploy/entrypoint.sh'), 'utf8')
+    expect(entry).toMatch(/door=\/run\/qed-chain-door\n  refuse_link "\$door"\n  rm -rf "\$door"\n  mkdir -m 750 "\$door"\n  chown node:qedcosign "\$door"\n  chmod 2750 "\$door"/)
+    expect(entry).toMatch(/export QED_COSIGNER_UID QED_COSIGNER_GID QED_COSIGNER_STATE_DIR QED_COSIGNER_CHAIN_DIR/)
+    // the co-signer still starts with no supplementary group: the door's group is its own primary group
+    expect(cosignerCommand(['x'], { QED_COSIGNER_UID: '999', QED_COSIGNER_GID: '999' }).args).toContain('--clear-groups')
   })
 
   it('the co-signer\'s own code opens no keyring: it imports no key-handling module and reads its keys from the rail\'s pipe', () => {

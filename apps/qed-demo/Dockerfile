@@ -50,7 +50,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends tini procps && 
 # folder, nor its data folder, nor its processes' /proc entries (scripts/deploy/entrypoint.sh; docs/LEAST-PRIVILEGE.md).
 COPY --from=accounts /usr/local/bin/anvil /usr/local/bin/anvil
 WORKDIR /app/apps/qed-demo
-COPY --from=build /src/apps/qed-demo/package.json /src/apps/qed-demo/package-lock.json ./
+# RELEASE: the workspace revision a published tree was cut from (tooling/scripts/release.sh writes it); absent in a checkout
+COPY --from=build /src/apps/qed-demo/package.json /src/apps/qed-demo/package-lock.json /src/apps/qed-demo/RELEAS[E] ./
 COPY --from=build /src/apps/qed-demo/node_modules node_modules
 COPY --from=build /src/apps/qed-demo/dist dist
 COPY --from=build /src/apps/qed-demo/server server
@@ -67,7 +68,7 @@ COPY docs/research/qed-qa-reliability/runs/adversarial-live-calls.tsv /app/docs/
 # The revision: given by the builder, else Railway's commit variable (set when the deploy comes from GitHub).
 ARG QED_REVISION=""
 ARG RAILWAY_GIT_COMMIT_SHA=""
-RUN echo "${QED_REVISION:-$RAILWAY_GIT_COMMIT_SHA}" > REVISION \
+RUN r="${QED_REVISION:-$RAILWAY_GIT_COMMIT_SHA}"; [ -n "$r" ] || r="$(cat RELEASE 2>/dev/null || true)"; echo "$r" > REVISION \
  && anvil --version | head -1 && node --version \
  && test -f dist/index.html && test -f chain/accounts/out/QEDOwnerAccount.sol/QEDOwnerAccount.json \
  && test -f /app/docs/shared/RISK_REGISTER.md && test -f /app/docs/research/qed-fin-infra-compliance/20261123-jurisdiction-matrix.json \

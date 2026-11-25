@@ -31,6 +31,23 @@ export function cosignerCommand(entry: string[], env: Record<string, string | un
   return { file: env.QED_SETPRIV || "/usr/bin/setpriv", args: [`--reuid=${uid}`, `--regid=${gid}`, "--clear-groups", "--inh-caps=-all", "--ambient-caps=-all", "--no-new-privs", "--", process.execPath, ...entry] };
 }
 
+/**
+ * Where the co-signer writes the decision records of one workspace scope (R14). With a folder of its own (`own`: the
+ * container's QED_COSIGNER_STATE_DIR, which scripts/deploy/entrypoint.sh gives to the co-signer's user), they go there,
+ * beside its replay state: `<own>/records/<scope>`. That user cannot enter the wallet service's data folder (R13 review
+ * fix F3), so a records folder inside it stopped every new workspace: the co-signer could not be configured for it
+ * (EACCES), and no on-chain wallet could be set up on the deployed image (25 Nov 2026). Without a folder of its own (one
+ * user, a development machine) the records stay where they were, in the workspace's own folder (`fallback`).
+ * The wallet service does not read these files: every verdict comes back with its record's text, which it keeps in the
+ * workspace's own store.
+ */
+export function cosignerRecordsDir(own: string | null | undefined, scope: string, fallback: string): string {
+  if (!own) return fallback;
+  // one path component, as rail/cosigner.ts SCOPE_RE has it (not imported: this file imports nothing)
+  if (!/^[a-z0-9][a-z0-9-]{2,62}$/.test(scope)) throw new Error("invalid co-signer scope");
+  return `${own.replace(/\/+$/, "")}/records/${scope}`;
+}
+
 /** The key file's form: { "<scope>": { "<version>": "0x" + 64 hex } }, or the legacy { "<version>": "0x…" }. */
 export function checkKeyFile(b: Buffer): void {
   let raw: unknown;

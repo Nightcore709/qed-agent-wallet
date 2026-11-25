@@ -25,8 +25,8 @@ import { dirname, join } from 'node:path'
 import { approvalLapsed, createApproval, getApproval, LAPSED_TEXT, signApproval } from './approvals.ts'
 import { rateLimit, type Session } from './auth.ts'
 import { log } from './log.ts'
-import { AppError, audit, bad, type Config, type Db, emit, j, notFound, parse, refused } from './core.ts'
-import { activeContacts, approvingCredentials, beginReauth, type Credential, finishReauth, handleOf, type RelyingParty, securityEvent, settledCredentials } from './passkeys.ts'
+import { AppError, audit, bad, type Config, type Db, emit, j, notFound, parse, refused, whenIst } from './core.ts'
+import { activeContacts, approvingCredentials, beginReauth, coolingOffUntil, COOL_OFF_MS, type Credential, finishReauth, handleOf, hasPasskey, type RelyingParty, restrictedError, securityEvent, settledCredentials } from './passkeys.ts'
 import { passwordWork } from './prepared.ts'
 import { sha256hex } from './receipts.ts'
 import { canSign, members, policyOf, type Role } from './workspaces.ts'
@@ -41,8 +41,10 @@ export interface RailReply { status: number; json: Json }
 /** Who is asking: the workspace whose vault it is, the person signed in, their role there, and their session. */
 export interface Asker { workspaceId: string; personId: string; role: Role; session: Session }
 
-const OFF = 'The on-chain vault service is not running on this computer. Start it with "npm start" in apps/qed-demo/chain, then reload.'
-const STARTING = 'The on-chain vault service is starting. Its local chain, contracts, store and co-signer must all answer before it is ready.'
+// What the person is told when the wallet's service does not answer (R14): what is wrong, that nothing of theirs changed,
+// and what to do. How to start the service is the operator's matter and is said on the wallet's page behind a disclosure.
+const OFF = 'The on-chain wallet\'s service is not answering, so nothing on the chain can be read or done just now. Nothing was sent, and nothing in your wallet has changed. Try again in a minute.'
+const STARTING = 'The on-chain wallet\'s service is starting: its chain, contracts and co-signer must all answer before it is ready, which usually takes under a minute. Nothing needs doing; try again shortly.'
 const BASELINE = 'The vault service on this computer runs in baseline-parity mode: one vault owned by the release\'s development key, for the parity tests only. Owners\' vaults need the multi-tenant mode: start it with "npm start" in apps/qed-demo/chain on a data folder of that mode.'
 const SHARED_OWNER = 'Only the owner of this workspace can set up its vault: it makes every signing member\'s passkey a signer of the vault\'s owner account.'
 const CUSTODY = 'Your vault is owned by an account on the chain whose signers are your passkeys, as they were when you set it up. The vault service holds no key that can act as the owner: every owner action needs your passkey\'s signature over the exact digest shown, and the chain checks it before anything runs. The agent, co-signer, guardian and relayer keys are the service\'s own, derived from a secret on this computer; none of them can sign for the owner.'
@@ -131,7 +133,7 @@ function answer(r: RailReply): Json {
     // its own words only for the answers that say what to do and name nothing inside it (the chain starting, a workspace
     // being made, a part this chain does not have)
     if (e.code && SAYABLE.has(e.code) && typeof e.message === 'string') throw new AppError(503, e.code, e.message.slice(0, 300))
-    throw new AppError(503, 'rail_unavailable', 'The on-chain vault service could not do that just now. Nothing was changed by this request; try again in a moment.')
+    throw new AppError(503, 'rail_unavailable', 'The on-chain wallet\'s service could not finish that. Nothing was changed, and your passkey and your device are not the cause. Try again in a minute; if it fails again, the fault is in the service itself, and whoever runs this QED can read the reason in its log.')
   }
   throw new AppError(r.status === 401 ? 503 : r.status, e.code ?? 'rail_refused', e.message ?? 'The on-chain vault service refused that request.')
 }
@@ -218,6 +220,8 @@ export async function railOverview(cfg: RailCfg, db: Db, rp: RelyingParty, who: 
   const signersNow = v?.members?.map((m) => { const p = plan?.members.find((x) => x.personId === m.personId); const c = db.get<{ name: string }>('SELECT name FROM webauthn_credentials WHERE id = ?', m.credentialId); return { name: p?.name ?? 'A former member', passkey: c?.name ?? '', you: m.personId === who.personId } }) ?? null
   const canSetUp = shared ? who.role === 'owner' : who.workspaceId === who.personId
   const base = {
+    // R14: for a household's own wallet, whether its passkeys can own one now, and if not why (the page says it before any press)
+    ...(shared || !canSetUp ? {} : { owner: ownerReadiness(db, who.personId, Date.now()) }),
     custody: CUSTODY, setUp: !!v, canSetUp, ...(canSetUp ? {} : { whyNot: SHARED_OWNER }), passkeys, origin: v?.request.origin ?? null, origins: rp.origins, workspace: null, state: null, scheduled: [],
     shared, ...(plan ? { plan: { threshold: plan.threshold, members: plan.members.map((m) => ({ name: m.name, handle: m.handle, role: m.role, passkey: m.credential?.name ?? null })) } } : {}), ...(signersNow ? { signers: signersNow } : {}),
   }
@@ -240,6 +244,7 @@ export async function railOverview(cfg: RailCfg, db: Db, rp: RelyingParty, who: 
 
 // ------------------------------------------------------------------------------------------------ test tokens (S5)
 
+const SETUP_UNFINISHED = 'A wallet set-up you started earlier stopped part of the way, and the wallet service is finishing it with the settings and passkeys you chose then, not these. Nothing was changed. Open the wallet again in a minute: once it says it is waiting for you, accept it with the passkey you used that first time. You can turn the time-lock on or off afterwards on the Security screen.'
 const SHARED_CURRENCIES = 'A shared workspace\'s vault takes the default test tokens (test rupees, test dollars, test euros) for now: another set needs as many members\' passkey signatures as the vault\'s admin threshold, which this screen does not collect yet. Nothing was set up.'
 /** A currency set from a request: three different currencies of the eight; null for the default (nothing to sign). */
 function currencySet(x: unknown): AssetSet | null {
@@ -248,14 +253,49 @@ function currencySet(x: unknown): AssetSet | null {
 /** The configuration a household owner's passkey signs for a set of test tokens other than the default (shared/chain-assets.ts). */
 const currencyDocument = (request: CreateRequest, set: AssetSet) => assetSetDocument({ workspaceId: request.workspaceId, rpIdHash: request.rpIdHash, origin: request.origin, members: request.owner.signers, threshold: request.owner.threshold, adminThreshold: request.owner.adminThreshold ?? request.owner.threshold, currencies: set })
 /**
+ * R14: whether this person's passkeys can own a new wallet now and, if not, exactly why. One rule, read by the wallet's
+ * page before anyone presses anything (railOverview's `owner`) and by the set-up itself (householdRequest), so the page
+ * and the refusal never say different things.
+ *   - `ready`: the passkeys that approve and are past their first 24 hours; they become the wallet's signers. `waiting`
+ *     names any that approve but are still in those hours: they are left out, and can be made signers later.
+ *   - `no-passkey`: the account signs in with a password only. Its first passkey has no 24-hour wait (server/passkeys.ts
+ *     finishAddPasskey), so adding one and setting the wallet up is one sitting.
+ *   - `signin-only`: its passkeys sign in but do not approve (a recovery's, or one added after a password reset, R12).
+ *   - `cooling-off`: every passkey that approves was added beside another within 24 hours (RISK-068, Q-062); the
+ *     earliest to finish is named with its time.
+ */
+export type OwnerReadiness =
+  | { state: 'ready'; passkeys: string[]; waiting?: { passkey: string; until: number }[] }
+  | { state: 'no-passkey' }
+  | { state: 'signin-only' }
+  | { state: 'cooling-off'; passkey: string; until: number }
+export function ownerReadiness(db: Db, personId: string, now: number): OwnerReadiness {
+  const approving = approvingCredentials(db, personId)
+  if (!approving.length) return hasPasskey(db, personId) ? { state: 'signin-only' } : { state: 'no-passkey' }
+  const waiting = approving.flatMap((c) => { const until = coolingOffUntil(db, c.id, now); return until === null ? [] : [{ passkey: c.name, until }] }).sort((a, b) => a.until - b.until)
+  const settled = settledCredentials(db, personId, now)
+  if (!settled.length) return { state: 'cooling-off', ...waiting[0]! }
+  return { state: 'ready', passkeys: settled.map((c) => c.name), ...(waiting.length ? { waiting } : {}) }
+}
+/** What a set-up that cannot go ahead is told: what is wrong and what to do next. Null when it can. */
+function ownerRefusal(r: OwnerReadiness): AppError | null {
+  if (r.state === 'ready') return null
+  if (r.state === 'signin-only') return restrictedError()
+  // the wait in words: 24 hours, or the seconds of a labelled test stack (QED_COOL_OFF_SEC)
+  const wait = COOL_OFF_MS >= 3600_000 ? `${Math.round(COOL_OFF_MS / 3600_000)} hours` : `${Math.round(COOL_OFF_MS / 1000)} seconds`
+  if (r.state === 'cooling-off') return new AppError(409, 'passkey_cooling_off', `${r.passkey} was added to this account less than ${wait} ago, and a passkey can own a wallet only after its first ${wait}: someone who got into your session must not be able to put their own passkey on your wallet. Set the wallet up from ${whenIst(r.until)}. Nothing was created.`)
+  return new AppError(409, 'passkey_needed', 'This account has no passkey yet, and a wallet is owned by a passkey. Add a passkey on this device first: enter your password on the wallet\'s page and your device makes one. Then set the wallet up. Nothing was created.')
+}
+
+/**
  * The request a household's vault would be set up with now: its passkeys past their first 24 hours (server/passkeys.ts
  * settledCredentials; RISK-068, Q-062), one to approve. railSetup and railCurrenciesBegin both use it, so the
  * configuration the owner signs names exactly the signers the vault is created with.
  */
 function householdRequest(db: Db, rp: RelyingParty, who: Asker, origin: string, now: number): { request: CreateRequest; keys: Credential[] } {
+  const refusal = ownerRefusal(ownerReadiness(db, who.personId, now))
+  if (refusal) throw refusal
   const keys = settledCredentials(db, who.personId, now)
-  if (!keys.length && approvingCredentials(db, who.personId).length) throw new AppError(409, 'passkey_cooling_off', 'Your passkeys were all added in the last 24 hours. A passkey becomes a signer of a vault only after its first 24 hours: set the vault up then.')
-  if (!keys.length) throw new AppError(409, 'passkey_needed', 'Add a passkey to this account first. The vault\'s owner account is made of your passkeys.')
   if (keys.length > 12) throw bad('A vault takes at most 12 passkeys. Remove the ones you no longer use first.')
   const rpIdHash = `0x${createHash('sha256').update(rp.id, 'utf8').digest('hex')}`
   return { keys, request: { workspaceId: railWorkspaceId(who.workspaceId), owner: { signers: keys.map((c) => ({ x: `0x${c.x}`, y: `0x${c.y}` })), threshold: 1 }, rpIdHash, origin } }
@@ -307,6 +347,7 @@ export async function railSetup(cfg: RailCfg, db: Db, rp: RelyingParty, who: Ask
   if (set && shared) throw refused('currencies_shared', SHARED_CURRENCIES)
   quota(db, who, now)
   let v = vaultOf(db, who.workspaceId)
+  const stored = v // the record as it stood before this request (R14, review M2)
   // A vault set-up is the host's scarcest resource (60 an hour for everyone): a person sets up at most four a day (L-01).
   // The engine also asks each vault's service on its own schedule, which no request budget counts: so the vaults one
   // person owns are bounded too (their household's and their businesses').
@@ -348,7 +389,19 @@ export async function railSetup(cfg: RailCfg, db: Db, rp: RelyingParty, who: Ask
     // Stored before the request, so that a lost reply is asked again with exactly the same body.
     db.run('INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', recordKey(who.workspaceId), j(v))
   }
-  const view = await must(cfg, 'POST', '/workspaces', v.request, {}, 120_000)
+  let view: Json
+  try {
+    view = await must(cfg, 'POST', '/workspaces', v.request, {}, 120_000)
+  } catch (e) {
+    // R14 (review M2): the service still holds a set-up begun earlier with other settings, one that stopped part of the way
+    // (an outage, or a restart in the middle). It finishes that one exactly as it was asked, never this one, so the record
+    // here goes back to that request: what the page shows, and the passkey it asks to accept, are what the chain will hold.
+    if (e instanceof AppError && e.code === 'workspace_exists' && stored && stored !== v) {
+      db.run('UPDATE meta SET value = ? WHERE key = ?', j(stored), recordKey(who.workspaceId))
+      throw refused('setup_unfinished', SETUP_UNFINISHED)
+    }
+    throw e
+  }
   audit(db, now, who.workspaceId, 'owner', 'vault.setup', v.railId, { signers: v.credentialIds, members: v.members?.map((m) => m.personId), threshold: v.request.owner.threshold, origin: v.request.origin, ownerAccount: view.ownerAccount, duplicate: view.duplicate === true, ...(v.request.currencies ? { currencies: v.request.currencies, signedDigest: (view.currencies as Json | undefined)?.digest ?? null } : {}) })
   // R7 D7: every other vault with a member in common is linked from the start (a failure is retried by the scheduler)
   await declareLinks(cfg, db, who.workspaceId, now).catch(() => undefined)

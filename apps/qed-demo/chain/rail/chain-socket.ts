@@ -16,8 +16,9 @@
  * reach the listener, and Anvil has no credential to ask for. Only a chain with no TCP listener, or one in its own network
  * namespace or container, closes that (SECURITY.md section 8).
  */
+import { chmodSync, rmSync } from "node:fs";
 import { createServer, type Server } from "node:http";
-import { connect, type Socket } from "node:net";
+import { connect, createServer as createSocketServer, type Socket } from "node:net";
 
 /**
  * Ports that the Fetch standard blocks and that Node's fetch (undici) was seen to refuse ("bad port"; checked by
@@ -224,4 +225,85 @@ export function startChainGuard(port: number, socketPath: string): Promise<Serve
   server.on("upgrade", (_req, socket) => socket.destroy());
   server.on("close", () => chain.close());
   return new Promise((ok, fail) => { server.once("error", fail); server.listen(port, "127.0.0.1", () => ok(server)); });
+}
+
+// ------------------------------------------------------------------------------------------------ a read-only door
+/**
+ * What a reader of the chain asks (R14). The co-signer certifies from what it reads: blocks, calls, logs, code, balances,
+ * storage, receipts. Nothing here sends a transaction, signs, moves Anvil's clock, balances, code or state, impersonates
+ * an account or keeps a filter on the chain. A name not listed is refused.
+ */
+export const READ_ONLY_METHODS: ReadonlySet<string> = new Set([
+  "eth_chainId", "net_version", "web3_clientVersion", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_call", "eth_estimateGas",
+  "eth_getLogs", "eth_getCode", "eth_getBalance", "eth_getStorageAt", "eth_getTransactionCount", "eth_getTransactionByHash", "eth_getTransactionReceipt",
+  "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getProof",
+]);
+
+export interface ReadOnlyDoor { path: string; forwarded(): number; refused(): string[]; close(): Promise<void> }
+
+/**
+ * The chain's read-only door (R14): a second socket, at `doorPath`, that speaks as Anvil's own does (one JSON value per
+ * line) and forwards only READ_ONLY_METHODS to the chain's socket at `socketPath`.
+ *
+ * Why it exists. The chain's own socket is in a folder only the wallet service's user may enter (F-14 above), and in the
+ * deployed image the co-signer runs as another user (R13 review fix F3), who must not enter that folder: Anvil has no
+ * credential, so its socket is full control of the chain. The two together left the co-signer unable to read the chain,
+ * and nothing it certifies could be paid (found 25 Nov 2026). The co-signer is given this door instead: a narrower way in
+ * than it had before F3, and the only one it is given or uses. Through the door it can read the chain and change nothing.
+ * The door is not a confinement: Anvil's loopback TCP listener (above) still answers any local user, the co-signer's
+ * included, with full control and no credential (RISK-114). Only a chain with no TCP listener, or one in its own network
+ * namespace, closes that; scripts/deploy/isolation-check.ts reports it as a LIMIT line.
+ *
+ * Who can open it: the socket is 0660 in the folder it is made in. The container's entrypoint makes that folder the
+ * wallet service's, group the co-signer's, set-group-id (2750), so the socket's group is the co-signer's and no other
+ * user reaches it. A request that is not one JSON-RPC call by name (a batch, another value) is refused; a line is at most
+ * 8 MB. `refused()` lists the last 256 methods refused, so a test can show the co-signer needs none of them. At most 256
+ * calls wait on the chain at once; one more is answered "busy" (-32005), so no user of the door can grow the wallet
+ * service's memory without bound (review of the R14 fix, L1).
+ */
+export function startReadOnlyDoor(doorPath: string, socketPath: string): Promise<ReadOnlyDoor> {
+  const chain = new ChainSocket(socketPath);
+  let forwarded = 0;
+  const refused: string[] = [];
+  const refuse = (name: string): void => { refused.push(name); if (refused.length > 256) refused.splice(0, refused.length - 256); };
+  let waiting = 0;
+  const clients = new Set<Socket>();
+  const answer = (c: Socket, m: unknown): void => { if (!c.destroyed) c.write(`${JSON.stringify(m)}\n`); };
+  const handle = async (c: Socket, line: string): Promise<void> => {
+    let m: { id?: unknown; method?: unknown } | null;
+    try { m = JSON.parse(line) as { id?: unknown; method?: unknown }; } catch { answer(c, { jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } }); return; }
+    if (!m || typeof m !== "object" || Array.isArray(m) || typeof m.method !== "string") { refuse("(not a single call)"); answer(c, { jsonrpc: "2.0", id: null, error: { code: -32600, message: "The chain's read-only door takes one JSON-RPC call at a time." } }); return; }
+    if (!READ_ONLY_METHODS.has(m.method)) { refuse(m.method.slice(0, 80)); answer(c, { jsonrpc: "2.0", id: m.id ?? null, error: { code: -32601, message: `${m.method.slice(0, 80)}: not available on the chain's read-only door.` } }); return; }
+    if (waiting >= 256) { answer(c, { jsonrpc: "2.0", id: m.id ?? null, error: { code: -32005, message: "The chain's read-only door is busy; ask again." } }); return; }
+    forwarded++;
+    waiting++;
+    try { answer(c, await chain.request(m as { id?: unknown }, 120_000)); }
+    catch { answer(c, { jsonrpc: "2.0", id: m.id ?? null, error: { code: -32603, message: "The local chain did not answer." } }); }
+    finally { waiting--; }
+  };
+  const server = createSocketServer((c) => {
+    clients.add(c);
+    let chunks: Buffer[] = [], size = 0;
+    c.on("error", () => c.destroy());
+    c.on("close", () => clients.delete(c));
+    c.on("data", (d: Buffer) => {
+      let start = 0;
+      for (let i = d.indexOf(10); i !== -1; i = d.indexOf(10, start)) {
+        chunks.push(d.subarray(start, i));
+        const line = Buffer.concat(chunks).toString("utf8");
+        chunks = []; size = 0; start = i + 1;
+        if (line.trim()) void handle(c, line);
+      }
+      if (start < d.length) { chunks.push(d.subarray(start)); size += d.length - start; if (size > 8 * 1024 * 1024) c.destroy(); }
+    });
+  });
+  const close = (): Promise<void> => new Promise((done) => { for (const c of clients) c.destroy(); chain.close(); server.close(() => { rmSync(doorPath, { force: true }); done(); }); });
+  return new Promise((ok, fail) => {
+    rmSync(doorPath, { force: true }); // a socket left by a service that was killed
+    server.once("error", fail);
+    server.listen(doorPath, () => {
+      try { chmodSync(doorPath, 0o660); } catch (e) { server.close(); fail(e as Error); return; }
+      ok({ path: doorPath, forwarded: () => forwarded, refused: () => [...refused], close });
+    });
+  });
 }

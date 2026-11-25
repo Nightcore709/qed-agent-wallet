@@ -120,6 +120,12 @@
 .vt-sum-mark svg { width: 11px; height: 11px; stroke-width: 3; }
 .vt-sum > div.done .vt-sum-mark { color: var(--gain); background: var(--gain-bg); border-color: transparent; }
 .vt-sum-foot { font-size: var(--t-micro); line-height: 1.45; color: var(--ink-3); }
+/* R14: a password account's first passkey, made in the set-up step itself: what it is, the password again, one action */
+.vt-gate { justify-self: stretch; display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--brand-line); max-width: 74ch; }
+.vt-gate h4 { font-size: var(--t-body); font-weight: 650; color: var(--ink); }
+.vt-gate > p { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; }
+.vt-gate-form { display: grid; gap: var(--s3); justify-items: start; }
+.vt-gate-form > label, .vt-gate-form > .field { justify-self: stretch; max-width: 36ch; }
 /* what the device asks for: a fingerprint, a face or a PIN stays on the device; QED receives a signature only */
 .vt-device { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); max-width: 74ch; }
 .vt-device-i { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; color: var(--brand); background: var(--brand-bg); border: 1px solid var(--brand-line); flex: none; }
@@ -396,7 +402,8 @@
 /* ------------------------------------------------------------------------------------------------ the wallet inside other pages
    Content without chrome: the page that holds it gives it its panel. It fits the width it is given, not the window's. */
 .vt-inline { container-type: inline-size; display: grid; gap: var(--s4); min-width: 0; }
-.vt-wmissing { font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); }
+/* one sentence with its link inside it: a paragraph, never a grid (a grid made the sentence, its link and its ending three rows) */
+.vt-wmissing { display: block; max-width: 62ch; font-size: var(--t-small); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .vt-wmissing a { font-weight: 600; }
 .vt-wto { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-md); background: color-mix(in oklab, var(--pane-2) 60%, transparent); border: 1px solid var(--rim); }
 .vt-wto-av { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-size: var(--t-small); font-weight: 700; color: var(--on-act); background: linear-gradient(180deg, var(--act), var(--act-2)); flex: none; }
