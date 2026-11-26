@@ -27,6 +27,7 @@ const APP = join(import.meta.dirname, '..', '..')
 const PORT = Number(process.env.QED_JUDGE_PORT ?? extraPort(20))
 const REPLIES = join(APP, 'evidence', '20261122-judge-journey', 'scripted-double-replies.json')
 type J = Record<string, any>
+const SHOTS_ORIG = join(APP, 'evidence', 'design', 'r14-judge-original')
 
 // One household walks the whole page, step after step, as a judge would watch it: the tests run in order on one stack.
 test.describe.configure({ mode: 'serial' })
@@ -193,4 +194,31 @@ test('revocation and recovery: the policy ended with the passkey, a tick asked f
   expect(restored).toMatch(/The next tick ran again under it: .*QED's engine asked for it by itself\./)
   // nothing in the walk-through called the double a model
   await expect(page.getByText(/proposed by the model|A real model:/)).toHaveCount(0)
+})
+
+// the original QED's public-chain evidence, historical (R14 release 12): last, on the same page, so the flow above is untouched
+test("the original QED's evidence on /judge: historical, linked and readable", async () => {
+  await openJudge(page, s.base)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  const hist = page.locator('section.jg-hist')
+  await expect(hist.getByRole('heading', { name: 'What the original QED proved on a public network' })).toBeVisible()
+  await expect(hist.getByText('Historical evidence', { exact: true }).first()).toBeVisible()
+  const rows = hist.getByRole('region', { name: 'The 19 refused attacks' }).locator('tbody tr')
+  await expect(rows).toHaveCount(19)
+  // each attack links to its recorded transaction on the public explorer (joined by step id from the vendored manifests)
+  const links = hist.getByRole('region', { name: 'The 19 refused attacks' }).locator('a[href^="https://sepolia.etherscan.io/tx/0x"]')
+  await expect(links).toHaveCount(19)
+  await expect(hist.getByText('SolvencyViolation', { exact: true })).toBeVisible()
+  await expect(hist.getByText(/not used by this build/)).toBeVisible()
+  for (const g of await hist.locator('.jg-guar summary').all()) await g.click()
+  await expect(hist.getByText(/Assumes:/).first()).toBeVisible()
+  for (const [w, h] of [[1440, 900], [390, 844]] as const) {
+    for (const scheme of ['light', 'dark'] as const) {
+      await page.setViewportSize({ width: w, height: h })
+      await page.emulateMedia({ colorScheme: scheme })
+      await hist.scrollIntoViewIfNeeded()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `no sideways scroll at ${w} ${scheme}`).toBe(true)
+      await hist.screenshot({ path: join(SHOTS_ORIG, `judge-original-${w}-${scheme}.png`) })
+    }
+  }
 })
