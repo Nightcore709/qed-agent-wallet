@@ -934,8 +934,9 @@ wallet. H1 and H2 were then fixed and re-verified (below):
   every other weakening uses: a row in `scheduled_changes`, applied by `applyDueChanges` on the engine's tick and before
   every Security read (`server/passkeys.ts` `scheduleFallbackRemoval`, `FALLBACK_REMOVALS`). No schema change.
   - *What waits* `PROTECTION_DELAY_MS` (72 hours): ending a recovery contact who has accepted (`removeContact`); removing
-    the password (`removePassword`); removing a confirmed email address (`server/recovery.ts` `removeAddress`); and
-    changing one: the new address is added at once, as adding always was, and the old one goes only when the delay ends
+    the password (`removePassword`); removing a confirmed email address or, since the 26 Nov follow-up (RISK-125), a confirmed phone number
+    (`server/recovery.ts` `removeAddress`; the number carries the notices that tell the owner of every change, so ending it
+    silently would silence them); and changing either: the new address is added at once, as adding always was, and the old one goes only when the delay ends
     (`confirmed`), so "change" is no way around the wait.
   - *Who is told, at once:* the person, in the history and by an urgent notice on every confirmed address (the one being
     removed included), with the time it takes effect; the contact being removed, who keeps the role, and can still issue
@@ -957,7 +958,7 @@ wallet. H1 and H2 were then fixed and re-verified (below):
     sessions last 24 hours), and reset or recovery links already sent to a removed address stop working (R05, from then).
   - *What stays at once, and why:* adding a contact, an address or a password (adding was never the risk); a contact
     stepping down (their decision, confirmed as strongly as they can); withdrawing a request nobody accepted, and an
-    address nobody confirmed (neither is a way back in); a phone number (notices only, never a way back in); and changing
+    address nobody confirmed (neither is a way back in); and changing
     the password, so that a password someone has learned can still be shut out at once.
   - Tests: `server/fallback-removal.test.ts`; `server/password-change-routes.test.ts` "8j (c)"; the Chrome journey
     "ending a recovery contact waits" in `browser/tests/recovery.spec.ts`.
@@ -970,6 +971,9 @@ wallet. H1 and H2 were then fixed and re-verified (below):
     reset the password of an account that has a passkey that can approve. On an account with no passkey, adding one stops
     resets at once. (4) An owner with neither a passkey at hand nor a saved code cannot cancel (the signed-out page offers
     only the pause); what protects them is the notice on every channel and 72 hours to reach a device or a code.
+    (5) Anyone holding one saved code can cancel an owner's scheduled removal. Since the follow-up that is no longer silent:
+    a cancellation with a saved code raises an urgent notice and a message on every channel ("A saved code was used to
+    cancel a scheduled change", `server/passkeys.ts` `securityEvent`), beside the history entry; a passkey's stays in the history.
 - **8j (b), examined under R14 (26 Nov 2026): no small mitigation is sound, so it stays accepted.** The rule considered,
   "a stop confirmed by a passkey added after the recovery began is refused, or needs the guardian's confirmation", was not
   adopted, for three reasons.
@@ -991,6 +995,22 @@ wallet. H1 and H2 were then fixed and re-verified (below):
   time if the delay was lowered meanwhile; the wallet service does not record `RecoveryRestarted`, so a screen can show a
   stale time until an apply is refused with the new one; a bounty board or an account recorded under an earlier build
   keeps its earlier code; a guardian can spend recovery codes by co-signing and then withdrawing.
+
+**R14 follow-ups to the independent review (C-R6 and RISK-125, 26 Nov 2026), fixed.**
+- *A withdrawal plan's reserve no longer races the hold.* `decide()` read balances before the write transaction that places the
+  hold, so a sale another process committed in between escaped the reserve check. `server/execute.ts` `plan` now decides every
+  instruction's action again inside that transaction and refuses it, placing no hold, on any check that now fails other than a
+  transient one (reserve, run limit, a stop, a pause, an authority revoked or expired); the refusal records the re-check's decision. Test: `server/withdrawal.test.ts` (a competing sale committed between the decision and the hold,
+  through the test seam `__testBetweenDecideAndWrite`). The month and day limits are checks of the
+  same decision, so they are tested again there too; only stale-data checks (transient) are left to the first decision.
+- *An evidence probe no longer counts a leg twice.* `server/evidence.ts` decides a changed copy of the action under a new id;
+  `decide(…, { probeOf })` now leaves the real action out of the run, month and day sums and puts its units back before the
+  reserve takes the probed sale off once. Test: `server/withdrawal.test.ts`.
+- *RISK-125:* a saved-code cancellation raises an urgent notice (above); a passkey from an email recovery that spent no saved
+  code gets its codes with its request (8k); a confirmed phone number waits the protection delay like an email address,
+  through the same path, with notices and cancellation (8j (c)). The veto trade-off and R3 stay with the owner (RISK-125).
+- *A withdrawal plan with no units left* says so once (notice 'swp-finished') and is marked finished, rather than skipping in
+  silence every run (`server/runner.ts`; `server/swp.test.ts`, `server/withdrawal.test.ts`).
 
 None of these can move money in this build: every balance is a valueless test token on a private chain.
 
@@ -1112,7 +1132,12 @@ confirmation box is gone; what protects is that the codes exist and are shown).
     while codes exist.
   Tests: `server/reset-authority-codes.test.ts` (shown at the request; refused before the restoration and accepted after;
   lost with each kind of cancellation; "REGRESSION R2": after a reset, the restoration and a fresh session, nobody can mint
-  a set of their own). A passkey that a recovery registered asks as before (its recovery made codes if it spent one).
+  a set of their own). A passkey that a recovery registered asks as before when its recovery spent a saved code (it made the codes then). Since the
+  RISK-125 follow-up, a passkey that an email recovery registered where no saved code was spent (a contact's code or the
+  password was the second proof) gets a held set with its request only when the account holds no unused codes, and the set
+  is dropped at activation if codes exist by then (`onlyIfNone`, `activatePendingCodes`): an unchallenged recoverer must never
+  replace the owner's codes (H2; the independent review of the first version found that it did). With codes held, nothing
+  is held and the owner's survive. Tests in the same file, "H2" and "RISK-125".
   Residual: a set lost before the restoration is not shown again; the person stops the request and asks again, which makes
   a new set and waits again. This was a gate on enabling email (RISK-123); the other gate, F4, is the delayed address above.
 - *Google-opened address.* The address a Google sign-in opens an account with is usable at once (`server/google.ts`). That

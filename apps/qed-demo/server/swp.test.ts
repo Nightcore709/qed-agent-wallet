@@ -134,8 +134,14 @@ describe('a signed plan runs', () => {
     const states = runs(k, d.programId)
     expect(states.length).toBe(3)
     expect(states[2]!.reason ?? '').toMatch(/no units|nothing to withdraw|Nothing/i)
-    revokeProgram(k.ctx, k.userId, d.programId)
-    expect(loadProgram(k.db, k.userId, d.programId).state).toBe('revoked')
+    // R14: with no units left it says so once and is finished, rather than skipping in silence for ever
+    expect(loadProgram(k.db, k.userId, d.programId).state).toBe('completed')
+    const told = k.db.all<{ title: string; body: string }>(`SELECT title, body FROM notices WHERE user_id = ? AND kind = 'swp-finished'`, k.userId)
+    expect(told.length).toBe(1)
+    expect(told[0]!.body).toMatch(/no units .*finished|finished/i)
+    await run(k, 3 * DAY)
+    expect(k.db.get<{ n: number }>(`SELECT COUNT(*) n FROM notices WHERE user_id = ? AND kind = 'swp-finished'`, k.userId)!.n).toBe(1)
+    expect(runs(k, d.programId).length).toBe(3) // no run is started for a finished plan
     sound(k)
   })
 })

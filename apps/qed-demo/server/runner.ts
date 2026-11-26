@@ -261,7 +261,15 @@ function processRun(ctx: Ctx, run: RunRow): void {
     if (plan.skip || plan.actions.length === 0) {
       // a withdrawal that could not be made leaves money not withdrawn: the owner is told, as for a run that ends partly done
       if (plan.owed) notice(db, run.user_id, { level: 'warning', kind: 'run-owed', title: `${p.title}: nothing was withdrawn`, body: plan.owed, subject: p.id, dedupe: `run-owed:${run.id}` }, now)
-      return finish(ctx, run, p, 'skipped', plan.skip ?? 'Nothing needed doing.')
+      finish(ctx, run, p, 'skipped', plan.skip ?? 'Nothing needed doing.')
+      // A withdrawal plan with no units left anywhere: told once, and the plan is finished, so it does not skip in silence
+      // for ever. It ends only if it is still active (finish may have found it revoked meanwhile).
+      if (plan.exhausted && db.get<{ state: string }>('SELECT state FROM programs WHERE id = ?', p.id)?.state === 'active') {
+        db.run(`UPDATE programs SET state = 'completed', next_due_at = NULL, updated_at = ? WHERE id = ?`, now, p.id)
+        programEvent(db, p.id, p.user_id, 'completed', 'engine', { why: 'No units were left in any of its funds.' }, now)
+        notice(db, run.user_id, { level: 'info', kind: 'swp-finished', title: `${p.title}: finished, no units left`, body: `${plan.skip ?? 'You hold no units of the funds in this plan.'} The plan is finished: nothing more will be withdrawn, and nothing was withdrawn on this run. Sign a new plan if you buy units again.`, subject: p.id, dedupe: `swp-finished:${p.id}` }, now)
+      }
+      return
     }
     // a reported problem holds QED's own payments on that rail, until the person releases the pause (dispute-pause.ts)
     if (plan.actions.some((a) => a.kind === 'payment' && pausedFor(db, run.user_id, a.venue))) return finish(ctx, run, p, 'skipped', PAUSE_REASON)
