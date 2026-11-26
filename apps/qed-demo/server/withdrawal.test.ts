@@ -6,8 +6,9 @@
 import { describe, expect, it } from 'vitest'
 import { confirmApproval } from './approvals.ts'
 import { istInstant } from './core.ts'
-import { createAction, stepAllActions } from './execute.ts'
-import { available, balance, verifyLedger } from './ledger.ts'
+import { __testBetweenDecideAndWrite, createAction, getAction, stepAllActions } from './execute.ts'
+import { decide } from './policy.ts'
+import { available, balance, placeHold, verifyLedger } from './ledger.ts'
 import { activateProgram, buildDraft, loadProgram, requestProgramApproval, saveDraft } from './programs.ts'
 import { sha256hex, verifyChain } from './receipts.ts'
 import { runTick, schedulerTick, triggerTick } from './runner.ts'
@@ -465,5 +466,69 @@ describe('F9 to F11: the wording and the unchanged single-fund plan', () => {
     await run(k2, 60_000)
     expect(runs(k2).map((r) => r.state)).toEqual(['blocked']) // as before: a blocked run with its reason, not a skipped one
     expect(id2).toBeTruthy()
+  })
+})
+
+describe('R14 follow-ups to review C-R6', () => {
+  it('refuses a sale when a competing sale committed between the decision and the hold took the funds below the reserve, and places no hold', async () => {
+    const { k, id } = await setupWith([[INDEX, 10_000], [OVER, 10_000]], { instrumentId: INDEX, alsoFrom: [OVER], reserve: RS(9_000) }, { runMode: 'approve' })
+    k.clock.set(istInstant('2026-11-20', '09:59')); for (const f of [INDEX, OVER]) k.nav(f, '2026-11-20', '100.0000')
+    await run(k, 60_000)
+    const r = runs(k)[0]!; expect(r.state).toBe('awaiting_approval')
+    approveRun(k, r.id)
+    let fired = 0
+    __testBetweenDecideAndWrite(() => {
+      if (fired++ > 0) return
+      // what another process's committed sale does to the position: its units are held
+      placeHold(k.db, k.userId, `pos:${INDEX}`, available(k.db, k.userId, `pos:${INDEX}`) - 10_000n, 'Sale in progress', 'act:competing', k.clock.now())
+    })
+    try { await run(k, 20_000) } finally { __testBetweenDecideAndWrite(null) }
+    expect(fired).toBeGreaterThan(0)
+    const acts = k.db.all<{ id: string; state: string; error: string | null }>('SELECT id, state, error FROM actions WHERE program_id = ? ORDER BY created_at, rowid', id)
+    expect(acts[0]!.state).toBe('blocked')
+    expect(acts[0]!.error).toMatch(/against the signed reserve of ₹9,000/)
+    expect(k.db.get('SELECT 1 FROM holds WHERE ref = ?', `act:${acts[0]!.id}`)).toBeUndefined()
+    // the reserve holds: only the competing sale and a rounding-sized second leg, if any, moved units
+    expect(available(k.db, k.userId, `pos:${INDEX}`)).toBeLessThanOrEqual(10_000n) // the blocked large leg took nothing from it
+    sound(k)
+  })
+  it('a stop that landed between the decision and the hold refuses the sale with the re-check on its record, and places no hold', async () => {
+    const { k, id } = await setupWith([[INDEX, 10_000]], { instrumentId: INDEX, reserve: RS(1_000) })
+    k.clock.set(istInstant('2026-11-20', '09:59')); k.nav(INDEX, '2026-11-20', '100.0000')
+    __testBetweenDecideAndWrite(() => { k.db.run('UPDATE users SET stop_at = ?, stop_protective = 0 WHERE id = ?', k.clock.now(), k.userId) })
+    try { await run(k, 60_000) } finally { __testBetweenDecideAndWrite(null) }
+    const a = k.db.get<{ id: string; state: string; error: string | null; policy_json: string }>('SELECT id, state, error, policy_json FROM actions WHERE program_id = ? ORDER BY created_at, rowid', id)!
+    expect(a.state).toBe('blocked')
+    expect(a.error).toMatch(/stopped/i)
+    expect(JSON.parse(a.policy_json).checks.find((c: { name: string }) => c.name === 'not-stopped').ok).toBe(false) // the re-check's decision, not the first
+    expect(k.db.get('SELECT 1 FROM holds WHERE ref = ?', `act:${a.id}`)).toBeUndefined()
+    sound(k)
+  })
+  it('an evidence probe of a leg already sent is not counted twice in the run limit or the reserve', async () => {
+    const { k, id } = await setupWith([[INDEX, 50_000]], { instrumentId: INDEX, reserve: RS(5_000) }, { maxPerRun: RS(10_000) })
+    k.clock.set(istInstant('2026-11-20', '09:59')); k.nav(INDEX, '2026-11-20', '100.0000')
+    await run(k, 60_000)
+    const real = k.db.get<{ id: string }>('SELECT id FROM actions WHERE program_id = ? ORDER BY created_at, rowid', id)!
+    const a = getAction(k.db, real.id)!
+    expect(['submitting', 'working', 'done']).toContain(a.state)
+    const copy = { ...a, id: `probe-${a.id}`, economic_id: `probe-${a.economic_id}`, state: 'planned' as const }
+    const naive = decide(k.ctx, copy, k.clock.now())
+    expect(naive.checks.find((c) => c.name === 'within-run-limit')!.ok).toBe(false) // the leg counted once as sent and once as this probe
+    const probed = decide(k.ctx, copy, k.clock.now(), { probeOf: a.id })
+    expect(probed.checks.find((c) => c.name === 'within-run-limit')!.ok).toBe(true)
+    // reserve: ₹50,000 held, ₹10,000 sold; as if unsent the funds are ₹50,000, less this sale, against the reserve
+    expect(probed.checks.find((c) => c.name === 'swp-reserve')!.detail).toMatch(/₹49,997\.50 of free units.*leaves ₹39,997\.50/s)
+  })
+  it('a plan with no units left in any of its funds says so once and is finished', async () => {
+    const { k, id } = await setupWith([[INDEX, 10_000], [OVER, 10_000]], { instrumentId: INDEX, alsoFrom: [OVER], reserve: RS(1_000) })
+    await manualSell(k, INDEX, 'all-index', available(k.db, k.userId, `pos:${INDEX}`))
+    await manualSell(k, OVER, 'all-over', available(k.db, k.userId, `pos:${OVER}`))
+    k.clock.set(istInstant('2026-11-20', '09:59')); for (const f of [INDEX, OVER]) k.nav(f, '2026-11-20', '100.0000')
+    await run(k, 60_000)
+    expect(loadProgram(k.db, k.userId, id).state).toBe('completed')
+    const told = k.db.all<{ body: string }>(`SELECT body FROM notices WHERE user_id = ? AND kind = 'swp-finished'`, k.userId)
+    expect(told.length).toBe(1)
+    expect(told[0]!.body).toMatch(/no units of any of the funds in this plan/)
+    sound(k)
   })
 })

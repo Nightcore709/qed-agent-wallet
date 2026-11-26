@@ -121,7 +121,7 @@
 .er-how { color: var(--ink-2); }
 .er-how summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--brand); font-weight: 600; }
 .er-how p { max-width: 86ch; }
-.er-empty { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3) var(--s6); }
+.er-empty { width: 100%; max-width: 56rem; display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: var(--s3) var(--s6); }
 .er-empty p { flex: 1 1 320px; max-width: 72ch; color: var(--ink-2); }
 .er-problem { display: grid; justify-items: start; gap: var(--s2); }
 /* the on-chain wallet's service not answering: what that means for the work, then a way to ask again */

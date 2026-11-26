@@ -39,7 +39,7 @@ import {
   activeContacts, completeRecovery, confirmNeeded, type CodeRow, type Credential, DUMMY_SALT, ES256, fail, handleOf, hasApprovingPasskey, hasPasskey, issueChallenge, isActiveLink,
   type ContactLink, matchCode, matchCodeAsync, passwordHeldUntil, PROTECTION_DELAY_MS, RECOVERY_DELAY_MS, RECOVERY_FINISH_WINDOW_MS, type RelyingParty, scryptCode, scryptCodeAsync, securityEvent, strongConfirm,
   takeChallenge, usableCredentials, utf8, verifyAssertion,
-  activatePendingCodes, endAddress, keepPendingCodes, newCodeSet, refuseCoolingOff, scheduleFallbackRemoval, type ScheduledFallback,
+  activatePendingCodes, endAddress, unusedCodes, usedSavedCode, keepPendingCodes, newCodeSet, refuseCoolingOff, scheduleFallbackRemoval, type ScheduledFallback,
 } from './passkeys.ts'
 import { sha256hex } from './receipts.ts'
 import { setStop } from './runner.ts'
@@ -222,16 +222,16 @@ function confirmed(db: Db, p: Point, now: number): { kind: Kind; address: string
   const old = p.replaces_id ? db.get<Point>('SELECT * FROM contact_points WHERE id = ? AND person_id = ? AND removed_at IS NULL', p.replaces_id, p.person_id) : undefined
   // R14 (SECURITY.md 8j (c)): a change of a confirmed email address adds the new one now, as adding always has, and removes
   // the old one only when the protection delay has passed, as a removal does (passkeys.ts endAddress tells it then what the
-  // address is now); otherwise asking to "change" an address would remove a way back in at once. A phone number (notices
-  // only) is changed at once, as before.
-  const waits = old?.kind === 'email' && old.verified_at !== null
+  // address is now); otherwise asking to "change" an address would remove a way back in at once. A phone number waits the
+  // same way (RISK-125: it carries the notices that tell the owner of every change, so ending it silently would silence them).
+  const waits = !!old && old.verified_at !== null
   if (old && !waits) db.run(`UPDATE contact_points SET removed_at = ?, removed_reason = 'replaced' WHERE id = ?`, now, old.id)
   securityEvent(db, p.person_id, p.kind === 'email' ? (own ? 'email-confirmed' : 'email-added') : 'phone-added', { address: maskAddress(p.kind, p.address), ...(old ? { replaced: maskAddress(old.kind, old.address) } : {}) }, now)
   // The number that was replaced hears of it once more, although it receives nothing else from now on.
   if (old && !waits) notifyChannels(db, p.person_id, { kind: `${p.kind}-changed`, title: p.kind === 'email' ? 'The email address of your QED account was changed' : 'The phone number of your QED account was changed', body: `It is now ${maskAddress(p.kind, p.address)}. This address will receive nothing more from QED.` }, now, [{ kind: old.kind, address: old.address }], true)
   // the old address is told now, with every other channel, that it is to be removed and when (unless its removal already waits)
   if (old && waits && !db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = 'remove-address' AND subject = ? AND cancelled_at IS NULL AND applied_at IS NULL`, p.person_id, old.id)) {
-    scheduleFallbackRemoval(db, { personId: p.person_id, requestedBy: null }, { kind: 'remove-address', subject: old.id, detail: { address: maskAddress('email', old.address), replacedBy: p.id }, event: 'email-removal-scheduled', already: 'Removing this email address is already scheduled.' }, now)
+    scheduleFallbackRemoval(db, { personId: p.person_id, requestedBy: null }, { kind: 'remove-address', subject: old.id, detail: { address: maskAddress(old.kind, old.address), replacedBy: p.id }, event: `${old.kind}-removal-scheduled`, already: `Removing this ${old.kind === 'phone' ? 'phone number' : 'email address'} is already scheduled.` }, now)
   }
   audit(db, now, p.person_id, 'owner', `${p.kind}.confirm`, p.id, { replaced: old?.id ?? null })
   return { kind: p.kind, address: p.address, usableFrom }
@@ -289,8 +289,10 @@ export function removeAddress(db: Db, s: Session, id: string, now: number): { re
   if (p.verified_at !== null && !strongConfirm(db, s, now)) throw confirmNeeded(db, s, p.kind === 'email' ? 'remove an email address' : 'remove a phone number', now)
   // removing an address stops its notices: a passkey in its cool-off removes none (RISK-068, Q-062)
   if (p.verified_at !== null) refuseCoolingOff(db, s, p.kind === 'email' ? 'remove an email address' : 'remove a phone number', now)
-  if (p.verified_at !== null && p.kind === 'email') {
-    return scheduleFallbackRemoval(db, { personId: s.userId, requestedBy: s.confirmedBy ?? s.credentialId ?? null }, { kind: 'remove-address', subject: id, detail: { address: maskAddress('email', p.address) }, event: 'email-removal-scheduled', already: 'Removing this email address is already scheduled.' }, now)
+  // a confirmed email address is a way back in; a confirmed phone number carries the notices that tell the owner of every change
+  // (RISK-125): both wait the protection delay, are told at once on every channel, and are cancelled by a passkey or a saved code
+  if (p.verified_at !== null) {
+    return scheduleFallbackRemoval(db, { personId: s.userId, requestedBy: s.confirmedBy ?? s.credentialId ?? null }, { kind: 'remove-address', subject: id, detail: { address: maskAddress(p.kind, p.address) }, event: `${p.kind}-removal-scheduled`, already: `Removing this ${p.kind === 'phone' ? 'phone number' : 'email address'} is already scheduled.` }, now)
   }
   db.tx(() => endAddress(db, s.userId, p, now, 'owner'))
   return { removed: true }
@@ -617,11 +619,14 @@ export async function finishAuthorityRequest(db: Db, rp: RelyingParty, s: Sessio
   const changeId = newId('chg', now), effectiveAt = now + PROTECTION_DELAY_MS
   // R2 (second review of the F1 fix): a passkey added after a password reset brought no codes. Its codes are made with this
   // request, shown once to this session, and kept apart until its authority is restored (passkeys.ts keepPendingCodes).
-  const set = cred.authority_reason === 'after-password-reset' ? newCodeSet() : null
+  // RISK-125: the same for a passkey that an email recovery registered when that recovery spent no saved code (a contact's code
+  // or the password was its second proof): nothing was replaced at its end, so its codes come with this request too.
+  const viaRecovery = cred.authority_reason === 'recovery' ? db.get<{ id: string }>('SELECT id FROM recovery_requests WHERE credential_id = ? AND person_id = ? AND completed_at IS NOT NULL', cred.id, s.userId) : undefined
+  const set = cred.authority_reason === 'after-password-reset' || (viaRecovery && !usedSavedCode(db, viaRecovery.id) && unusedCodes(db, s.userId) === 0) ? newCodeSet() : null
   db.tx(() => {
     if (db.get(`SELECT 1 FROM scheduled_changes WHERE person_id = ? AND kind = 'restore-authority' AND subject = ? AND cancelled_at IS NULL AND applied_at IS NULL`, s.userId, cred.id)) throw new AppError(409, 'already_scheduled', 'This passkey has already asked for approval authority. It is given when the wait ends.')
     db.run(`INSERT INTO scheduled_changes (id, person_id, kind, subject, detail_json, requested_at, requested_by, effective_at) VALUES (?, ?, 'restore-authority', ?, ?, ?, ?, ?)`, changeId, s.userId, cred.id, j({ name: cred.name, reason: cred.authority_reason }), now, cred.id, effectiveAt)
-    if (set) keepPendingCodes(db, s.userId, changeId, set.kept)
+    if (set) keepPendingCodes(db, s.userId, changeId, set.kept, cred.authority_reason === 'recovery')
     securityEvent(db, s.userId, 'authority-restore-requested', { passkey: cred.name, effectiveAt, ...(set ? { codesWithIt: true } : {}) }, now)
     for (const c of activeContacts(db, s.userId, now)) securityEvent(db, c, 'contact-authority-requested', { for: handleOf(db, s.userId), effectiveAt }, now)
     audit(db, now, s.userId, 'owner', 'authority.request', cred.id, { changeId, effectiveAt, codesWithIt: !!set })

@@ -290,8 +290,16 @@ function Welcome() {
   if (recovered) return <Suspense fallback={<main className="solo"><Loading what="Opening" /></main>}><RecoveredStep codes={recovered} onDone={() => void reload()} /></Suspense>
 
   // rendered only where this installation has Google configured; inside .access-act so a wrapped label keeps its mark beside it
+  // R14: a choice of its own, not a footnote to the device's: a divider before it, its own button and its own sentence
   const googleButton = google ? (
-    <div className="access-act"><Btn className="lg block" busy={withGoogle.busy} onClick={() => void withGoogle.run()}><GoogleMark />Continue with Google{google === 'stand-in' ? ' (test stand-in)' : ''}</Btn></div>
+    <>
+      <div className="or"><span>or</span></div>
+      <div className="access-act" data-method="google">
+        <Btn className="lg block" busy={withGoogle.busy} onClick={() => void withGoogle.run()}><GoogleMark />Continue with Google{google === 'stand-in' ? ' (test stand-in)' : ''}</Btn>
+        <p className="access-explain">Google confirms who you are. QED receives your name and email address, never your Google password.</p>
+      </div>
+      <Problem error={withGoogle.error} />
+    </>
   ) : null
   const creating = mode === 'new' || mode === 'new-passkey'
   return (
@@ -327,7 +335,7 @@ function Welcome() {
               </form>
               <div className="or"><span>or</span></div>
               {/* the device, first-class beside the password: the button and what the device will ask for, read as one group */}
-              <div className="access-act">
+              <div className="access-act" data-method="passkey">
                 <Btn className="lg block" busy={signin.busy} disabled={!supported} onClick={() => void signin.run()}><Fingerprint aria-hidden="true" />{DEVICE_SIGN_IN}</Btn>
                 {!supported ? <p className="access-explain">{NO_PASSKEYS_AT_ALL}</p>
                   : check === 'other-device' ? <p className="access-explain">{NO_DEVICE_CHECK}</p>
@@ -335,7 +343,6 @@ function Welcome() {
               </div>
               <Problem error={signin.error} />
               {googleButton}
-              <Problem error={withGoogle.error} />
               <div className="access-foot access-help">
                 <p className="small muted">Forgotten your password? <button type="button" className="linkish" onClick={() => go('forgot')}>Reset your password</button></p>
                 <p className="small muted">Lost your device? <button type="button" className="linkish" onClick={() => go('recover')}>Recover your account</button></p>
@@ -358,11 +365,10 @@ function Welcome() {
                   <p className="access-explain">Next, you can set up your fingerprint, Face ID or device PIN for faster, more secure access. QED keeps your password in a form it cannot read back.</p>
                 </div>
               </form>
-              <div className="or"><span>or</span></div>
               {googleButton}
-              <Problem error={withGoogle.error} />
-              <div className="access-act">
-                <Btn className="block" disabled={!supported} onClick={() => go('new-passkey')}><Fingerprint aria-hidden="true" />Use a passkey instead</Btn>
+              <div className="or"><span>or</span></div>
+              <div className="access-act" data-method="passkey">
+                <Btn className="lg block" disabled={!supported} onClick={() => go('new-passkey')}><Fingerprint aria-hidden="true" />Use a passkey instead</Btn>
                 <p className="access-explain">{supported ? 'No password: a passkey is your device\'s own fingerprint, Face ID or PIN check, kept for QED.' : NO_PASSKEYS_AT_ALL}</p>
               </div>
               <p className="small faint">{ORDINARY_SIGN_IN_LIMIT}</p>

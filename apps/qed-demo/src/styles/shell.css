@@ -274,11 +274,15 @@ a.brand:hover .logo-meridian { animation: meridian-turn 1.2s var(--ease-move); }
    one centred block with its icon rather than leaving the icon stranded at the left edge */
 .access-act > .btn { display: block; line-height: 1.25; text-wrap: balance; padding-block: calc((var(--h) - 1.25em - 2px) / 2); }
 .access-act > .btn > svg { display: inline-block; vertical-align: -.2em; margin-inline-end: .45em; }
+/* R14: the three ways in (password, device, Google) are one size and one alignment. The device's label is the longest and
+   takes two lines in the card, so all three take the height of two lines, at every width. */
+.access .btn.lg { font-size: var(--t-body); padding-inline: var(--s4); min-height: 4.5rem; }
+.access .btn.lg > :is(svg, .g-mark) { flex: none; }
 /* more room after the group than inside it, so the sentence reads as the button's and not as the next block's */
 .stack > .access-act:not(:last-child) { margin-block-end: var(--s3); }
 .access-explain { max-width: 40ch; margin: 0; padding-inline: var(--s2); text-align: center; text-wrap: balance; font-size: var(--t-small); line-height: 1.55; color: var(--ink-2); }
 /* the letter that stands for Google on its button: a plain mark in the ink colour, sized as the icons are */
-.g-mark { display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; margin-inline-end: .45em; border-radius: 50%; border: 1.5px solid currentColor; font-size: var(--t-micro); font-weight: 700; line-height: 1; vertical-align: -.15em; }
+.g-mark { display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; margin-inline-end: .45em; border-radius: 50%; border: 1.5px solid currentColor; font-size: var(--t-micro); font-weight: 700; line-height: 1; vertical-align: middle; position: relative; top: -.04em; }
 /* an optional part of a form, closed until asked for (the handle at sign-up) */
 .access-more { display: grid; gap: var(--s3); }
 .access-more > summary { min-height: 32px; padding-block: 6px; font-size: var(--t-small); font-weight: 560; color: var(--ink-2); cursor: pointer; }

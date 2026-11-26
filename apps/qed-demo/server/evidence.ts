@@ -421,7 +421,7 @@ function paperProbes(o: AssembleOptions, a: ReturnType<typeof actionFromRow>, au
   const at = o.now
   const ask = (question: string, change: Json, params: Json): void => {
     try {
-      const d = decide(o.ctx!, { ...a, id: `probe-${a.id}`, economic_id: `probe-${a.economic_id}`, state: 'planned', created_at: at, params: params as never }, at)
+      const d = decide(o.ctx!, { ...a, id: `probe-${a.id}`, economic_id: `probe-${a.economic_id}`, state: 'planned', created_at: at, params: params as never }, at, { probeOf: a.id })
       out.push({ question, input: change, answer: { allowed: d.allowed, failed: d.checks.filter((x) => !x.ok).map((x) => ({ name: x.name, detail: x.detail })) }, by: 'server/policy.ts decide, the check every action passes before it is sent', evaluatedAt: iso(at) })
     } catch (e) { out.push({ question, input: change, answer: { error: e instanceof Error ? e.message : String(e) }, evaluatedAt: iso(at) }) }
   }

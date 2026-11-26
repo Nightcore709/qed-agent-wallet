@@ -166,12 +166,80 @@ describe('R2: the passkey added after a password reset gets its codes with its r
     expect(pendingSets(db)).toBe(0)
   })
 
-  it('a passkey a recovery registered asks as before: no codes come with its request', async () => {
+  it('a passkey a recovery registered, after the recovery spent a saved code, asks as before: no codes come with its request', async () => {
     const db = openDb(':memory:')
     const a = await afterReset(db, { earlier: false })
-    db.run(`UPDATE webauthn_credentials SET authority_reason = 'recovery' WHERE id = ?`, a.cred.id)
+    asEmailRecovery(db, a, 'a-saved-code-id')
     const r = await ask(db, a.auth, T0 + 1000)
     expect(r).not.toHaveProperty('recoveryCodes')
+    expect(pendingSets(db)).toBe(0)
+  })
+})
+
+/**
+ * RISK-125: a passkey that an email recovery registered, where the recovery spent no saved code (a recovery contact's code or the
+ * password was its second proof), replaced no codes at its end. It gets its codes with its request for authority, exactly as a
+ * passkey added after a reset does, so the account never reaches one passkey and no codes.
+ */
+function asEmailRecovery(db: Db, a: { id: string; cred: { id: string } }, codeId: string): void {
+  db.run(`UPDATE webauthn_credentials SET authority_reason = 'recovery' WHERE id = ?`, a.cred.id)
+  db.run(`INSERT INTO recovery_requests (id, person_id, code_id, method, started_at, available_at, completed_at, credential_id, via) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'email')`,
+    `rec_r125_${codeId}`, a.id, codeId, codeId === 'none' ? 'email+contact' : 'email+saved', T0, T0 + 1, T0 + 2, a.cred.id)
+}
+
+describe('RISK-125: the passkey an email recovery added, with no saved code spent, gets its codes with its request', { timeout: 120_000 }, () => {
+  it('H2: an unchallenged recovery never replaces the owner\'s codes: with codes held, no set comes with its request and the owner\'s survive the restoration', async () => {
+    const db = openDb(':memory:')
+    const a = await afterReset(db, { earlier: true })
+    asEmailRecovery(db, a, 'none')
+    const r = await ask(db, a.auth, T0 + 1000)
+    expect(r).not.toHaveProperty('recoveryCodes')
+    expect(pendingSets(db)).toBe(0)
+    expect(applyDueChanges(db, r.effectiveAt)).toBe(1)
+    expect(db.get('SELECT authority FROM webauthn_credentials WHERE id = ?', a.cred.id)).toEqual({ authority: 'full' })
+    expect(unused(db, a.id)).toBe(10)
+    await expect(savedCodeFor(db, a.id, a.early[0], 'test it')).resolves.toMatchObject({ id: expect.any(String) })
+  })
+
+  it('H2: a set held when the account had no codes is dropped at activation if the owner holds codes by then', async () => {
+    const db = openDb(':memory:')
+    const a = await afterReset(db, { earlier: false })
+    asEmailRecovery(db, a, 'none')
+    const r = await ask(db, a.auth, T0 + 1000)
+    expect(r.recoveryCodes).toHaveLength(10)
+    db.run('INSERT INTO recovery_codes (id, person_id, salt, code_hash, algo, created_at) VALUES (?, ?, ?, ?, ?, ?)', 'rcd_own', a.id, 'aa', 'bb', 'scrypt', T0 + 1100)
+    applyDueChanges(db, r.effectiveAt)
+    expect(unused(db, a.id)).toBe(1) // only the owner's own row: the held set was dropped, not stored
+    expect(kinds(db, a.id).map((e) => e.kind)).not.toContain('recovery-codes-made')
+    expect(pendingSets(db)).toBe(0)
+  })
+
+  it('REGRESSION: with no codes before, the restoration and a fresh session cannot mint a set of their own', async () => {
+    const db = openDb(':memory:')
+    const a = await afterReset(db, { earlier: false })
+    asEmailRecovery(db, a, 'none')
+    expect(unused(db, a.id)).toBe(0)
+    const r = await ask(db, a.auth, T0 + 1000)
+    applyDueChanges(db, r.effectiveAt)
+    expect(unused(db, a.id)).toBe(10)
+    const later = r.effectiveAt + 1000
+    for (const tok of [await signIn(db, a.auth, later), await signIn(db, a.auth, later + 1)]) {
+      const s = sessionFor(db, tok, later + 2)!
+      expect(() => regenerateRecoveryCodes(db, s, later + 2)).toThrow(expect.objectContaining({ code: 'code_needed' }))
+      expect(() => regenerateJustMadeCodes(db, s, later + 2)).toThrow(expect.objectContaining({ code: 'codes_window_closed' }))
+    }
+    await expect(savedCodeFor(db, a.id, r.recoveryCodes![2], 'test it')).resolves.toMatchObject({ id: expect.any(String) })
+  })
+
+  it('a request that is stopped (by the passkey itself) takes its codes with it', async () => {
+    const db = openDb(':memory:')
+    const a = await afterReset(db, { earlier: false })
+    asEmailRecovery(db, a, 'none')
+    const first = await ask(db, a.auth, T0 + 1000)
+    cancelAuthorityRequest(db, sessionFor(db, first.token, T0 + 1100)!, first.changeId, T0 + 1100)
+    await refused(db, a.id, first.recoveryCodes!)
+    applyDueChanges(db, T0 + 1200)
+    expect(unused(db, a.id)).toBe(0)
     expect(pendingSets(db)).toBe(0)
   })
 })
