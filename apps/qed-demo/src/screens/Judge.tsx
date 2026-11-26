@@ -18,6 +18,7 @@
  * earlier with a real model are shown as recorded, with their date and revision, and checkable here.
  */
 import { Check, Download, FileSearch, X } from 'lucide-react'
+import { OriginalEvidence } from './judge-original.tsx'
 import { type ReactNode, useEffect, useId, useState } from 'react'
 import { JUDGE_MANDATE, JUDGE_QUESTIONS, PROVENANCE, type Provenance } from '../../shared/judge.ts'
 import type { HistoricalEvidence } from '../../chain/types.ts'
@@ -159,6 +160,7 @@ export function JudgeScreen() {
       <section className="panel jg-hist" aria-labelledby="jg-hist-h">
         <h2 id="jg-hist-h" className="jg-label">Historical testnet</h2>
         <p><ProvTag p="historical" /> {hist.data ? `${hist.data.counts.inManifests.transactions} transactions on ${hist.data.network}, recorded by the QED team on 19 and 20 October 2026, before this build.` : 'The transactions the QED team recorded on Ethereum Sepolia on 19 and 20 October 2026, before this build.'} Anyone can look them up on the public explorer; they show what the earlier release did, not this build. <Link to="/evidence#hist">Read them under Evidence</Link></p>
+        <OriginalEvidence transactions={hist.data?.transactions} />
       </section>
       {v.sheet}
     </div>
