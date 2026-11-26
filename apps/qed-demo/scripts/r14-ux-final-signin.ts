@@ -18,7 +18,7 @@ const browser = await chromium.launch({ channel: 'chrome', headless: true })
 let bad = 0
 try {
   for (const w of W) {
-    const c = await browser.newContext({ viewport: { width: w, height: 900 }, reducedMotion: 'reduce' })
+    const c = await browser.newContext({ viewport: { width: w, height: 900 }, reducedMotion: 'reduce', colorScheme: (process.env.SCHEME as 'light' | 'dark') ?? 'light' })
     const p = await c.newPage()
     await p.addInitScript(() => { (window as unknown as { qedTestAutofill: boolean }).qedTestAutofill = false })
     for (const view of ['in', 'new'] as const) {
@@ -51,7 +51,7 @@ try {
       const ok = m.hit.length === 0 && !m.scrollX && sizes.size === 1
       if (!ok) bad++
       console.log(`[signin ${tag}] ${w}px ${view}: ${ok ? 'ok' : 'FAULT'}`, JSON.stringify(m))
-      await p.screenshot({ path: join(import.meta.dirname, '..', 'evidence', 'design', 'r14-ux-final', `signin-${view}-${w}-${tag}.png`), fullPage: true })
+      await p.screenshot({ path: join(import.meta.dirname, '..', 'evidence', 'design', 'r14-ux-final', `signin-${view}-${w}-${tag}${process.env.SCHEME === 'dark' ? '-dark' : ''}.png`), fullPage: true })
     }
     await c.close()
   }
