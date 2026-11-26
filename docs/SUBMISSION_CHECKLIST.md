@@ -39,8 +39,8 @@ email with the transaction hashes is in the submission kit.
 | E | Security report | `docs/SECURITY.md`, PDF | READY |
 | F | Test evidence and a list of unverified components | `docs/TESTING.md`; CI; `docs/KNOWN_LIMITATIONS.md` §7 | READY |
 | G | Blockchain evidence | `docs/EVIDENCE.md`, `evidence/`, `relay/`, PDF | READY |
-| H | Interface | <https://nightcore709.github.io/qed-agent-wallet/> (also `dist/qed-proof-ledger.html`, one file, works offline) | READY |
-| I | Editable PowerPoint, presentation PDF, speaker notes, timed script, judge questions | Slides artifact (exports .pptx and .pdf), `presentation/` | READY · PowerPoint export is one click (team) |
+| H | Interface | Live app: <https://qed-judges-preview-production.up.railway.app/> (real contracts on a testnet sandbox chain; verified end to end 20 Oct, `docs/PROGRESS.md`) · proof ledger: <https://nightcore709.github.io/qed-agent-wallet/> (also `dist/qed-proof-ledger.html`) | READY |
+| I | Editable PowerPoint, presentation PDF, speaker notes, timed script, judge questions | `presentation/QED-Pitch-Deck.pptx` (23 slides, notes, sections), Slides artifact, `presentation/` | READY |
 | J | Reproducibility | `docs/REPRODUCIBILITY.md` | READY |
 | K | This checklist | `docs/SUBMISSION_CHECKLIST.md` | READY |
 | L | Final ruthless evaluation | `docs/SELF_REVIEW.md` §4 (scores before and after) and §8 (quality gates) | READY |
