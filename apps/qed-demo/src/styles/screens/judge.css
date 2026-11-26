@@ -126,6 +126,9 @@
 .jg-run-line { line-height: 1.5; color: var(--ink-2); }
 .jg-run-line strong { color: var(--ink); }
 .jg-hist p { line-height: 1.55; color: var(--ink-2); }
+.jg-hist-runs { margin: var(--s-2, 0.5rem) 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; color: var(--ink-2); line-height: 1.5; }
+.jg-hist-runs b, .jg-hist p b { color: var(--ink); }
+.jg-hist code { overflow-wrap: anywhere; }
 
 /* ------------------------------------------------------------------------------------------------ narrower screens */
 @media (max-width: 1099px) {
@@ -153,3 +156,12 @@ html[data-fx="plain"] .jg-st.is-current .jg-node::after { display: none; }
   .jg-st::before { background: CanvasText; }
 }
 .jg-sub { font-size: var(--t-body); font-weight: 600; color: var(--ink); }
+
+.jg-orig h3 { margin: 1.25rem 0 0.4rem; font-size: var(--t-h3); color: var(--ink); }
+.jg-guar details, .jg-more { border-top: 1px solid var(--line, rgba(127, 127, 127, 0.25)); padding: 0.55rem 0; }
+.jg-guar details:last-child { border-bottom: 1px solid var(--line, rgba(127, 127, 127, 0.25)); }
+.jg-guar summary, .jg-more summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.jg-guar p { margin: 0.45rem 0 0; }
+.jg-scroll { overflow-x: auto; max-width: 100%; }
+.jg-orig td { vertical-align: top; }
+.jg-orig code { overflow-wrap: anywhere; }

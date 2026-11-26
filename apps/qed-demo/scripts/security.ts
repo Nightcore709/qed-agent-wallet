@@ -585,7 +585,12 @@ try {
     const addBegin = await http('POST', '/api/security/passkeys/begin', as(legacy))
     const added = authenticator()
     const addFinish = addBegin.status === 200 ? await http('POST', '/api/security/passkeys/finish', as(legacy, { body: { challengeId: addBegin.json!.challengeId, response: added.create(addBegin.json!.options) } })) : null
-    if (addFinish?.status === 200) { legacyAuth = added; settle(added.id) }
+    if (addFinish?.status === 200) {
+      legacyAuth = added; settle(added.id)
+      // D-182: the first passkey makes the account's saved codes and replaces earlier ones, so later checks use the fresh set
+      const fresh = addFinish.json?.recoveryCodes as string[] | undefined
+      if (fresh?.length) legacySavedCodes = fresh
+    }
     check('N15', 'legacy', 'a legacy password re-entry unlocks only adding a first passkey and, on an account whose password is its only credential (RISK-076), renewing its own saved codes: every change that weakens a protection of money still needs a passkey', 'V6.3.4 consistent strength across pathways', 'five refusals (401 stepup_required, or 409 passkey_needed for the passkey step-up); new saved codes 200 (the account\'s strongest credential, outside a reset hold); adding a passkey 200', `${weak.map(([n, x]) => `${n}: ${code(x)}`).join('; ')}; add a first passkey: begin ${code(addBegin)}, finish ${code(addFinish)}`, [0, 1, 2, 4].every((i) => weak[i]![1].status === 401 && weak[i]![1].json?.error?.code === 'stepup_required') && weak[3]![1].status === 200 && weak[5]![1].status === 409 && addBegin.status === 200 && addFinish?.status === 200)
     const pw2 = await http('POST', '/api/auth/stepup', as(legacy, { body: { password: legacy.password } }))
     const second = await http('POST', '/api/security/passkeys/begin', as(legacy))
