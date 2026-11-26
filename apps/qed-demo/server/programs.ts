@@ -223,7 +223,7 @@ export function trailingReturn(db: Db, instrumentId: string, days: number): { an
 
 export { describeSchedule, firstDue, nextDue }
 
-export interface PlanResult { actions: PlannedAction[]; skip?: string; memo?: Record<string, unknown>; /** What a run still owes, in words, when it could not do all of what was asked (shown with the run and ending it as partial). */ owed?: string; /** The latest instant the money of a withdrawal may reach the bank; the policy check re-tests it when each sale is sent. */ neededBy?: number }
+export interface PlanResult { actions: PlannedAction[]; skip?: string; memo?: Record<string, unknown>; /** What a run still owes, in words, when it could not do all of what was asked (shown with the run and ending it as partial). */ owed?: string; /** The latest instant the money of a withdrawal may reach the bank; the policy check re-tests it when each sale is sent. */ neededBy?: number; /** A withdrawal plan with no units left in any signed fund: the plan is finished (the runner says so once and completes it). */ exhausted?: boolean }
 export interface ProgramRow { id: string; user_id: string; kind: ProgramKind; pillar: Pillar; title: string; state: string; live_version: number | null; next_due_at: number | null; memo: Record<string, unknown>; created_at: number }
 export interface TriggerHit { occurrence: string; trigger: Record<string, unknown>; memo?: Record<string, unknown> }
 
@@ -561,7 +561,7 @@ const swpLegacy: KindSpec<SwpP> = {
     const nav = ctx.market.get(inst.id, 'nav')
     if (!nav) return { actions: [], skip: `No NAV has been received for ${inst.name}, so nothing was withdrawn.` }
     const held = available(ctx.db, prog.user_id, `pos:${inst.id}`)
-    if (held <= 0n) return { actions: [], skip: `You hold no units of ${inst.name}, so there is nothing to withdraw.` }
+    if (held <= 0n) return { actions: [], skip: `You hold no units of ${inst.name}, so there is nothing to withdraw.`, exhausted: true }
     const target = Math.min(p.amount, a.maxPerRun)
     let units = quantityFor(BigInt(target), inst.quoteScale, parsePrice(nav.price), inst.baseScale, 'down')
     const last = units >= held
@@ -689,7 +689,7 @@ const swp: KindSpec<SwpP> = {
     if (w.legs.length === 0) {
       const names = sourcesOf(p).map((id) => instrument(ctx.db, id)?.name ?? id)
       const why = w.left.filter((l) => l.kind !== 'covered')
-      if (why.length > 0 && why.every((l) => l.kind === 'none-held')) return { actions: [], skip: names.length > 1 ? 'You hold no units of any of the funds in this plan, so there is nothing to withdraw.' : `You hold no units of ${names[0]}, so there is nothing to withdraw.` }
+      if (why.length > 0 && why.every((l) => l.kind === 'none-held')) return { actions: [], skip: names.length > 1 ? 'You hold no units of any of the funds in this plan, so there is nothing to withdraw.' : `You hold no units of ${names[0]}, so there is nothing to withdraw.`, exhausted: true }
       const text = `Nothing was withdrawn this run; ${amountText(target)} is not withdrawn, and later runs do not make it up. ${why.map((l) => `${l.name}: ${l.reason}`).join(' ')}`.trim()
       return { actions: [], skip: text, owed: text }
     }

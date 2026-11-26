@@ -77,8 +77,13 @@ const qtyText = (atoms: bigint, inst: Instrument): string => `${(Number(atoms) /
 /** An order or payment not started within this time of being asked for is refused, not sent late. */
 export const START_BY_MS = 150_000
 
-export function decide(ctx: Ctx, a: ActionRow, now: number): Decision {
+/**
+ * `probeOf`: the id of a real action this one is a changed copy of (an evidence probe). The real action's own use of the
+ * limits and of the funds is left out of the sums, so a leg already sent is not counted twice (R14, review C-R6 follow-up).
+ */
+export function decide(ctx: Ctx, a: ActionRow, now: number, opts: { probeOf?: string } = {}): Decision {
   const { db } = ctx
+  const selfId = opts.probeOf ?? a.id
   const checks: Check[] = []
   const add = (name: string, ok: boolean, detail: string, transient = false) => { checks.push({ name, ok, detail, ...(transient && !ok ? { transient: true } : {}) }) }
   const user = db.get<{ stop_at: number | null; stop_protective: number }>('SELECT stop_at, stop_protective FROM users WHERE id = ?', a.user_id)
@@ -115,12 +120,12 @@ export function decide(ctx: Ctx, a: ActionRow, now: number): Decision {
         else if (!(order && order.side === 'sell' && prog?.kind !== 'swp')) {
           // the limit is per run, not per action: a run of several actions (a split's shares) is held to it as a whole
           // (adversarial review of R12, H1); this run's other actions count as programUsage counts them
-          const runSoFar = a.run_id ? runUsage(db, a.run_id, a.id) : 0n
+          const runSoFar = a.run_id ? runUsage(db, a.run_id, selfId) : 0n
           add('within-run-limit', runSoFar + size <= BigInt(authority.maxPerRun), runSoFar > 0n ? `${homeMoneyMinor(runSoFar)} already in this run plus ${homeMoneyMinor(size)} against ${homeMoneyMinor(authority.maxPerRun)} per run.` : `${homeMoneyMinor(size)} in this run against ${homeMoneyMinor(authority.maxPerRun)} per run.`)
-          const usedMonth = programUsage(db, a.program_id!, monthStart(now), a.id)
+          const usedMonth = programUsage(db, a.program_id!, monthStart(now), selfId)
           add('within-month-limit', usedMonth + size <= BigInt(authority.maxPerMonth), `${homeMoneyMinor(usedMonth)} used this month plus ${homeMoneyMinor(size)} against ${homeMoneyMinor(authority.maxPerMonth)}.`)
           if (authority.maxPerDay !== null) {
-            const usedDay = programUsage(db, a.program_id!, dayStart(now), a.id)
+            const usedDay = programUsage(db, a.program_id!, dayStart(now), selfId)
             add('within-day-limit', usedDay + size <= BigInt(authority.maxPerDay), `${homeMoneyMinor(usedDay)} used today plus ${homeMoneyMinor(size)} against ${homeMoneyMinor(authority.maxPerDay)}.`)
           }
         }
@@ -140,9 +145,12 @@ export function decide(ctx: Ctx, a: ActionRow, now: number): Decision {
             const sp = parse<{ instrumentId?: string; alsoFrom?: string[]; reserve?: number; needByDays?: number }>(ver!.params_json, {})
             if ((sp.reserve ?? 0) > 0) {
               let free = 0n
+              // a probe of a leg already sent: its units are out of the position, so they are put back before this sale is taken off once
+              const sent = opts.probeOf ? db.get<{ kind: string; state: string; params_json: string }>(`SELECT kind, state, params_json FROM actions WHERE id = ? AND user_id = ? AND state NOT IN ('blocked', 'rejected', 'failed', 'cancelled', 'expired')`, opts.probeOf, a.user_id) : undefined
+              const sentP = sent && sent.kind === 'order' ? parse<OrderParams>(sent.params_json, {} as OrderParams) : null
               for (const id of [sp.instrumentId, ...(sp.alsoFrom ?? [])]) {
                 const si = id ? instrument(db, id) : undefined, nav = si ? ctx.market.get(si.id, 'nav') : undefined
-                if (si && nav) free += notional(available(db, a.user_id, `pos:${si.id}`), si.baseScale, parsePrice(nav.price), si.quoteScale, 'down')
+                if (si && nav) free += notional(available(db, a.user_id, `pos:${si.id}`) + (sentP && sentP.side === 'sell' && sentP.instrumentId === si.id && sentP.qty ? big(sentP.qty) : 0n), si.baseScale, parsePrice(nav.price), si.quoteScale, 'down')
               }
               const navNow = ctx.market.get(inst.id, 'nav')
               const leg = navNow ? notional(big(order.qty), inst.baseScale, parsePrice(navNow.price), inst.quoteScale, 'down') : 0n

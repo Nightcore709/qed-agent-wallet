@@ -247,7 +247,8 @@ export function securityEvent(db: Db, personId: string, kind: string, detail: un
   // what to do if it was not them (R10 section 7; server/notify.ts treats 'security-change' as critical and escalates it
   // if nobody acknowledges it). Delivery is inside QED only.
   // One event, one notice: the codes a completed recovery replaces are told in the recovery's own notice.
-  const told = SENSITIVE[kind]
+  // RISK-125: a scheduled change cancelled with a saved code (not a passkey) is told urgently on every channel: anyone holding a code can do it
+  const told = kind === 'change-cancelled' && (detail as { with?: string } | null)?.with === 'saved-code' ? CANCELLED_WITH_CODE : SENSITIVE[kind]
   const partOfRecovery = kind === 'recovery-codes-replaced' && (detail as { reason?: string } | null)?.reason === 'recovery'
   // ... and the codes the first device brings (R14, F1) are told in that device's own notice ('first-passkey-added')
   const withDevice = kind === 'recovery-codes-made' && ['first-device'].includes((detail as { reason?: string } | null)?.reason ?? '')
@@ -261,6 +262,7 @@ export function securityEvent(db: Db, personId: string, kind: string, detail: un
   }
 }
 
+const CANCELLED_WITH_CODE: [string, string] = ['A saved code was used to cancel a scheduled change', 'A saved recovery code, not a passkey, was used to cancel a change to your account that was waiting its delay (such as removing a way back in). Cancelling grants nothing, but only someone who holds one of your saved codes can do it. If this was not you, someone has a saved code of yours: under Security and recovery, make new codes with another unused code of yours, which stops the old ones working.']
 const IF_NOT_YOU = 'If this was not you, open Security and recovery now: suspend a passkey you do not recognise from another of yours, end sessions you do not recognise, and cancel a recovery you did not start.'
 /** The security events a person is told of at once, as an urgent notice: title, then what it means and what to do. */
 const SENSITIVE: Record<string, [string, string]> = {
@@ -277,6 +279,7 @@ const SENSITIVE: Record<string, [string, string]> = {
   'recovery-contact-removal-scheduled': ['A recovery contact is to be removed from your account', `They stay your recovery contact until {when}, and can still issue you a recovery code until then. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. ${IF_NOT_YOU}`],
   'contact-role-ending-scheduled': ['Someone you are a recovery contact for is removing you', 'You stay their recovery contact until {when}. If they did not tell you about it, call them on a number you already have: someone else may be using their account, and they can cancel the removal with one of their passkeys or a saved recovery code.'],
   'email-removal-scheduled': ['An email address is to be removed from your account', `It stays on your account, and keeps receiving your security notices, until {when}. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. ${IF_NOT_YOU}`],
+  'phone-removal-scheduled': ['A phone number is to be removed from your account', `It stays on your account, and keeps receiving your security notices by text message, until {when}. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. ${IF_NOT_YOU}`],
   'password-removal-scheduled': ['Your password is to be removed', `It keeps working until {when}; from then the account signs in only with its passkeys. Any of your passkeys, or one of your saved recovery codes, can cancel the removal before then, under Security and recovery. If you think someone knows the password, change it now instead: a change takes effect at once. ${IF_NOT_YOU}`],
   'passkey-removal-scheduled': ['A passkey is to be removed from your account', `It will be removed when its delay ends; any of your passkeys can cancel that. ${IF_NOT_YOU}`],
   'passkey-suspended': ['A passkey of your account was suspended', `It cannot sign or sign in until it is restored. ${IF_NOT_YOU}`],
@@ -679,15 +682,17 @@ export function makeRecoveryCodes(db: Db, personId: string, now: number): string
  * never becomes usable, and the next sweep (applyDueChanges) removes what was kept of it.
  */
 const pendingKey = (changeId: string): string => `pending-codes:${changeId}`
-export function keepPendingCodes(db: Db, personId: string, changeId: string, kept: KeptCodes): void {
-  db.run('INSERT INTO meta (key, value) VALUES (?, ?)', pendingKey(changeId), j({ person: personId, ...kept }))
+export function keepPendingCodes(db: Db, personId: string, changeId: string, kept: KeptCodes, onlyIfNone = false): void {
+  db.run('INSERT INTO meta (key, value) VALUES (?, ?)', pendingKey(changeId), j({ person: personId, ...kept, ...(onlyIfNone ? { onlyIfNone: true } : {}) }))
 }
 /** The set kept with this request becomes the person's codes, inside the caller's transaction; said in the history. */
 export function activatePendingCodes(db: Db, personId: string, changeId: string, now: number): boolean {
-  const kept = parse<(KeptCodes & { person: string }) | null>(db.get<{ value: string }>('SELECT value FROM meta WHERE key = ?', pendingKey(changeId))?.value, null)
+  const kept = parse<(KeptCodes & { person: string; onlyIfNone?: boolean }) | null>(db.get<{ value: string }>('SELECT value FROM meta WHERE key = ?', pendingKey(changeId))?.value, null)
   db.run('DELETE FROM meta WHERE key = ?', pendingKey(changeId))
   if (!kept || kept.person !== personId || kept.hashes.length !== CODES) return false
   const earlier = unusedCodes(db, personId) > 0
+  // a set held for a recovery's passkey (not a reset's) never replaces codes the owner holds: dropped if any exist by now
+  if (kept.onlyIfNone && earlier) return false
   storeCodes(db, personId, kept, now)
   securityEvent(db, personId, earlier ? 'recovery-codes-replaced' : 'recovery-codes-made', { reason: 'authority-restored' }, now)
   audit(db, now, personId, 'system', 'recovery-codes.make', personId, { reason: 'authority-restored', changeId })
@@ -1037,7 +1042,7 @@ export async function removePasskeyWithCode(db: Db, s: Session & { credentialId?
   return scheduleRemovePasskey(db, s, credentialId, now, spent)
 }
 type ScheduledRemoval = { changeId: string | null; effectiveAt: number; removed?: true }
-const unusedCodes = (db: Db, personId: string): number =>
+export const unusedCodes = (db: Db, personId: string): number =>
   db.get<{ n: number }>('SELECT COUNT(*) n FROM recovery_codes WHERE person_id = ? AND used_at IS NULL AND replaced_at IS NULL', personId)?.n ?? 0
 /** regenerateRecoveryCodes, with the saved code it needs while unused ones remain (H2). */
 export async function regenerateRecoveryCodesWithCode(db: Db, s: Session, code: unknown, now: number): Promise<string[]> {

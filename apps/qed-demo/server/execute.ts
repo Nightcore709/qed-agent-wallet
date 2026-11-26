@@ -141,6 +141,10 @@ async function stepActionInHome(ctx: Ctx, id: string): Promise<ActionRow> {
   return a
 }
 
+/** Test seam only: runs between a decision and the write transaction that acts on it, to commit a competing change there. */
+let betweenDecideAndWrite: (() => void) | null = null
+export const __testBetweenDecideAndWrite = (f: (() => void) | null): void => { betweenDecideAndWrite = f }
+
 function plan(ctx: Ctx, a: ActionRow): ActionRow {
   const { db } = ctx
   const now = ctx.clock.now()
@@ -161,11 +165,22 @@ function plan(ctx: Ctx, a: ActionRow): ActionRow {
     }
     return refuse(ctx, a, d, failing[0]?.detail ?? 'Refused by policy.')
   }
+  betweenDecideAndWrite?.()
+  let recheck: Decision | null = null
   try {
     return db.tx(() => {
       // Read again under the write lock: a cancel from the API (another process) may have landed since it was decided.
       const current = getAction(db, a.id)!
       if (current.state !== a.state) return current
+      // An instruction's action: everything it was decided on was read before this write lock, so a stop, a pause, a revoked or
+      // expired authority, or a sale committed by another process since then is not in it. It is decided again here, in the
+      // transaction that places the hold, and refused (no hold placed) on any check that now fails other than a transient one,
+      // with this decision on its record (independent review C-R6 and its follow-up).
+      if (current.origin === 'program') {
+        const again = decide(ctx, current, now)
+        const bad = again.checks.find((c) => !c.ok && !c.transient)
+        if (bad) { recheck = again; throw new AppError(409, 'decision_changed', bad.detail) }
+      }
       // a payment another process asked for since it was decided counts as an earlier one (duplicates.ts)
       if (current.kind === 'payment' && current.origin === 'owner' && typeof current.result.duplicateConfirmedAt !== 'number') {
         const rep = repeatOf(db, current.user_id, current.params as PaymentParams, { id: current.id, createdAt: current.created_at })
@@ -204,7 +219,7 @@ function plan(ctx: Ctx, a: ActionRow): ActionRow {
       return save(ctx, s, { time: 'submitting' })
     })
   } catch (e) {
-    if (e instanceof AppError) return refuse(ctx, a, d, e.message)
+    if (e instanceof AppError) return refuse(ctx, a, recheck ?? d, e.message)
     throw e
   }
 }

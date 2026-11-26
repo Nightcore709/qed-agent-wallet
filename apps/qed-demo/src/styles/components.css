@@ -623,4 +623,5 @@ aside.margin > section > h2:first-child { font-size: var(--t-h3); }
 .empty-state.guided.across { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s5); padding: var(--s4) var(--s5); }
 .empty-state.guided.across .es-words { flex: 1 1 36ch; }
 .empty-state.guided.across p { max-width: 84ch; }
-.empty-state.guided.across .es-act { flex: none; }
+.empty-state.guided.across .es-act { flex: 0 1 auto; min-width: 0; max-width: 100%; } /* may shrink and wrap on a narrow panel: it once ran 22 px past a 320 px window */
+.empty-state.guided .es-act .btn { max-width: 100%; }

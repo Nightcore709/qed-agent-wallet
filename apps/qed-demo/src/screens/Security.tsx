@@ -109,6 +109,7 @@ const EVENT: Record<string, string> = {
   'contact-role-ending-scheduled': 'Someone who trusts you asked to end you as their recovery contact; you stay it until the wait ends',
   'contact-role-continues': 'Someone who trusts you cancelled ending you as their recovery contact',
   'email-removal-scheduled': 'Removing an email address was asked for; it waits before it takes effect',
+  'phone-removal-scheduled': 'Removing a phone number was asked for; it waits before it takes effect',
   'password-removal-scheduled': 'Removing your password was asked for; it waits before it takes effect',
   'password-removal-lapsed': 'Removing your password did not take effect: without it, a recovery would have had no second proof',
 }

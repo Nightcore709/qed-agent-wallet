@@ -176,18 +176,62 @@ describe('8j (c): removing a confirmed email address waits the protection delay'
     expect(count(events(db, asha.id), 'email-removed')).toBe(1)
   })
 
-  it('an address never confirmed, and a phone number (notices only), are removed at once, as before', async () => {
+  it('an address never confirmed is removed at once, as before', async () => {
     const db = openDb(':memory:')
     const asha = await person(db, 'asha')
     const s = (await signedIn(db, asha.auth, T0))()
     const { id: unconfirmed } = addAddress(db, s, 'email', 'asha.new@gmail.com', T0)
     expect(removeAddress(db, s, unconfirmed, T0 + 1)).toEqual({ removed: true })
+    expect(db.get<{ n: number }>('SELECT COUNT(*) n FROM contact_points WHERE person_id = ? AND removed_at IS NULL', asha.id)!.n).toBe(0)
+    expect(waiting(db, asha.id)).toEqual([])
+  })
+
+  it('RISK-125: a confirmed phone number waits the protection delay like an email address, is told at once, and can be cancelled', async () => {
+    const db = openDb(':memory:')
+    const asha = await person(db, 'asha')
+    const s = (await signedIn(db, asha.auth, T0))()
     const phone = addAddress(db, s, 'phone', '+919876543210', T0 + 2)
     const six = /is (\d{6})\./.exec(lastTo(db, '+919876543210')!.body)![1]!
     confirmAddressByCode(db, s, phone.id, six, T0 + 3)
-    expect(removeAddress(db, (await signedIn(db, asha.auth, T0 + 4))(), phone.id, T0 + 4)).toEqual({ removed: true })
-    expect(db.get<{ n: number }>('SELECT COUNT(*) n FROM contact_points WHERE person_id = ? AND removed_at IS NULL', asha.id)!.n).toBe(0)
-    expect(waiting(db, asha.id)).toEqual([])
+    const r = scheduled(removeAddress(db, (await signedIn(db, asha.auth, T0 + 4))(), phone.id, T0 + 4))
+    expect(r.effectiveAt).toBe(T0 + 4 + D)
+    expect(db.get('SELECT removed_at FROM contact_points WHERE id = ?', phone.id)).toEqual({ removed_at: null })
+    expect(waiting(db, asha.id)).toEqual([expect.objectContaining({ id: r.changeId, kind: 'remove-address', subject: phone.id })])
+    expect(events(db, asha.id)).toContain('phone-removal-scheduled')
+    expect(urgent(db, asha.id)).toContain('phone-removal-scheduled')
+    expect(purposesTo(db, '+919876543210')).toContain('notice:phone-removal-scheduled') // the number itself is told, as every channel
+    // asking twice schedules once
+    const again0 = (await signedIn(db, asha.auth, T0 + 5))()
+    expect(() => removeAddress(db, again0, phone.id, T0 + 5)).toThrow(expect.objectContaining({ code: 'already_scheduled' }))
+    // a passkey cancels it: the number stays
+    await cancelScheduledChangeWithCode(db, (await signedIn(db, asha.auth, T0 + 6))(), r.changeId, undefined, T0 + 6)
+    expect(applyDueChanges(db, T0 + 4 + D)).toBe(0)
+    expect(db.get('SELECT removed_at FROM contact_points WHERE id = ?', phone.id)).toEqual({ removed_at: null })
+    // asked again and left alone, it is removed when the delay ends, once, and the number is told
+    const again = scheduled(removeAddress(db, (await signedIn(db, asha.auth, T0 + 10))(), phone.id, T0 + 10))
+    expect(applyDueChanges(db, again.effectiveAt)).toBe(1)
+    expect(db.get<{ removed_at: number | null }>('SELECT removed_at FROM contact_points WHERE id = ?', phone.id)!.removed_at).toBe(again.effectiveAt)
+    expect(count(events(db, asha.id), 'phone-removed')).toBe(1)
+  })
+
+  it('RISK-125: a saved code that cancels a scheduled removal raises an urgent notice and a message on every channel; a passkey does not', async () => {
+    const db = openDb(':memory:')
+    const { asha, linkId } = await withContact(db)
+    confirmedEmail(db, (await signedIn(db, asha.auth, T0))(), 'asha@gmail.com', T0)
+    const first = scheduled(removeContact(db, (await signedIn(db, asha.auth, T1))(), linkId, T1))
+    await cancelScheduledChangeWithCode(db, (await signedIn(db, asha.auth, T1 + 10))(), first.changeId, undefined, T1 + 10)
+    expect(urgent(db, asha.id)).not.toContain('change-cancelled') // by a passkey: history only, as before
+    const second = scheduled(removeContact(db, (await signedIn(db, asha.auth, T1 + 20))(), linkId, T1 + 20))
+    const stale = (await signedIn(db, asha.auth, T1 + 30))(T1 + 30 + 10 * 60_000)
+    const before = purposesTo(db, 'asha@gmail.com').filter((x) => x === 'notice:change-cancelled').length
+    await cancelScheduledChangeWithCode(db, stale, second.changeId, asha.codes[3], T1 + 30 + 10 * 60_000)
+    expect(urgent(db, asha.id)).toContain('change-cancelled')
+    const n = db.get<{ title: string; body: string; level: string }>(`SELECT title, body, level FROM notices WHERE user_id = ? AND kind = 'security-change' AND subject = 'change-cancelled'`, asha.id)!
+    expect(n.title).toMatch(/saved code was used to cancel/i)
+    expect(n.level).toBe('action')
+    expect(n.body).toMatch(/not a passkey/)
+    expect(purposesTo(db, 'asha@gmail.com').filter((x) => x === 'notice:change-cancelled').length).toBe(before + 1)
+    expect(lastTo(db, 'asha@gmail.com')!.body).toMatch(/saved code was used to cancel/i)
   })
 
   it('changing an address cannot be used to remove the old one at once: the new one is added, the old one waits', async () => {

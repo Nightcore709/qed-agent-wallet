@@ -302,7 +302,9 @@ a.fold-sheet:focus-visible { outline: 2px solid var(--focus); outline-offset: 2p
 
 /* ------------------------------------------------------------------------------------------------ the day book */
 /* one ruled table on one panel: the shared columns read down, each day a group, a fold one line */
-.panel.ac-book { padding: var(--s5) 0 var(--s2); overflow-x: auto; }
+.panel.ac-book { padding: var(--s5) 0 var(--s2); overflow-x: clip; } /* clip, not auto: a scroll container would stop the header sticking to the window */
+/* R14: the column labels stay under the top bar while the day book scrolls; solid, so rows pass beneath them unseen */
+.ac-table thead th { position: sticky; top: var(--bar-top, 74px); z-index: 2; background: color-mix(in oklab, var(--well) 55%, var(--ground)); }
 .ac-book-head { padding: 0 var(--s6); }
 .ac-table th:first-child, .ac-table td:first-child { padding-left: var(--s6); }
 .ac-table th:last-child, .ac-table td:last-child { padding-right: var(--s6); }
